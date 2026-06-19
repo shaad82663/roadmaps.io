@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Learning Roadmaps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    :root {
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      /* Premium Dark Theme */
+      --color-bg-base: #0f1115;
+      --color-bg-gradient: radial-gradient(circle at top center, #1a1d24, #0f1115 80%);
+      --color-background-primary: rgba(30, 33, 40, 0.6);
+      --color-background-secondary: rgba(45, 49, 58, 0.7);
+      --color-border-primary: rgba(255, 255, 255, 0.15);
+      --color-border-secondary: rgba(255, 255, 255, 0.08);
+      --color-border-tertiary: rgba(255, 255, 255, 0.04);
+
+      --color-text-primary: #f8f9fa;
+      --color-text-secondary: #adb5bd;
+      --color-text-tertiary: #6c757d;
+
+      --border-radius-md: 12px;
+      --border-radius-lg: 16px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+      background: var(--color-bg-base);
+      background-image: var(--color-bg-gradient);
+      background-attachment: fixed;
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+
+    header {
+      margin-bottom: 3.5rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff, #adb5bd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--color-text-secondary);
+      font-size: 1.2rem;
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-card {
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.25rem 2rem;
+      min-width: 130px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--color-border-primary);
+    }
+
+    .stat-val {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 0.25rem;
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+    }
+
+    .grid-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.5px;
+      border-bottom: 1px solid var(--color-border-secondary);
+      padding-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .roadmaps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .roadmap-card {
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 2rem;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: calc(100% - 4rem);
+    }
+
+    .roadmap-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .roadmap-card:hover {
+      border-color: var(--color-border-primary);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .roadmap-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .subject-logo {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #7fc8ff;
+      flex-shrink: 0;
+    }
+
+    .subject-logo img,
+    .subject-logo svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .subject-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .subject-desc {
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .card-stats {
+      display: flex;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border-tertiary);
+    }
+
+    .card-stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-stat-val {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .card-stat-label {
+      font-size: 0.75rem;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--color-border-tertiary);
+      color: var(--color-text-secondary);
+      transition: all 0.2s;
+    }
+
+    .roadmap-card:hover .tag {
+      border-color: var(--color-border-secondary);
+      color: var(--color-text-primary);
+    }
+
+    .enter-btn {
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--border-radius-md);
+      border: 1px solid var(--color-border-primary);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+      justify-content: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .roadmap-card:hover .enter-btn {
+      background: var(--color-text-primary);
+      color: var(--color-bg-base);
+      border-color: var(--color-text-primary);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--color-text-tertiary);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--color-border-tertiary);
+      padding-top: 2rem;
+      margin-top: auto;
+    }
+
+    footer a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: var(--color-text-primary);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg-base);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border-primary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-text-secondary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Learning Roadmaps</h1>
+      <p class="subtitle">A structured, phase-wise guide to mastering engineering subjects and frameworks.</p>
+    </header>
+
+    <!-- Portal Summary Stats -->
+    <div class="stats-container" id="global-stats">
+      <!-- Dynamically filled -->
+    </div>
+
+    <div class="grid-title">
+      <i class="ti ti-map" aria-hidden="true"></i> Available Roadmaps
+    </div>
+
+    <!-- Roadmaps Grid -->
+    <div class="roadmaps-grid" id="roadmaps-list">
+      <!-- Dynamically filled -->
+    </div>
+
+    <footer>
+      <p>© 2026 Interactive Roadmaps. Built with pride. <a href="https://github.com" target="_blank"><i class="ti ti-brand-github"></i> GitHub</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // Config: Add new roadmaps here. They will automatically render on the dashboard
+    const roadmaps = [
+      {
+        id: 'langchain',
+        title: 'LangChain Mastery',
+        description: '15 units across Foundation, Core, RAG Pipeline, Agents, and Production phases to elevate your AI engineering skills.',
+        logo: 'langchain/logo.svg',
+        path: 'langchain/index.html',
+        stats: {
+          units: 15,
+          topics: 84,
+          labs: 61
+        },
+        tags: ['AI Engineering', 'LLMs', 'RAG', 'Agents']
+      }
+      /* 
+      FUTURE SUBJECT EXAMPLE:
+      ,
+      {
+        id: 'react',
+        title: 'React Core & Ecosystem',
+        description: 'Master React state management, hooks, render cycles, performance optimization, and styling frameworks.',
+        logo: 'react/logo.svg', // logo file in react directory
+        path: 'react/index.html', // entry file in react directory
+        stats: {
+          units: 10,
+          topics: 50,
+          labs: 35
+        },
+        tags: ['Frontend', 'JavaScript', 'React']
+      }
+      */
+    ];
+
+    function renderDashboard() {
+      // 1. Render Stats
+      const totalRoadmaps = roadmaps.length;
+      const totalUnits = roadmaps.reduce((acc, r) => acc + (r.stats.units || 0), 0);
+      const totalTopics = roadmaps.reduce((acc, r) => acc + (r.stats.topics || 0), 0);
+      const totalLabs = roadmaps.reduce((acc, r) => acc + (r.stats.labs || 0), 0);
+
+      const statsEl = document.getElementById('global-stats');
+      statsEl.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-val">${totalRoadmaps}</div>
+          <div class="stat-label">Roadmaps</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${totalUnits}</div>
+          <div class="stat-label">Total Units</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${totalTopics}</div>
+          <div class="stat-label">Total Topics</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${totalLabs}</div>
+          <div class="stat-label">Total Labs</div>
+        </div>
+      `;
+
+      // 2. Render Cards
+      const gridEl = document.getElementById('roadmaps-list');
+      gridEl.innerHTML = roadmaps.map((r) => {
+        return `
+          <div class="roadmap-card" onclick="window.location.href='${r.path}'">
+            <div class="card-header">
+              <div class="subject-logo">
+                <object type="image/svg+xml" data="${r.logo}" style="pointer-events: none; width: 28px; height: 28px;"></object>
+              </div>
+              <div class="subject-title">${r.title}</div>
+            </div>
+            <div class="subject-desc">${r.description}</div>
+            <div class="card-stats">
+              <div class="card-stat-item">
+                <span class="card-stat-val">${r.stats.units}</span>
+                <span class="card-stat-label">Units</span>
+              </div>
+              <div class="card-stat-item">
+                <span class="card-stat-val">${r.stats.topics}</span>
+                <span class="card-stat-label">Topics</span>
+              </div>
+              <div class="card-stat-item">
+                <span class="card-stat-val">${r.stats.labs}</span>
+                <span class="card-stat-label">Labs</span>
+              </div>
+            </div>
+            <div class="tags-row">
+              ${r.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+            </div>
+            <button class="enter-btn">
+              <i class="ti ti-arrow-right"></i> Enter Roadmap
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', renderDashboard);
+  </script>
+</body>
+
+</html>
