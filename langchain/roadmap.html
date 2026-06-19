@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LangChain Mastery Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root {
+  --font-sans: 'Outfit', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  
+  /* Premium Dark Theme */
+  --color-bg-base: #0f1115;
+  --color-bg-gradient: radial-gradient(circle at top center, #1a1d24, #0f1115 80%);
+  --color-background-primary: rgba(30, 33, 40, 0.6);
+  --color-background-secondary: rgba(45, 49, 58, 0.7);
+  --color-border-primary: rgba(255, 255, 255, 0.15);
+  --color-border-secondary: rgba(255, 255, 255, 0.08);
+  --color-border-tertiary: rgba(255, 255, 255, 0.04);
+  
+  --color-text-primary: #f8f9fa;
+  --color-text-secondary: #adb5bd;
+  --color-text-tertiary: #6c757d;
+
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+
+  /* Rich phase colors */
+  --p-found-bg: rgba(99, 102, 241, 0.15);
+  --p-found-text: #a5b4fc;
+  --p-found-dot: #6366f1;
+  --p-found-border: rgba(99, 102, 241, 0.3);
+
+  --p-core-bg: rgba(16, 185, 129, 0.15);
+  --p-core-text: #6ee7b7;
+  --p-core-dot: #10b981;
+  --p-core-border: rgba(16, 185, 129, 0.3);
+
+  --p-rag-bg: rgba(56, 189, 248, 0.15);
+  --p-rag-text: #7dd3fc;
+  --p-rag-dot: #38bdf8;
+  --p-rag-border: rgba(56, 189, 248, 0.3);
+
+  --p-agent-bg: rgba(245, 158, 11, 0.15);
+  --p-agent-text: #fcd34d;
+  --p-agent-dot: #f59e0b;
+  --p-agent-border: rgba(245, 158, 11, 0.3);
+
+  --p-prod-bg: rgba(239, 68, 68, 0.15);
+  --p-prod-text: #fca5a5;
+  --p-prod-dot: #ef4444;
+  --p-prod-border: rgba(239, 68, 68, 0.3);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg-base);
+  background-image: var(--color-bg-gradient);
+  background-attachment: fixed;
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+header {
+  margin-bottom: 3.5rem;
+  text-align: center;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff, #adb5bd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  font-size: 1.15rem;
+  font-weight: 300;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.stats-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.stat-card {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem 2rem;
+  min-width: 130px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-border-primary);
+}
+
+.stat-val {
+  font-size: 2.75rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+}
+
+.filters {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  padding: 0.5rem;
+  border-radius: 100px;
+  border: 1px solid var(--color-border-tertiary);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.filter-btn {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.95rem;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.filter-btn.active {
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+  background: var(--color-background-secondary);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.filter-btn:hover:not(.active) {
+  color: var(--color-text-primary);
+  background: rgba(255,255,255,0.05);
+}
+
+.unit-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: stretch;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.5s forwards ease-out;
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.spine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 24px;
+  flex-shrink: 0;
+  padding-top: 2rem;
+}
+
+.spine-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px currentColor;
+  z-index: 2;
+  position: relative;
+  transition: transform 0.3s;
+}
+
+.unit-card:hover .spine-dot {
+  transform: scale(1.2);
+}
+
+.spine-dot::after {
+  content: '';
+  position: absolute;
+  top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.3;
+}
+
+.spine-line {
+  flex: 1;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--color-border-secondary) 0%, transparent 100%);
+  margin-top: 1rem;
+}
+
+.unit-card {
+  flex: 1;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.75rem;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.unit-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.unit-card:hover {
+  border-color: var(--color-border-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.unit-card:hover::before {
+  opacity: 1;
+}
+
+.unit-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.unit-num {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--color-text-tertiary);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.unit-title {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  flex: 1;
+  min-width: 200px;
+  letter-spacing: -0.3px;
+}
+
+.phase-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 100px;
+  white-space: nowrap;
+  border: 1px solid;
+}
+
+.diff-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 100px;
+  border: 1px solid var(--color-border-tertiary);
+  color: var(--color-text-secondary);
+  background: rgba(255,255,255,0.02);
+  white-space: nowrap;
+}
+
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.2rem 0 0 0;
+}
+
+.tag {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--color-border-tertiary);
+  color: var(--color-text-secondary);
+  transition: all 0.2s;
+}
+
+.unit-card:hover .tag {
+  border-color: var(--color-border-secondary);
+  color: var(--color-text-primary);
+}
+
+.expand-content {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expand-content.open {
+  max-height: 2000px;
+  opacity: 1;
+  margin-top: 1.5rem;
+}
+
+.expand-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border-secondary), transparent);
+  margin-bottom: 1.5rem;
+}
+
+.expand-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media(max-width: 768px) {
+  .expand-grid { grid-template-columns: 1fr; }
+  .unit-title { font-size: 1.2rem; }
+  .stat-card { padding: 1.25rem; min-width: 100px; }
+  .stat-val { font-size: 2.2rem; }
+  h1 { font-size: 2.2rem; }
+}
+
+.section-label {
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-label i {
+  color: var(--color-text-secondary);
+  font-size: 1.2rem;
+}
+
+.item-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item-list li {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  line-height: 1.5;
+  border-bottom: 1px solid var(--color-border-tertiary);
+}
+
+.item-list li:last-child {
+  border-bottom: none;
+}
+
+.item-list li::before {
+  content: '→';
+  color: var(--color-text-tertiary);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+
+.study-btn {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border-primary);
+  background: rgba(255,255,255,0.05);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  margin-top: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  font-family: var(--font-sans);
+  width: 100%;
+  justify-content: center;
+}
+
+.study-btn:hover {
+  background: var(--color-text-primary);
+  color: var(--color-bg-base);
+  border-color: var(--color-text-primary);
+  box-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
+.chevron {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  font-size: 1.25rem;
+  color: var(--color-text-tertiary);
+  margin-left: auto;
+}
+
+.unit-card:hover .chevron {
+  color: var(--color-text-primary);
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-primary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>LangChain Mastery Roadmap</h1>
+    <p class="subtitle">15 units across Foundation, Core, RAG Pipeline, Agents, and Production phases to elevate your AI engineering skills.</p>
+  </header>
+
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-val">15</div>
+      <div class="stat-label">Units</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">84</div>
+      <div class="stat-label">Topics</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">61</div>
+      <div class="stat-label">Labs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">5</div>
+      <div class="stat-label">Phases</div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All Phases</button>
+    <button class="filter-btn" onclick="setFilter('Foundation', this)">Foundation</button>
+    <button class="filter-btn" onclick="setFilter('Core', this)">Core</button>
+    <button class="filter-btn" onclick="setFilter('RAG Pipeline', this)">RAG Pipeline</button>
+    <button class="filter-btn" onclick="setFilter('Agents', this)">Agents</button>
+    <button class="filter-btn" onclick="setFilter('Production', this)">Production</button>
+  </div>
+
+  <div id="units-list"></div>
+</div>
+
+<script>
+const phases = {
+  Foundation: { bg: 'var(--p-found-bg)', text: 'var(--p-found-text)', dot: 'var(--p-found-dot)', border: 'var(--p-found-border)' },
+  Core: { bg: 'var(--p-core-bg)', text: 'var(--p-core-text)', dot: 'var(--p-core-dot)', border: 'var(--p-core-border)' },
+  'RAG Pipeline': { bg: 'var(--p-rag-bg)', text: 'var(--p-rag-text)', dot: 'var(--p-rag-dot)', border: 'var(--p-rag-border)' },
+  Agents: { bg: 'var(--p-agent-bg)', text: 'var(--p-agent-text)', dot: 'var(--p-agent-dot)', border: 'var(--p-agent-border)' },
+  Production: { bg: 'var(--p-prod-bg)', text: 'var(--p-prod-text)', dot: 'var(--p-prod-dot)', border: 'var(--p-prod-border)' }
+};
+
+const units = [
+  {order:0,title:'Setup & environment',phase:'Foundation',difficulty:'Beginner',
+   tags:['installation','npm','API keys','@langchain/core','.env'],
+   theory:['LangChain ecosystem and package structure (@langchain/core, @langchain/openai, etc.)','Environment variables and API key management','LangChain Expression Language (LCEL) — high-level overview','LangChain JS/TS docs navigation and reference structure'],
+   labs:['Install LangChain packages via npm/yarn','Set up a .env file with an OpenAI API key','Run a minimal "Hello World" LLM call','Explore the official LangChain JS/TS docs structure']},
+  {order:1,title:'Models',phase:'Foundation',difficulty:'Beginner',
+   tags:['LLMs','Chat Models','Embedding Models','withStructuredOutput','Zod','providers'],
+   theory:['LLMs vs Chat Models — input/output differences','Embedding Models — vector representations of text','Model providers: OpenAI, Anthropic, Mistral, and others','Structured output with withStructuredOutput() and Zod schemas','Output Parsers for models without native structured output','Model parameters: temperature, max_tokens, stop sequences'],
+   labs:['Call an LLM and a Chat Model; compare their outputs','Generate embeddings for a set of sentences','Use withStructuredOutput() to extract structured JSON from a sentence','Use a JSON Output Parser to parse raw model text output']},
+  {order:2,title:'Prompts',phase:'Foundation',difficulty:'Beginner',
+   tags:['PromptTemplate','ChatPromptTemplate','MessagesPlaceholder','few-shot','system messages'],
+   theory:['PromptTemplate — static text with dynamic input variables','ChatPromptTemplate — system, human, and AI message roles','Few-shot prompt templates with inline examples','MessagesPlaceholder for injecting conversation history','Dynamic prompt composition and partial variable templates'],
+   labs:['Build a PromptTemplate with input variables and invoke it','Build a ChatPromptTemplate with system + human messages','Create a few-shot prompt that shapes output style','Use MessagesPlaceholder to inject history into a chat prompt']},
+  {order:3,title:'Output parsers',phase:'Foundation',difficulty:'Beginner',
+   tags:['StringOutputParser','JsonOutputParser','StructuredOutputParser','format instructions'],
+   theory:['Why output parsers are needed and when to use them','StringOutputParser — extracting raw text from model output','JsonOutputParser — parsing JSON from model output','StructuredOutputParser with format instructions injected into the prompt','Parsing errors and fallback / retry strategies'],
+   labs:['Chain a chat model with StringOutputParser','Use JsonOutputParser to extract a structured object','Define a Zod schema and use StructuredOutputParser','Intentionally trigger a parse error and handle it gracefully']},
+  {order:4,title:'Runnables & LCEL',phase:'Core',difficulty:'Intermediate',
+   tags:['Runnable','RunnableSequence','RunnableParallel','RunnableBranch','RunnableLambda','RunnablePassthrough','pipe()','invoke/batch/stream'],
+   theory:['What is a Runnable — the invoke / batch / stream interface','RunnableSequence — chaining steps one after another','RunnableParallel — executing steps concurrently','RunnableBranch — conditional routing between runnables','RunnableLambda — wrapping custom functions as runnables','RunnablePassthrough — forwarding input unchanged downstream','pipe() syntax as shorthand for RunnableSequence'],
+   labs:['Build a RunnableSequence: prompt → model → parser','Build a RunnableParallel to generate a summary and keywords simultaneously','Use RunnableBranch to route queries to different chains by category','Wrap a custom function with RunnableLambda and compose it in a pipeline','Stream output token-by-token from a runnable chain']},
+  {order:5,title:'Chains',phase:'Core',difficulty:'Intermediate',
+   tags:['LLMChain','sequential','parallel','conditional','nesting chains'],
+   theory:['Chains as data-flow pipelines — input → process → output','Simple chain: prompt + model','Parallel chains — multiple outputs from one input','Conditional chains — branching logic based on previous output','Nesting chains within chains for multi-stage workflows'],
+   labs:['Build a simple translation chain (English → French)','Build a parallel chain: generate a title and a summary from one document','Build a conditional chain that routes based on question category','Nest two chains into a multi-stage pipeline']},
+  {order:6,title:'Memory',phase:'Core',difficulty:'Intermediate',
+   tags:['ConversationBufferMemory','Window Memory','Summary Memory','Custom Memory','stateless vs stateful'],
+   theory:['Why LLM API calls are stateless by default','ConversationBufferMemory — full message history storage','ConversationBufferWindowMemory — last N messages only','ConversationSummaryMemory — summarized rolling history','Custom Memory — storing specific user data or preferences','Attaching memory to a chain or runnable'],
+   labs:['Build a chatbot that remembers messages with BufferMemory','Switch to WindowMemory and observe context dropping beyond N turns','Implement SummaryMemory and inspect the generated summary','Build custom memory that stores a user\'s name and topic preferences']},
+  {order:7,title:'Document loaders',phase:'RAG Pipeline',difficulty:'Intermediate',
+   tags:['PDFLoader','TextLoader','CheerioWebBaseLoader','load()','lazyLoad()','Document format'],
+   theory:['Document object structure: pageContent + metadata fields','Eager loading with load() vs lazy loading with lazyLoad()','PDF, plain text, and web page loaders','Directory loaders for bulk file processing','When lazy loading matters: memory efficiency for large corpora'],
+   labs:['Load a PDF file and inspect the resulting Document objects','Load a web page with CheerioWebBaseLoader','Use lazyLoad() to process a large folder of text files one at a time','Attach custom metadata fields to loaded documents']},
+  {order:8,title:'Text splitters',phase:'RAG Pipeline',difficulty:'Intermediate',
+   tags:['CharacterTextSplitter','RecursiveCharacterTextSplitter','token splitters','semantic splitters','chunk_size','chunk_overlap'],
+   theory:['Why documents must be split before embedding','chunk_size and chunk_overlap parameters and their trade-offs','Length-based splitting — character and token counts','Text-structure-based splitting — paragraphs, sentences, line breaks','Document-structure-based splitting — headings, code blocks, markdown','Semantic splitting — boundary detection by topic shift'],
+   labs:['Split a document with CharacterTextSplitter and inspect the chunks','Compare chunk sizes using RecursiveCharacterTextSplitter','Split source code with a language-aware splitter','Experiment with chunk_overlap to reduce boundary information loss']},
+  {order:9,title:'Embeddings & vector stores',phase:'RAG Pipeline',difficulty:'Intermediate',
+   tags:['OpenAIEmbeddings','FAISS','Chroma','Pinecone','cosine similarity','similarity search'],
+   theory:['Embeddings — text represented as high-dimensional vectors','Similarity metrics: cosine similarity vs dot product','Embedding documents vs embedding queries','Vector store options: FAISS (in-memory), Chroma (local), Pinecone (cloud)','Adding documents to a vector store','Persisting and reloading a vector store across sessions'],
+   labs:['Embed a list of sentences and compare their pairwise similarity','Build an in-memory FAISS vector store from a document set','Run a similarity search query and inspect top-k results','Persist the vector store to disk and reload it in a new session']},
+  {order:10,title:'Retrievers',phase:'RAG Pipeline',difficulty:'Advanced',
+   tags:['VectorStoreRetriever','MMR','Multi-Query','Contextual Compression','search strategies'],
+   theory:['Retriever interface — getRelevantDocuments()','VectorStoreRetriever — top-k similarity search','MMR (Maximal Marginal Relevance) — diversity in retrieved results','Multi-Query Retriever — LLM-generated query variants to reduce ambiguity','Contextual Compression Retriever — post-retrieval relevance filtering','Combining and layering retrieval strategies'],
+   labs:['Create a retriever from a vector store and fetch documents','Run MMR retrieval; compare diversity vs standard top-k','Use Multi-Query Retriever on an ambiguous question and observe sub-queries','Set up Contextual Compression; compare raw vs compressed retrieved context']},
+  {order:11,title:'RAG — full pipeline',phase:'RAG Pipeline',difficulty:'Advanced',
+   tags:['end-to-end RAG','stuffing','map-reduce','refine','conversational RAG','source citations'],
+   theory:['End-to-end RAG flow: load → split → embed → store → retrieve → generate','Stuffing strategy — all retrieved docs injected into one prompt','Map-Reduce strategy — summarize each chunk then synthesize','Refine strategy — iterative context integration across chunks','Conversational RAG — combining memory with retrieval','Returning source document metadata alongside the final answer'],
+   labs:['Build a full Q&A bot over a PDF using the complete RAG pipeline','Add conversation memory for multi-turn RAG (conversational RAG)','Return source document metadata alongside each generated answer','Compare stuffing vs map-reduce on a long document']},
+  {order:12,title:'Agents & tools',phase:'Agents',difficulty:'Advanced',
+   tags:['ReAct','Tool','AgentExecutor','custom tools','DuckDuckGoSearch','Calculator','stopping conditions'],
+   theory:['What distinguishes an agent from a chain','ReAct loop — Reason → Act → Observe → Repeat until done','Defining tools: name, description, and function/input schema','Built-in tools: web search, calculator, file reader, etc.','AgentExecutor — orchestrating the reasoning loop','Stopping conditions, max iterations, and error handling in agents'],
+   labs:['Define a custom tool that wraps a simple function','Build a ReAct agent with a calculator tool and inspect reasoning steps','Add a web search tool; let the agent decide when to use it','Build a multi-tool agent and trace the full reasoning chain']},
+  {order:13,title:'Callbacks & observability',phase:'Production',difficulty:'Advanced',
+   tags:['Callbacks','LangSmith','tracing','token usage','debugging'],
+   theory:['LangChain callback system — event hooks (onLLMStart, onChainEnd, etc.)','Built-in callbacks: ConsoleCallbackHandler, token usage tracking','LangSmith — end-to-end run tracing and dataset-based evaluation','Debugging failing chains or agents with trace inspection','Evaluating run quality using LangSmith evals'],
+   labs:['Attach ConsoleCallbackHandler to a chain and observe emitted events','Set up a LangSmith project and trace a full chain run','Track token usage across a multi-step RAG pipeline','Debug a failing agent by inspecting its LangSmith trace']},
+  {order:14,title:'Streaming & batching',phase:'Production',difficulty:'Advanced',
+   tags:['streaming','batching','ainvoke','astream','abatch','RunnableConfig','async/await'],
+   theory:['Streaming — incremental token delivery from a chain','How to stream output from any runnable or chain','Batching — processing many inputs in parallel with one call','Async methods: ainvoke(), astream(), abatch()','RunnableConfig — passing runtime config to runnables','Concurrency control and rate limiting in batched calls'],
+   labs:['Stream chat model output to the console token by token','Stream a full RAG chain response end-to-end','Batch 10 queries to a chain and measure serial vs concurrent latency','Use ainvoke() with async/await inside a Node.js handler']},
+];
+
+let current = 'all';
+
+function render() {
+  const el = document.getElementById('units-list');
+  const vis = current === 'all' ? units : units.filter(u => u.phase === current);
+  
+  if (vis.length === 0) {
+    el.innerHTML = '<div style="text-align:center; padding: 3rem; color: var(--color-text-tertiary);">No units found for this phase.</div>';
+    return;
+  }
+
+  el.innerHTML = vis.map((u, i) => {
+    const p = phases[u.phase];
+    const last = i === vis.length - 1;
+    // Animation delay for cascading effect
+    const delay = i * 0.05;
+    
+    return `
+<div class="unit-row" id="row-${u.order}" style="animation-delay: ${delay}s">
+  <div class="spine">
+    <div class="spine-dot" style="background:${p.dot}; color:${p.dot}"></div>
+    ${!last ? `<div class="spine-line"></div>` : ''}
+  </div>
+  <div class="unit-card" onclick="toggle(${u.order})">
+    <div class="unit-header">
+      <span class="unit-num">U${String(u.order).padStart(2,'0')}</span>
+      <span class="unit-title">${u.title}</span>
+      <span class="phase-badge" style="background:${p.bg}; color:${p.text}; border-color:${p.border}">${u.phase}</span>
+      <span class="diff-badge">${u.difficulty}</span>
+      <i class="ti ti-chevron-down chevron" id="chev-${u.order}" aria-hidden="true"></i>
+    </div>
+    <div class="tags-row">${u.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    <div class="expand-content" id="exp-${u.order}" onclick="event.stopPropagation()">
+      <div class="expand-divider"></div>
+      <div class="expand-grid">
+        <div>
+          <div class="section-label"><i class="ti ti-book" aria-hidden="true"></i> Theory topics</div>
+          <ul class="item-list">${u.theory.map(t => `<li>${t}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <div class="section-label"><i class="ti ti-terminal-2" aria-hidden="true"></i> Lab exercises</div>
+          <ul class="item-list">${u.labs.map(l => `<li>${l}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <button class="study-btn" onclick="console.log('Teach me Unit ${u.order}: ${u.title}')">
+        <i class="ti ti-player-play-filled" style="font-size: 1rem;"></i> Start Learning this Unit
+      </button>
+    </div>
+  </div>
+</div>`;
+  }).join('');
+}
+
+function toggle(id) {
+  const e = document.getElementById('exp-' + id);
+  const c = document.getElementById('chev-' + id);
+  const o = e.classList.contains('open');
+  
+  // Close all others (accordion style)
+  document.querySelectorAll('.expand-content').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.chevron').forEach(el => el.classList.remove('open'));
+  
+  // Toggle current
+  if (!o) {
+    e.classList.add('open');
+    c.classList.add('open');
+  }
+}
+
+function setFilter(phase, btn) {
+  current = phase;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+// Initial render
+document.addEventListener('DOMContentLoaded', render);
+
+</script>
+</body>
+</html>

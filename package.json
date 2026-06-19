@@ -1,0 +1,18 @@
+{
+  "name": "roadmap-guide",
+  "version": "1.0.0",
+  "description": "This repo is created to guide developers to follow roadmaps for many tech skils. ",
+  "keywords": [
+    "guide",
+    "learning",
+    "knowledge",
+    "roadmaps"
+  ],
+  "license": "ISC",
+  "author": "Mohd Shadab",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
