@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <!-- PrismJS Tomorrow Dark Theme for Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+    :root {
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      /* Premium Dark Theme */
+      --color-bg-base: #0f1115;
+      --color-bg-gradient: radial-gradient(circle at top center, #1a1d24, #0f1115 80%);
+      --color-background-primary: rgba(30, 33, 40, 0.6);
+      --color-background-secondary: rgba(45, 49, 58, 0.7);
+      --color-border-primary: rgba(255, 255, 255, 0.15);
+      --color-border-secondary: rgba(255, 255, 255, 0.08);
+      --color-border-tertiary: rgba(255, 255, 255, 0.04);
+
+      --color-text-primary: #f8f9fa;
+      --color-text-secondary: #adb5bd;
+      --color-text-tertiary: #6c757d;
+
+      --border-radius-md: 12px;
+      --border-radius-lg: 16px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+      background: var(--color-bg-base);
+      background-image: var(--color-bg-gradient);
+      background-attachment: fixed;
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Reading Progress Bar */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #6366f1, #38bdf8);
+      width: 0%;
+      z-index: 1000;
+      transition: width 0.1s ease;
+    }
+
+    /* Header Nav */
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 17, 21, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border-secondary);
+      z-index: 100;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 50px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      color: var(--color-text-primary);
+      padding: 0.5rem 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--color-border-primary);
+    }
+
+    .doc-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 400px;
+      letter-spacing: -0.2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .toc-toggle {
+      background: transparent;
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      color: var(--color-text-primary);
+      padding: 0.5rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .toc-toggle:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Layout Wrapper */
+    .layout {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Sidebar Table of Contents */
+    aside {
+      width: 280px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--color-border-secondary);
+      position: sticky;
+      top: 75px;
+      height: calc(100vh - 100px);
+      overflow-y: auto;
+      padding: 2rem 1.5rem 2rem 0;
+      box-sizing: border-box;
+    }
+
+    .toc-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--color-text-tertiary);
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      padding-left: 1.5rem;
+    }
+
+    .toc-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toc-item a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: block;
+      padding: 0.4rem 1rem 0.4rem 1.5rem;
+      border-left: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toc-item.level-2 a {
+      padding-left: 2.25rem;
+      font-size: 0.88rem;
+    }
+
+    .toc-item.level-3 a {
+      padding-left: 3rem;
+      font-size: 0.82rem;
+      color: var(--color-text-tertiary);
+    }
+
+    .toc-item.active a {
+      color: #6366f1;
+      border-left-color: #6366f1;
+      font-weight: 500;
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .toc-item a:hover:not(.active) {
+      color: var(--color-text-primary);
+      border-left-color: var(--color-border-primary);
+    }
+
+    /* Main Reader Body */
+    main {
+      flex: 1;
+      min-width: 0;
+      padding: 3rem 4rem;
+    }
+
+    /* Loading and Errors */
+    .loader-container,
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 50vh;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.05);
+      border-top: 3px solid #6366f1;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Markdown Typography styling (Beautiful dark layout) */
+    .markdown-body {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--color-text-primary);
+    }
+
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4 {
+      color: var(--color-text-primary);
+      font-weight: 600;
+      margin-top: 2.25rem;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.5px;
+      scroll-margin-top: 80px; /* Offset for sticky header */
+    }
+
+    .markdown-body h1 {
+      font-size: 2.5rem;
+      border-bottom: 1px solid var(--color-border-secondary);
+      padding-bottom: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .markdown-body h2 {
+      font-size: 1.8rem;
+      border-bottom: 1px solid var(--color-border-tertiary);
+      padding-bottom: 0.5rem;
+    }
+
+    .markdown-body h3 {
+      font-size: 1.4rem;
+    }
+
+    .markdown-body p {
+      margin-bottom: 1.5rem;
+      color: var(--color-text-secondary);
+    }
+
+    .markdown-body a {
+      color: #38bdf8;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(56, 189, 248, 0.4);
+      transition: all 0.2s;
+    }
+
+    .markdown-body a:hover {
+      color: #7dd3fc;
+      border-bottom-style: solid;
+    }
+
+    .markdown-body ul,
+    .markdown-body ol {
+      margin-bottom: 1.5rem;
+      padding-left: 1.75rem;
+      color: var(--color-text-secondary);
+    }
+
+    .markdown-body li {
+      margin-bottom: 0.5rem;
+    }
+
+    .markdown-body blockquote {
+      margin: 1.5rem 0;
+      padding: 0.75rem 1.5rem;
+      border-left: 4px solid #6366f1;
+      background: rgba(99, 102, 241, 0.05);
+      border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+      color: var(--color-text-secondary);
+    }
+
+    .markdown-body blockquote p {
+      margin: 0;
+    }
+
+    /* Inline Code and Code Blocks */
+    .markdown-body code {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 0.2rem 0.45rem;
+      border-radius: 6px;
+      color: #fca5a5;
+    }
+
+    .markdown-body pre {
+      margin: 1.75rem 0;
+      padding: 1.25rem;
+      background: #181b20 !important;
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .markdown-body pre code {
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+      color: inherit;
+      font-size: 0.9rem;
+    }
+
+    /* Copy Button inside Code Block */
+    .code-header {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 10;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: 6px;
+      color: var(--color-text-tertiary);
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--color-text-primary);
+      border-color: var(--color-border-secondary);
+    }
+
+    .copy-btn.copied {
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* Tables styling */
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      overflow: hidden;
+    }
+
+    .markdown-body th,
+    .markdown-body td {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--color-border-tertiary);
+      text-align: left;
+    }
+
+    .markdown-body th {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--color-text-primary);
+      font-weight: 600;
+    }
+
+    .markdown-body td {
+      color: var(--color-text-secondary);
+    }
+
+    .markdown-body tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* Horizontal Rules */
+    .markdown-body hr {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-border-secondary), transparent);
+      margin: 3rem 0;
+    }
+
+    /* Responsive Styling */
+    @media(max-width: 992px) {
+      aside {
+        display: none; /* Hide sidebar on tablet/mobile */
+        position: fixed;
+        left: 0;
+        top: 50px;
+        height: calc(100vh - 50px);
+        background: #0f1115;
+        z-index: 200;
+        width: 300px;
+        padding: 2rem;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+      }
+
+      aside.open {
+        display: block;
+      }
+
+      .toc-toggle {
+        display: flex;
+      }
+
+      main {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg-base);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border-primary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-text-secondary);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Progress Bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <button class="back-btn" onclick="goBack()">
+        <i class="ti ti-arrow-left"></i> Back
+      </button>
+      <span class="doc-title" id="navbar-title">Loading Guide...</span>
+    </div>
+    <div class="header-right">
+      <button class="toc-toggle" onclick="toggleTOC()" aria-label="Toggle Outline">
+        <i class="ti ti-list"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="layout">
+    <!-- Outline Sidebar -->
+    <aside id="toc-sidebar">
+      <div class="toc-title">Guide Outline</div>
+      <ul class="toc-list" id="toc-container">
+        <!-- Dynamically filled -->
+      </ul>
+    </aside>
+
+    <!-- Main Content Reader -->
+    <main>
+      <!-- Loading indicator -->
+      <div class="loader-container" id="loader">
+        <div class="spinner"></div>
+        <p style="color: var(--color-text-secondary)">Fetching guide contents...</p>
+      </div>
+
+      <!-- Error indicator -->
+      <div class="error-container" id="error-view" style="display: none;">
+        <i class="ti ti-alert-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+        <h2 style="margin-bottom: 0.5rem;">Could not load guide</h2>
+        <p id="error-message" style="color: var(--color-text-secondary); margin-bottom: 1.5rem; max-width: 400px;">The requested file could not be fetched or does not exist.</p>
+        <button class="back-btn" onclick="goBack()">
+          Return to Roadmap
+        </button>
+      </div>
+
+      <!-- Markdown Output -->
+      <article class="markdown-body" id="content" style="display: none;"></article>
+    </main>
+  </div>
+
+  <!-- MarkedJS for parsing Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- PrismJS for syntax highlighting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+  <script>
+    // 1. Fetch File path from query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const filePath = urlParams.get('file');
+
+    function goBack() {
+      // Go back in history or redirect to root if no history
+      if (document.referrer) {
+        window.location.href = document.referrer;
+      } else {
+        window.close(); // If opened in a new tab, close it
+      }
+    }
+
+    function toggleTOC() {
+      const sidebar = document.getElementById('toc-sidebar');
+      sidebar.classList.toggle('open');
+    }
+
+    // Set custom heading rendering in marked to include IDs for Table of Contents
+    const renderer = new marked.Renderer();
+    renderer.heading = function (text, level) {
+      // Create a URL-friendly ID
+      const escapedText = text.toLowerCase()
+        .replace(/[^\w\s-]/g, '') // remove punctuation
+        .trim()
+        .replace(/[-\s]+/g, '-'); // replace spaces/dashes with single dash
+      
+      return `
+        <h${level} id="${escapedText}">
+          ${text}
+        </h${level}>
+      `;
+    };
+    marked.setOptions({ renderer: renderer });
+
+    // Copy to clipboard helper
+    function copyCode(button, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        button.classList.add('copied');
+        button.innerHTML = '<i class="ti ti-check"></i> Copied';
+        setTimeout(() => {
+          button.classList.remove('copied');
+          button.innerHTML = '<i class="ti ti-copy"></i> Copy';
+        }, 2000);
+      });
+    }
+
+    async function loadGuide() {
+      if (!filePath) {
+        showError('No markdown guide file specified in the URL.');
+        return;
+      }
+
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) {
+          throw new Error(`Failed to load file (Status: ${response.status})`);
+        }
+        const markdownText = await response.text();
+        renderContent(markdownText);
+      } catch (err) {
+        console.error(err);
+        showError(`Could not find or retrieve "${filePath}". Please verify that the file exists in the repository.`);
+      }
+    }
+
+    function renderContent(markdown) {
+      // Render markdown using Marked
+      const htmlContent = marked.parse(markdown);
+      
+      const contentEl = document.getElementById('content');
+      contentEl.innerHTML = htmlContent;
+      
+      // Post-process code blocks to add copy button and class wrappers
+      contentEl.querySelectorAll('pre').forEach((pre) => {
+        const code = pre.querySelector('code');
+        if (code) {
+          const rawCode = code.innerText;
+          
+          // Create code header wrapper for copying
+          const header = document.createElement('div');
+          header.className = 'code-header';
+          
+          const copyBtn = document.createElement('button');
+          copyBtn.className = 'copy-btn';
+          copyBtn.innerHTML = '<i class="ti ti-copy"></i> Copy';
+          copyBtn.onclick = () => copyCode(copyBtn, rawCode);
+          
+          header.appendChild(copyBtn);
+          pre.appendChild(header);
+        }
+      });
+
+      // Highlight syntax using Prism
+      Prism.highlightAllUnder(contentEl);
+
+      // Build outline sidebar (Table of Contents)
+      buildTOC(contentEl);
+
+      // Update titles
+      const h1 = contentEl.querySelector('h1');
+      const docTitle = h1 ? h1.textContent : 'Guide Reader';
+      document.title = docTitle;
+      document.getElementById('navbar-title').textContent = docTitle;
+
+      // Swap views
+      document.getElementById('loader').style.display = 'none';
+      contentEl.style.display = 'block';
+
+      // Attach scroll listeners for active section tracking and reading progress
+      window.addEventListener('scroll', handleScroll);
+      handleScroll(); // Run once to trigger highlight/progress calculation
+    }
+
+    function buildTOC(container) {
+      const headings = container.querySelectorAll('h1, h2, h3');
+      const tocContainer = document.getElementById('toc-container');
+      
+      if (headings.length === 0) {
+        document.getElementById('toc-sidebar').style.display = 'none';
+        return;
+      }
+
+      tocContainer.innerHTML = Array.from(headings).map((heading) => {
+        const id = heading.id;
+        const text = heading.textContent;
+        const level = heading.tagName.toLowerCase(); // 'h1', 'h2', 'h3'
+        
+        let levelClass = 'level-1';
+        if (level === 'h2') levelClass = 'level-2';
+        if (level === 'h3') levelClass = 'level-3';
+
+        return `
+          <li class="toc-item ${levelClass}" data-target="${id}">
+            <a href="#${id}" onclick="closeMobileSidebar()">${text}</a>
+          </li>
+        `;
+      }).join('');
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('toc-sidebar');
+      if (window.innerWidth <= 992) {
+        sidebar.classList.remove('open');
+      }
+    }
+
+    function handleScroll() {
+      // 1. Update Reading Progress Bar
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      document.getElementById('progress-bar').style.width = scrolled + '%';
+
+      // 2. Track Active TOC Item based on scroll position
+      const headings = document.getElementById('content').querySelectorAll('h1, h2, h3');
+      let activeId = '';
+      
+      headings.forEach((heading) => {
+        const rect = heading.getBoundingClientRect();
+        // If the heading is above the top of the viewport (with some offset)
+        if (rect.top <= 120) {
+          activeId = heading.id;
+        }
+      });
+
+      // Highlight active heading in TOC
+      const tocItems = document.querySelectorAll('.toc-item');
+      tocItems.forEach((item) => {
+        if (item.getAttribute('data-target') === activeId) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    function showError(msg) {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('error-message').textContent = msg;
+      document.getElementById('error-view').style.display = 'flex';
+      document.getElementById('navbar-title').textContent = 'Error';
+    }
+
+    // Initialize
+    loadGuide();
+  </script>
+</body>
+
+</html>
