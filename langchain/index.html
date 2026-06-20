@@ -738,8 +738,8 @@
 
       const phaseNum = phaseMap[unit.phase];
       if (phaseNum) {
-        const path = `../reader.html?file=langchain/phases/phase_${phaseNum}.md`;
-        window.open(path, '_blank');
+        const pdfPath = `phases/phase_${phaseNum}.pdf`;
+        window.open(pdfPath, '_blank');
       } else {
         console.error('Unknown phase:', unit.phase);
       }
