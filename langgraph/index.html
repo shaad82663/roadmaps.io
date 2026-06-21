@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LangChain Mastery Roadmap</title>
+  <title>LangGraph Mastery Roadmap</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -36,20 +36,25 @@
       --p-found-dot: #6366f1;
       --p-found-border: rgba(99, 102, 241, 0.3);
 
-      --p-core-bg: rgba(16, 185, 129, 0.15);
-      --p-core-text: #6ee7b7;
-      --p-core-dot: #10b981;
-      --p-core-border: rgba(16, 185, 129, 0.3);
+      --p-ctrl-bg: rgba(20, 184, 166, 0.15);
+      --p-ctrl-text: #5eead4;
+      --p-ctrl-dot: #14b8a6;
+      --p-ctrl-border: rgba(20, 184, 166, 0.3);
 
-      --p-rag-bg: rgba(56, 189, 248, 0.15);
-      --p-rag-text: #7dd3fc;
-      --p-rag-dot: #38bdf8;
-      --p-rag-border: rgba(56, 189, 248, 0.3);
+      --p-pers-bg: rgba(56, 189, 248, 0.15);
+      --p-pers-text: #7dd3fc;
+      --p-pers-dot: #38bdf8;
+      --p-pers-border: rgba(56, 189, 248, 0.3);
 
-      --p-agent-bg: rgba(245, 158, 11, 0.15);
-      --p-agent-text: #fcd34d;
-      --p-agent-dot: #f59e0b;
-      --p-agent-border: rgba(245, 158, 11, 0.3);
+      --p-hitl-bg: rgba(245, 158, 11, 0.15);
+      --p-hitl-text: #fcd34d;
+      --p-hitl-dot: #f59e0b;
+      --p-hitl-border: rgba(245, 158, 11, 0.3);
+
+      --p-multi-bg: rgba(168, 85, 247, 0.15);
+      --p-multi-text: #d8b4fe;
+      --p-multi-dot: #a855f7;
+      --p-multi-border: rgba(168, 85, 247, 0.3);
 
       --p-prod-bg: rgba(239, 68, 68, 0.15);
       --p-prod-text: #fca5a5;
@@ -94,7 +99,7 @@
       color: var(--color-text-secondary);
       font-size: 1.15rem;
       font-weight: 300;
-      max-width: 600px;
+      max-width: 620px;
       margin: 0 auto;
       line-height: 1.6;
     }
@@ -510,9 +515,10 @@
 
   <div class="container">
     <header>
-      <h1>LangChain Mastery Roadmap</h1>
-      <p class="subtitle">15 units across Foundation, Core, RAG Pipeline, Agents, and Production phases to elevate your
-        AI engineering skills.</p>
+      <h1>LangGraph Mastery Roadmap</h1>
+      <p class="subtitle">15 units across Foundation, Control Flow, Persistence & Memory, Human-in-the-Loop,
+        Multi-Agent & Tools, and Production phases — every core LangGraph concept from your first node to a deployed
+        multi-agent system.</p>
     </header>
 
     <div class="stats-container">
@@ -521,15 +527,15 @@
         <div class="stat-label">Units</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">84</div>
+        <div class="stat-val">75</div>
         <div class="stat-label">Topics</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">61</div>
+        <div class="stat-val">60</div>
         <div class="stat-label">Labs</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">5</div>
+        <div class="stat-val">6</div>
         <div class="stat-label">Phases</div>
       </div>
     </div>
@@ -537,9 +543,10 @@
     <div class="filters">
       <button class="filter-btn active" onclick="setFilter('all', this)">All Phases</button>
       <button class="filter-btn" onclick="setFilter('Foundation', this)">Foundation</button>
-      <button class="filter-btn" onclick="setFilter('Core', this)">Core</button>
-      <button class="filter-btn" onclick="setFilter('RAG Pipeline', this)">RAG Pipeline</button>
-      <button class="filter-btn" onclick="setFilter('Agents', this)">Agents</button>
+      <button class="filter-btn" onclick="setFilter('Control Flow', this)">Control Flow</button>
+      <button class="filter-btn" onclick="setFilter('Persistence & Memory', this)">Persistence & Memory</button>
+      <button class="filter-btn" onclick="setFilter('Human-in-the-Loop', this)">Human-in-the-Loop</button>
+      <button class="filter-btn" onclick="setFilter('Multi-Agent & Tools', this)">Multi-Agent & Tools</button>
       <button class="filter-btn" onclick="setFilter('Production', this)">Production</button>
     </div>
 
@@ -549,102 +556,103 @@
   <script>
     const phases = {
       Foundation: { bg: 'var(--p-found-bg)', text: 'var(--p-found-text)', dot: 'var(--p-found-dot)', border: 'var(--p-found-border)' },
-      Core: { bg: 'var(--p-core-bg)', text: 'var(--p-core-text)', dot: 'var(--p-core-dot)', border: 'var(--p-core-border)' },
-      'RAG Pipeline': { bg: 'var(--p-rag-bg)', text: 'var(--p-rag-text)', dot: 'var(--p-rag-dot)', border: 'var(--p-rag-border)' },
-      Agents: { bg: 'var(--p-agent-bg)', text: 'var(--p-agent-text)', dot: 'var(--p-agent-dot)', border: 'var(--p-agent-border)' },
+      'Control Flow': { bg: 'var(--p-ctrl-bg)', text: 'var(--p-ctrl-text)', dot: 'var(--p-ctrl-dot)', border: 'var(--p-ctrl-border)' },
+      'Persistence & Memory': { bg: 'var(--p-pers-bg)', text: 'var(--p-pers-text)', dot: 'var(--p-pers-dot)', border: 'var(--p-pers-border)' },
+      'Human-in-the-Loop': { bg: 'var(--p-hitl-bg)', text: 'var(--p-hitl-text)', dot: 'var(--p-hitl-dot)', border: 'var(--p-hitl-border)' },
+      'Multi-Agent & Tools': { bg: 'var(--p-multi-bg)', text: 'var(--p-multi-text)', dot: 'var(--p-multi-dot)', border: 'var(--p-multi-border)' },
       Production: { bg: 'var(--p-prod-bg)', text: 'var(--p-prod-text)', dot: 'var(--p-prod-dot)', border: 'var(--p-prod-border)' }
     };
 
     const units = [
       {
-        order: 0, title: 'Setup & environment', phase: 'Foundation', difficulty: 'Beginner',
-        tags: ['installation', 'npm', 'API keys', '@langchain/core', '.env'],
-        theory: ['LangChain ecosystem and package structure (@langchain/core, @langchain/openai, etc.)', 'Environment variables and API key management', 'LangChain Expression Language (LCEL) — high-level overview', 'LangChain JS/TS docs navigation and reference structure'],
-        labs: ['Install LangChain packages via npm/yarn', 'Set up a .env file with an OpenAI API key', 'Run a minimal "Hello World" LLM call', 'Explore the official LangChain JS/TS docs structure']
+        order: 0, title: 'Why LangGraph', phase: 'Foundation', difficulty: 'Beginner',
+        tags: ['state machines', 'cycles', 'vs Chains', 'vs AgentExecutor', '@langchain/langgraph'],
+        theory: ['Limitations of Chains — linear execution, no cycles, no dynamic control', 'Limitations of standard AgentExecutor — black-box loop, hard to inspect or control', "LangGraph's core idea: workflows modeled as state machines / directed graphs", 'When to reach for LangGraph vs. a simple Chain vs. a simple Agent', 'Installing @langchain/langgraph and core packages'],
+        labs: ['Install LangGraph.js and run a minimal one-node graph', 'Rebuild a simple LangChain chain as a 2-node LangGraph graph', 'Compare reasoning visibility: AgentExecutor vs. a hand-built graph', 'Sketch a graph diagram for a multi-step workflow before coding it']
       },
       {
-        order: 1, title: 'Models', phase: 'Foundation', difficulty: 'Beginner',
-        tags: ['LLMs', 'Chat Models', 'Embedding Models', 'withStructuredOutput', 'Zod', 'providers'],
-        theory: ['LLMs vs Chat Models — input/output differences', 'Embedding Models — vector representations of text', 'Model providers: OpenAI, Anthropic, Mistral, and others', 'Structured output with withStructuredOutput() and Zod schemas', 'Output Parsers for models without native structured output', 'Model parameters: temperature, max_tokens, stop sequences'],
-        labs: ['Call an LLM and a Chat Model; compare their outputs', 'Generate embeddings for a set of sentences', 'Use withStructuredOutput() to extract structured JSON from a sentence', 'Use a JSON Output Parser to parse raw model text output']
+        order: 1, title: 'State & schema', phase: 'Foundation', difficulty: 'Beginner',
+        tags: ['Annotated', 'Zod schema', 'reducers', 'MessagesState', 'channels'],
+        theory: ['Defining a State schema (Annotated / Zod in JS, TypedDict in Python)', 'Reducers — how partial state updates get merged into full state', 'Built-in MessagesState and the default messages reducer', 'Channels — how LangGraph propagates state between nodes internally', 'Default vs. custom reducers (operator.add, last-value-wins, custom merge fn)'],
+        labs: ['Define a custom state schema with multiple typed fields', 'Write a custom reducer function for a numeric counter field', 'Use MessagesState in a simple chatbot graph', 'Inspect how two nodes updating the same key get merged']
       },
       {
-        order: 2, title: 'Prompts', phase: 'Foundation', difficulty: 'Beginner',
-        tags: ['PromptTemplate', 'ChatPromptTemplate', 'MessagesPlaceholder', 'few-shot', 'system messages'],
-        theory: ['PromptTemplate — static text with dynamic input variables', 'ChatPromptTemplate — system, human, and AI message roles', 'Few-shot prompt templates with inline examples', 'MessagesPlaceholder for injecting conversation history', 'Dynamic prompt composition and partial variable templates'],
-        labs: ['Build a PromptTemplate with input variables and invoke it', 'Build a ChatPromptTemplate with system + human messages', 'Create a few-shot prompt that shapes output style', 'Use MessagesPlaceholder to inject history into a chat prompt']
+        order: 2, title: 'Nodes & edges', phase: 'Foundation', difficulty: 'Beginner',
+        tags: ['StateGraph', 'addNode', 'addEdge', 'START/END', 'compile', 'invoke/stream'],
+        theory: ['StateGraph — instantiating a graph with a state schema', 'Nodes — functions that read state and return partial updates', 'Normal edges — addEdge() wiring nodes in sequence', 'START and END virtual nodes', "Compiling a graph with .compile()", 'Running a graph: invoke(), stream(), batch()'],
+        labs: ['Build a 3-node linear graph and compile it', 'Add a node that mutates only part of the state', "Run the graph with invoke() and inspect the final state", 'Stream the graph\'s intermediate states with stream()']
       },
       {
-        order: 3, title: 'Output parsers', phase: 'Foundation', difficulty: 'Beginner',
-        tags: ['StringOutputParser', 'JsonOutputParser', 'StructuredOutputParser', 'format instructions'],
-        theory: ['Why output parsers are needed and when to use them', 'StringOutputParser — extracting raw text from model output', 'JsonOutputParser — parsing JSON from model output', 'StructuredOutputParser with format instructions injected into the prompt', 'Parsing errors and fallback / retry strategies'],
-        labs: ['Chain a chat model with StringOutputParser', 'Use JsonOutputParser to extract a structured object', 'Define a Zod schema and use StructuredOutputParser', 'Intentionally trigger a parse error and handle it gracefully']
+        order: 3, title: 'Conditional edges & branching', phase: 'Control Flow', difficulty: 'Intermediate',
+        tags: ['addConditionalEdges', 'routing function', 'cycles', 'recursion limit', 'loops'],
+        theory: ['addConditionalEdges() — routing to different nodes based on state', "Writing a routing function that returns the next node's name", 'Fan-out — one node conditionally routing to multiple possible paths', 'Cycles/loops — looping back to an earlier node (the key Chain limitation LangGraph solves)', 'recursionLimit — preventing runaway infinite loops'],
+        labs: ['Build a graph that routes to "approve" or "reject" nodes based on state', 'Build a self-correcting loop: generate → critique → regenerate until passing', 'Trigger an infinite loop on purpose and catch the recursion limit error', "Visualize the branch paths with getGraph().drawMermaid()"]
       },
       {
-        order: 4, title: 'Runnables & LCEL', phase: 'Core', difficulty: 'Intermediate',
-        tags: ['Runnable', 'RunnableSequence', 'RunnableParallel', 'RunnableBranch', 'RunnableLambda', 'RunnablePassthrough', 'pipe()', 'invoke/batch/stream'],
-        theory: ['What is a Runnable — the invoke / batch / stream interface', 'RunnableSequence — chaining steps one after another', 'RunnableParallel — executing steps concurrently', 'RunnableBranch — conditional routing between runnables', 'RunnableLambda — wrapping custom functions as runnables', 'RunnablePassthrough — forwarding input unchanged downstream', 'pipe() syntax as shorthand for RunnableSequence'],
-        labs: ['Build a RunnableSequence: prompt → model → parser', 'Build a RunnableParallel to generate a summary and keywords simultaneously', 'Use RunnableBranch to route queries to different chains by category', 'Wrap a custom function with RunnableLambda and compose it in a pipeline', 'Stream output token-by-token from a runnable chain']
+        order: 4, title: 'Command & Send API', phase: 'Control Flow', difficulty: 'Intermediate',
+        tags: ['Command', 'goto', 'update', 'Send', 'map-reduce', 'parallel branches'],
+        theory: ['Command object — combining a state update and routing decision in one return value', 'Dynamic routing from inside a node, vs. static addConditionalEdges()', 'Send API — fanning out one input into many parallel node executions', 'Map-reduce pattern — Send to parallel "map" nodes, then aggregate in a "reduce" node', 'Aggregating parallel results back into shared state'],
+        labs: ['Refactor a conditional-edge graph to use Command(goto=...) instead', 'Use Send() to process a list of documents in parallel "map" nodes', 'Build a map-reduce summarization graph over multiple text chunks', "Combine Command's update and goto in a single node"]
       },
       {
-        order: 5, title: 'Chains', phase: 'Core', difficulty: 'Intermediate',
-        tags: ['LLMChain', 'sequential', 'parallel', 'conditional', 'nesting chains'],
-        theory: ['Chains as data-flow pipelines — input → process → output', 'Simple chain: prompt + model', 'Parallel chains — multiple outputs from one input', 'Conditional chains — branching logic based on previous output', 'Nesting chains within chains for multi-stage workflows'],
-        labs: ['Build a simple translation chain (English → French)', 'Build a parallel chain: generate a title and a summary from one document', 'Build a conditional chain that routes based on question category', 'Nest two chains into a multi-stage pipeline']
+        order: 5, title: 'Checkpointers', phase: 'Persistence & Memory', difficulty: 'Intermediate',
+        tags: ['MemorySaver', 'SqliteSaver', 'PostgresSaver', 'thread_id', 'checkpoints'],
+        theory: ['What a Checkpointer is and why stateful graphs need one', 'MemorySaver — in-memory, dev/testing only', 'SqliteSaver and PostgresSaver — durable, production-grade persistence', 'thread_id — isolating separate conversations/sessions on one graph', 'Checkpoint structure: state snapshot + step metadata'],
+        labs: ['Compile a graph with MemorySaver and resume a paused thread', 'Swap in SqliteSaver and persist state across process restarts', 'Run two parallel threads with different thread_ids on the same graph', "Inspect a raw checkpoint object's structure"]
       },
       {
-        order: 6, title: 'Memory', phase: 'Core', difficulty: 'Intermediate',
-        tags: ['ConversationBufferMemory', 'Window Memory', 'Summary Memory', 'Custom Memory', 'stateless vs stateful'],
-        theory: ['Why LLM API calls are stateless by default', 'ConversationBufferMemory — full message history storage', 'ConversationBufferWindowMemory — last N messages only', 'ConversationSummaryMemory — summarized rolling history', 'Custom Memory — storing specific user data or preferences', 'Attaching memory to a chain or runnable'],
-        labs: ['Build a chatbot that remembers messages with BufferMemory', 'Switch to WindowMemory and observe context dropping beyond N turns', 'Implement SummaryMemory and inspect the generated summary', 'Build custom memory that stores a user\'s name and topic preferences']
+        order: 6, title: 'State management & time travel', phase: 'Persistence & Memory', difficulty: 'Advanced',
+        tags: ['getState', 'updateState', 'getStateHistory', 'time travel', 'replay', 'forking'],
+        theory: ["getState() — inspecting a thread's current state snapshot", 'updateState() — manually editing state outside normal node execution', "getStateHistory() — walking the full checkpoint history of a thread", 'Time travel — replaying or forking execution from a past checkpoint', 'Practical uses: debugging, undo/redo, "what-if" branch exploration'],
+        labs: ["Print a thread's full state history after a multi-step run", 'Manually correct a field with updateState() mid-conversation', 'Replay execution from an earlier checkpoint and observe the new path', 'Fork a conversation into two diverging branches from one checkpoint']
       },
       {
-        order: 7, title: 'Document loaders', phase: 'RAG Pipeline', difficulty: 'Intermediate',
-        tags: ['PDFLoader', 'TextLoader', 'CheerioWebBaseLoader', 'load()', 'lazyLoad()', 'Document format'],
-        theory: ['Document object structure: pageContent + metadata fields', 'Eager loading with load() vs lazy loading with lazyLoad()', 'PDF, plain text, and web page loaders', 'Directory loaders for bulk file processing', 'When lazy loading matters: memory efficiency for large corpora'],
-        labs: ['Load a PDF file and inspect the resulting Document objects', 'Load a web page with CheerioWebBaseLoader', 'Use lazyLoad() to process a large folder of text files one at a time', 'Attach custom metadata fields to loaded documents']
+        order: 7, title: 'Long-term memory (Store API)', phase: 'Persistence & Memory', difficulty: 'Advanced',
+        tags: ['Store', 'InMemoryStore', 'put/get/search', 'namespaces', 'cross-thread memory'],
+        theory: ['Short-term memory (thread-scoped, via Checkpointer) vs. long-term memory (cross-thread, via Store)', 'InMemoryStore and persistent store backends', 'put() / get() / search() — writing, reading, and semantic search over memories', 'Namespacing memories per-user or per-application', 'Memory patterns: semantic, episodic, and procedural memory'],
+        labs: ['Store a user preference in a Store and retrieve it in a new thread', 'Use search() to semantically find a relevant past memory', 'Namespace memories by user_id across multiple simulated users', 'Build an agent node that writes to long-term memory after each turn']
       },
       {
-        order: 8, title: 'Text splitters', phase: 'RAG Pipeline', difficulty: 'Intermediate',
-        tags: ['CharacterTextSplitter', 'RecursiveCharacterTextSplitter', 'token splitters', 'semantic splitters', 'chunk_size', 'chunk_overlap'],
-        theory: ['Why documents must be split before embedding', 'chunk_size and chunk_overlap parameters and their trade-offs', 'Length-based splitting — character and token counts', 'Text-structure-based splitting — paragraphs, sentences, line breaks', 'Document-structure-based splitting — headings, code blocks, markdown', 'Semantic splitting — boundary detection by topic shift'],
-        labs: ['Split a document with CharacterTextSplitter and inspect the chunks', 'Compare chunk sizes using RecursiveCharacterTextSplitter', 'Split source code with a language-aware splitter', 'Experiment with chunk_overlap to reduce boundary information loss']
+        order: 8, title: 'Human-in-the-loop', phase: 'Human-in-the-Loop', difficulty: 'Advanced',
+        tags: ['interrupt()', 'interruptBefore', 'interruptAfter', 'resume', 'approval workflows'],
+        theory: ['interrupt() — dynamically pausing execution from inside a node', 'Static breakpoints — interruptBefore / interruptAfter on compile', 'Resuming a paused graph with Command(resume=...)', 'Approval workflows — pausing before a sensitive tool call for human sign-off', 'Editing state during a pause — human correction before resuming'],
+        labs: ['Add a static breakpoint before a "send_email" node and approve manually', 'Use interrupt() to ask a clarifying question mid-execution', "Build an approval gate that lets a human edit a draft before it's sent", 'Reject a proposed action and reroute the graph to revise it']
       },
       {
-        order: 9, title: 'Embeddings & vector stores', phase: 'RAG Pipeline', difficulty: 'Intermediate',
-        tags: ['OpenAIEmbeddings', 'FAISS', 'Chroma', 'Pinecone', 'cosine similarity', 'similarity search'],
-        theory: ['Embeddings — text represented as high-dimensional vectors', 'Similarity metrics: cosine similarity vs dot product', 'Embedding documents vs embedding queries', 'Vector store options: FAISS (in-memory), Chroma (local), Pinecone (cloud)', 'Adding documents to a vector store', 'Persisting and reloading a vector store across sessions'],
-        labs: ['Embed a list of sentences and compare their pairwise similarity', 'Build an in-memory FAISS vector store from a document set', 'Run a similarity search query and inspect top-k results', 'Persist the vector store to disk and reload it in a new session']
+        order: 9, title: 'Subgraphs', phase: 'Multi-Agent & Tools', difficulty: 'Advanced',
+        tags: ['nested graphs', 'subgraph state mapping', 'modular graphs', 'reusability'],
+        theory: ['Nesting one compiled graph as a node inside a parent graph', "Mapping state schemas between parent graph and subgraph", 'Building reusable, modular graph components', 'Streaming and checkpointing behavior across subgraph boundaries'],
+        labs: ['Build a standalone "research" subgraph and embed it in a larger graph', "Map a subset of parent state into a subgraph's own schema", 'Stream output through a graph that contains a nested subgraph', 'Reuse the same subgraph inside two different parent graphs']
       },
       {
-        order: 10, title: 'Retrievers', phase: 'RAG Pipeline', difficulty: 'Advanced',
-        tags: ['VectorStoreRetriever', 'MMR', 'Multi-Query', 'Contextual Compression', 'search strategies'],
-        theory: ['Retriever interface — getRelevantDocuments()', 'VectorStoreRetriever — top-k similarity search', 'MMR (Maximal Marginal Relevance) — diversity in retrieved results', 'Multi-Query Retriever — LLM-generated query variants to reduce ambiguity', 'Contextual Compression Retriever — post-retrieval relevance filtering', 'Combining and layering retrieval strategies'],
-        labs: ['Create a retriever from a vector store and fetch documents', 'Run MMR retrieval; compare diversity vs standard top-k', 'Use Multi-Query Retriever on an ambiguous question and observe sub-queries', 'Set up Contextual Compression; compare raw vs compressed retrieved context']
+        order: 10, title: 'Multi-agent architectures', phase: 'Multi-Agent & Tools', difficulty: 'Advanced',
+        tags: ['Supervisor', 'Network', 'Hierarchical Teams', 'Swarm', 'handoffs'],
+        theory: ['Network architecture — any agent can call any other agent', 'Supervisor architecture — a router/orchestrator delegates to worker agents', 'Hierarchical teams — supervisors of supervisors for large systems', 'Swarm — agents dynamically hand off control to one another', 'Handoffs — passing context and control between cooperating agents'],
+        labs: ['Build a Supervisor that routes questions to a "math" or "writer" worker agent', 'Convert the supervisor system into a peer-to-peer Network', 'Build a two-level hierarchical team (team leads + a top-level supervisor)', 'Implement a Swarm where agents hand off control based on a handoff tool call']
       },
       {
-        order: 11, title: 'RAG — full pipeline', phase: 'RAG Pipeline', difficulty: 'Advanced',
-        tags: ['end-to-end RAG', 'stuffing', 'map-reduce', 'refine', 'conversational RAG', 'source citations'],
-        theory: ['End-to-end RAG flow: load → split → embed → store → retrieve → generate', 'Stuffing strategy — all retrieved docs injected into one prompt', 'Map-Reduce strategy — summarize each chunk then synthesize', 'Refine strategy — iterative context integration across chunks', 'Conversational RAG — combining memory with retrieval', 'Returning source document metadata alongside the final answer'],
-        labs: ['Build a full Q&A bot over a PDF using the complete RAG pipeline', 'Add conversation memory for multi-turn RAG (conversational RAG)', 'Return source document metadata alongside each generated answer', 'Compare stuffing vs map-reduce on a long document']
+        order: 11, title: 'Tools & prebuilt components', phase: 'Multi-Agent & Tools', difficulty: 'Intermediate',
+        tags: ['ToolNode', 'createReactAgent', 'tool-calling loop', 'prebuilt agents'],
+        theory: ['ToolNode — executing tool calls as a dedicated graph node', 'The tool-calling loop pattern: agent node → ToolNode → agent node', "createReactAgent() — LangGraph's prebuilt ReAct-style agent graph", 'When to use a prebuilt agent vs. a hand-rolled custom graph', 'Customizing prebuilt agents: system prompts, state schema, hooks'],
+        labs: ['Wire up a ToolNode with two custom tools in a tool-calling loop', 'Build the same agent using createReactAgent() and compare code size', "Customize a prebuilt agent's system prompt and state schema", 'Add a pre-model hook to a prebuilt agent for input validation']
       },
       {
-        order: 12, title: 'Agents & tools', phase: 'Agents', difficulty: 'Advanced',
-        tags: ['ReAct', 'Tool', 'AgentExecutor', 'custom tools', 'DuckDuckGoSearch', 'Calculator', 'stopping conditions'],
-        theory: ['What distinguishes an agent from a chain', 'ReAct loop — Reason → Act → Observe → Repeat until done', 'Defining tools: name, description, and function/input schema', 'Built-in tools: web search, calculator, file reader, etc.', 'AgentExecutor — orchestrating the reasoning loop', 'Stopping conditions, max iterations, and error handling in agents'],
-        labs: ['Define a custom tool that wraps a simple function', 'Build a ReAct agent with a calculator tool and inspect reasoning steps', 'Add a web search tool; let the agent decide when to use it', 'Build a multi-tool agent and trace the full reasoning chain']
+        order: 12, title: 'Advanced execution patterns', phase: 'Production', difficulty: 'Advanced',
+        tags: ['Functional API', 'entrypoint/task', 'caching', 'retries', 'durable execution'],
+        theory: ['Functional API — entrypoint() and task() as a code-first alternative to StateGraph', 'Node-level caching to skip redundant work on re-runs', 'Retry policies and per-node error handling', 'Durable execution — surviving process crashes or restarts mid-run', 'Async graph execution and configurable runtime fields (RunnableConfig)'],
+        labs: ['Rebuild a simple graph using the Functional API (entrypoint + task)', 'Add a retry policy to a node that calls a flaky external API', 'Enable caching on a node and confirm repeated runs skip computation', 'Simulate a crash mid-run and resume via durable execution']
       },
       {
-        order: 13, title: 'Callbacks & observability', phase: 'Production', difficulty: 'Advanced',
-        tags: ['Callbacks', 'LangSmith', 'tracing', 'token usage', 'debugging'],
-        theory: ['LangChain callback system — event hooks (onLLMStart, onChainEnd, etc.)', 'Built-in callbacks: ConsoleCallbackHandler, token usage tracking', 'LangSmith — end-to-end run tracing and dataset-based evaluation', 'Debugging failing chains or agents with trace inspection', 'Evaluating run quality using LangSmith evals'],
-        labs: ['Attach ConsoleCallbackHandler to a chain and observe emitted events', 'Set up a LangSmith project and trace a full chain run', 'Track token usage across a multi-step RAG pipeline', 'Debug a failing agent by inspecting its LangSmith trace']
+        order: 13, title: 'Observability & debugging', phase: 'Production', difficulty: 'Advanced',
+        tags: ['LangSmith', 'getGraph', 'Mermaid', 'LangGraph Studio', 'streaming modes'],
+        theory: ['Tracing graph runs end-to-end with LangSmith', "Visualizing a compiled graph: getGraph() and Mermaid diagram export", 'LangGraph Studio — the visual graph debugger and run inspector', 'Streaming modes: values, updates, messages, custom, debug', 'Evaluating multi-step agent behavior against test datasets'],
+        labs: ["Trace a multi-agent run in LangSmith and inspect each node's span", "Export a graph's structure as a Mermaid diagram", 'Open a graph in LangGraph Studio and step through execution', 'Compare output across all five streaming modes on the same graph']
       },
       {
-        order: 14, title: 'Streaming & batching', phase: 'Production', difficulty: 'Advanced',
-        tags: ['streaming', 'batching', 'ainvoke', 'astream', 'abatch', 'RunnableConfig', 'async/await'],
-        theory: ['Streaming — incremental token delivery from a chain', 'How to stream output from any runnable or chain', 'Batching — processing many inputs in parallel with one call', 'Async methods: ainvoke(), astream(), abatch()', 'RunnableConfig — passing runtime config to runnables', 'Concurrency control and rate limiting in batched calls'],
-        labs: ['Stream chat model output to the console token by token', 'Stream a full RAG chain response end-to-end', 'Batch 10 queries to a chain and measure serial vs concurrent latency', 'Use ainvoke() with async/await inside a Node.js handler']
+        order: 14, title: 'Deployment & production patterns', phase: 'Production', difficulty: 'Advanced',
+        tags: ['LangGraph Platform', 'LangGraph Cloud', 'Postgres backends', 'testing', 'versioning'],
+        theory: ['LangGraph Platform / LangGraph Cloud — managed deployment for graphs', 'Production persistence backends (Postgres-backed checkpointers and stores)', 'Scaling considerations for stateful, long-running graphs', 'Testing strategies: unit-testing individual nodes, integration-testing full runs', 'Versioning graphs and migrating state schemas safely'],
+        labs: ['Deploy a compiled graph to LangGraph Platform and call it via API', 'Configure a Postgres-backed checkpointer for a production graph', 'Write unit tests for two individual nodes in isolation', 'Plan a state-schema migration for a graph with existing checkpoints']
       },
     ];
 
@@ -730,10 +738,11 @@
 
       const phaseMap = {
         'Foundation': 1,
-        'Core': 2,
-        'RAG Pipeline': 3,
-        'Agents': 4,
-        'Production': 5
+        'Control Flow': 2,
+        'Persistence & Memory': 3,
+        'Human-in-the-Loop': 4,
+        'Multi-Agent & Tools': 5,
+        'Production': 6
       };
 
       const phaseNum = phaseMap[unit.phase];
@@ -791,6 +800,7 @@
       tick();
     }
 
+    // Initial render
     document.addEventListener('DOMContentLoaded', () => {
       render(); // draw unit cards
       const durations = [1800, 2400, 2400, 1400];
