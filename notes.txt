@@ -1,0 +1,1 @@
+resources = https://claude.ai/share/27208e64-bf23-4284-aef7-688c0b7ed7df

@@ -2,6 +2,14 @@
 <html lang="en">
 
 <head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      }
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LangChain Mastery Roadmap</title>
@@ -503,10 +511,196 @@
     ::-webkit-scrollbar-thumb:hover {
       background: var(--color-text-secondary);
     }
+
+    /* Theme Toggle Button Styling */
+    .theme-toggle-btn {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      transform: scale(1.1);
+      border-color: var(--color-border-primary);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Light Theme Styling Variable Overrides */
+    :root.light-theme,
+    .light-theme {
+      --color-bg-base: #f5f7fa;
+      --color-bg-gradient: radial-gradient(circle at top center, #ffffff, #edf0f5 80%);
+      --color-background-primary: rgba(255, 255, 255, 0.85);
+      --color-background-secondary: rgba(235, 238, 243, 0.95);
+      --color-border-primary: rgba(0, 0, 0, 0.12);
+      --color-border-secondary: rgba(0, 0, 0, 0.06);
+      --color-border-tertiary: rgba(0, 0, 0, 0.03);
+
+      --color-text-primary: #1a202c;
+      --color-text-secondary: #4a5568;
+      --color-text-tertiary: #718096;
+
+      /* Phase badge overrides for readable contrast in light mode */
+      --p-found-bg: rgba(79, 70, 229, 0.08);
+      --p-found-text: #4f46e5;
+      --p-found-dot: #4f46e5;
+      --p-found-border: rgba(79, 70, 229, 0.2);
+
+      --p-core-bg: rgba(5, 150, 105, 0.08);
+      --p-core-text: #059669;
+      --p-core-dot: #059669;
+      --p-core-border: rgba(5, 150, 105, 0.2);
+
+      --p-comp-bg: rgba(5, 150, 105, 0.08);
+      --p-comp-text: #059669;
+      --p-comp-dot: #059669;
+      --p-comp-border: rgba(5, 150, 105, 0.2);
+
+      --p-rag-bg: rgba(2, 132, 199, 0.08);
+      --p-rag-text: #0284c7;
+      --p-rag-dot: #0284c7;
+      --p-rag-border: rgba(2, 132, 199, 0.2);
+
+      --p-stor-bg: rgba(2, 132, 199, 0.08);
+      --p-stor-text: #0284c7;
+      --p-stor-dot: #0284c7;
+      --p-stor-border: rgba(2, 132, 199, 0.2);
+
+      --p-agent-bg: rgba(217, 119, 6, 0.08);
+      --p-agent-text: #b45309;
+      --p-agent-dot: #d97706;
+      --p-agent-border: rgba(217, 119, 6, 0.2);
+
+      --p-app-bg: rgba(217, 119, 6, 0.08);
+      --p-app-text: #b45309;
+      --p-app-dot: #d97706;
+      --p-app-border: rgba(217, 119, 6, 0.2);
+
+      --p-prod-bg: rgba(220, 38, 38, 0.08);
+      --p-prod-text: #dc2626;
+      --p-prod-dot: #dc2626;
+      --p-prod-border: rgba(220, 38, 38, 0.2);
+
+      --p-sec-bg: rgba(220, 38, 38, 0.08);
+      --p-sec-text: #dc2626;
+      --p-sec-dot: #dc2626;
+      --p-sec-border: rgba(220, 38, 38, 0.2);
+
+      --p-ctrl-bg: rgba(13, 148, 136, 0.08);
+      --p-ctrl-text: #0d9488;
+      --p-ctrl-dot: #0d9488;
+      --p-ctrl-border: rgba(13, 148, 136, 0.2);
+
+      --p-mon-bg: rgba(13, 148, 136, 0.08);
+      --p-mon-text: #0d9488;
+      --p-mon-dot: #0d9488;
+      --p-mon-border: rgba(13, 148, 136, 0.2);
+
+      --p-pers-bg: rgba(2, 132, 199, 0.08);
+      --p-pers-text: #0284c7;
+      --p-pers-dot: #0284c7;
+      --p-pers-border: rgba(2, 132, 199, 0.2);
+
+      --p-hitl-bg: rgba(217, 119, 6, 0.08);
+      --p-hitl-text: #b45309;
+      --p-hitl-dot: #d97706;
+      --p-hitl-border: rgba(217, 119, 6, 0.2);
+
+      --p-multi-bg: rgba(147, 51, 234, 0.08);
+      --p-multi-text: #9333ea;
+      --p-multi-dot: #9333ea;
+      --p-multi-border: rgba(147, 51, 234, 0.2);
+
+      --p-arch-bg: rgba(147, 51, 234, 0.08);
+      --p-arch-text: #9333ea;
+      --p-arch-dot: #9333ea;
+      --p-arch-border: rgba(147, 51, 234, 0.2);
+    }
+
+    /* Light Theme adjustments for specific elements */
+    .light-theme h1 {
+      background: linear-gradient(135deg, #1a202c, #4a5568);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .light-theme .theme-toggle-btn {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .light-theme .unit-card:hover {
+      box-shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
+    }
+
+    .light-theme .tag {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--color-text-secondary);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .light-theme .unit-card:hover .tag {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--color-text-primary);
+    }
+
+    .light-theme .study-btn {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.1);
+      color: var(--color-text-primary);
+    }
+
+    .light-theme .study-btn:hover {
+      background: #1a202c;
+      color: #ffffff;
+      border-color: #1a202c;
+      box-shadow: 0 4px 12px rgba(26, 32, 44, 0.25);
+    }
+
+    .light-theme .filters {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .light-theme .filter-btn.active {
+      background: #1a202c;
+      color: #ffffff;
+      border-color: #1a202c;
+    }
+
+    .light-theme ::-webkit-scrollbar-track {
+      background: #f5f7fa;
+    }
+
+    .light-theme ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .light-theme ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
   </style>
 </head>
 
 <body>
+  <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+    <i class="ti ti-moon"></i>
+  </button>
 
   <div class="container">
     <header>
@@ -764,7 +958,24 @@
       window.requestAnimationFrame(step);
     }
 
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      updateThemeToggleIcon();
+    }
+
+    function updateThemeToggleIcon() {
+      const icon = document.querySelector('.theme-toggle-btn i');
+      if (!icon) return;
+      if (document.documentElement.classList.contains('light-theme')) {
+        icon.className = 'ti ti-sun';
+      } else {
+        icon.className = 'ti ti-moon';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      updateThemeToggleIcon();
       render(); // draw unit cards
       const durations = [1000, 1200, 1200, 800];
       document.querySelectorAll('.stat-val').forEach((el, i) => {
