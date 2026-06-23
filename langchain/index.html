@@ -745,58 +745,31 @@
       }
     }
 
-    // Scoreboard-style ticker for stat cards
-    function animateTicker(element, target, duration) {
+    // Smooth counting animation for stat cards
+    function animateCount(element, target, duration = 1200) {
       if (!element) return;
-      const lineH = parseFloat(getComputedStyle(element).fontSize) * 1.1;
-      element.style.cssText += `position:relative;overflow:hidden;height:${lineH}px;`;
-
-      let activeSpan = document.createElement('span');
-      activeSpan.style.cssText = 'display:block;position:absolute;inset:0;text-align:center;';
-      activeSpan.textContent = '0';
-      element.innerHTML = '';
-      element.appendChild(activeSpan);
-
-      const TICKS = Math.min(target, 10);
-      const interval = duration / TICKS;
-      const tickDur = Math.min(interval * 0.72, 200);
-      let step = 0;
-
-      function tick() {
-        if (step >= TICKS) return;
-        step++;
-        const newVal = step === TICKS ? target : Math.round((step / TICKS) * target);
-
-        const incoming = document.createElement('span');
-        incoming.style.cssText = `display:block;position:absolute;inset:0;text-align:center;transform:translateY(100%);will-change:transform;`;
-        incoming.textContent = newVal;
-        element.appendChild(incoming);
-
-        const outgoing = activeSpan;
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          outgoing.style.transition = `transform ${tickDur}ms cubic-bezier(.4,0,.2,1), opacity ${tickDur}ms ease`;
-          outgoing.style.transform = 'translateY(-100%)';
-          outgoing.style.opacity = '0';
-          incoming.style.transition = `transform ${tickDur}ms cubic-bezier(.4,0,.2,1)`;
-          incoming.style.transform = 'translateY(0)';
-        }));
-
-        activeSpan = incoming;
-        setTimeout(() => {
-          [...element.querySelectorAll('span')].forEach(s => { if (s !== activeSpan) s.remove(); });
-          tick();
-        }, interval);
-      }
-
-      tick();
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const easeProgress = progress * (2 - progress); // Ease out quad
+        const currentValue = Math.floor(easeProgress * target);
+        element.textContent = currentValue;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          element.textContent = target;
+        }
+      };
+      window.requestAnimationFrame(step);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       render(); // draw unit cards
-      const durations = [1800, 2400, 2400, 1400];
+      const durations = [1000, 1200, 1200, 800];
       document.querySelectorAll('.stat-val').forEach((el, i) => {
         const target = parseInt(el.textContent, 10);
-        if (!isNaN(target)) animateTicker(el, target, durations[i] || 1200);
+        if (!isNaN(target)) animateCount(el, target, durations[i] || 1200);
       });
     });
 

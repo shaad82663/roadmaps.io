@@ -385,6 +385,19 @@
           labs: 60
         },
         tags: ['Stateful Agents', 'Graphs', 'Multi-Agent', 'LLMs']
+      },
+      {
+        id: 'aws',
+        title: 'AWS Solutions Architect',
+        description: '46 units across 7 phases — from Cloud Foundations to Architecture Mastery and Exam Readiness. 100% SAA-C03 syllabus coverage.',
+        logo: 'AWS/logo.svg',
+        path: 'AWS/index.html',
+        stats: {
+          units: 46,
+          topics: 338,
+          labs: 184
+        },
+        tags: ['Cloud', 'AWS', 'Infrastructure', 'Solutions Architect']
       }
       /* 
       FUTURE SUBJECT EXAMPLE:
@@ -405,61 +418,22 @@
       */
     ];
 
-    function animateTicker(element, target, duration = 1400) {
+    function animateCount(element, target, duration = 1200) {
       if (!element) return;
-
-      // Prepare the element as a clipping viewport
-      const lineH = parseFloat(getComputedStyle(element).fontSize) * 1.1;
-      element.style.cssText += `position:relative;overflow:hidden;height:${lineH}px;`;
-
-      // Seed with "0"
-      let activeSpan = document.createElement('span');
-      activeSpan.style.cssText = 'display:block;position:absolute;inset:0;text-align:center;';
-      activeSpan.textContent = '0';
-      element.innerHTML = '';
-      element.appendChild(activeSpan);
-
-      const TICKS = Math.min(target, 10);
-      const interval = duration / TICKS;
-      const tickDur = Math.min(interval * 0.72, 200); // ms per flip
-
-      let step = 0;
-
-      function tick() {
-        if (step >= TICKS) return;
-        step++;
-        const newVal = step === TICKS ? target : Math.round((step / TICKS) * target);
-
-        // Build incoming span (starts below)
-        const incoming = document.createElement('span');
-        incoming.style.cssText = `display:block;position:absolute;inset:0;text-align:center;transform:translateY(100%);will-change:transform;`;
-        incoming.textContent = newVal;
-        element.appendChild(incoming);
-
-        const outgoing = activeSpan;
-
-        // Double-rAF ensures the browser has painted the initial position
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          outgoing.style.transition = `transform ${tickDur}ms cubic-bezier(.4,0,.2,1), opacity ${tickDur}ms ease`;
-          outgoing.style.transform = 'translateY(-100%)';
-          outgoing.style.opacity = '0';
-
-          incoming.style.transition = `transform ${tickDur}ms cubic-bezier(.4,0,.2,1)`;
-          incoming.style.transform = 'translateY(0)';
-        }));
-
-        activeSpan = incoming;
-
-        setTimeout(() => {
-          // Prune old spans, keep only the live one
-          [...element.querySelectorAll('span')].forEach(s => {
-            if (s !== activeSpan) s.remove();
-          });
-          tick();
-        }, interval);
-      }
-
-      tick();
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const easeProgress = progress * (2 - progress); // Ease out quad
+        const currentValue = Math.floor(easeProgress * target);
+        element.textContent = currentValue;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          element.textContent = target;
+        }
+      };
+      window.requestAnimationFrame(step);
     }
 
     function renderDashboard() {
@@ -489,11 +463,11 @@
         </div>
       `;
 
-      // Scoreboard-style ticker animation
-      animateTicker(document.getElementById('stat-roadmaps'), totalRoadmaps, 1400);
-      animateTicker(document.getElementById('stat-units'), totalUnits, 2200);
-      animateTicker(document.getElementById('stat-topics'), totalTopics, 2600);
-      animateTicker(document.getElementById('stat-labs'), totalLabs, 2600);
+      // Smooth counting animation
+      animateCount(document.getElementById('stat-roadmaps'), totalRoadmaps, 800);
+      animateCount(document.getElementById('stat-units'), totalUnits, 1000);
+      animateCount(document.getElementById('stat-topics'), totalTopics, 1200);
+      animateCount(document.getElementById('stat-labs'), totalLabs, 1200);
 
       // 2. Render Cards
       const gridEl = document.getElementById('roadmaps-list');

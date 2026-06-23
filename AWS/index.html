@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS SAA-C03 Mastery Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    :root {
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --color-bg-base: #0f1115;
+      --color-bg-gradient: radial-gradient(circle at top center, #1a1d24, #0f1115 80%);
+      --color-background-primary: rgba(30, 33, 40, 0.6);
+      --color-background-secondary: rgba(45, 49, 58, 0.7);
+      --color-border-primary: rgba(255, 255, 255, 0.15);
+      --color-border-secondary: rgba(255, 255, 255, 0.08);
+      --color-border-tertiary: rgba(255, 255, 255, 0.04);
+
+      --color-text-primary: #f8f9fa;
+      --color-text-secondary: #adb5bd;
+      --color-text-tertiary: #6c757d;
+
+      --border-radius-md: 12px;
+      --border-radius-lg: 16px;
+
+      /* Phase 1 – Cloud Foundations: Indigo */
+      --p-found-bg: rgba(99, 102, 241, 0.15);
+      --p-found-text: #a5b4fc;
+      --p-found-dot: #6366f1;
+      --p-found-border: rgba(99, 102, 241, 0.3);
+
+      /* Phase 2 – Compute & Networking: Emerald */
+      --p-comp-bg: rgba(16, 185, 129, 0.15);
+      --p-comp-text: #6ee7b7;
+      --p-comp-dot: #10b981;
+      --p-comp-border: rgba(16, 185, 129, 0.3);
+
+      /* Phase 3 – Storage & Databases: Sky */
+      --p-stor-bg: rgba(56, 189, 248, 0.15);
+      --p-stor-text: #7dd3fc;
+      --p-stor-dot: #38bdf8;
+      --p-stor-border: rgba(56, 189, 248, 0.3);
+
+      /* Phase 4 – App Services: Amber */
+      --p-app-bg: rgba(245, 158, 11, 0.15);
+      --p-app-text: #fcd34d;
+      --p-app-dot: #f59e0b;
+      --p-app-border: rgba(245, 158, 11, 0.3);
+
+      /* Phase 5 – Security & Compliance: Rose */
+      --p-sec-bg: rgba(239, 68, 68, 0.15);
+      --p-sec-text: #fca5a5;
+      --p-sec-dot: #ef4444;
+      --p-sec-border: rgba(239, 68, 68, 0.3);
+
+      /* Phase 6 – Monitoring & Automation: Teal */
+      --p-mon-bg: rgba(20, 184, 166, 0.15);
+      --p-mon-text: #5eead4;
+      --p-mon-dot: #14b8a6;
+      --p-mon-border: rgba(20, 184, 166, 0.3);
+
+      /* Phase 7 – Architecture & Exam Prep: Purple */
+      --p-arch-bg: rgba(168, 85, 247, 0.15);
+      --p-arch-text: #d8b4fe;
+      --p-arch-dot: #a855f7;
+      --p-arch-border: rgba(168, 85, 247, 0.3);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+      background: var(--color-bg-base);
+      background-image: var(--color-bg-gradient);
+      background-attachment: fixed;
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+
+    header { margin-bottom: 3.5rem; text-align: center; }
+
+    .header-badge {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fcd34d;
+      margin-bottom: 1.25rem;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 0 0 1rem;
+      background: linear-gradient(135deg, #ffffff, #adb5bd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--color-text-secondary);
+      font-size: 1.1rem;
+      font-weight: 300;
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-card {
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem 2rem;
+      min-width: 130px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--color-border-primary); }
+
+    .stat-val {
+      font-size: 2.75rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+    }
+
+    .filters {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+      justify-content: center;
+      background: rgba(0,0,0,0.3);
+      padding: 0.45rem;
+      border-radius: 100px;
+      border: 1px solid var(--color-border-tertiary);
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .filter-btn {
+      padding: 0.55rem 1.1rem;
+      font-size: 0.88rem;
+      border-radius: 100px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active {
+      border-color: var(--color-border-primary);
+      color: var(--color-text-primary);
+      background: var(--color-background-secondary);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .filter-btn:hover:not(.active) {
+      color: var(--color-text-primary);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .unit-row {
+      display: flex;
+      gap: 1.5rem;
+      align-items: stretch;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.5s forwards ease-out;
+    }
+
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    .spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 24px;
+      flex-shrink: 0;
+      padding-top: 2rem;
+    }
+
+    .spine-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px currentColor;
+      z-index: 2;
+      position: relative;
+      transition: transform 0.3s;
+    }
+
+    .unit-card:hover .spine-dot { transform: scale(1.2); }
+
+    .spine-dot::after {
+      content: '';
+      position: absolute;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      opacity: 0.3;
+    }
+
+    .spine-line {
+      flex: 1;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--color-border-secondary) 0%, transparent 100%);
+      margin-top: 1rem;
+    }
+
+    .unit-card {
+      flex: 1;
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.75rem;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .unit-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 100%;
+      background: linear-gradient(120deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .unit-card:hover { border-color: var(--color-border-primary); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+    .unit-card:hover::before { opacity: 1; }
+
+    .unit-header { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+    .unit-num {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--color-text-tertiary);
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .unit-title {
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      flex: 1;
+      min-width: 200px;
+      letter-spacing: -0.3px;
+    }
+
+    .phase-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.32rem 0.8rem;
+      border-radius: 100px;
+      white-space: nowrap;
+      border: 1px solid;
+    }
+
+    .diff-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.32rem 0.8rem;
+      border-radius: 100px;
+      border: 1px solid var(--color-border-tertiary);
+      color: var(--color-text-secondary);
+      background: rgba(255,255,255,0.02);
+      white-space: nowrap;
+    }
+
+    .tags-row { display: flex; flex-wrap: wrap; gap: 0.55rem; margin: 1.1rem 0 0 0; }
+
+    .tag {
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      padding: 0.28rem 0.7rem;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--color-border-tertiary);
+      color: var(--color-text-secondary);
+      transition: all 0.2s;
+    }
+
+    .unit-card:hover .tag { border-color: var(--color-border-secondary); color: var(--color-text-primary); }
+
+    .expand-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .expand-content.open { max-height: 2200px; opacity: 1; margin-top: 1.5rem; }
+
+    .expand-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-border-secondary), transparent);
+      margin-bottom: 1.5rem;
+    }
+
+    .expand-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media(max-width: 768px) {
+      .expand-grid { grid-template-columns: 1fr; }
+      .unit-title { font-size: 1.15rem; }
+      .stat-card { padding: 1.25rem; min-width: 100px; }
+      .stat-val { font-size: 2.2rem; }
+      h1 { font-size: 2.2rem; }
+      .filters { border-radius: 16px; }
+    }
+
+    .section-label {
+      font-size: 0.82rem;
+      color: var(--color-text-primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-label i { color: var(--color-text-secondary); font-size: 1.15rem; }
+
+    .item-list { margin: 0; padding: 0; list-style: none; }
+
+    .item-list li {
+      font-size: 0.97rem;
+      color: var(--color-text-secondary);
+      padding: 0.48rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      line-height: 1.5;
+      border-bottom: 1px solid var(--color-border-tertiary);
+    }
+
+    .item-list li:last-child { border-bottom: none; }
+
+    .item-list li::before {
+      content: '→';
+      color: var(--color-text-tertiary);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .study-btn {
+      font-size: 0.97rem;
+      font-weight: 500;
+      padding: 0.82rem 1.5rem;
+      border-radius: var(--border-radius-md);
+      border: 1px solid var(--color-border-primary);
+      background: rgba(255,255,255,0.05);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      margin-top: 2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .study-btn:hover {
+      background: var(--color-text-primary);
+      color: var(--color-bg-base);
+      border-color: var(--color-text-primary);
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+
+    .chevron {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-block;
+      font-size: 1.2rem;
+      color: var(--color-text-tertiary);
+      margin-left: auto;
+    }
+
+    .unit-card:hover .chevron { color: var(--color-text-primary); }
+    .chevron.open { transform: rotate(180deg); }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--color-bg-base); }
+    ::-webkit-scrollbar-thumb { background: var(--color-border-primary); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-badge">SAA-C03 Certification Roadmap</div>
+      <h1>AWS Solutions Architect</h1>
+      <p class="subtitle">46 units across 7 phases — from Cloud Foundations to Architecture Mastery and Exam Readiness. 100% SAA-C03 syllabus coverage.</p>
+    </header>
+
+    <div class="stats-container">
+      <div class="stat-card"><div class="stat-val">46</div><div class="stat-label">Units</div></div>
+      <div class="stat-card"><div class="stat-val">338</div><div class="stat-label">Topics</div></div>
+      <div class="stat-card"><div class="stat-val">184</div><div class="stat-label">Labs</div></div>
+      <div class="stat-card"><div class="stat-val">7</div><div class="stat-label">Phases</div></div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all', this)">All Phases</button>
+      <button class="filter-btn" onclick="setFilter('Cloud Foundations', this)">Cloud Foundations</button>
+      <button class="filter-btn" onclick="setFilter('Compute & Networking', this)">Compute & Networking</button>
+      <button class="filter-btn" onclick="setFilter('Storage & Databases', this)">Storage & Databases</button>
+      <button class="filter-btn" onclick="setFilter('App Services', this)">App Services</button>
+      <button class="filter-btn" onclick="setFilter('Security & Compliance', this)">Security</button>
+      <button class="filter-btn" onclick="setFilter('Monitoring & Automation', this)">Monitoring</button>
+      <button class="filter-btn" onclick="setFilter('Architecture & Exam Prep', this)">Arch & Exam</button>
+    </div>
+
+    <div id="units-list"></div>
+  </div>
+
+  <script>
+    const phases = {
+      'Cloud Foundations':      { bg: 'var(--p-found-bg)', text: 'var(--p-found-text)', dot: 'var(--p-found-dot)', border: 'var(--p-found-border)' },
+      'Compute & Networking':   { bg: 'var(--p-comp-bg)',  text: 'var(--p-comp-text)',  dot: 'var(--p-comp-dot)',  border: 'var(--p-comp-border)'  },
+      'Storage & Databases':    { bg: 'var(--p-stor-bg)',  text: 'var(--p-stor-text)',  dot: 'var(--p-stor-dot)',  border: 'var(--p-stor-border)'  },
+      'App Services':           { bg: 'var(--p-app-bg)',   text: 'var(--p-app-text)',   dot: 'var(--p-app-dot)',   border: 'var(--p-app-border)'   },
+      'Security & Compliance':  { bg: 'var(--p-sec-bg)',   text: 'var(--p-sec-text)',   dot: 'var(--p-sec-dot)',   border: 'var(--p-sec-border)'   },
+      'Monitoring & Automation':{ bg: 'var(--p-mon-bg)',   text: 'var(--p-mon-text)',   dot: 'var(--p-mon-dot)',   border: 'var(--p-mon-border)'   },
+      'Architecture & Exam Prep':{ bg: 'var(--p-arch-bg)', text: 'var(--p-arch-text)', dot: 'var(--p-arch-dot)',  border: 'var(--p-arch-border)'  }
+    };
+
+    const units = [
+      // ─── PHASE 1: CLOUD FOUNDATIONS ───────────────────────────────────────
+      {
+        order: 0, title: 'AWS Fundamentals & Global Infrastructure', phase: 'Cloud Foundations', difficulty: 'Beginner',
+        tags: ['Regions', 'AZs', 'Edge Locations', 'Local Zones', 'Shared Responsibility', 'Service Health'],
+        theory: [
+          'Cloud computing models: IaaS, PaaS, SaaS — definitions and AWS mapping',
+          'AWS Global Infrastructure: Regions, Availability Zones, Local Zones, Wavelength Zones',
+          'Edge Locations and Points of Presence (PoP) for CloudFront and Route 53',
+          'Global vs. Regional vs. AZ-scoped services — how scope affects resilience design',
+          'AWS Shared Responsibility Model: security OF the cloud vs. security IN the cloud',
+          'AWS Service Health Dashboard and Personal Health Dashboard',
+          'AWS Well-Architected Framework: six pillars overview'
+        ],
+        labs: [
+          'Explore the AWS Management Console and identify global vs. regional services',
+          'Navigate the AWS Global Infrastructure map and verify Region/AZ counts',
+          'Review the Shared Responsibility Model applied to EC2 and S3',
+          'Access Personal Health Dashboard and subscribe to Service Health alerts'
+        ]
+      },
+      {
+        order: 1, title: 'IAM Essentials', phase: 'Cloud Foundations', difficulty: 'Beginner',
+        tags: ['Users', 'Groups', 'Roles', 'Policies', 'MFA', 'ARN', 'Least Privilege'],
+        theory: [
+          'IAM Users, Groups, and Roles — purpose and differences',
+          'IAM Policies: inline vs. managed, identity-based vs. resource-based',
+          'Amazon Resource Names (ARNs): structure and wildcard usage',
+          'Multi-Factor Authentication (MFA): Virtual MFA, U2F, hardware token',
+          'IAM Best Practices: root account protection, least privilege, credential rotation',
+          'IAM Password Policy, Account Alias, and credential report',
+          'IAM Policy Simulator for testing effective permissions'
+        ],
+        labs: [
+          'Create IAM users and groups; assign AWS-managed and custom policies',
+          'Enable MFA on the root account and an IAM user account',
+          'Create an IAM role for EC2 and attach an S3 read policy',
+          'Use the IAM Policy Simulator to validate effective permissions'
+        ]
+      },
+      {
+        order: 2, title: 'AWS CLI, SDK & Access Methods', phase: 'Cloud Foundations', difficulty: 'Beginner',
+        tags: ['CLI', 'SDK', 'CloudShell', 'Access Keys', 'Named Profiles', 'Credential Precedence'],
+        theory: [
+          'AWS CLI v2: installation, configuration, and command structure',
+          'AWS CloudShell: browser-based CLI with pre-authenticated access',
+          'Access keys vs. IAM roles for programmatic access — security trade-offs',
+          'Credential provider chain and precedence order',
+          'Named profiles and region/output configuration in ~/.aws/config',
+          'AWS SDK overview: Python (Boto3), Node.js, Java — common use cases'
+        ],
+        labs: [
+          'Install and configure AWS CLI v2 with access keys and a default region',
+          'Run CLI commands: describe-instances, list-buckets, describe-vpcs',
+          'Use AWS CloudShell to run commands without local setup',
+          'Configure multiple named CLI profiles and switch between them'
+        ]
+      },
+      {
+        order: 3, title: 'Billing, Pricing & Support', phase: 'Cloud Foundations', difficulty: 'Beginner',
+        tags: ['Free Tier', 'Pricing Calculator', 'Cost Explorer', 'Budgets', 'Support Plans', 'Savings Plans', 'TCO'],
+        theory: [
+          'AWS pricing models: On-Demand, Reserved, Spot, Savings Plans, and Dedicated',
+          'AWS Free Tier categories: 12-month, Always Free, and short-term trial offers',
+          'AWS Pricing Calculator and Total Cost of Ownership (TCO) Calculator',
+          'AWS Cost Explorer: cost and usage visualisation, filtering, and forecasting',
+          'AWS Budgets: cost, usage, Savings Plan, and reservation budget types',
+          'AWS Support Plans: Basic, Developer, Business, Enterprise On-Ramp, Enterprise',
+          'AWS Marketplace: third-party software procurement and licensing models'
+        ],
+        labs: [
+          'Create a CloudWatch billing alarm to alert when estimated charges exceed threshold',
+          'Set up a monthly cost budget in AWS Budgets with email alerts',
+          'Use the AWS Pricing Calculator to estimate a 3-tier web application cost',
+          'Explore Cost Explorer to analyse service-level spending breakdowns'
+        ]
+      },
+
+      // ─── PHASE 2: COMPUTE & NETWORKING ────────────────────────────────────
+      {
+        order: 4, title: 'EC2 Fundamentals', phase: 'Compute & Networking', difficulty: 'Beginner',
+        tags: ['Instance Types', 'AMI', 'Key Pairs', 'Security Groups', 'User Data', 'EIP', 'IMDSv2'],
+        theory: [
+          'EC2 instance families: General Purpose, Compute Optimised, Memory Optimised, Storage Optimised, Accelerated Computing',
+          'Amazon Machine Images (AMIs): public, private, community, Marketplace AMIs',
+          'EC2 instance lifecycle: pending, running, stopping, stopped, terminated states',
+          'Security Groups: stateful virtual firewall rules, inbound vs. outbound',
+          'Key pairs: RSA and ED25519, SSH for Linux, RDP for Windows',
+          'Elastic IP Addresses (EIPs): static public IPv4, association and re-association',
+          'EC2 User Data scripts: bootstrap execution at launch',
+          'Instance Metadata Service (IMDSv1 vs. IMDSv2): token-based security'
+        ],
+        labs: [
+          'Launch an EC2 instance with a bootstrap User Data script; verify via browser',
+          'Configure security group rules for SSH (22) and HTTP (80) inbound access',
+          'Allocate an Elastic IP and associate/disassociate it with a running instance',
+          'Connect via SSH and query IMDSv2 for instance metadata tokens'
+        ]
+      },
+      {
+        order: 5, title: 'EC2 Advanced', phase: 'Compute & Networking', difficulty: 'Intermediate',
+        tags: ['Placement Groups', 'Spot', 'Reserved', 'Savings Plans', 'Dedicated Hosts', 'Hibernate', 'Nitro'],
+        theory: [
+          'EC2 Placement Groups: Cluster (low latency), Spread (isolation), Partition (large distributed apps)',
+          'EC2 Purchasing Options: On-Demand, Standard Reserved, Convertible Reserved, Scheduled Reserved',
+          'Spot Instances: Spot price, interruption notices, Spot Blocks, Spot Fleet with diversification',
+          'Dedicated Hosts vs. Dedicated Instances: licensing and tenancy differences',
+          'Capacity Reservations: on-demand capacity guarantee in a specific AZ',
+          'EC2 Hibernate: in-memory state preserved to EBS, RAM < 150 GB, resume in seconds',
+          'AWS Nitro System: next-generation hypervisor with near bare-metal performance',
+          'EC2 Compute Savings Plans vs. EC2 Instance Savings Plans: flexibility trade-offs'
+        ],
+        labs: [
+          'Create a Cluster Placement Group and launch two EC2 instances into it',
+          'Request a Spot Instance with a maximum price; observe potential interruption',
+          'Compare 1-year On-Demand vs. Standard Reserved pricing for m5.xlarge',
+          'Enable EC2 Hibernate on a supported instance type and verify memory restoration'
+        ]
+      },
+      {
+        order: 6, title: 'VPC Core Concepts', phase: 'Compute & Networking', difficulty: 'Intermediate',
+        tags: ['CIDR', 'Subnets', 'Route Tables', 'IGW', 'NAT Gateway', 'DNS', 'Public/Private Subnets'],
+        theory: [
+          'VPC fundamentals: CIDR blocks, primary and secondary CIDR ranges',
+          'Public vs. Private subnet design: internet-routable vs. isolated subnets',
+          'Internet Gateway (IGW): enables internet access for public subnets',
+          'NAT Gateway vs. NAT Instance: managed HA vs. self-managed, cost comparison',
+          'Route table types: main route table and custom route tables; subnet associations',
+          'VPC DNS: enableDnsSupport and enableDnsHostnames settings',
+          'Elastic Network Interfaces (ENIs): primary and secondary, cross-AZ attachment rules'
+        ],
+        labs: [
+          'Create a custom VPC with public and private subnets across two Availability Zones',
+          'Attach an Internet Gateway and configure the public subnet route table',
+          'Deploy a NAT Gateway in a public subnet; route private subnet traffic through it',
+          'Launch EC2 instances in both subnet types; verify connectivity differences'
+        ]
+      },
+      {
+        order: 7, title: 'VPC Advanced Networking', phase: 'Compute & Networking', difficulty: 'Intermediate',
+        tags: ['VPC Peering', 'Transit Gateway', 'VPC Endpoints', 'PrivateLink', 'NACLs', 'Flow Logs', 'Egress-Only IGW'],
+        theory: [
+          'VPC Peering: non-transitive, cross-account, cross-region; overlapping CIDR limitations',
+          'Transit Gateway: hub-and-spoke model, route tables, attachments, inter-region peering',
+          'VPC Endpoints: Gateway type (S3, DynamoDB) vs. Interface type (PrivateLink-backed)',
+          'AWS PrivateLink: private exposure of services across VPCs without peering',
+          'Network ACLs: stateless, numbered rules, inbound and outbound evaluated separately',
+          'Security Groups vs. NACLs: stateful vs. stateless comparison for exam scenarios',
+          'VPC Flow Logs: capturing IP traffic metadata; destinations (S3, CloudWatch Logs)',
+          'Egress-Only Internet Gateway: IPv6 outbound without inbound IPv6 access'
+        ],
+        labs: [
+          'Create a VPC Peering connection between two VPCs; update route tables on both sides',
+          'Configure a VPC Gateway Endpoint for private S3 access from a private subnet',
+          'Create a VPC Interface Endpoint for Systems Manager and test Session Manager',
+          'Enable VPC Flow Logs to CloudWatch Logs; analyse rejected traffic'
+        ]
+      },
+      {
+        order: 8, title: 'Elastic Load Balancing', phase: 'Compute & Networking', difficulty: 'Intermediate',
+        tags: ['ALB', 'NLB', 'GWLB', 'Target Groups', 'Health Checks', 'SSL Termination', 'Sticky Sessions', 'Cross-Zone LB'],
+        theory: [
+          'ALB (Application Load Balancer): Layer 7, HTTP/HTTPS, WebSocket, HTTP/2 support',
+          'ALB routing rules: path-based, host-based, HTTP header, query string, source IP',
+          'NLB (Network Load Balancer): Layer 4, TCP/UDP/TLS, static IPs per AZ, ultra-low latency',
+          'GWLB (Gateway Load Balancer): Layer 3, transparent inline inspection for security appliances',
+          'CLB (Classic Load Balancer): legacy Layer 4/7, avoid for new architectures',
+          'Target Groups: EC2 instances, IP addresses, Lambda functions, ALB as NLB target',
+          'Health checks: protocol, path, thresholds, intervals, timeout configuration',
+          'SSL/TLS termination at ALB vs. NLB SSL passthrough vs. NLB TLS termination',
+          'Sticky sessions (session affinity): duration-based vs. application-based cookies',
+          'Cross-zone load balancing: enabled by default on ALB, optional on NLB'
+        ],
+        labs: [
+          'Create an ALB with two target groups and configure path-based routing rules',
+          'Deploy an NLB with a static Elastic IP and TCP listener; test connection persistence',
+          'Attach an ACM SSL certificate to an ALB HTTPS listener; redirect HTTP to HTTPS',
+          'Enable sticky sessions on an ALB target group and verify session persistence'
+        ]
+      },
+      {
+        order: 9, title: 'Auto Scaling Groups', phase: 'Compute & Networking', difficulty: 'Intermediate',
+        tags: ['Launch Templates', 'Scaling Policies', 'Cooldown', 'Lifecycle Hooks', 'Predictive Scaling', 'Mixed Instances'],
+        theory: [
+          'ASG components: minimum, maximum, desired capacity; AZ balancing',
+          'Launch Templates vs. Launch Configurations: versioning, mixed instances, IPv6 support',
+          'Scaling policies: Simple, Step, Target Tracking, Scheduled, Predictive',
+          'Target Tracking: scale on CPU, ALB request count, custom CloudWatch metrics',
+          'Cooldown period: default 300s; warm-up for instance metric contribution delay',
+          'ASG Lifecycle Hooks: Pending:Wait and Terminating:Wait states for custom logic',
+          'ASG health checks: EC2 status vs. ELB health check; grace period',
+          'Mixed instances policy: Spot + On-Demand combinations for cost optimisation'
+        ],
+        labs: [
+          'Create an ASG with a Launch Template across two AZs; attach it to an ALB',
+          'Configure a Target Tracking policy (CPU = 50%) and simulate load with stress tool',
+          'Add a Lifecycle Hook on instance termination; drain connections before shutdown',
+          'Enable Predictive Scaling and review the scaling schedule it generates'
+        ]
+      },
+      {
+        order: 10, title: 'Route 53 & DNS', phase: 'Compute & Networking', difficulty: 'Intermediate',
+        tags: ['Hosted Zones', 'Routing Policies', 'Health Checks', 'Alias Records', 'Domain Registration', 'Resolver'],
+        theory: [
+          'DNS fundamentals: TTL, record types (A, AAAA, CNAME, MX, NS, SOA, TXT, PTR)',
+          'Route 53 Hosted Zones: public (internet-facing) vs. private (VPC-scoped)',
+          'Alias records vs. CNAME records: Alias maps to AWS resources, no additional charge',
+          'Routing policies: Simple, Weighted, Latency, Failover, Geolocation, Geoproximity, Multi-Value Answer, IP-Based',
+          'Route 53 Health Checks: endpoint, calculated (aggregated), CloudWatch alarm-based',
+          'Route 53 Resolver: outbound and inbound endpoints for hybrid DNS resolution',
+          'Domain registration, transfer, and DNSSEC signing'
+        ],
+        labs: [
+          'Create a public hosted zone and configure A and CNAME records for a domain',
+          'Implement Weighted routing between two EC2 instances with a 70/30 split',
+          'Configure Failover routing (primary + secondary) with Route 53 health checks',
+          'Set up Latency-based routing across two regions and verify nearest region response'
+        ]
+      },
+
+      // ─── PHASE 3: STORAGE & DATABASES ─────────────────────────────────────
+      {
+        order: 11, title: 'S3 Fundamentals', phase: 'Storage & Databases', difficulty: 'Beginner',
+        tags: ['Buckets', 'Objects', 'Versioning', 'Storage Classes', 'Lifecycle', 'Static Website', 'Multipart Upload'],
+        theory: [
+          'S3 object model: buckets, objects, keys, metadata, ETags, object URL structure',
+          'S3 storage classes: Standard, Standard-IA, One Zone-IA, Intelligent-Tiering, Glacier Instant Retrieval, Glacier Flexible Retrieval, Glacier Deep Archive',
+          'S3 Versioning: enabling, suspending; delete markers; MFA Delete protection',
+          'S3 Lifecycle policies: transition actions (between classes) and expiration actions',
+          'S3 multipart upload: required for objects > 5 GB, recommended above 100 MB',
+          'S3 static website hosting: bucket policy, index and error documents, custom domains',
+          'S3 event notifications: S3 → SQS, SNS, Lambda, EventBridge triggers'
+        ],
+        labs: [
+          'Create a versioned S3 bucket; upload, overwrite, and restore a previous version',
+          'Configure a lifecycle rule to transition objects to Glacier after 90 days',
+          'Host a static website on S3 with public access and a custom error page',
+          'Configure S3 event notification to trigger a Lambda on object creation'
+        ]
+      },
+      {
+        order: 12, title: 'S3 Advanced & Security', phase: 'Storage & Databases', difficulty: 'Intermediate',
+        tags: ['SSE-S3', 'SSE-KMS', 'SSE-C', 'Bucket Policy', 'Block Public Access', 'Pre-Signed URLs', 'Replication', 'Object Lock', 'S3 Access Points'],
+        theory: [
+          'S3 encryption at rest: SSE-S3 (AES-256), SSE-KMS (CMK, key policy control), SSE-C (customer-provided keys)',
+          'S3 client-side encryption: encrypt before upload using AWS Encryption SDK',
+          'S3 encryption in transit: enforcing TLS via bucket policy (aws:SecureTransport)',
+          'S3 Block Public Access: account-level and bucket-level ACL/policy override settings',
+          'S3 Bucket Policies vs. IAM policies vs. ACLs: scope and precedence',
+          'Pre-Signed URLs: time-limited access for GET and PUT operations',
+          'S3 Access Points: application-specific aliases with scoped bucket policies',
+          'S3 Cross-Region Replication (CRR) and Same-Region Replication (SRR): requirements, delete marker replication',
+          'S3 Object Lock: Write-Once-Read-Many (WORM); Governance vs. Compliance mode; Legal Hold',
+          'S3 Transfer Acceleration: CloudFront Edge for faster long-distance uploads'
+        ],
+        labs: [
+          'Enable SSE-KMS on a bucket and verify object-level encryption headers',
+          'Create a bucket policy that enforces HTTPS and denies if KMS is not used',
+          'Generate a pre-signed URL for a private object and test with a browser',
+          'Configure Cross-Region Replication; verify object replication including delete markers'
+        ]
+      },
+      {
+        order: 13, title: 'EBS & Instance Store', phase: 'Storage & Databases', difficulty: 'Intermediate',
+        tags: ['gp3', 'io2', 'st1', 'sc1', 'Snapshots', 'Encryption', 'Multi-Attach', 'Elastic Volumes', 'Instance Store'],
+        theory: [
+          'EBS volume types: gp2/gp3 (general SSD), io1/io2 (provisioned IOPS SSD), st1 (throughput HDD), sc1 (cold HDD)',
+          'gp3 vs. gp2: independent IOPS/throughput configuration; baseline and burst characteristics',
+          'io2 Block Express: highest durability (99.999%), up to 256,000 IOPS',
+          'EBS Snapshots: incremental, stored in S3, cross-region copy, cross-account sharing',
+          'EBS Encryption: at-rest with KMS, encrypted AMIs, snapshot encryption inheritance',
+          'EBS Multi-Attach: io1/io2 only; attach one volume to multiple EC2s in same AZ',
+          'Instance Store: ephemeral NVMe SSD, data lost on stop/termination; use for buffers and caches',
+          'Elastic Volumes: modify type, size, IOPS without detachment on nitro instances'
+        ],
+        labs: [
+          'Create a gp3 volume; attach, format, and mount it to a running EC2 instance',
+          'Take an EBS snapshot and restore it as a new volume in a different AZ',
+          'Enable EBS default encryption at the region level; verify new volume inheritance',
+          'Perform an Elastic Volume modification (gp2 → gp3) and observe live migration'
+        ]
+      },
+      {
+        order: 14, title: 'EFS, FSx & Shared File Storage', phase: 'Storage & Databases', difficulty: 'Intermediate',
+        tags: ['EFS', 'FSx for Windows', 'FSx for Lustre', 'FSx for NetApp ONTAP', 'Performance Modes', 'Throughput Modes'],
+        theory: [
+          'Amazon EFS: fully managed NFS (NFSv4), elastic, multi-AZ, thousands of concurrent connections',
+          'EFS Performance Modes: General Purpose (low latency) vs. Max I/O (high throughput, higher latency)',
+          'EFS Throughput Modes: Bursting (proportional to size), Provisioned, Elastic',
+          'EFS Storage Classes: Standard, Standard-IA, One Zone, One Zone-IA and lifecycle management',
+          'Amazon FSx for Windows File Server: SMB protocol, Active Directory integration, DFS Namespaces',
+          'Amazon FSx for Lustre: HPC workloads, sub-millisecond latency, S3 data repository integration',
+          'Amazon FSx for NetApp ONTAP: multi-protocol (NFS, SMB, iSCSI), SnapMirror, deduplication',
+          'Amazon FSx for OpenZFS: ZFS file system, NFS-compatible, data compression and cloning'
+        ],
+        labs: [
+          'Create an EFS file system and mount it to two EC2 instances; write from one and read from the other',
+          'Configure an EFS lifecycle policy to transition files to IA after 30 days',
+          'Launch FSx for Windows; join to Active Directory and access from a Windows EC2 instance',
+          'Create FSx for Lustre linked to an S3 bucket; import and export data'
+        ]
+      },
+      {
+        order: 15, title: 'Storage Gateway & Snow Family', phase: 'Storage & Databases', difficulty: 'Intermediate',
+        tags: ['File Gateway', 'Volume Gateway', 'Tape Gateway', 'DataSync', 'Snowball Edge', 'Snowcone', 'Snowmobile', 'Transfer Family'],
+        theory: [
+          'AWS Storage Gateway types: File Gateway (NFS/SMB → S3), Volume Gateway (iSCSI → EBS/S3), Tape Gateway (VTL → S3/Glacier)',
+          'File Gateway: on-premises NFS/SMB access to S3, local cache for frequently accessed data',
+          'Volume Gateway modes: Cached (primary in S3, local cache) vs. Stored (primary local, async S3 backup)',
+          'Tape Gateway: virtual tape library compatible with Veeam, Veritas, Commvault, and NetBackup',
+          'AWS DataSync: scheduled automated data transfer; on-premises NFS/SMB/HDFS/S3 to AWS',
+          'AWS Snow Family: Snowcone (8 TB HDD / 14 TB SSD), Snowball Edge Compute/Storage Optimised, Snowmobile (100 PB)',
+          'Snow Family use cases: offline large-scale migration, edge computing in disconnected environments',
+          'AWS Transfer Family: managed SFTP, FTPS, FTP, and AS2 endpoints into S3 or EFS'
+        ],
+        labs: [
+          'Design a File Gateway architecture for hybrid NFS access to S3 (whiteboard exercise)',
+          'Architect a Snowball Edge workflow for a 500 TB offline data centre migration',
+          'Configure a DataSync task from on-premises NFS to S3 with scheduling and filtering',
+          'Choose the correct Snow Family device given data size, connectivity, and compute requirements'
+        ]
+      },
+      {
+        order: 16, title: 'RDS & Aurora', phase: 'Storage & Databases', difficulty: 'Intermediate',
+        tags: ['Multi-AZ', 'Read Replicas', 'Aurora', 'PITR', 'RDS Proxy', 'Aurora Serverless', 'Aurora Global', 'Encryption'],
+        theory: [
+          'RDS supported engines: MySQL, PostgreSQL, MariaDB, Oracle, SQL Server, Db2',
+          'RDS Multi-AZ Deployment: synchronous standby in second AZ, automatic failover (60–120s)',
+          'RDS Multi-AZ DB Cluster: two readable standby instances across three AZs (MySQL, PostgreSQL)',
+          'RDS Read Replicas: asynchronous replication, up to 15 per source, cross-AZ and cross-region',
+          'RDS automated backups: 1–35 day retention, Point-In-Time Recovery (PITR) to second granularity',
+          'RDS Snapshots: manual, retained after instance deletion, cross-region copy and sharing',
+          'RDS Encryption at rest with KMS; encrypting an unencrypted instance via snapshot copy',
+          'RDS Proxy: connection pooling, reduces database connections, IAM and Secrets Manager auth, failover improvement',
+          'Amazon Aurora: custom storage engine, 6-way replication across 3 AZs, up to 15 read replicas',
+          'Aurora cluster endpoints: cluster (writer), reader, custom, instance endpoints',
+          'Aurora Serverless v2: per-second ACU scaling, suitable for variable workloads',
+          'Aurora Global Database: primary region + up to 5 secondary regions, RPO < 1 second, RTO < 1 minute'
+        ],
+        labs: [
+          'Launch an RDS MySQL Multi-AZ instance; trigger a failover and measure downtime',
+          'Create a cross-region Read Replica; promote it to standalone and test write access',
+          'Enable automated backups; perform Point-In-Time Recovery to 15 minutes ago',
+          'Create an Aurora cluster with reader endpoint; distribute read traffic via connection string'
+        ]
+      },
+      {
+        order: 17, title: 'DynamoDB', phase: 'Storage & Databases', difficulty: 'Intermediate',
+        tags: ['Partition Key', 'Sort Key', 'GSI', 'LSI', 'DAX', 'Streams', 'Global Tables', 'TTL', 'Transactions', 'Capacity Modes'],
+        theory: [
+          'DynamoDB core concepts: tables, items, attributes; composite primary key (PK + SK)',
+          'Partition key design: cardinality, hot partition avoidance, write sharding strategies',
+          'Global Secondary Indexes (GSI): alternate PK, eventually consistent, own capacity',
+          'Local Secondary Indexes (LSI): same partition key, alternate sort key, must be defined at table creation',
+          'Capacity Modes: Provisioned (with optional auto-scaling) vs. On-Demand (pay-per-request)',
+          'DynamoDB Accelerator (DAX): write-through in-memory cache, microsecond reads, cluster mode',
+          'DynamoDB Streams: ordered change stream; 24h retention; triggers Lambda for event-driven processing',
+          'Time To Live (TTL): automatic item expiration based on attribute epoch timestamp',
+          'DynamoDB Transactions: ACID, up to 100 actions per transaction, across tables in same region',
+          'DynamoDB Global Tables: multi-region, active-active replication; conflict resolution (last-write-wins)'
+        ],
+        labs: [
+          'Create a table with a composite key; write and query items via console and CLI',
+          'Add a GSI and run a query against the new index; compare cost with table scan',
+          'Enable DynamoDB Streams and wire a Lambda function to process change events',
+          'Switch a table to On-Demand mode; compare RCU/WCU billing model differences'
+        ]
+      },
+      {
+        order: 18, title: 'Other Database Services', phase: 'Storage & Databases', difficulty: 'Intermediate',
+        tags: ['ElastiCache', 'Redis', 'Memcached', 'Redshift', 'Neptune', 'DocumentDB', 'Keyspaces', 'QLDB', 'Timestream'],
+        theory: [
+          'Amazon ElastiCache Redis: clustering mode, Multi-AZ with auto-failover, replication groups, backup/restore',
+          'Amazon ElastiCache Memcached: simple horizontal scaling, no persistence, no replication',
+          'Redis vs. Memcached decision criteria for the SAA-C03 exam',
+          'Amazon Redshift: columnar MPP data warehouse, node types (RA3, dc2), concurrency scaling',
+          'Redshift Spectrum: query S3 data files directly without loading',
+          'Amazon Neptune: property graph (Gremlin) and RDF/SPARQL; graph analytics use cases',
+          'Amazon DocumentDB (MongoDB-compatible): managed document store, storage auto-scaling',
+          'Amazon Keyspaces (Apache Cassandra-compatible): serverless, wide-column store',
+          'Amazon QLDB: immutable ledger; cryptographically verifiable journal',
+          'Amazon Timestream: purpose-built time-series database; automatic data tiering'
+        ],
+        labs: [
+          'Launch an ElastiCache Redis cluster; connect from EC2 and benchmark cache hit rate',
+          'Design a session state caching layer using Redis in front of an ALB/EC2 application',
+          'Identify the correct database service for each of 10 varied exam scenario prompts',
+          'Architect a caching strategy: Cache-Aside vs. Write-Through vs. Write-Behind patterns'
+        ]
+      },
+
+      // ─── PHASE 4: APP SERVICES & INTEGRATION ──────────────────────────────
+      {
+        order: 19, title: 'Lambda & Serverless Compute', phase: 'App Services', difficulty: 'Intermediate',
+        tags: ['Lambda', 'Triggers', 'Layers', 'Versions', 'Aliases', 'Concurrency', 'Cold Start', 'Lambda@Edge', 'DLQ'],
+        theory: [
+          'Lambda execution model: synchronous (API GW, ALB), asynchronous (S3, SNS), polling (SQS, DynamoDB, Kinesis)',
+          'Lambda function configuration: memory (128 MB–10 GB), timeout (max 15 min), ephemeral storage (/tmp)',
+          'Reserved Concurrency: maximum cap; Provisioned Concurrency: pre-initialised, eliminates cold starts',
+          'Lambda Layers: shared code/libraries up to 250 MB; up to 5 layers per function',
+          'Lambda Versions (immutable snapshots) and Aliases (mutable pointers with weighted routing)',
+          'Lambda@Edge: runs at CloudFront Edge; viewer/origin request and response triggers',
+          'CloudFront Functions: lightweight JS at edge; sub-ms latency for URL rewrites and header manipulation',
+          'Lambda VPC integration: ENI per subnet-security group pair; cold start latency with Hyperplane ENI'
+        ],
+        labs: [
+          'Create a Lambda function triggered by S3 object upload; process and write to DynamoDB',
+          'Configure an SQS event source mapping; test batch processing and DLQ behaviour',
+          'Deploy a Lambda inside a VPC; access an RDS instance via private subnet',
+          'Create Lambda Alias with weighted traffic 90/10 for canary deployment between versions'
+        ]
+      },
+      {
+        order: 20, title: 'API Gateway', phase: 'App Services', difficulty: 'Intermediate',
+        tags: ['REST API', 'HTTP API', 'WebSocket API', 'Stages', 'Throttling', 'Caching', 'Authorisers', 'CORS', 'Usage Plans'],
+        theory: [
+          'API Gateway types: REST API (full features), HTTP API (lightweight, cheaper), WebSocket API (stateful)',
+          'Integration types: Lambda Proxy, Lambda Custom, HTTP Proxy, AWS Service, Mock',
+          'API stages, deployments, stage variables, and canary release deployments',
+          'Throttling: account-level, stage-level, method-level limits; token bucket algorithm',
+          'Usage Plans and API Keys: rate limiting and quota enforcement per consumer',
+          'API Gateway caching: TTL 0–3600s, cache key parameters, per-stage cache size',
+          'Authorisers: IAM Signature V4, Cognito User Pool authoriser, Lambda (custom) authoriser',
+          'CORS configuration: preflight handling, Access-Control-Allow-Origin header'
+        ],
+        labs: [
+          'Build a REST API in API Gateway with Lambda Proxy integration and deploy to a stage',
+          'Configure a Usage Plan with API Key; test throttling behaviour at the request limit',
+          'Enable API Gateway caching and verify cache hit response headers',
+          'Set up a Cognito User Pool authoriser; test with valid and expired JWT tokens'
+        ]
+      },
+      {
+        order: 21, title: 'SQS, SNS & Messaging', phase: 'App Services', difficulty: 'Intermediate',
+        tags: ['SQS Standard', 'SQS FIFO', 'SNS', 'Fan-Out', 'DLQ', 'Visibility Timeout', 'Message Retention', 'Filtering'],
+        theory: [
+          'SQS Standard Queue: at-least-once delivery, best-effort ordering, nearly unlimited throughput',
+          'SQS FIFO Queue: exactly-once processing, strict ordering, 300 TPS (3,000 with batching), message group IDs',
+          'SQS key parameters: visibility timeout (0s–12h), message retention (1min–14days), delay queues, long polling',
+          'SQS Dead Letter Queues (DLQ): maxReceiveCount threshold, source queue redrive policy',
+          'Amazon SNS: pub/sub model; topics, subscriptions; up to 12.5M subscriptions per topic',
+          'SNS delivery protocols: SQS, Lambda, HTTP/HTTPS, Email, SMS, Mobile Push (APNS, FCM)',
+          'SNS Message Filtering: JSON attribute-based subscription filter policies',
+          'Fan-Out pattern: one SNS publish triggers multiple SQS queue consumers in parallel'
+        ],
+        labs: [
+          'Create an SQS Standard Queue; send, receive, and delete messages via AWS CLI',
+          'Configure a DLQ; send a deliberately unprocessable message and verify redrive after maxReceiveCount',
+          'Create an SNS topic; add SQS and email subscriptions; test fan-out delivery',
+          'Implement SNS subscription filter policies; verify only matching messages are delivered'
+        ]
+      },
+      {
+        order: 22, title: 'Kinesis & Event Streaming', phase: 'App Services', difficulty: 'Intermediate',
+        tags: ['Kinesis Data Streams', 'Kinesis Firehose', 'Kinesis Analytics', 'Shards', 'Enhanced Fan-Out', 'MSK'],
+        theory: [
+          'Kinesis Data Streams (KDS): real-time, shards (1 MB/s in, 2 MB/s out), partition keys, sequence numbers',
+          'KDS retention: 24h default, up to 365 days; Enhanced Fan-Out: dedicated 2 MB/s per consumer per shard',
+          'Shard iterator types: AT_SEQUENCE_NUMBER, AFTER_SEQUENCE_NUMBER, AT_TIMESTAMP, TRIM_HORIZON, LATEST',
+          'Kinesis Data Firehose: near real-time (60s buffer or 1 MB); destinations: S3, Redshift, OpenSearch, HTTP endpoint',
+          'Kinesis Data Analytics for Apache Flink: stateful stream processing with SQL or Java/Scala/Python',
+          'KDS vs. SQS vs. MSK: replay capability, ordering, consumer group model, use-case selection',
+          'Amazon MSK (Managed Streaming for Apache Kafka): Kafka-compatible, provisioned and serverless'
+        ],
+        labs: [
+          'Create a KDS stream with 2 shards; produce and consume records using the CLI',
+          'Set up a Firehose delivery stream (KDS → S3) with S3 prefix and buffering configuration',
+          'Design a real-time click-stream analytics pipeline using KDS + Lambda + DynamoDB',
+          'Compare KDS vs. SQS for given scenarios: ordering, replay, fan-out, throughput'
+        ]
+      },
+      {
+        order: 23, title: 'EventBridge & Workflow Services', phase: 'App Services', difficulty: 'Intermediate',
+        tags: ['EventBridge', 'Event Bus', 'Rules', 'Scheduler', 'Step Functions', 'Standard Workflow', 'Express Workflow'],
+        theory: [
+          'Amazon EventBridge: default event bus (AWS events), custom event buses, partner event buses',
+          'EventBridge rules: event patterns (JSON matching), scheduled rules (cron/rate expressions), targets',
+          'EventBridge Pipes: point-to-point integration with filtering, enrichment, and transformation',
+          'EventBridge Scheduler: standalone scheduler with cron and rate expressions; replaces CloudWatch Events',
+          'AWS Step Functions: state machines defining workflow logic; SDK integrations and optimised integrations',
+          'Step Functions state types: Task, Choice, Parallel, Map, Wait, Pass, Succeed, Fail',
+          'Standard Workflows: exactly-once, up to 1 year duration, auditable execution history',
+          'Express Workflows: at-least-once, up to 5 minutes, high throughput, event processing'
+        ],
+        labs: [
+          'Create an EventBridge rule triggered by EC2 state change (stopped); notify via SNS',
+          'Build a Step Functions state machine with a Choice state for order routing logic',
+          'Add Retry and Catch fields to a Task state; simulate and handle a Lambda failure',
+          'Schedule a Lambda function with EventBridge Scheduler using a cron expression'
+        ]
+      },
+      {
+        order: 24, title: 'CloudFront & Edge Services', phase: 'App Services', difficulty: 'Intermediate',
+        tags: ['CloudFront', 'Origins', 'Behaviors', 'OAC', 'Signed URLs', 'Lambda@Edge', 'Global Accelerator', 'Geo-Restriction'],
+        theory: [
+          'CloudFront distributions: origins (S3, ALB, EC2, API Gateway, custom HTTP), behaviours, cache policies',
+          'Origin Access Control (OAC): restricts direct S3 access, supports SSE-KMS; replaces legacy OAI',
+          'CloudFront cache keys: URI, headers, cookies, query strings; Cache Policy and Origin Request Policy',
+          'CloudFront Signed URLs vs. Signed Cookies: per-file vs. multiple-file access control',
+          'CloudFront Field-Level Encryption: encrypt sensitive POST data at the edge',
+          'CloudFront Functions (lightweight JS) vs. Lambda@Edge (Node.js/Python, higher limits)',
+          'Geo-Restriction: allow-list or deny-list by country using MaxMind GeoIP database',
+          'AWS Global Accelerator: Anycast static IPs, TCP/UDP (Layer 4), 60% faster via AWS backbone'
+        ],
+        labs: [
+          'Create a CloudFront distribution fronting an S3 static website with OAC',
+          'Configure a CloudFront behaviour for /api/* routed to an ALB origin',
+          'Implement Signed URL-based content protection for a private S3 video',
+          'Compare Global Accelerator vs. CloudFront for an API latency use case'
+        ]
+      },
+      {
+        order: 25, title: 'Containers on AWS', phase: 'App Services', difficulty: 'Intermediate',
+        tags: ['ECS', 'EKS', 'Fargate', 'ECR', 'Task Definitions', 'Services', 'App Runner', 'App Mesh'],
+        theory: [
+          'Amazon ECR: private registry, image scanning, cross-region and cross-account replication',
+          'Amazon ECS: clusters, task definitions (CPU, memory, networking mode), tasks, services',
+          'ECS launch types: EC2 launch type (you manage instances) vs. AWS Fargate (serverless compute)',
+          'ECS networking modes: awsvpc (own ENI per task), bridge, host, none',
+          'ECS service auto-scaling: target tracking, step scaling, scheduled scaling',
+          'Amazon EKS: managed Kubernetes control plane; node groups (managed, self-managed), Fargate profiles',
+          'ECS vs. EKS decision criteria: Kubernetes ecosystem needs, operational complexity, portability',
+          'AWS App Runner: fully managed container platform for web apps, auto-scaling, built-in HTTPS',
+          'AWS App Mesh: Envoy-based service mesh; traffic routing, observability for microservices'
+        ],
+        labs: [
+          'Push a Docker image to ECR; create an ECS task definition referencing it',
+          'Deploy an ECS Fargate service behind an ALB; configure service auto-scaling',
+          'Run an ECS task with awsvpc networking; verify task-level security group assignment',
+          'Design a microservices architecture: ECS Fargate + ALB + RDS + ElastiCache + ECR'
+        ]
+      },
+      {
+        order: 26, title: 'Elastic Beanstalk', phase: 'App Services', difficulty: 'Intermediate',
+        tags: ['Environments', 'Deployment Policies', '.ebextensions', 'Worker Tier', 'Blue/Green', 'Platform Branches'],
+        theory: [
+          'Elastic Beanstalk: PaaS for web apps; supported platforms (Node.js, Python, Java, .NET, Docker)',
+          'Environment types: Web Server (handles HTTP requests) vs. Worker (processes SQS messages)',
+          'Deployment policies: All at Once, Rolling, Rolling with Additional Batch, Immutable, Traffic Splitting',
+          'Blue/Green deployment in Beanstalk: swap environment URLs for zero-downtime releases',
+          '.ebextensions: YAML/JSON config files for package installation, files, commands, services',
+          'Elastic Beanstalk and RDS: coupled (created with environment, deleted with it) vs. decoupled (external RDS)'
+        ],
+        labs: [
+          'Deploy a Node.js application to Elastic Beanstalk via the EB CLI',
+          'Configure a Rolling with Additional Batch deployment and observe zero-downtime behaviour',
+          'Use .ebextensions to install the CloudWatch agent on Beanstalk EC2 instances',
+          'Perform a blue/green URL swap between two Beanstalk environments'
+        ]
+      },
+
+      // ─── PHASE 5: SECURITY & COMPLIANCE ───────────────────────────────────
+      {
+        order: 27, title: 'IAM Advanced & Identity Services', phase: 'Security & Compliance', difficulty: 'Advanced',
+        tags: ['STS', 'AssumeRole', 'Permission Boundaries', 'SCPs', 'Cognito', 'IAM Identity Center', 'SAML', 'OIDC', 'Directory Service'],
+        theory: [
+          'IAM Roles and cross-account access: AssumeRole, trust policies, external IDs for third parties',
+          'STS (Security Token Service): temporary credentials, token duration, session tags',
+          'IAM Permission Boundaries: maximum effective permissions ceiling for users/roles',
+          'Session policies: further restricting permissions in AssumeRole calls',
+          'AWS Organizations: management account, OUs, SCPs (deny-list and allow-list strategies)',
+          'AWS IAM Identity Center (SSO): SAML 2.0 federation, permission sets, attribute-based access control',
+          'Identity federation: SAML 2.0 for corporate IdPs; Web Identity Federation (OIDC) for social login',
+          'Amazon Cognito User Pools: user directory, JWT tokens, OAuth 2.0, MFA, identity triggers',
+          'Amazon Cognito Identity Pools: exchange social/SAML tokens for AWS credentials (STS)',
+          'AWS Directory Service: Managed Microsoft AD, AD Connector (proxy to on-prem AD), Simple AD'
+        ],
+        labs: [
+          'Configure cross-account role assumption; verify access from Account A to S3 in Account B',
+          'Attach a Permission Boundary to an IAM role; verify it limits access below the attached policy',
+          'Create an SCP in AWS Organizations to deny S3 delete operations in all member accounts',
+          'Set up a Cognito User Pool with Google as a social identity provider'
+        ]
+      },
+      {
+        order: 28, title: 'KMS, Encryption & Secrets', phase: 'Security & Compliance', difficulty: 'Advanced',
+        tags: ['KMS CMK', 'Envelope Encryption', 'Key Rotation', 'CloudHSM', 'Secrets Manager', 'Parameter Store', 'ACM'],
+        theory: [
+          'AWS KMS key types: Customer Managed Keys (CMK), AWS Managed Keys, AWS Owned Keys',
+          'Envelope encryption: data encrypted with Data Key (DEK); DEK encrypted with CMK',
+          'KMS Key Policy and grants: resource-based policy required for key access',
+          'KMS automatic key rotation: annual for symmetric CMKs; on-demand rotation (KMS 2024)',
+          'KMS multi-region keys: primary and replica keys, same key material, different ARNs',
+          'AWS CloudHSM: dedicated Hardware Security Module; FIPS 140-2 Level 3; user-managed keys',
+          'AWS Secrets Manager: automatic rotation (via Lambda), cross-account access, versioning',
+          'AWS Systems Manager Parameter Store: String, StringList, SecureString; Standard vs. Advanced tiers',
+          'AWS Certificate Manager (ACM): public TLS certificates (free), private CA, automatic renewal'
+        ],
+        labs: [
+          'Create a KMS CMK; encrypt and decrypt an S3 object using SSE-KMS with key policy',
+          'Enable automatic key rotation for a CMK; verify rotation status and key version',
+          'Store a database password in Secrets Manager with a Lambda rotation function',
+          'Request a public ACM certificate; attach it to an ALB HTTPS listener'
+        ]
+      },
+      {
+        order: 29, title: 'WAF, Shield & Network Security', phase: 'Security & Compliance', difficulty: 'Advanced',
+        tags: ['WAF', 'Web ACL', 'Managed Rules', 'Shield Standard', 'Shield Advanced', 'Firewall Manager', 'Network Firewall'],
+        theory: [
+          'AWS WAF: Web ACLs, rule groups (managed, custom), rule priority, allow/block/count/CAPTCHA actions',
+          'WAF rule types: IP set match, geo match, regex pattern, rate-based, SQL injection, XSS',
+          'AWS Managed Rule Groups: Core Rule Set (CRS), Known Bad Inputs, Bot Control, Fraud Control',
+          'AWS Shield Standard: automatic Layer 3/4 DDoS protection for all AWS customers at no cost',
+          'AWS Shield Advanced: SLA protection, response team (SRT), cost protection, event dashboard',
+          'AWS Firewall Manager: centralised WAF, Shield, Security Group, and Network Firewall policy management across accounts',
+          'AWS Network Firewall: stateful deep-packet inspection at the VPC perimeter; Suricata-based rules'
+        ],
+        labs: [
+          'Create a WAF Web ACL with an IP block rule and AWS Managed Core Rule Set; attach to ALB',
+          'Add a rate-based rule to WAF to block IP addresses exceeding 2,000 requests/5 min',
+          'Design a DDoS-resilient architecture: CloudFront + Shield Advanced + WAF + Route 53',
+          'Deploy AWS Network Firewall in a firewall VPC and route ingress traffic through it'
+        ]
+      },
+      {
+        order: 30, title: 'GuardDuty, Inspector & Threat Detection', phase: 'Security & Compliance', difficulty: 'Advanced',
+        tags: ['GuardDuty', 'Inspector', 'Macie', 'Security Hub', 'Detective', 'Findings', 'Threat Intelligence'],
+        theory: [
+          'Amazon GuardDuty: ML-based threat detection from VPC Flow Logs, CloudTrail, DNS logs, EKS audit logs',
+          'GuardDuty finding categories: EC2 findings, IAM findings, S3 findings, EKS findings, Malware Protection',
+          'GuardDuty integration with EventBridge for automated threat remediation',
+          'Amazon Inspector: agentless vulnerability scanning for EC2 (OS CVEs), ECR images, and Lambda functions',
+          'Inspector finding types: software vulnerabilities (CVE), network reachability findings',
+          'Amazon Macie: S3 sensitive data discovery using ML; PII, financial data, credentials classification',
+          'Amazon Detective: graph-based investigation of GuardDuty/Security Hub findings; EKS and CloudTrail correlation',
+          'AWS Security Hub: aggregated security score; CSPM; integration with GuardDuty, Macie, Inspector, Config'
+        ],
+        labs: [
+          'Enable GuardDuty; run the GuardDuty sample findings generator; review finding types',
+          'Enable Amazon Inspector; review EC2 OS vulnerability findings and network reachability',
+          'Configure Macie to scan an S3 bucket; identify PII data findings',
+          'Enable Security Hub; configure standards (CIS AWS Benchmark); review aggregated findings'
+        ]
+      },
+      {
+        order: 31, title: 'CloudTrail, Config & Compliance', phase: 'Security & Compliance', difficulty: 'Advanced',
+        tags: ['CloudTrail', 'Config', 'Config Rules', 'Remediation', 'Audit Manager', 'Artifact', 'Compliance'],
+        theory: [
+          'AWS CloudTrail: Management Events (API calls), Data Events (S3/Lambda object-level), Insight Events (anomalies)',
+          'CloudTrail log storage: S3 (encrypted with SSE-KMS), log file integrity validation (SHA-256 hashing)',
+          'CloudTrail Lake: managed query and analysis of CloudTrail events with SQL; 7-year retention',
+          'AWS Config: continuous resource configuration recording; configuration timeline and history',
+          'AWS Config Rules: managed rules (AWS-provided) vs. custom rules (Lambda-backed)',
+          'Config conformance packs: collection of Config rules deployed as a unit from templates',
+          'AWS Config Remediation: manual and automatic remediation via SSM Automation runbooks',
+          'AWS Audit Manager: automated evidence collection mapped to compliance frameworks (PCI-DSS, HIPAA, SOC2)'
+        ],
+        labs: [
+          'Enable a multi-region CloudTrail trail; query events in S3 using Athena',
+          'Create a Config rule to check if S3 Versioning is enabled on all buckets',
+          'Set up automatic remediation for non-compliant resources using an SSM Automation document',
+          'Browse AWS Artifact to locate SOC 2 Type II and ISO 27001 compliance reports'
+        ]
+      },
+
+      // ─── PHASE 6: MONITORING & AUTOMATION ─────────────────────────────────
+      {
+        order: 32, title: 'CloudWatch & Observability', phase: 'Monitoring & Automation', difficulty: 'Intermediate',
+        tags: ['Metrics', 'Alarms', 'Logs', 'Logs Insights', 'Dashboards', 'CloudWatch Agent', 'Container Insights', 'Contributor Insights'],
+        theory: [
+          'CloudWatch Metrics: namespaces, dimensions, standard vs. high-resolution (1s) metrics',
+          'CloudWatch Alarms: OK / ALARM / INSUFFICIENT_DATA states; actions (SNS, EC2, ASG)',
+          'Composite Alarms: combine multiple alarms with AND/OR logic to reduce noise',
+          'CloudWatch Logs: log groups, log streams, retention policies (1 day – 10 years)',
+          'CloudWatch Logs Insights: query syntax — fields, filter, stats, sort, limit',
+          'CloudWatch Agent: collect OS-level metrics (memory, disk) and custom log files from EC2',
+          'CloudWatch Dashboards: multi-metric, cross-region, cross-account, auto-refresh intervals',
+          'Container Insights: ECS/EKS cluster, node, pod, and task-level metrics',
+          'Contributor Insights: high-cardinality real-time analysis (e.g., top IP addresses, top keys)'
+        ],
+        labs: [
+          'Create a CloudWatch alarm for EC2 CPU > 80%; trigger an SNS email notification',
+          'Install and configure the CloudWatch Agent on EC2 to capture memory and disk metrics',
+          'Write a Logs Insights query to find ERROR patterns across a log group in a time range',
+          'Build a CloudWatch Dashboard showing EC2 CPU, ALB request count, and RDS connections'
+        ]
+      },
+      {
+        order: 33, title: 'CloudFormation & Infrastructure as Code', phase: 'Monitoring & Automation', difficulty: 'Advanced',
+        tags: ['Templates', 'Stacks', 'StackSets', 'Change Sets', 'Nested Stacks', 'Drift Detection', 'CDK', 'SAM'],
+        theory: [
+          'CloudFormation template anatomy: AWSTemplateFormatVersion, Description, Parameters, Mappings, Conditions, Resources, Outputs',
+          'Intrinsic functions: Ref, Fn::GetAtt, Fn::Sub, Fn::Join, Fn::If, Fn::Select, Fn::ImportValue',
+          'CloudFormation Change Sets: preview changes before applying, avoiding accidental resource replacement',
+          'Nested Stacks: modular templates, cross-stack references using Exports and ImportValue',
+          'CloudFormation StackSets: deploy stacks to multiple accounts and regions from a single operation',
+          'CloudFormation Drift Detection: identify manual configuration changes on stack resources',
+          'CloudFormation Helper Scripts: cfn-init, cfn-signal, cfn-hup, cfn-get-metadata',
+          'AWS CDK: define cloud infrastructure using TypeScript/Python/Java; synthesises to CloudFormation'
+        ],
+        labs: [
+          'Write a CloudFormation template to create a VPC, public subnet, and EC2 instance',
+          'Create a Change Set to update an EC2 instance type; review and execute the change',
+          'Deploy a nested stack pattern: root stack referencing a reusable VPC nested stack',
+          'Build and deploy a serverless REST API using AWS SAM (template, build, deploy)'
+        ]
+      },
+      {
+        order: 34, title: 'Systems Manager & Automation', phase: 'Monitoring & Automation', difficulty: 'Intermediate',
+        tags: ['Parameter Store', 'Session Manager', 'Run Command', 'Patch Manager', 'State Manager', 'Automation', 'Inventory', 'OpsCenter'],
+        theory: [
+          'AWS Systems Manager overview: managed instances, SSM Agent requirement, IAM role (AmazonSSMManagedInstanceCore)',
+          'SSM Parameter Store: String, StringList, SecureString (KMS-encrypted); Standard (10K) vs. Advanced (100K) tiers',
+          'SSM Session Manager: browser-based and CLI shell access without SSH port; all session activity logged',
+          'SSM Run Command: execute shell scripts and PowerShell on target instances; rate controls and error thresholds',
+          'SSM Patch Manager: patch baselines, patch groups, maintenance windows, compliance reporting',
+          'SSM State Manager: associations maintain desired configuration state; periodic or event-based execution',
+          'SSM Automation: runbooks (pre-built and custom) for multi-step operational tasks',
+          'SSM Inventory: collect OS, application, and custom metadata; query via Config or Athena'
+        ],
+        labs: [
+          'Use SSM Session Manager to access an EC2 instance with no public IP and no SSH',
+          'Run a shell command on multiple EC2 instances using SSM Run Command with rate control',
+          'Create a Patch Manager baseline and run a patch compliance scan on a set of instances',
+          'Store a DB connection string as a SecureString in Parameter Store; retrieve it in Lambda'
+        ]
+      },
+
+      // ─── PHASE 7: ARCHITECTURE & EXAM PREP ────────────────────────────────
+      {
+        order: 35, title: 'Well-Architected Framework', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Operational Excellence', 'Security', 'Reliability', 'Performance', 'Cost Optimisation', 'Sustainability', 'WAT'],
+        theory: [
+          'Pillar 1 – Operational Excellence: IaC, observability, runbooks, game days, frequent small changes',
+          'Pillar 2 – Security: IAM least privilege, detective controls, infrastructure protection, data protection, incident response',
+          'Pillar 3 – Reliability: fault isolation, automatic recovery, horizontal scaling, tested recovery procedures',
+          'Pillar 4 – Performance Efficiency: selecting correct resource types, benchmarking, evolving to serverless and containers',
+          'Pillar 5 – Cost Optimisation: expenditure awareness, cost-effective resources, managed services, savings plans',
+          'Pillar 6 – Sustainability: maximise utilisation, reduce downstream impact, adopt managed and serverless services',
+          'AWS Well-Architected Tool: workload review, milestone tracking, improvement plan generation'
+        ],
+        labs: [
+          'Conduct a Well-Architected review of a given 3-tier web architecture using the WAT',
+          'Map 10 given architecture anti-patterns to the correct WAF pillar violation',
+          'Re-design an over-provisioned monolith to improve Performance Efficiency and Cost pillars',
+          'Create a workload in the Well-Architected Tool; complete a lens review and export the report'
+        ]
+      },
+      {
+        order: 36, title: 'High Availability & Fault Tolerance', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Multi-AZ', 'Multi-Region', 'RTO', 'RPO', 'Fault Isolation', 'Active-Active', 'Active-Passive', 'AWS FIS'],
+        theory: [
+          'High Availability vs. Fault Tolerance: HA = minimise downtime; FT = zero-downtime, no data loss',
+          'Fault isolation domains: Availability Zone, Region, account; blast radius containment',
+          'Multi-AZ design patterns for EC2 (ASG), RDS (Multi-AZ), ElastiCache (Multi-AZ), EFS',
+          'RTO (Recovery Time Objective) and RPO (Recovery Point Objective): definition and architectural drivers',
+          'Active-Active architecture: all regions serve traffic; requires conflict resolution for stateful data',
+          'Active-Passive architecture: warm standby or pilot light in a secondary region',
+          'AWS Fault Injection Simulator (FIS): chaos engineering experiments (CPU stress, AZ failure, throttling)',
+          'Health checks and failure detection: Route 53 health checks, ALB health checks, CloudWatch alarms'
+        ],
+        labs: [
+          'Architect a Multi-AZ 3-tier web app: ALB + ASG + RDS Multi-AZ + ElastiCache Multi-AZ',
+          'Run an AWS FIS experiment to terminate a random EC2 instance in an ASG; verify auto-recovery',
+          'Design an Active-Active multi-region architecture for a stateless web application',
+          'Calculate the expected RTO and RPO for Warm Standby and Pilot Light DR configurations'
+        ]
+      },
+      {
+        order: 37, title: 'Disaster Recovery Strategies', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Backup & Restore', 'Pilot Light', 'Warm Standby', 'Multi-Site Active-Active', 'Route 53 Failover', 'Aurora Global', 'AWS Backup'],
+        theory: [
+          'DR strategy spectrum: Backup & Restore (hours RTO/RPO, cheapest) → Active-Active (seconds, most expensive)',
+          'Backup & Restore: nightly snapshots, S3 CRR, manual restore; suitable for non-critical workloads',
+          'Pilot Light: minimal core running (e.g., DB replication); scale-out compute on disaster declaration',
+          'Warm Standby: scaled-down but running full stack in DR region; minutes to fail over',
+          'Multi-Site Active-Active: full capacity in two or more regions; Route 53 load balances across all',
+          'Data replication for DR: RDS Read Replica promotion, Aurora Global Database, S3 CRR, DynamoDB Global Tables',
+          'AWS Backup: centralised, policy-based backup across EC2, EBS, RDS, DynamoDB, EFS, FSx, Aurora'
+        ],
+        labs: [
+          'Design Backup & Restore vs. Warm Standby for a given RTO/RPO: 4h vs. 15 min',
+          'Configure an Aurora Global Database with a secondary region; test failover promotion',
+          'Set up Route 53 Failover routing between primary and DR region ALB endpoints',
+          'Create an AWS Backup plan with cross-region copy and compliance report generation'
+        ]
+      },
+      {
+        order: 38, title: 'Migration Strategies & Services', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['7Rs', 'Application Discovery', 'DMS', 'SCT', 'MGN', 'Migration Hub', 'DataSync', 'Snow Family'],
+        theory: [
+          'Migration Strategies — The 7 Rs: Retire, Retain, Rehost, Replatform, Repurchase, Refactor/Re-architect, Relocate',
+          'AWS Migration Hub: central dashboard for migration tracking; integrates with MGN, DMS, and partner tools',
+          'AWS Application Discovery Service: agentless (API-based) and agent-based (software) server discovery',
+          'AWS Database Migration Service (DMS): homogeneous (MySQL → RDS MySQL) and heterogeneous (Oracle → Aurora) migrations',
+          'AWS Schema Conversion Tool (SCT): schema translation for heterogeneous database migrations',
+          'AWS Application Migration Service (MGN): lift-and-shift; continuous block-level replication, cutover testing',
+          'AWS DataSync: automated, scheduled transfer for file system data (NFS, SMB, S3, HDFS, EFS)',
+          'AWS Snow Family for offline migrations: Snowcone, Snowball Edge, Snowmobile capacity guidance'
+        ],
+        labs: [
+          'Assign the correct 7R strategy to each of 12 application profiles in a migration portfolio',
+          'Architect a DMS migration from on-premises MySQL to RDS Aurora PostgreSQL with SCT',
+          'Design an MGN migration workflow for 50 physical servers with a 4-hour maintenance window',
+          'Choose the correct data migration service for three scenarios: 1 TB online, 500 TB offline, 5 EB'
+        ]
+      },
+      {
+        order: 39, title: 'Hybrid Architectures', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Direct Connect', 'VPN', 'Transit Gateway', 'VPN CloudHub', 'Outposts', 'Local Zones', 'Direct Connect Gateway'],
+        theory: [
+          'AWS Direct Connect: dedicated 1/10/100 Gbps physical connection; private, public, and transit VIFs',
+          'Direct Connect Gateway: connect to multiple VPCs across different regions from one DX connection',
+          'Direct Connect + VPN failover: IPSec VPN as backup path for HA hybrid connectivity',
+          'AWS Site-to-Site VPN: IPSec over public internet, Virtual Private Gateway, BGP or static routing',
+          'AWS VPN CloudHub: hub-and-spoke VPN for multiple branch office connectivity',
+          'AWS Transit Gateway: single gateway connecting many VPCs, VPNs, and DX; route tables, attachments, peering',
+          'AWS Outposts: AWS-managed racks and servers on-premises; same APIs, services, and tools as in cloud',
+          'AWS Local Zones: low-latency extensions of AWS Regions in major metro areas for latency-sensitive workloads'
+        ],
+        labs: [
+          'Design a hybrid architecture diagram: Direct Connect + VPN failover + Transit Gateway',
+          'Configure a Transit Gateway to connect three VPCs and a Site-to-Site VPN attachment',
+          'Choose between Direct Connect and VPN for given bandwidth, latency, and cost requirements',
+          'Architect an Outposts solution for a data-residency requirement in a country with no AWS Region'
+        ]
+      },
+      {
+        order: 40, title: 'Analytics & Big Data', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Athena', 'Glue', 'EMR', 'OpenSearch', 'QuickSight', 'Lake Formation', 'MSK', 'Redshift Spectrum'],
+        theory: [
+          'Amazon Athena: serverless interactive SQL queries on S3; Glue Data Catalog integration; partition pruning',
+          'AWS Glue: serverless ETL; Data Catalog (databases, tables, crawlers); Glue Studio visual ETL',
+          'Amazon EMR: managed Hadoop/Spark/HBase/Flink/Presto clusters; instance fleet for Spot mix',
+          'Amazon OpenSearch Service: managed OpenSearch/Elasticsearch; log analytics, full-text search',
+          'Amazon QuickSight: serverless BI and visualisation; SPICE in-memory engine; ML Insights',
+          'AWS Lake Formation: data lake governance; column/row-level security; governed tables',
+          'Amazon Redshift Spectrum: query exabytes of data directly in S3 without loading into Redshift',
+          'Service selection: Athena (ad-hoc S3 SQL), EMR (large-scale Spark), Redshift (structured DWH), OpenSearch (log search)'
+        ],
+        labs: [
+          'Use Athena to query a partitioned CSV dataset in S3 without provisioning any infrastructure',
+          'Run a Glue Crawler on an S3 bucket; inspect the resulting Data Catalog table schema',
+          'Design a data lake pipeline: ingestion via Kinesis → S3 → Glue ETL → Redshift → QuickSight',
+          'Select the correct analytics service for each of 8 scenario prompts in exam style'
+        ]
+      },
+      {
+        order: 41, title: 'Decoupling & Integration Patterns', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Loose Coupling', 'Fan-Out', 'Saga Pattern', 'Idempotency', 'Choreography', 'Orchestration', 'Amazon MQ', 'Dead Letter'],
+        theory: [
+          'Tight coupling vs. loose coupling: failure isolation, independent scaling, deployment independence',
+          'Synchronous vs. asynchronous communication trade-offs for SAA-C03 design questions',
+          'Message queue patterns: point-to-point (SQS), publish/subscribe (SNS), streaming (Kinesis)',
+          'Choreography (event-driven, no central coordinator) vs. Orchestration (Step Functions, centralised control)',
+          'Idempotency in distributed systems: importance for exactly-once semantics in retry scenarios',
+          'Saga pattern: sequence of local transactions with compensating transactions on failure',
+          'Amazon MQ: managed ActiveMQ and RabbitMQ; migration path from on-premises message brokers',
+          'Dead Letter Queue handling: failure analysis, replay, and alerting strategies'
+        ],
+        labs: [
+          'Refactor a synchronous Lambda call chain into an async SQS-decoupled pipeline',
+          'Implement a fan-out architecture: SNS → 3 SQS queues with different filter policies',
+          'Design a saga pattern for an e-commerce order flow (inventory → payment → shipping)',
+          'Build an orchestrated multi-step order processing workflow using Step Functions + Lambda'
+        ]
+      },
+      {
+        order: 42, title: 'Cost Optimisation Strategies', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Reserved Instances', 'Savings Plans', 'Spot', 'Rightsizing', 'Compute Optimizer', 'Intelligent-Tiering', 'Cost Anomaly Detection'],
+        theory: [
+          'EC2 cost optimisation: On-Demand → Savings Plans → Reserved Instances → Spot (cost reduction ladder)',
+          'Compute Savings Plans (most flexible) vs. EC2 Instance Savings Plans (highest discount)',
+          'Spot Instance strategies: fault-tolerant workloads, Spot Fleet, interruption handling, diversification',
+          'Rightsizing with AWS Compute Optimizer: EC2, Lambda, EBS, ECS on Fargate recommendations',
+          'S3 cost optimisation: storage class selection, Intelligent-Tiering, lifecycle transitions, S3 Object Expire',
+          'RDS cost optimisation: Reserved DB Instances, Aurora Serverless for spiky workloads',
+          'Data transfer cost reduction: CloudFront for origin shielding, VPC Endpoints to avoid NAT Gateway costs',
+          'Cost Anomaly Detection: ML-based anomaly alerts; root-cause analysis by service and usage type'
+        ],
+        labs: [
+          'Calculate 1-year On-Demand vs. Compute Savings Plan savings for a mixed workload',
+          'Use Compute Optimizer to identify EC2 rightsizing opportunities and estimate savings',
+          'Design an S3 storage tiering strategy for a 5-year data retention policy',
+          'Identify the correct cost optimisation recommendation for each of 8 scenario prompts'
+        ]
+      },
+      {
+        order: 43, title: 'Serverless Architecture Patterns', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Event-Driven', 'Request-Response', 'Serverless Pipeline', 'Cold Start Mitigation', 'Multi-Region Serverless', 'SnapStart'],
+        theory: [
+          'Core serverless AWS services: Lambda, API Gateway, S3, DynamoDB, Step Functions, SQS, SNS, EventBridge, Fargate',
+          'Event-driven patterns: S3 trigger, DynamoDB Streams, Kinesis consumers, SQS batch processing',
+          'Request-response pattern: synchronous API Gateway → Lambda → DynamoDB',
+          'Cold start mitigation: Provisioned Concurrency, Lambda SnapStart (Java 11+), keep-warm workarounds',
+          'Serverless data processing pipeline: Kinesis → Lambda → DynamoDB → S3 → Athena',
+          'Multi-region serverless: Global DynamoDB Tables + Route 53 latency routing + Lambda per region',
+          'Cost model of serverless: pay-per-invocation vs. always-on; break-even analysis vs. EC2'
+        ],
+        labs: [
+          'Build a serverless REST API: API Gateway → Lambda → DynamoDB with IAM authorisation',
+          'Implement a serverless image processing pipeline: S3 → Lambda → Rekognition → DynamoDB',
+          'Add SQS queuing and DLQ for reliable async processing between two Lambda functions',
+          'Design a multi-region serverless architecture with global DynamoDB and Route 53 latency routing'
+        ]
+      },
+      {
+        order: 44, title: 'Security Architecture Patterns', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Defence in Depth', 'Zero Trust', 'Data Classification', 'Encryption Everywhere', 'VPC Isolation', 'Compliance', 'Threat Modelling'],
+        theory: [
+          'Defence in depth: layered security controls across network, host, application, and data tiers',
+          'Zero Trust architecture principles on AWS: verify explicitly, least privilege, assume breach',
+          'Data classification and protection requirements: public, internal, confidential, restricted',
+          'Network segmentation: private subnets, NACLs, security groups, VPC endpoints, PrivateLink',
+          'Encryption everywhere: in transit (TLS via ACM, ALB), at rest (KMS for EBS, S3, RDS, DynamoDB)',
+          'Compliance frameworks on AWS: PCI-DSS, HIPAA, SOC 1/2/3, ISO 27001, FedRAMP, GDPR',
+          'Security automation: EventBridge → Lambda for auto-remediation; Config rules + SSM Automation',
+          'Perimeter security: WAF + Shield + Network Firewall + CloudFront + Route 53 DNSSEC'
+        ],
+        labs: [
+          'Design a secure 3-tier architecture: WAF → CloudFront → ALB → EC2 (private) → RDS (isolated)',
+          'Implement a PCI-DSS compliant card processing architecture using AWS native controls',
+          'Map 10 AWS security services to the NIST Cybersecurity Framework (Identify/Protect/Detect/Respond/Recover)',
+          'Audit a given architecture diagram for security gaps and provide Well-Architected remediation steps'
+        ]
+      },
+      {
+        order: 45, title: 'Exam Preparation & Final Review', phase: 'Architecture & Exam Prep', difficulty: 'Advanced',
+        tags: ['Exam Domains', 'SAA-C03 Weightings', 'Scenario Analysis', 'Key Limits', 'Elimination Strategy', 'Practice Tests', 'Time Management'],
+        theory: [
+          'SAA-C03 format: 65 questions, 130 minutes, multiple choice (1 answer) and multiple response (2–3 answers)',
+          'Domain weightings: Design Secure Architectures (30%), Resilient (26%), High-Performing (24%), Cost-Optimised (20%)',
+          'Scenario-based question framework: identify the requirement, eliminate wrong answers, pick the "most suitable"',
+          'Common exam traps: not reading all options, cost vs. performance trade-offs, Multi-AZ vs. Multi-Region confusion',
+          'Key AWS limits to memorise: Lambda 15 min timeout, S3 5 TB max object, EC2 Max IOPS per volume, EBS Max size',
+          'Service elimination strategy: managed > self-managed; least operational overhead; simplest solution that meets SLA'
+        ],
+        labs: [
+          'Complete a timed 65-question full-length practice exam under exam conditions',
+          'Review all incorrect answers; classify each by domain and root cause of error',
+          'Build a personal cheat sheet: key limits, service comparison tables, DR strategy RTO/RPO summary',
+          'Do a final architecture design: sketch an enterprise solution covering all 4 exam domains end-to-end'
+        ]
+      }
+    ];
+
+    let current = 'all';
+
+    function render() {
+      const el = document.getElementById('units-list');
+      const vis = current === 'all' ? units : units.filter(u => u.phase === current);
+
+      if (vis.length === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--color-text-tertiary);">No units found for this phase.</div>';
+        return;
+      }
+
+      el.innerHTML = vis.map((u, i) => {
+        const p = phases[u.phase];
+        const last = i === vis.length - 1;
+        const delay = i * 0.05;
+        return `
+<div class="unit-row" id="row-${u.order}" style="animation-delay:${delay}s">
+  <div class="spine">
+    <div class="spine-dot" style="background:${p.dot};color:${p.dot}"></div>
+    ${!last ? '<div class="spine-line"></div>' : ''}
+  </div>
+  <div class="unit-card" onclick="toggle(${u.order})">
+    <div class="unit-header">
+      <span class="unit-num">U${String(u.order).padStart(2,'0')}</span>
+      <span class="unit-title">${u.title}</span>
+      <span class="phase-badge" style="background:${p.bg};color:${p.text};border-color:${p.border}">${u.phase}</span>
+      <span class="diff-badge">${u.difficulty}</span>
+      <i class="ti ti-chevron-down chevron" id="chev-${u.order}" aria-hidden="true"></i>
+    </div>
+    <div class="tags-row">${u.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    <div class="expand-content" id="exp-${u.order}" onclick="event.stopPropagation()">
+      <div class="expand-divider"></div>
+      <div class="expand-grid">
+        <div>
+          <div class="section-label"><i class="ti ti-book" aria-hidden="true"></i> Theory Topics</div>
+          <ul class="item-list">${u.theory.map(t => `<li>${t}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <div class="section-label"><i class="ti ti-terminal-2" aria-hidden="true"></i> Lab Exercises</div>
+          <ul class="item-list">${u.labs.map(l => `<li>${l}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <button class="study-btn" onclick="startLearning(${u.order})">
+        <i class="ti ti-player-play-filled" style="font-size:1rem;"></i> Start Studying this Unit
+      </button>
+    </div>
+  </div>
+</div>`;
+      }).join('');
+    }
+
+    function toggle(id) {
+      const e = document.getElementById('exp-' + id);
+      const c = document.getElementById('chev-' + id);
+      const o = e.classList.contains('open');
+      document.querySelectorAll('.expand-content').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.chevron').forEach(el => el.classList.remove('open'));
+      if (!o) { e.classList.add('open'); c.classList.add('open'); }
+    }
+
+    function setFilter(phase, btn) {
+      current = phase;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    }
+
+    function startLearning(order) {
+      const unit = units.find(u => u.order === order);
+      if (!unit) return;
+      // In the future, chapter-wise PDFs will be loaded (e.g. phases/chapter_1.pdf for unit order 0)
+      window.open(`phases/chapter_${order + 1}.pdf`, '_blank');
+    }
+
+    // Smooth counting animation for stat cards
+    function animateCount(element, target, duration = 1200) {
+      if (!element) return;
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const easeProgress = progress * (2 - progress); // Ease out quad
+        const currentValue = Math.floor(easeProgress * target);
+        element.textContent = currentValue;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          element.textContent = target;
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      render();
+      const durations = [1000, 1200, 1200, 800];
+      document.querySelectorAll('.stat-val').forEach((el, i) => {
+        const target = parseInt(el.textContent, 10);
+        if (!isNaN(target)) animateCount(el, target, durations[i] || 1200);
+      });
+    });
+  </script>
+</body>
+</html>
