@@ -531,7 +531,7 @@
 
     <!-- Floating illustration -->
     <div class="illustration-wrap">
-      <img src="404.png" alt="In Progress" class="illustration-img">
+      <img src="" alt="In Progress" class="illustration-img" id="illustration-img">
     </div>
 
     <!-- Status badge -->
@@ -582,9 +582,9 @@
       <a href="#" id="home-btn" class="btn-primary">
         <i class="ti ti-home"></i> Back to Home
       </a>
-      <a href="javascript:history.back()" class="btn-secondary">
+      <button onclick="goBack()" class="btn-secondary">
         <i class="ti ti-arrow-left"></i> Go Back
-      </a>
+      </button>
     </div>
 
   </div>
@@ -602,38 +602,43 @@
     // We use the repo root by removing everything after the last
     // known base segment. Since 404.html sits at the site root,
     // we just need to point to index.html relative to the Pages root.
-    (function resolveHomeLinks() {
-      // Find the site root: strip the 404-redirected path and keep
-      // only the origin + the GitHub Pages base path.
-      // GitHub Pages always serves 404.html from the root, so
-      // window.location when loading 404.html directly will be
-      // at the root. But when redirected, the URL is the broken path.
-      // Safe approach: walk up until we find a path that ends at root.
+    // Resolve the GitHub Pages site root so all assets and links work
+    // regardless of which broken URL triggered the 404.
+    // e.g. visiting /roadmaps.io/langgraph/phases/x.pdf still finds
+    // /roadmaps.io/404.png and /roadmaps.io/ correctly.
+    var siteRoot = (function () {
       const origin = window.location.origin;
-      // The Pages root is the path up to (but not including) any subpath.
-      // For user pages (username.github.io) base = '/'
-      // For project pages (username.github.io/repo) base = '/repo/'
-      // We detect by checking if we are on github.io or a custom domain.
-      // Simplest reliable method: use the repo name from pathname if present.
       const pathParts = window.location.pathname.split('/').filter(Boolean);
-      // If GitHub project page, first segment is the repo name.
-      // 404.html is at root, so when navigating to a missing page like
-      // /roadmaps/foo, GitHub serves /roadmaps/404.html automatically.
-      // The root of the site is always origin + '/' + repoSegment + '/'.
-      // We detect by seeing if there are path segments.
-      let siteRoot;
+      // GitHub project pages: origin/repoName/...
+      // The repo name is always the first path segment on github.io
       if (window.location.hostname.endsWith('github.io') && pathParts.length >= 1) {
-        // Project page: first segment is repo name
-        siteRoot = origin + '/' + pathParts[0] + '/';
-      } else {
-        // User/org page or custom domain: root is just origin
-        siteRoot = origin + '/';
+        return origin + '/' + pathParts[0] + '/';
       }
+      // User/org pages or custom domains: root is just origin/
+      return origin + '/';
+    })();
+
+    // Fix all paths that depend on site root
+    (function applyRootPaths() {
+      // 1. Image — must be absolute so it loads regardless of current URL depth
+      const img = document.getElementById('illustration-img');
+      if (img) img.src = siteRoot + '404.png';
+
+      // 2. Home links
       const homeLink = document.getElementById('home-btn');
       const footerLink = document.getElementById('footer-home-link');
       if (homeLink) homeLink.href = siteRoot;
       if (footerLink) footerLink.href = siteRoot;
     })();
+
+    // Go Back: use browser history if available, otherwise go home
+    function goBack() {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = siteRoot;
+      }
+    }
 
     // ── Theme toggle ─────────────────────────────────────
     function toggleTheme() {
