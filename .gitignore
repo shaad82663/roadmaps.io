@@ -1,3 +1,5 @@
 .DS_Store
 langchain/phases/temp/*
 langgraph/phases/temp/*
+node_modules/
+package-lock.json
