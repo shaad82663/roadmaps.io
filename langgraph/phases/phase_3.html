@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Phase 3: Persistence &amp; Memory</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script>
 // Runs before first paint so there is no flash of the wrong theme.
 (function () {
@@ -174,9 +175,10 @@ body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
 }
 .theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
 .theme-toggle:active{transform:scale(0.95);}
-.theme-toggle .icon-moon{display:none;}
-[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
-[data-theme="dark"] .theme-toggle .icon-moon{display:inline;}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
 @media (max-width:600px){
   .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
 }
@@ -447,16 +449,8 @@ table code.inline-code{white-space:nowrap;}
 </style>
 </head>
 <body>
-<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="
-  (function(){
-    var html = document.documentElement;
-    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
-  })();
-">
-  <span class="icon-sun">&#9728;&#65039;</span>
-  <span class="icon-moon">&#127769;</span>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
 </button>
 <header class="top-banner">
   <h1>Phase 3: Persistence &amp; Memory</h1>
@@ -540,10 +534,10 @@ table code.inline-code{white-space:nowrap;}
 <p>Every time a super-step completes, a <em>new</em> checkpoint is written — old checkpoints are not overwritten. This means a checkpointer doesn&#39;t just store &quot;the current state,&quot; it stores the <strong>entire history</strong> of how that thread evolved, one snapshot per step. That history is what Unit 6 (time travel) is built on.</p>
 <h3 id="517-how-compiling-with-a-checkpointer-changes-behavior"><a class="heading-anchor" href="#517-how-compiling-with-a-checkpointer-changes-behavior" aria-hidden="true">#</a>5.1.7 How compiling with a checkpointer changes behavior</h3>
 <p>Without a checkpointer:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = graph.<span class="hljs-title function_">compile</span>();
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = graph.<span class="hljs-title function_">compile</span>();
 <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [...] }); <span class="hljs-comment">// stateless, one-shot</span></code></pre></div>
 <p>With a checkpointer:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = graph.<span class="hljs-title function_">compile</span>({ checkpointer });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = graph.<span class="hljs-title function_">compile</span>({ checkpointer });
 <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(
   { <span class="hljs-attr">messages</span>: [...] },
   { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;user-42&quot;</span> } } <span class="hljs-comment">// required once a checkpointer is attached</span>
@@ -554,7 +548,7 @@ table code.inline-code{white-space:nowrap;}
 <h3 id="lab-51--from-stateless-to-stateful-with-memorysaver"><a class="heading-anchor" href="#lab-51--from-stateless-to-stateful-with-memorysaver" aria-hidden="true">#</a>Lab 5.1 — From stateless to stateful with <code class="inline-code">MemorySaver</code></h3>
 <p><strong>Goal:</strong> Take a simple chatbot graph and make it remember previous turns using <code class="inline-code">MemorySaver</code>, then prove that two different <code class="inline-code">thread_id</code>s stay isolated.</p>
 <h4 id="step-0--project-setup"><a class="heading-anchor" href="#step-0--project-setup" aria-hidden="true">#</a>Step 0 — Project setup</h4>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> langgraph-phase3 &amp;&amp; <span class="hljs-built_in">cd</span> langgraph-phase3
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> langgraph-phase3 &amp;&amp; <span class="hljs-built_in">cd</span> langgraph-phase3
 npm init -y
 npm install typescript ts-node @types/node --save-dev
 npm install @langchain/langgraph @langchain/openai @langchain/core zod
@@ -563,12 +557,12 @@ npx tsc --init</code></pre></div>
 <p><strong>Expected result:</strong> A <code class="inline-code">package.json</code>, <code class="inline-code">node_modules/</code>, and <code class="inline-code">tsconfig.json</code> in your folder. No errors in the terminal.</p>
 <p><strong>Common mistake:</strong> Forgetting <code class="inline-code">--save-dev</code> for <code class="inline-code">typescript</code>/<code class="inline-code">ts-node</code> means it still works, but it&#39;s good practice to keep build tooling separate from runtime dependencies. If you forget, it&#39;s not a bug — just slightly messier dependency hygiene.</p>
 <h4 id="step-1--set-your-api-key"><a class="heading-anchor" href="#step-1--set-your-api-key" aria-hidden="true">#</a>Step 1 — Set your API key</h4>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">export</span> OPENAI_API_KEY=<span class="hljs-string">&quot;sk-...your-key-here...&quot;</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">export</span> OPENAI_API_KEY=<span class="hljs-string">&quot;sk-...your-key-here...&quot;</span></code></pre></div>
 <p><strong>Why:</strong> <code class="inline-code">@langchain/openai</code>&#39;s <code class="inline-code">ChatOpenAI</code> class automatically reads this environment variable. You never hard-code keys in source files — if you accidentally commit a key to git, it can be scraped and abused within minutes.</p>
 <p><strong>Verify:</strong> Run <code class="inline-code">echo $OPENAI_API_KEY</code> (Mac/Linux) and confirm it prints your key. On Windows PowerShell use <code class="inline-code">$env:OPENAI_API_KEY=&quot;sk-...&quot;</code>.</p>
 <h4 id="step-2--build-the-base-graph-no-memory-yet"><a class="heading-anchor" href="#step-2--build-the-base-graph-no-memory-yet" aria-hidden="true">#</a>Step 2 — Build the base graph (no memory yet)</h4>
 <p>Create <code class="inline-code">src/lab5-1.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
 <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
@@ -603,12 +597,12 @@ npx tsc --init</code></pre></div>
 <li>Compiling with no <code class="inline-code">{ checkpointer }</code> option means <code class="inline-code">app</code> is purely stateless between <code class="inline-code">.invoke()</code> calls.</li>
 </ul>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/lab5-1.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npx ts-node src/lab5-1.ts</code></pre></div>
 <p><strong>Expected result:</strong> Turn 1 gets a reasonable greeting acknowledging the name. Turn 2 — and this is the important part — the model will say something like <em>&quot;I don&#39;t have access to your name&quot;</em> because each <code class="inline-code">.invoke()</code> call starts a brand-new <code class="inline-code">messages</code> array. Nothing carried over.</p>
 <p><strong>This &quot;failure&quot; is the whole point of the lab.</strong> You&#39;re about to fix it with one parameter.</p>
 <h4 id="step-3--add-memorysaver-and-a-thread_id"><a class="heading-anchor" href="#step-3--add-memorysaver-and-a-thread_id" aria-hidden="true">#</a>Step 3 — Add <code class="inline-code">MemorySaver</code> and a <code class="inline-code">thread_id</code></h4>
 <p>Create <code class="inline-code">src/lab5-2.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
 <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
@@ -645,12 +639,12 @@ npx tsc --init</code></pre></div>
 <li>Passing the <strong>same</strong> <code class="inline-code">config.configurable.thread_id</code> on both calls means: before turn 2 runs, LangGraph loads the saved state (which already contains turn 1&#39;s two messages), appends your new human message to it, runs the node, and saves again.</li>
 </ul>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/lab5-2.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npx ts-node src/lab5-2.ts</code></pre></div>
 <p><strong>Expected result:</strong> Turn 2 should correctly answer <em>&quot;Your name is Shaad.&quot;</em> — proof that state persisted across two separate <code class="inline-code">.invoke()</code> calls.</p>
 <p><strong>Verification step:</strong> Add a <code class="inline-code">console.log((await app.getState(config)).values.messages.length)</code> after turn 2. It should print <code class="inline-code">4</code> (2 human + 2 AI messages), confirming the full history accumulated correctly.</p>
 <h4 id="step-4--prove-thread-isolation"><a class="heading-anchor" href="#step-4--prove-thread-isolation" aria-hidden="true">#</a>Step 4 — Prove thread isolation</h4>
 <p>Append this to the bottom of <code class="inline-code">main()</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts">  <span class="hljs-keyword">const</span> otherConfig = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;different-user&quot;</span> } };
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts">  <span class="hljs-keyword">const</span> otherConfig = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;different-user&quot;</span> } };
   <span class="hljs-keyword">const</span> r3 = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What is my name?&quot;</span> }] }, otherConfig);
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Different thread:&quot;</span>, r3.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);</code></pre></div>
 <p><strong>Expected result:</strong> The model should say it doesn&#39;t know the name — because <code class="inline-code">&quot;different-user&quot;</code> is a brand-new, empty thread that has never seen &quot;Shaad.&quot; This proves <code class="inline-code">thread_id</code> truly isolates conversations on the same compiled graph.</p>
@@ -662,10 +656,10 @@ npx tsc --init</code></pre></div>
 </ol>
 <h3 id="lab-52--durable-persistence-with-sqlitesaver"><a class="heading-anchor" href="#lab-52--durable-persistence-with-sqlitesaver" aria-hidden="true">#</a>Lab 5.2 — Durable persistence with <code class="inline-code">SqliteSaver</code></h3>
 <p><strong>Goal:</strong> Swap <code class="inline-code">MemorySaver</code> for <code class="inline-code">SqliteSaver</code> and prove state survives a full process restart.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-checkpoint-sqlite better-sqlite3</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-checkpoint-sqlite better-sqlite3</code></pre></div>
 <p><strong>Why:</strong> <code class="inline-code">SqliteSaver</code> needs an actual SQLite driver to talk to a file on disk; <code class="inline-code">better-sqlite3</code> is the native binding LangGraph&#39;s package uses under the hood.</p>
 <p>Create <code class="inline-code">src/lab5-3.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">SqliteSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-sqlite&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
@@ -694,7 +688,7 @@ npx tsc --init</code></pre></div>
 
 <span class="hljs-title function_">main</span>();</code></pre></div>
 <p><strong>Run it twice, as two completely separate process invocations:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;My favorite color is teal.&quot;</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;My favorite color is teal.&quot;</span>
 npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite color?&quot;</span></code></pre></div>
 <p><strong>Expected result:</strong> The second command — a <strong>brand new Node.js process</strong> with zero in-memory state — correctly answers &quot;teal.&quot; This is the proof that matters: persistence survived across process boundaries, not just across function calls within one running program.</p>
 <p><strong>Verify on disk:</strong> Run <code class="inline-code">ls -la checkpoints.sqlite</code> — you should see a real file with a nonzero size. Optionally inspect it with <code class="inline-code">sqlite3 checkpoints.sqlite &quot;.tables&quot;</code> if you have the <code class="inline-code">sqlite3</code> CLI installed; you&#39;ll see tables like <code class="inline-code">checkpoints</code> and <code class="inline-code">writes</code>.</p>
@@ -706,7 +700,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 </ul>
 <h3 id="lab-53--two-parallel-threads-one-graph-one-process"><a class="heading-anchor" href="#lab-53--two-parallel-threads-one-graph-one-process" aria-hidden="true">#</a>Lab 5.3 — Two parallel threads, one graph, one process</h3>
 <p><strong>Goal:</strong> Demonstrate that a single compiled graph instance can safely juggle many independent conversations concurrently — this is exactly how a real chat server behaves.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
 <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
@@ -739,7 +733,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 <span class="hljs-title function_">main</span>();</code></pre></div>
 <p><strong>Expected result:</strong> Alice&#39;s answer mentions cats; Bob&#39;s mentions dogs — despite both requests being sent concurrently through the same <code class="inline-code">app</code> object. <strong>Verify</strong> by checking the two responses never cross-contaminate, even if you run this 5 times.</p>
 <h4 id="step--inspect-a-raw-checkpoint-object"><a class="heading-anchor" href="#step--inspect-a-raw-checkpoint-object" aria-hidden="true">#</a>Step — Inspect a raw checkpoint object</h4>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> raw = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">getState</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> raw = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">getState</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } });
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(raw, <span class="hljs-literal">null</span>, <span class="hljs-number">2</span>));</code></pre></div>
 <p><strong>What to look for in the output:</strong> a <code class="inline-code">values</code> field (your actual state), a <code class="inline-code">next</code> field (which node would run next, empty if the graph finished), and <code class="inline-code">config</code> containing the <code class="inline-code">thread_id</code> and a <code class="inline-code">checkpoint_id</code>. This structure is the foundation for everything in Unit 6.</p>
 <hr>
@@ -805,7 +799,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 </tbody>
 </table></div>
 <h3 id="612-getstate--reading-the-present"><a class="heading-anchor" href="#612-getstate--reading-the-present" aria-hidden="true">#</a>6.1.2 <code class="inline-code">getState()</code> — reading the present</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> snapshot = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">getState</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } });</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> snapshot = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">getState</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } });</code></pre></div>
 <p>This returns a <code class="inline-code">StateSnapshot</code> object with (among other fields):</p>
 <ul>
 <li><code class="inline-code">values</code> — the actual state values (e.g., <code class="inline-code">{ messages: [...] }</code>)</li>
@@ -814,20 +808,20 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 </ul>
 <h3 id="613-updatestate--editing-history-by-hand"><a class="heading-anchor" href="#613-updatestate--editing-history-by-hand" aria-hidden="true">#</a>6.1.3 <code class="inline-code">updateState()</code> — editing history by hand</h3>
 <p>Sometimes you, the developer (or a human reviewer), need to correct the state without running a node. Maybe a tool returned bad data and you want to patch it before the graph continues, or a human needs to edit a draft message before it&#39;s sent (this becomes essential in Phase 4).</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">await</span> app.<span class="hljs-title function_">updateState</span>(
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">await</span> app.<span class="hljs-title function_">updateState</span>(
   { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } },
   { <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Correction: I actually prefer dogs, not cats.&quot;</span> }] }
 );</code></pre></div>
 <p><strong>Critical detail:</strong> <code class="inline-code">updateState()</code> runs through the <strong>same reducers</strong> your schema defines. If your <code class="inline-code">messages</code> field uses an append-only reducer, calling <code class="inline-code">updateState</code> with a new message <em>appends</em> it — it does not wipe the array. If you want to truly overwrite a field, your reducer needs to support that (e.g., a &quot;last value wins&quot; reducer for non-message fields like a <code class="inline-code">status: string</code>).</p>
 <p><code class="inline-code">updateState()</code> also creates a <strong>brand new checkpoint</strong> — it doesn&#39;t mutate an old one. This keeps the &quot;every checkpoint is immutable history&quot; guarantee intact, which matters enormously for the next concept: time travel.</p>
 <h3 id="614-getstatehistory--walking-the-timeline"><a class="heading-anchor" href="#614-getstatehistory--walking-the-timeline" aria-hidden="true">#</a>6.1.4 <code class="inline-code">getStateHistory()</code> — walking the timeline</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> snap <span class="hljs-keyword">of</span> app.<span class="hljs-title function_">getStateHistory</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } })) {
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> snap <span class="hljs-keyword">of</span> app.<span class="hljs-title function_">getStateHistory</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } })) {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(snap.<span class="hljs-property">config</span>.<span class="hljs-property">configurable</span>?.<span class="hljs-property">checkpoint_id</span>, snap.<span class="hljs-property">values</span>);
 }</code></pre></div>
 <p>This is an <strong>async generator</strong> — it yields snapshots one at a time, ordered from most recent to oldest, all the way back to the very first checkpoint of the thread. Each yielded snapshot is a complete, independently addressable point-in-time copy of state, each with its own <code class="inline-code">checkpoint_id</code>.</p>
 <h3 id="615-time-travel--replay-and-forking"><a class="heading-anchor" href="#615-time-travel--replay-and-forking" aria-hidden="true">#</a>6.1.5 Time travel — replay and forking</h3>
 <p>This is the part that makes checkpointers feel like magic the first time you see it. Because every checkpoint is immutable and individually addressable by <code class="inline-code">checkpoint_id</code>, you can tell LangGraph: <em>&quot;don&#39;t resume from the latest state — resume from this specific checkpoint three steps ago.&quot;</em></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> historicalConfig = {
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> historicalConfig = {
   <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span>, <span class="hljs-attr">checkpoint_id</span>: <span class="hljs-string">&quot;1ef7a3c2-...&quot;</span> }
 };
 <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(<span class="hljs-literal">null</span>, historicalConfig);</code></pre></div>
@@ -849,7 +843,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 <h2 id="62-practical-lab"><a class="heading-anchor" href="#62-practical-lab" aria-hidden="true">#</a>6.2 Practical Lab</h2>
 <h3 id="lab-61--printing-full-state-history"><a class="heading-anchor" href="#lab-61--printing-full-state-history" aria-hidden="true">#</a>Lab 6.1 — Printing full state history</h3>
 <p>Create <code class="inline-code">src/lab6-1.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
 <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
@@ -885,7 +879,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 <p><strong>Common mistake:</strong> Trying to use <code class="inline-code">for (const snap of ...)</code> (without <code class="inline-code">await</code>) — <code class="inline-code">getStateHistory</code> returns an <strong>async</strong> iterator, so the loop must be <code class="inline-code">for await (...)</code>. Forgetting <code class="inline-code">await</code> here throws a TypeScript/runtime error about iterables.</p>
 <h3 id="lab-62--manually-correcting-state-with-updatestate"><a class="heading-anchor" href="#lab-62--manually-correcting-state-with-updatestate" aria-hidden="true">#</a>Lab 6.2 — Manually correcting state with <code class="inline-code">updateState()</code></h3>
 <p>Create <code class="inline-code">src/lab6-2.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
 <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
@@ -917,7 +911,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 <p><strong>Verify:</strong> Print <code class="inline-code">(await app.getState(config)).values.messages.map(m =&gt; m.content)</code> and confirm the correction message appears in order, sandwiched between the original message and the final question.</p>
 <h3 id="lab-63--replaying-from-an-earlier-checkpoint"><a class="heading-anchor" href="#lab-63--replaying-from-an-earlier-checkpoint" aria-hidden="true">#</a>Lab 6.3 — Replaying from an earlier checkpoint</h3>
 <p>Create <code class="inline-code">src/lab6-3.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
 <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.9</span> }); <span class="hljs-comment">// higher temp = more varied replies</span>
@@ -968,7 +962,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 </ol>
 <h3 id="lab-64--forking-into-two-diverging-conversation-branches"><a class="heading-anchor" href="#lab-64--forking-into-two-diverging-conversation-branches" aria-hidden="true">#</a>Lab 6.4 — Forking into two diverging conversation branches</h3>
 <p>Extend Lab 6.3: after creating the forked branch, send <strong>different</strong> follow-up questions down each branch and confirm they evolve independently.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-comment">// continuing from Lab 6.3&#x27;s &quot;replayConfig&quot; checkpoint...</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// continuing from Lab 6.3&#x27;s &quot;replayConfig&quot; checkpoint...</span>
 <span class="hljs-keyword">const</span> branchA = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(
   { <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Make that fact sillier.&quot;</span> }] },
   replayConfig
@@ -1046,7 +1040,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 </table></div>
 <h3 id="712-the-store-interface"><a class="heading-anchor" href="#712-the-store-interface" aria-hidden="true">#</a>7.1.2 The <code class="inline-code">Store</code> interface</h3>
 <p>LangGraph&#39;s <code class="inline-code">Store</code> API gives you three core operations, all namespaced:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(namespace, key, value);
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(namespace, key, value);
 <span class="hljs-keyword">const</span> item = <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">get</span>(namespace, key);
 <span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">search</span>(namespace, { <span class="hljs-attr">query</span>: <span class="hljs-string">&quot;some natural language query&quot;</span> });</code></pre></div>
 <ul>
@@ -1063,7 +1057,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 </ul>
 <h3 id="714-namespacing-patterns"><a class="heading-anchor" href="#714-namespacing-patterns" aria-hidden="true">#</a>7.1.4 Namespacing patterns</h3>
 <p>A namespace is just an array of strings you design yourself, but a few patterns are extremely common:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts">[<span class="hljs-string">&quot;users&quot;</span>, userId]                       <span class="hljs-comment">// one folder per user</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts">[<span class="hljs-string">&quot;users&quot;</span>, userId]                       <span class="hljs-comment">// one folder per user</span>
 [<span class="hljs-string">&quot;users&quot;</span>, userId, <span class="hljs-string">&quot;preferences&quot;</span>]        <span class="hljs-comment">// sub-folder for a category of memory</span>
 [<span class="hljs-string">&quot;org&quot;</span>, orgId, <span class="hljs-string">&quot;users&quot;</span>, userId]         <span class="hljs-comment">// multi-tenant apps: org first, then user</span></code></pre></div>
 <p>The deeper/more specific your namespace, the more precisely scoped your <code class="inline-code">search()</code> calls become. <code class="inline-code">search([&quot;users&quot;, &quot;shaad-id-123&quot;], { query: &quot;food&quot; })</code> only ever searches Shaad&#39;s own memories — it physically cannot leak another user&#39;s data, because the namespace boundary is enforced by the store itself, not by application-level filtering you&#39;d have to remember to write correctly every time.</p>
@@ -1077,13 +1071,13 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 <p>You don&#39;t need to rigidly categorize every memory you store, but thinking in these three buckets helps you decide <em>what&#39;s worth writing to the Store at all</em> — not everything that happens in a conversation deserves to become a permanent memory.</p>
 <h3 id="716-where-the-store-plugs-into-a-graph"><a class="heading-anchor" href="#716-where-the-store-plugs-into-a-graph" aria-hidden="true">#</a>7.1.6 Where the Store plugs into a graph</h3>
 <p>The Store is attached at <code class="inline-code">.compile()</code> time, exactly like a checkpointer, and the two are completely independent of each other — you can have a checkpointer with no store, a store with no checkpointer, or (most commonly) both together:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>({ checkpointer, store });</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>({ checkpointer, store });</code></pre></div>
 <p>Inside a node, you access the store through the node function&#39;s second argument, <code class="inline-code">config</code>, which LangGraph injects automatically — specifically via <code class="inline-code">config.store</code> in recent LangGraph.js versions, or by accepting <code class="inline-code">store</code> as an explicit constructor parameter depending on the exact version you&#39;re using. The key idea regardless of exact syntax: <strong>nodes read and write long-term memory explicitly</strong>, unlike checkpointing, which happens automatically. You decide exactly what&#39;s worth remembering forever and what should just live and die with the conversation thread.</p>
 <h2 id="72-practical-lab"><a class="heading-anchor" href="#72-practical-lab" aria-hidden="true">#</a>7.2 Practical Lab</h2>
 <h3 id="lab-71--storing-and-retrieving-a-user-preference-across-threads"><a class="heading-anchor" href="#lab-71--storing-and-retrieving-a-user-preference-across-threads" aria-hidden="true">#</a>Lab 7.1 — Storing and retrieving a user preference across threads</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-checkpoint  <span class="hljs-comment"># if not already present</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-checkpoint  <span class="hljs-comment"># if not already present</span></code></pre></div>
 <p>Create <code class="inline-code">src/lab7-1.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
@@ -1150,7 +1144,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 <li>Using a single global namespace (e.g., just <code class="inline-code">[&quot;memories&quot;]</code>) for all users — this works fine in a single-user demo but is a serious bug in any multi-user app, since <code class="inline-code">search()</code> and <code class="inline-code">get()</code> would then mix everyone&#39;s data together.</li>
 </ol>
 <h3 id="lab-72--semantic-search-over-memories"><a class="heading-anchor" href="#lab-72--semantic-search-over-memories" aria-hidden="true">#</a>Lab 7.2 — Semantic search over memories</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
 <span class="hljs-keyword">const</span> embeddings = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIEmbeddings</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;text-embedding-3-small&quot;</span> });
@@ -1182,7 +1176,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 <p><strong>Verify:</strong> Run a second query, <code class="inline-code">&quot;Does the user enjoy back-to-back calls?&quot;</code>, and confirm <code class="inline-code">fact-4</code> ranks highest this time, even though &quot;back-to-back calls&quot; and &quot;long meetings&quot; share almost no vocabulary.</p>
 <p><strong>Common mistake:</strong> Forgetting that <code class="inline-code">dims</code> must match your embeddings model&#39;s actual output size. <code class="inline-code">text-embedding-3-small</code> is 1536; if you switch models (e.g., to <code class="inline-code">text-embedding-3-large</code>, which is 3072), forgetting to update <code class="inline-code">dims</code> causes a dimension-mismatch error at write time, not at query time, so test this immediately after switching embedding models rather than discovering it later.</p>
 <h3 id="lab-73--namespacing-memories-per-simulated-user"><a class="heading-anchor" href="#lab-73--namespacing-memories-per-simulated-user" aria-hidden="true">#</a>Lab 7.3 — Namespacing memories per simulated user</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">rememberFact</span>(<span class="hljs-params"><span class="hljs-attr">store</span>: <span class="hljs-title class_">InMemoryStore</span>, <span class="hljs-attr">userId</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">key</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span></span>) {
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">rememberFact</span>(<span class="hljs-params"><span class="hljs-attr">store</span>: <span class="hljs-title class_">InMemoryStore</span>, <span class="hljs-attr">userId</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">key</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span></span>) {
   <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>([<span class="hljs-string">&quot;users&quot;</span>, userId], key, { text });
 }
 
@@ -1204,7 +1198,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 <p><strong>Expected result:</strong> Each call only ever returns that specific user&#39;s data — never a mix. <strong>Verify</strong> by deliberately calling <code class="inline-code">recallFacts(store, &quot;user-shaad&quot;, ...)</code> and confirming Alex&#39;s &quot;backend engineer&quot; fact never appears, no matter how broad the query.</p>
 <h3 id="lab-74--a-node-that-writes-to-long-term-memory-automatically"><a class="heading-anchor" href="#lab-74--a-node-that-writes-to-long-term-memory-automatically" aria-hidden="true">#</a>Lab 7.4 — A node that writes to long-term memory automatically</h3>
 <p>This lab combines everything: a node that, after every turn, asks a small LLM call &quot;did the user just state a durable preference?&quot; and writes it to the Store if so — without you manually calling <code class="inline-code">store.put()</code> from outside the graph like in Lab 7.1.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span>, <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span>, <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 <span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
 
@@ -1309,7 +1303,7 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 </ul>
 <p>This mirrors a real production pattern: thread-scoped conversation + cross-session personalization + the ability to undo/redo, all running on Node/TS with OpenAI as the model provider.</p>
 <h2 id="architecture-diagram-described"><a class="heading-anchor" href="#architecture-diagram-described" aria-hidden="true">#</a>Architecture Diagram (described)</h2>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">START
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">START
   ↓
 [load_long_term_context]  ← reads relevant memories from Store, injects as system message
   ↓
@@ -1320,11 +1314,11 @@ npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite co
 END</code></pre></div>
 <h2 id="full-implementation"><a class="heading-anchor" href="#full-implementation" aria-hidden="true">#</a>Full Implementation</h2>
 <h3 id="step-1--install-everything-needed"><a class="heading-anchor" href="#step-1--install-everything-needed" aria-hidden="true">#</a>Step 1 — Install everything needed</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph @langchain/openai @langchain/core zod
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install @langchain/langgraph @langchain/openai @langchain/core zod
 npm install @langchain/langgraph-checkpoint-sqlite better-sqlite3
 npm install readline</code></pre></div>
 <h3 id="step-2--srcfinal-projectts"><a class="heading-anchor" href="#step-2--srcfinal-projectts" aria-hidden="true">#</a>Step 2 — <code class="inline-code">src/final-project.ts</code></h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> readline <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;readline&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> readline <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;readline&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">SqliteSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-sqlite&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span>, <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
@@ -1465,18 +1459,18 @@ npm install readline</code></pre></div>
 <span class="hljs-title function_">main</span>();</code></pre></div>
 <h3 id="step-3--run-it-across-multiple-sessions-to-test-everything"><a class="heading-anchor" href="#step-3--run-it-across-multiple-sessions-to-test-everything" aria-hidden="true">#</a>Step 3 — Run it across multiple sessions to test everything</h3>
 <p><strong>Session 1 (new terminal run):</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/final-project.ts research-session-1</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">&gt; I&#x27;m researching the history of submarine cables. Please always include at least one source in your answers.
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npx ts-node src/final-project.ts research-session-1</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">&gt; I&#x27;m researching the history of submarine cables. Please always include at least one source in your answers.
 Assistant: ...
 [memory saved] User is researching the history of submarine cables and wants sources included in answers.
 &gt; exit</code></pre></div>
 <p><strong>Session 2 — a completely new thread, simulating a different day:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/final-project.ts research-session-2</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">&gt; What&#x27;s a good starting topic for me today?
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npx ts-node src/final-project.ts research-session-2</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">&gt; What&#x27;s a good starting topic for me today?
 Assistant: Given your interest in submarine cable history... [includes a source, unprompted]</code></pre></div>
 <p><strong>Verify:</strong> the assistant references the submarine-cable topic and includes a source <strong>without you repeating that preference</strong>, proving cross-session long-term memory worked (Unit 7).</p>
 <p><strong>Now test time travel:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">&gt; Tell me a fact about the first transatlantic cable.
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">&gt; Tell me a fact about the first transatlantic cable.
 Assistant: &lt;some answer&gt;
 &gt; /regenerate
 [Regenerated] Assistant: &lt;a different answer to the same underlying question&gt;</code></pre></div>
@@ -1491,7 +1485,7 @@ Close the terminal entirely, then re-run with <code class="inline-code">research
 </ol>
 <hr>
 <h1 id="phase-3-master-cheat-sheet"><a class="heading-anchor" href="#phase-3-master-cheat-sheet" aria-hidden="true">#</a>Phase 3 Master Cheat Sheet</h1>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-comment">// ── Checkpointer setup ──────────────────────────────────────</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// ── Checkpointer setup ──────────────────────────────────────</span>
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;                          <span class="hljs-comment">// dev only, RAM</span>
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">SqliteSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-sqlite&quot;</span>;        <span class="hljs-comment">// disk-durable</span>
 <span class="hljs-comment">// import { PostgresSaver } from &quot;@langchain/langgraph-checkpoint-postgres&quot;; // production</span>
@@ -1569,6 +1563,42 @@ Close the terminal entirely, then re-run with <code class="inline-code">research
   <div class="scroll-progress-bar" id="scroll-bar"></div>
 </div>
 <script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
   (function() {
     var bar = null;
     var ticking = false;

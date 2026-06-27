@@ -163,7 +163,7 @@ function buildRenderer() {
     const langLabel = lang ? escapeHtml(lang) : "text";
     return (
       `<div class="code-block">` +
-      `<div class="code-block-header"><span class="code-lang">${langLabel}</span></div>` +
+      `<div class="code-block-header"><span class="code-lang">${langLabel}</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>` +
       `<pre><code class="hljs language-${escapeHtml(langLabel)}">${highlighted}</code></pre>` +
       `</div>\n`
     );
@@ -247,6 +247,7 @@ function pageTemplate({ title, bodyHtml }) {
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>${escapeHtml(title)}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script>
 // Runs before first paint so there is no flash of the wrong theme.
 (function () {
@@ -352,9 +353,10 @@ body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
 }
 .theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
 .theme-toggle:active{transform:scale(0.95);}
-.theme-toggle .icon-moon{display:none;}
-[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
-[data-theme="dark"] .theme-toggle .icon-moon{display:inline;}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
 @media (max-width:600px){
   .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
 }
@@ -625,16 +627,8 @@ table code.inline-code{white-space:nowrap;}
 </style>
 </head>
 <body>
-<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="
-  (function(){
-    var html = document.documentElement;
-    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
-  })();
-">
-  <span class="icon-sun">&#9728;&#65039;</span>
-  <span class="icon-moon">&#127769;</span>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
 </button>
 <header class="top-banner">
   <h1>${escapeHtml(title)}</h1>
@@ -648,6 +642,42 @@ ${bodyHtml}
   <div class="scroll-progress-bar" id="scroll-bar"></div>
 </div>
 <script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '\u2713 Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
   (function() {
     var bar = null;
     var ticking = false;

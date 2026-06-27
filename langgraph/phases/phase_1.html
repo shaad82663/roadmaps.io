@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LangGraph Mastery Guide</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script>
 // Runs before first paint so there is no flash of the wrong theme.
 (function () {
@@ -174,9 +175,10 @@ body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
 }
 .theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
 .theme-toggle:active{transform:scale(0.95);}
-.theme-toggle .icon-moon{display:none;}
-[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
-[data-theme="dark"] .theme-toggle .icon-moon{display:inline;}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
 @media (max-width:600px){
   .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
 }
@@ -447,16 +449,8 @@ table code.inline-code{white-space:nowrap;}
 </style>
 </head>
 <body>
-<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="
-  (function(){
-    var html = document.documentElement;
-    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
-  })();
-">
-  <span class="icon-sun">&#9728;&#65039;</span>
-  <span class="icon-moon">&#127769;</span>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
 </button>
 <header class="top-banner">
   <h1>LangGraph Mastery Guide</h1>
@@ -524,17 +518,17 @@ table code.inline-code{white-space:nowrap;}
 </ul>
 <h3 id="step-1--verify-or-install-nodejs"><a class="heading-anchor" href="#step-1--verify-or-install-nodejs" aria-hidden="true">#</a>Step 1 — Verify or Install Node.js</h3>
 <p>Open your terminal and run:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">node --version</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">node --version</code></pre></div>
 <p>If you see something like <code class="inline-code">v20.11.0</code> — great, you are good to go. If you see an error or a version below 18, go to <a href="https://nodejs.org">https://nodejs.org</a> and download the LTS release.</p>
 <h3 id="step-2--create-your-project-folder"><a class="heading-anchor" href="#step-2--create-your-project-folder" aria-hidden="true">#</a>Step 2 — Create Your Project Folder</h3>
 <p>We will create a dedicated folder for all Phase 1 work. Every chapter and lab lives inside this folder.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> langgraph-phase1
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> langgraph-phase1
 <span class="hljs-built_in">cd</span> langgraph-phase1</code></pre></div>
 <h3 id="step-3--initialise-a-nodejs-project"><a class="heading-anchor" href="#step-3--initialise-a-nodejs-project" aria-hidden="true">#</a>Step 3 — Initialise a Node.js Project</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm init -y</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm init -y</code></pre></div>
 <p>This creates a <code class="inline-code">package.json</code> file, which tracks your project dependencies. The <code class="inline-code">-y</code> flag accepts all defaults so you do not have to answer prompts.</p>
 <h3 id="step-4--install-typescript-and-the-typescript-runner"><a class="heading-anchor" href="#step-4--install-typescript-and-the-typescript-runner" aria-hidden="true">#</a>Step 4 — Install TypeScript and the TypeScript Runner</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install --save-dev typescript tsx @types/node</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install --save-dev typescript tsx @types/node</code></pre></div>
 <p>What each package does:</p>
 <ul>
 <li><code class="inline-code">typescript</code> — the TypeScript compiler that checks your code for type errors</li>
@@ -542,9 +536,9 @@ table code.inline-code{white-space:nowrap;}
 <li><code class="inline-code">@types/node</code> — TypeScript type definitions for Node.js built-ins like <code class="inline-code">process</code>, <code class="inline-code">fs</code>, etc.</li>
 </ul>
 <h3 id="step-5--create-a-typescript-configuration-file"><a class="heading-anchor" href="#step-5--create-a-typescript-configuration-file" aria-hidden="true">#</a>Step 5 — Create a TypeScript Configuration File</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsc --init</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npx tsc --init</code></pre></div>
 <p>Then open the generated <code class="inline-code">tsconfig.json</code> and replace its contents with the following. Do not worry about every option — the comments explain what matters.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;compilerOptions&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
     <span class="hljs-attr">&quot;target&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ES2022&quot;</span><span class="hljs-punctuation">,</span>
     <span class="hljs-attr">&quot;module&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;CommonJS&quot;</span><span class="hljs-punctuation">,</span>
@@ -567,7 +561,7 @@ table code.inline-code{white-space:nowrap;}
 <li><code class="inline-code">&quot;esModuleInterop&quot;: true</code> — allows <code class="inline-code">import</code> of CommonJS modules without workarounds</li>
 </ul>
 <h3 id="step-6--install-langgraph-and-langchain-packages"><a class="heading-anchor" href="#step-6--install-langgraph-and-langchain-packages" aria-hidden="true">#</a>Step 6 — Install LangGraph and LangChain Packages</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph @langchain/core @langchain/openai</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install @langchain/langgraph @langchain/core @langchain/openai</code></pre></div>
 <p>What each package does:</p>
 <ul>
 <li><code class="inline-code">@langchain/langgraph</code> — the core LangGraph library (state graphs, nodes, edges)</li>
@@ -575,34 +569,34 @@ table code.inline-code{white-space:nowrap;}
 <li><code class="inline-code">@langchain/openai</code> — the OpenAI integration, so we can call GPT models from our graphs</li>
 </ul>
 <h3 id="step-7--create-your-source-directory"><a class="heading-anchor" href="#step-7--create-your-source-directory" aria-hidden="true">#</a>Step 7 — Create Your Source Directory</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> src</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> src</code></pre></div>
 <h3 id="step-8--store-your-openai-api-key"><a class="heading-anchor" href="#step-8--store-your-openai-api-key" aria-hidden="true">#</a>Step 8 — Store Your OpenAI API Key</h3>
 <p>Never hard-code API keys in your source files. Instead, create a <code class="inline-code">.env</code> file at the project root:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> .<span class="hljs-built_in">env</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> .<span class="hljs-built_in">env</span></code></pre></div>
 <p>Open it and add:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">OPENAI_API_KEY=sk-your-actual-key-here</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">OPENAI_API_KEY=sk-your-actual-key-here</code></pre></div>
 <p>Then install <code class="inline-code">dotenv</code> to load this file automatically:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install dotenv</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install dotenv</code></pre></div>
 <h3 id="step-9--add-a-run-script"><a class="heading-anchor" href="#step-9--add-a-run-script" aria-hidden="true">#</a>Step 9 — Add a Run Script</h3>
 <p>Open <code class="inline-code">package.json</code> and add a <code class="inline-code">&quot;scripts&quot;</code> section so you can run files easily:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
     <span class="hljs-attr">&quot;run&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsx&quot;</span>
   <span class="hljs-punctuation">}</span>
 <span class="hljs-punctuation">}</span></code></pre></div>
 <p>Now you can run any TypeScript file with:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/whatever.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/whatever.ts</code></pre></div>
 <h3 id="step-10--verify-everything-works"><a class="heading-anchor" href="#step-10--verify-everything-works" aria-hidden="true">#</a>Step 10 — Verify Everything Works</h3>
 <p>Create <code class="inline-code">src/hello.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Node version:&quot;</span>, process.<span class="hljs-property">version</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;OpenAI key loaded:&quot;</span>, !!process.<span class="hljs-property">env</span>.<span class="hljs-property">OPENAI_API_KEY</span>);</code></pre></div>
 <p>Run it:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/hello.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/hello.ts</code></pre></div>
 <p>Expected output:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">Node version: v20.11.0
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Node version: v20.11.0
 OpenAI key loaded: true</code></pre></div>
 <p>If <code class="inline-code">OpenAI key loaded: false</code>, double-check your <code class="inline-code">.env</code> file and make sure there are no spaces around the <code class="inline-code">=</code> sign.</p>
 <p><strong>Your environment is ready. Let us begin.</strong></p>
@@ -622,9 +616,9 @@ OpenAI key loaded: true</code></pre></div>
 <h3 id="12-langchain-chains-what-they-are-and-why-they-fall-short"><a class="heading-anchor" href="#12-langchain-chains-what-they-are-and-why-they-fall-short" aria-hidden="true">#</a>1.2 LangChain Chains: What They Are and Why They Fall Short</h3>
 <p><strong>What is a Chain?</strong></p>
 <p>A Chain is the simplest way to connect AI components in sequence. Think of it as an assembly line: input goes in one end, passes through a fixed series of steps, and output comes out the other end.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">Input → Step 1 → Step 2 → Step 3 → Output</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Input → Step 1 → Step 2 → Step 3 → Output</code></pre></div>
 <p>Here is a concrete example of a Chain in LangChain:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">User message → Prompt template → LLM call → Output parser → Final answer</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">User message → Prompt template → LLM call → Output parser → Final answer</code></pre></div>
 <p>Every time the user sends a message, it flows left to right through the exact same steps in the exact same order. This is called <strong>linear execution</strong>.</p>
 <p><strong>Why linear execution is limiting:</strong></p>
 <ol>
@@ -643,7 +637,7 @@ OpenAI key loaded: true</code></pre></div>
 <p><strong>What is an AgentExecutor?</strong></p>
 <p>LangChain&#39;s AgentExecutor was the answer to the &quot;linear chains are too rigid&quot; problem. An AgentExecutor gives the LLM a set of <strong>tools</strong> (like a web search tool, a calculator, a database lookup), and then lets the LLM decide which tools to call and in what order.</p>
 <p>The loop looks like this:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">User input
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">User input
     ↓
 LLM decides: &quot;I need to search the web&quot;
     ↓
@@ -769,10 +763,10 @@ Final answer</code></pre></div>
 <h3 id="16-lab-1-a-install-langgraph-and-run-your-first-one-node-graph"><a class="heading-anchor" href="#16-lab-1-a-install-langgraph-and-run-your-first-one-node-graph" aria-hidden="true">#</a>1.6 Lab 1-A: Install LangGraph and Run Your First One-Node Graph</h3>
 <p>Let us write the simplest possible LangGraph program. One node, one edge, done. The goal is to confirm everything is working and to see the bare minimum structure of a graph.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p src/chapter1
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p src/chapter1
 <span class="hljs-built_in">touch</span> src/chapter1/lab1a-first-graph.ts</code></pre></div>
 <p><strong>Write the code:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter1/lab1a-first-graph.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter1/lab1a-first-graph.ts</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
@@ -878,9 +872,9 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter1/lab1a-first-graph.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter1/lab1a-first-graph.ts</code></pre></div>
 <p><strong>Expected output:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">============================================================
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">============================================================
 Running Lab 1-A: First LangGraph Graph
 ============================================================
 
@@ -905,8 +899,8 @@ Final state: { message: &quot;Hello! You said: \&quot;I am learning LangGraph\&q
 <p>Now we will do something more meaningful — use an actual LLM. We will first see what a two-step Chain would look like conceptually, then build the equivalent as a LangGraph.</p>
 <p>The workflow: &quot;Translate a sentence to French, then summarize it in one word.&quot;</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter1/lab1b-chain-to-graph.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter1/lab1b-chain-to-graph.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter1/lab1b-chain-to-graph.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter1/lab1b-chain-to-graph.ts</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
@@ -1040,9 +1034,9 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter1/lab1b-chain-to-graph.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter1/lab1b-chain-to-graph.ts</code></pre></div>
 <p><strong>Expected output:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">============================================================
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">============================================================
 Lab 1-B: Two-Node LangGraph Pipeline (with LLM)
 ============================================================
 
@@ -1063,8 +1057,8 @@ Summary   : Enrichissement
 <h3 id="18-lab-1-c-visibility-comparison--seeing-each-step"><a class="heading-anchor" href="#18-lab-1-c-visibility-comparison--seeing-each-step" aria-hidden="true">#</a>1.8 Lab 1-C: Visibility Comparison — Seeing Each Step</h3>
 <p>One of LangGraph&#39;s biggest advantages over AgentExecutor is that you can see every intermediate state. Let us demonstrate this by streaming the graph&#39;s output step by step.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter1/lab1c-visibility.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter1/lab1c-visibility.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter1/lab1c-visibility.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter1/lab1c-visibility.ts</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
@@ -1166,7 +1160,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter1/lab1c-visibility.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter1/lab1c-visibility.ts</code></pre></div>
 <p>You should see three separate blocks of output, one for each node, appearing one after another as the graph progresses. This real-time visibility into each step is the core difference from a Chain (which would only show the final output).</p>
 <hr>
 <h3 id="19-knowledge-check--chapter-1"><a class="heading-anchor" href="#19-knowledge-check--chapter-1" aria-hidden="true">#</a>1.9 Knowledge Check — Chapter 1</h3>
@@ -1195,7 +1189,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 </ol>
 <h4 id="mini-exercise"><a class="heading-anchor" href="#mini-exercise" aria-hidden="true">#</a>Mini Exercise</h4>
 <p>Extend <code class="inline-code">lab1b-chain-to-graph.ts</code> to add a <strong>fourth node</strong> that takes the one-word French summary and translates it back to English. The flow should be:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">START → translate → summarize → translateBack → END</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">START → translate → summarize → translateBack → END</code></pre></div>
 <p>Verify that the final state has all four fields populated correctly.</p>
 <hr>
 <h2 id="chapter-2--state-amp-schema"><a class="heading-anchor" href="#chapter-2--state-amp-schema" aria-hidden="true">#</a>Chapter 2 — State &amp; Schema</h2>
@@ -1217,7 +1211,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 <h3 id="22-defining-state-with-the-annotation-api"><a class="heading-anchor" href="#22-defining-state-with-the-annotation-api" aria-hidden="true">#</a>2.2 Defining State with the Annotation API</h3>
 <p>LangGraph provides the <code class="inline-code">Annotation</code> API to define state schemas in TypeScript with full type safety.</p>
 <p><strong>The pattern:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Annotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Annotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">MyState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
   <span class="hljs-attr">fieldName</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">FieldType</span>&gt;({
@@ -1250,7 +1244,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 <p>A function that returns the initial value of this field when no value is provided in the initial input to <code class="inline-code">invoke()</code>. Using a function (instead of a plain value) ensures each graph run gets a fresh copy — especially important for arrays and objects.</p>
 <p><strong>Accessing the TypeScript type of your state:</strong></p>
 <p>After defining <code class="inline-code">MyState</code>, you can get the TypeScript type of the state object using:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MyState</span>.<span class="hljs-property">State</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MyState</span>.<span class="hljs-property">State</span>
 <span class="hljs-comment">// This gives you: { fieldName: FieldType, ... }</span></code></pre></div>
 <p>Use this in node function signatures to get full type safety and autocomplete.</p>
 <hr>
@@ -1261,7 +1255,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 <p>This design enables several powerful patterns:</p>
 <p><strong>Pattern 1: Last-Write-Wins (Replace)</strong></p>
 <p>The most common pattern. The new value simply replaces the old one. Use this for fields like &quot;current answer&quot;, &quot;latest status&quot;, &quot;user input&quot;.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-attr">fieldName</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-attr">fieldName</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({
   <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">_existing</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">update</span>: <span class="hljs-built_in">string</span></span>) =&gt;</span> update,
   <span class="hljs-comment">//         ^ ignore old value    ^ take new value</span>
   <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span>,
@@ -1269,7 +1263,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 <p>The underscore prefix on <code class="inline-code">_existing</code> is a TypeScript convention meaning &quot;this parameter is intentionally unused.&quot;</p>
 <p><strong>Pattern 2: Accumulate (Append)</strong></p>
 <p>The new value is added to the existing value. Use this for fields like &quot;message history&quot;, &quot;collected results&quot;, &quot;error log&quot;.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-attr">messages</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>[]&gt;({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-attr">messages</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>[]&gt;({
   <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">existing</span>: <span class="hljs-built_in">string</span>[], <span class="hljs-attr">update</span>: <span class="hljs-built_in">string</span>[]</span>) =&gt;</span> [...existing, ...update],
   <span class="hljs-comment">//         ^ keep old items           ^ add new items</span>
   <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> [],
@@ -1277,14 +1271,14 @@ dotenv.<span class="hljs-title function_">config</span>();
 <p>Note: the spread operator <code class="inline-code">...</code> creates a new array combining both. This is important — avoid mutating <code class="inline-code">existing</code> directly.</p>
 <p><strong>Pattern 3: Numeric Accumulation (Add)</strong></p>
 <p>The new value is added arithmetically. Use this for counters, totals, retry counts.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-attr">retryCount</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">number</span>&gt;({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-attr">retryCount</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">number</span>&gt;({
   <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">existing</span>: <span class="hljs-built_in">number</span>, <span class="hljs-attr">update</span>: <span class="hljs-built_in">number</span></span>) =&gt;</span> existing + update,
   <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-number">0</span>,
 }),</code></pre></div>
 <p>A node would then return <code class="inline-code">{ retryCount: 1 }</code> to increment the counter by 1, regardless of the current value.</p>
 <p><strong>Pattern 4: Smart Merge (Conditional)</strong></p>
 <p>The reducer can contain any logic you want, including conditionals.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-attr">bestScore</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">number</span>&gt;({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-attr">bestScore</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">number</span>&gt;({
   <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">existing</span>: <span class="hljs-built_in">number</span>, <span class="hljs-attr">update</span>: <span class="hljs-built_in">number</span></span>) =&gt;</span> <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(existing, update),
   <span class="hljs-comment">// Always keeps the highest score seen</span>
   <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-number">0</span>,
@@ -1294,7 +1288,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 <hr>
 <h3 id="24-messagesstate-the-built-in-chat-state"><a class="heading-anchor" href="#24-messagesstate-the-built-in-chat-state" aria-hidden="true">#</a>2.4 MessagesState: The Built-in Chat State</h3>
 <p>Because building chatbots with conversation history is so common, LangGraph provides a pre-built state schema called <code class="inline-code">MessagesAnnotation</code>. It has exactly one field: <code class="inline-code">messages</code>, which is an array of LangChain message objects.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessagesAnnotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessagesAnnotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-title class_">AIMessage</span>, <span class="hljs-title class_">SystemMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;</code></pre></div>
 <p><strong>The <code class="inline-code">messages</code> field&#39;s built-in reducer:</strong></p>
 <p>The built-in reducer for <code class="inline-code">messages</code> is smart. It does not just append blindly. It uses the LangChain <code class="inline-code">addMessages</code> utility, which:</p>
@@ -1335,7 +1329,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 </tbody>
 </table></div>
 <p><strong>Using MessagesAnnotation:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessagesAnnotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 
 <span class="hljs-comment">// When using MessagesAnnotation, your graph already has a `messages` field.</span>
@@ -1370,10 +1364,10 @@ dotenv.<span class="hljs-title function_">config</span>();
 <h3 id="26-lab-2-a-define-a-custom-state-schema-with-multiple-typed-fields"><a class="heading-anchor" href="#26-lab-2-a-define-a-custom-state-schema-with-multiple-typed-fields" aria-hidden="true">#</a>2.6 Lab 2-A: Define a Custom State Schema with Multiple Typed Fields</h3>
 <p>Let us build a graph with a rich, realistic state schema.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter2/lab2a-custom-schema.ts
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter2/lab2a-custom-schema.ts
 <span class="hljs-built_in">mkdir</span> -p src/chapter2
 <span class="hljs-built_in">touch</span> src/chapter2/lab2a-custom-schema.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter2/lab2a-custom-schema.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter2/lab2a-custom-schema.ts</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
@@ -1565,7 +1559,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter2/lab2a-custom-schema.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter2/lab2a-custom-schema.ts</code></pre></div>
 <p><strong>What to observe:</strong></p>
 <ul>
 <li><code class="inline-code">extractedSkills</code> is an array that gets skills appended, not replaced</li>
@@ -1576,8 +1570,8 @@ dotenv.<span class="hljs-title function_">config</span>();
 <h3 id="27-lab-2-b-custom-reducer-functions-for-a-counter"><a class="heading-anchor" href="#27-lab-2-b-custom-reducer-functions-for-a-counter" aria-hidden="true">#</a>2.7 Lab 2-B: Custom Reducer Functions for a Counter</h3>
 <p>This lab focuses specifically on understanding reducer behavior by visualising what happens step by step.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter2/lab2b-custom-reducers.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter2/lab2b-custom-reducers.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter2/lab2b-custom-reducers.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter2/lab2b-custom-reducers.ts</span>
 <span class="hljs-comment">// This lab uses NO LLM — purely demonstrates reducer behavior with simple data.</span>
 
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">Annotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
@@ -1725,14 +1719,14 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter2/lab2b-custom-reducers.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter2/lab2b-custom-reducers.ts</code></pre></div>
 <p>Verify the final values match the expected reducer behavior described in the summary section.</p>
 <hr>
 <h3 id="28-lab-2-c-messagesstate-chatbot"><a class="heading-anchor" href="#28-lab-2-c-messagesstate-chatbot" aria-hidden="true">#</a>2.8 Lab 2-C: MessagesState Chatbot</h3>
 <p>Let us build a real multi-turn chatbot using the built-in <code class="inline-code">MessagesAnnotation</code>.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter2/lab2c-messages-state.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter2/lab2c-messages-state.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter2/lab2c-messages-state.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter2/lab2c-messages-state.ts</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
@@ -1833,14 +1827,14 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter2/lab2c-messages-state.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter2/lab2c-messages-state.ts</code></pre></div>
 <p><strong>What to observe:</strong> In Turn 3, the bot correctly remembers the language name it mentioned in Turn 1 — because the full conversation history is passed in <code class="inline-code">state.messages</code>. This demonstrates how <code class="inline-code">MessagesAnnotation</code> accumulates context across turns.</p>
 <hr>
 <h3 id="29-lab-2-d-observing-how-two-nodes-update-the-same-key"><a class="heading-anchor" href="#29-lab-2-d-observing-how-two-nodes-update-the-same-key" aria-hidden="true">#</a>2.9 Lab 2-D: Observing How Two Nodes Update the Same Key</h3>
 <p>This short lab demonstrates what happens when two different nodes both try to write to the same state field.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter2/lab2d-merge-behavior.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter2/lab2d-merge-behavior.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter2/lab2d-merge-behavior.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter2/lab2d-merge-behavior.ts</span>
 <span class="hljs-comment">// No LLM needed — demonstrates reducer merge behavior with pure data</span>
 
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">Annotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
@@ -1918,7 +1912,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter2/lab2d-merge-behavior.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter2/lab2d-merge-behavior.ts</code></pre></div>
 <hr>
 <h3 id="210-knowledge-check--chapter-2"><a class="heading-anchor" href="#210-knowledge-check--chapter-2" aria-hidden="true">#</a>2.10 Knowledge Check — Chapter 2</h3>
 <h4 id="summary-1"><a class="heading-anchor" href="#summary-1" aria-hidden="true">#</a>Summary</h4>
@@ -1954,7 +1948,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 <h3 id="31-stategraph-the-container-for-your-workflow"><a class="heading-anchor" href="#31-stategraph-the-container-for-your-workflow" aria-hidden="true">#</a>3.1 StateGraph: The Container for Your Workflow</h3>
 <p><code class="inline-code">StateGraph</code> is the class that holds your entire graph definition. Think of it as the architect&#39;s blueprint — before any actual work is done, you describe on paper what rooms (nodes) exist and how the corridors (edges) connect them.</p>
 <p><strong>Creating a StateGraph:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 
 <span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">YourStateAnnotation</span>);</code></pre></div>
 <p>The only required argument is your state schema (the <code class="inline-code">Annotation.Root(...)</code> you defined). This tells the graph what shape of data to expect and how to manage it.</p>
@@ -1963,7 +1957,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 <li><p><strong>Mutable before compile, immutable after.</strong> You can call <code class="inline-code">.addNode()</code> and <code class="inline-code">.addEdge()</code> as many times as you want before calling <code class="inline-code">.compile()</code>. Once compiled, the graph is locked — you cannot add or modify nodes.</p>
 </li>
 <li><p><strong>Fluent API.</strong> Every method on <code class="inline-code">StateGraph</code> returns the graph itself, so you can chain method calls. This is why you often see:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;a&quot;</span>, funcA)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;b&quot;</span>, funcB)
   .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;a&quot;</span>)
@@ -1976,7 +1970,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 <h3 id="32-nodes-the-workers-in-your-graph"><a class="heading-anchor" href="#32-nodes-the-workers-in-your-graph" aria-hidden="true">#</a>3.2 Nodes: The Workers in Your Graph</h3>
 <p>A node is a function that represents one unit of work in your workflow. It is the place where things actually happen — LLM calls, database queries, data transformations, API calls, or any other computation.</p>
 <p><strong>Node function signature:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">myNode</span>(<span class="hljs-params">
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">myNode</span>(<span class="hljs-params">
   <span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MyState</span>.<span class="hljs-title class_">State</span>,           <span class="hljs-comment">// current full state</span>
   <span class="hljs-attr">config</span>?: <span class="hljs-title class_">RunnableConfig</span>                <span class="hljs-comment">// optional runtime config (thread IDs, callbacks, etc.)</span>
 </span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MyState</span>.<span class="hljs-property">State</span>&gt;&gt; {
@@ -1997,13 +1991,13 @@ dotenv.<span class="hljs-title function_">config</span>();
 </li>
 </ol>
 <p><strong>Registering a node:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript">graph.<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;nodeName&quot;</span>, nodeFunction);</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript">graph.<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;nodeName&quot;</span>, nodeFunction);</code></pre></div>
 <p>The first argument is the name (a string used to reference this node in edges). The second argument is the function.</p>
 <hr>
 <h3 id="33-edges-the-roads-between-nodes"><a class="heading-anchor" href="#33-edges-the-roads-between-nodes" aria-hidden="true">#</a>3.3 Edges: The Roads Between Nodes</h3>
 <p>Edges define the execution order. Without edges, LangGraph would not know which node to run after which.</p>
 <p><strong>Normal (unconditional) edges:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript">graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;nodeA&quot;</span>, <span class="hljs-string">&quot;nodeB&quot;</span>);</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript">graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;nodeA&quot;</span>, <span class="hljs-string">&quot;nodeB&quot;</span>);</code></pre></div>
 <p>This means: &quot;After <code class="inline-code">nodeA</code> finishes, always go to <code class="inline-code">nodeB</code>.&quot; There is no condition. As soon as nodeA returns, nodeB starts.</p>
 <p><strong>Rules:</strong></p>
 <ul>
@@ -2012,19 +2006,19 @@ dotenv.<span class="hljs-title function_">config</span>();
 <li>You cannot have circular edges without an exit condition (LangGraph will enforce a recursion limit — covered in Phase 2).</li>
 </ul>
 <p><strong>Conditional (dynamic) edges</strong> — preview, covered fully in Phase 2:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript">graph.<span class="hljs-title function_">addConditionalEdges</span>(<span class="hljs-string">&quot;nodeA&quot;</span>, routingFunction);</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript">graph.<span class="hljs-title function_">addConditionalEdges</span>(<span class="hljs-string">&quot;nodeA&quot;</span>, routingFunction);</code></pre></div>
 <p>Where <code class="inline-code">routingFunction</code> takes the state and returns the name of the next node. This enables branching.</p>
 <hr>
 <h3 id="34-start-and-end-the-entry-and-exit-points"><a class="heading-anchor" href="#34-start-and-end-the-entry-and-exit-points" aria-hidden="true">#</a>3.4 START and END: The Entry and Exit Points</h3>
 <p>Every graph needs to know where execution begins and where it ends.</p>
 <p><strong>START:</strong></p>
 <p><code class="inline-code">START</code> is a virtual node that represents the entry point. It is not a real function — it is a sentinel value that tells LangGraph &quot;this is where the graph starts.&quot; You always add an edge from <code class="inline-code">START</code> to your first real node.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">START</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">START</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 
 graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;firstNode&quot;</span>);</code></pre></div>
 <p><strong>END:</strong></p>
 <p><code class="inline-code">END</code> is a virtual node that represents the exit point. When a node has an edge to <code class="inline-code">END</code>, reaching that node terminates graph execution and returns the final state to the caller.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 
 graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;lastNode&quot;</span>, <span class="hljs-variable constant_">END</span>);</code></pre></div>
 <p><strong>Multiple paths to END:</strong></p>
@@ -2042,12 +2036,12 @@ graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string
 <li><p><strong>Locks the definition.</strong> After compiling, you cannot add or modify nodes or edges.</p>
 </li>
 <li><p><strong>Optionally accepts a checkpointer.</strong> This is how you add persistence (covered in Phase 3):</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> graph = workflow.<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: memorySaver });</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> graph = workflow.<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: memorySaver });</code></pre></div>
 </li>
 </ol>
 <p><strong>What <code class="inline-code">.compile()</code> returns:</strong></p>
 <p>A <code class="inline-code">CompiledStateGraph</code> object — this is what you actually call <code class="inline-code">.invoke()</code>, <code class="inline-code">.stream()</code>, and <code class="inline-code">.batch()</code> on.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> compiled = workflow.<span class="hljs-title function_">compile</span>();
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> compiled = workflow.<span class="hljs-title function_">compile</span>();
 <span class="hljs-comment">// compiled is a CompiledStateGraph</span>
 <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> compiled.<span class="hljs-title function_">invoke</span>({ ... });</code></pre></div>
 <hr>
@@ -2055,7 +2049,7 @@ graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string
 <p>Once compiled, a graph can be run in three modes:</p>
 <hr>
 <p><strong><code class="inline-code">invoke(input, config?)</code> — Run and return final state</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> finalState = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Hello&quot;</span> });</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> finalState = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Hello&quot;</span> });</code></pre></div>
 <ul>
 <li>Runs the entire graph synchronously (awaited)</li>
 <li>Returns the complete final state after all nodes have finished</li>
@@ -2063,7 +2057,7 @@ graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string
 </ul>
 <hr>
 <p><strong><code class="inline-code">stream(input, config?)</code> — Yield output after each node</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> stream = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">stream</span>({ <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Hello&quot;</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> stream = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">stream</span>({ <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Hello&quot;</span> });
 
 <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> stream) {
   <span class="hljs-comment">// chunk is an object: { nodeName: { ...partialState } }</span>
@@ -2077,7 +2071,7 @@ graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string
 </ul>
 <p><strong>Stream modes:</strong></p>
 <p><code class="inline-code">stream()</code> can be called with different modes to control what data it yields:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// Default: yields partial node outputs</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// Default: yields partial node outputs</span>
 <span class="hljs-keyword">const</span> stream = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">stream</span>(input);
 
 <span class="hljs-comment">// &quot;values&quot; mode: yields the FULL state after every node</span>
@@ -2088,7 +2082,7 @@ graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string
 <p>The <code class="inline-code">&quot;values&quot;</code> mode is useful when you want to see the cumulative state rather than just what each node changed.</p>
 <hr>
 <p><strong><code class="inline-code">batch(inputs[], config?)</code> — Run multiple inputs in parallel</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">batch</span>([
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">batch</span>([
   { <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Input 1&quot;</span> },
   { <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Input 2&quot;</span> },
   { <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Input 3&quot;</span> },
@@ -2102,9 +2096,9 @@ graph.<span class="hljs-title function_">addEdge</span>(<span class="hljs-string
 <hr>
 <h3 id="37-lab-3-a-build-a-3-node-linear-graph-and-compile-it"><a class="heading-anchor" href="#37-lab-3-a-build-a-3-node-linear-graph-and-compile-it" aria-hidden="true">#</a>3.7 Lab 3-A: Build a 3-Node Linear Graph and Compile It</h3>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p src/chapter3
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> -p src/chapter3
 <span class="hljs-built_in">touch</span> src/chapter3/lab3a-three-node-graph.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/lab3a-three-node-graph.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/lab3a-three-node-graph.ts</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
@@ -2264,13 +2258,13 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter3/lab3a-three-node-graph.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter3/lab3a-three-node-graph.ts</code></pre></div>
 <hr>
 <h3 id="38-lab-3-b-add-a-node-that-mutates-only-part-of-the-state"><a class="heading-anchor" href="#38-lab-3-b-add-a-node-that-mutates-only-part-of-the-state" aria-hidden="true">#</a>3.8 Lab 3-B: Add a Node That Mutates Only Part of the State</h3>
 <p>This lab reinforces the concept that nodes only return what they change.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter3/lab3b-partial-updates.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/lab3b-partial-updates.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter3/lab3b-partial-updates.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/lab3b-partial-updates.ts</span>
 <span class="hljs-comment">// Demonstrates partial state updates and that untouched fields are preserved</span>
 
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">Annotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
@@ -2379,13 +2373,13 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter3/lab3b-partial-updates.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter3/lab3b-partial-updates.ts</code></pre></div>
 <hr>
 <h3 id="39-lab-3-c-invoke-and-inspect-final-state"><a class="heading-anchor" href="#39-lab-3-c-invoke-and-inspect-final-state" aria-hidden="true">#</a>3.9 Lab 3-C: invoke() and Inspect Final State</h3>
 <p>This lab explores <code class="inline-code">invoke()</code> in depth — including how the initial input merges with defaults.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter3/lab3c-invoke-inspect.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/lab3c-invoke-inspect.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter3/lab3c-invoke-inspect.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/lab3c-invoke-inspect.ts</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
@@ -2507,13 +2501,13 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter3/lab3c-invoke-inspect.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter3/lab3c-invoke-inspect.ts</code></pre></div>
 <hr>
 <h3 id="310-lab-3-d-stream-intermediate-states"><a class="heading-anchor" href="#310-lab-3-d-stream-intermediate-states" aria-hidden="true">#</a>3.10 Lab 3-D: stream() Intermediate States</h3>
 <p>This is the most important lab in Chapter 3. Streaming is what makes LangGraph&#39;s execution transparent.</p>
 <p><strong>Create the file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter3/lab3d-streaming.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/lab3d-streaming.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter3/lab3d-streaming.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/lab3d-streaming.ts</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
 dotenv.<span class="hljs-title function_">config</span>();
@@ -2656,7 +2650,7 @@ dotenv.<span class="hljs-title function_">config</span>();
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter3/lab3d-streaming.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter3/lab3d-streaming.ts</code></pre></div>
 <p><strong>What to observe:</strong></p>
 <ul>
 <li>In Mode 1 (default), each chunk only contains what the node returned — the delta</li>
@@ -2714,8 +2708,8 @@ dotenv.<span class="hljs-title function_">config</span>();
 </ul>
 <hr>
 <p><strong>Create the project file:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter3/capstone-article-checker.ts</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/capstone-article-checker.ts</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">touch</span> src/chapter3/capstone-article-checker.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// src/chapter3/capstone-article-checker.ts</span>
 <span class="hljs-comment">// PHASE 1 CAPSTONE PROJECT: AI Article Quality Checker</span>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> dotenv <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;dotenv&quot;</span>;
@@ -3043,7 +3037,7 @@ The future of AI is not predetermined. The choices we make today about how to de
 
 <span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">error</span>);</code></pre></div>
 <p><strong>Run it:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm run run src/chapter3/capstone-article-checker.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm run run src/chapter3/capstone-article-checker.ts</code></pre></div>
 <p><strong>Expected behaviour:</strong></p>
 <ul>
 <li>You see streaming progress as each of 5 nodes completes</li>
@@ -3094,6 +3088,42 @@ The future of AI is not predetermined. The choices we make today about how to de
   <div class="scroll-progress-bar" id="scroll-bar"></div>
 </div>
 <script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
   (function() {
     var bar = null;
     var ticking = false;

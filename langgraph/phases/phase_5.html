@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LangGraph Mastery Guide — Phase 5: Multi-Agent &amp; Tools</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script>
 // Runs before first paint so there is no flash of the wrong theme.
 (function () {
@@ -174,9 +175,10 @@ body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
 }
 .theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
 .theme-toggle:active{transform:scale(0.95);}
-.theme-toggle .icon-moon{display:none;}
-[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
-[data-theme="dark"] .theme-toggle .icon-moon{display:inline;}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
 @media (max-width:600px){
   .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
 }
@@ -447,16 +449,8 @@ table code.inline-code{white-space:nowrap;}
 </style>
 </head>
 <body>
-<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="
-  (function(){
-    var html = document.documentElement;
-    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
-  })();
-">
-  <span class="icon-sun">&#9728;&#65039;</span>
-  <span class="icon-moon">&#127769;</span>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
 </button>
 <header class="top-banner">
   <h1>LangGraph Mastery Guide — Phase 5: Multi-Agent &amp; Tools</h1>
@@ -510,13 +504,13 @@ table code.inline-code{white-space:nowrap;}
 <p>Every lab below assumes a working TypeScript + Node.js project with the right packages installed and your OpenAI API key configured. If this step is skipped, every single code sample later will fail with confusing module errors — so we do it carefully, once, up front.</p>
 <h3 id="step-by-step-setup"><a class="heading-anchor" href="#step-by-step-setup" aria-hidden="true">#</a>Step-by-step setup</h3>
 <p><strong>1. Create a project folder and initialize it.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> langgraph-phase5
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> langgraph-phase5
 <span class="hljs-built_in">cd</span> langgraph-phase5
 npm init -y</code></pre></div>
 <p><em>What this does:</em> <code class="inline-code">npm init -y</code> creates a <code class="inline-code">package.json</code> file with default values. This file is Node&#39;s &quot;manifest&quot; — it tracks what packages your project depends on, so anyone (including future you) can reinstall everything with one command.</p>
 <p><em>Expected result:</em> A new <code class="inline-code">package.json</code> file appears in the folder. Open it — you&#39;ll see fields like <code class="inline-code">&quot;name&quot;</code>, <code class="inline-code">&quot;version&quot;</code>, <code class="inline-code">&quot;main&quot;</code>. That&#39;s normal; we&#39;ll edit a couple of these in a moment.</p>
 <p><strong>2. Install TypeScript and the LangGraph packages.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install typescript tsx @types/node --save-dev
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install typescript tsx @types/node --save-dev
 npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></pre></div>
 <p><em>What each package is for:</em></p>
 <ul>
@@ -532,7 +526,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>Common beginner mistake:</em> Forgetting <code class="inline-code">--save-dev</code> for <code class="inline-code">typescript</code>/<code class="inline-code">tsx</code>/<code class="inline-code">@types/node</code> doesn&#39;t break anything functionally, but it&#39;s good hygiene — those are <em>development</em> tools, not something your running application needs in production. Don&#39;t worry if you forget; it won&#39;t cause lab failures.</p>
 <p><strong>3. Add a <code class="inline-code">tsconfig.json</code>.</strong></p>
 <p>Create a file named <code class="inline-code">tsconfig.json</code> in the project root with this content:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">&quot;compilerOptions&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
     <span class="hljs-attr">&quot;target&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ES2022&quot;</span><span class="hljs-punctuation">,</span>
     <span class="hljs-attr">&quot;module&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;NodeNext&quot;</span><span class="hljs-punctuation">,</span>
@@ -547,20 +541,20 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>Why this matters:</em> <code class="inline-code">&quot;module&quot;: &quot;NodeNext&quot;</code> and <code class="inline-code">&quot;moduleResolution&quot;: &quot;NodeNext&quot;</code> tell TypeScript to use Node&#39;s modern module system, which is what <code class="inline-code">@langchain/langgraph</code> expects. If you use an older module setting, you&#39;ll get cryptic &quot;cannot find module&quot; errors even though the package is installed correctly.</p>
 <p><strong>4. Set your OpenAI API key.</strong></p>
 <p>Create a <code class="inline-code">.env</code> file in the project root:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">OPENAI_API_KEY=sk-your-key-here</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">OPENAI_API_KEY=sk-your-key-here</code></pre></div>
 <p>Then install <code class="inline-code">dotenv</code> so Node can read it:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install dotenv</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install dotenv</code></pre></div>
 <p>At the top of every lab file in this guide, you&#39;ll see:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;</code></pre></div>
 <p><em>What this does:</em> loads the <code class="inline-code">.env</code> file&#39;s contents into <code class="inline-code">process.env</code> before anything else in the file runs, so <code class="inline-code">new ChatOpenAI({...})</code> can find your API key automatically (the <code class="inline-code">ChatOpenAI</code> class reads <code class="inline-code">process.env.OPENAI_API_KEY</code> by default — you don&#39;t need to pass it explicitly).</p>
 <p><em>Common beginner mistake:</em> Putting <code class="inline-code">import &quot;dotenv/config&quot;</code> <em>after</em> you&#39;ve already created a <code class="inline-code">ChatOpenAI</code> instance. Import order matters here — it must be the very first import in the file.</p>
 <p><strong>5. Create a <code class="inline-code">src/</code> folder.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> src</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> src</code></pre></div>
 <p>All lab files in this guide will live in <code class="inline-code">src/</code>, e.g. <code class="inline-code">src/lab9-1.ts</code>. You&#39;ll run them with:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx src/lab9-1.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npx tsx src/lab9-1.ts</code></pre></div>
 <p><strong>6. Verify the setup works.</strong></p>
 <p>Create <code class="inline-code">src/sanity-check.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
 <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
@@ -568,7 +562,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(<span class="hljs-string">&quot;Say &#x27;setup works&#x27; and nothing else.&quot;</span>);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(response.<span class="hljs-property">content</span>);</code></pre></div>
 <p>Run it:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx src/sanity-check.ts</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npx tsx src/sanity-check.ts</code></pre></div>
 <p><em>Expected result:</em> The terminal prints <code class="inline-code">setup works</code> (or very close to it). If you see this, your environment is correctly configured for every lab in this guide.</p>
 <p><em>If it fails:</em> The two most common causes are (a) a missing or invalid <code class="inline-code">OPENAI_API_KEY</code> in <code class="inline-code">.env</code>, or (b) the <code class="inline-code">.env</code> file not being in the same folder you&#39;re running the command from. Double check both before moving on.</p>
 <hr>
@@ -589,7 +583,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 </ul>
 <h3 id="how-it-works-under-the-hood"><a class="heading-anchor" href="#how-it-works-under-the-hood" aria-hidden="true">#</a>How it works under the hood</h3>
 <p>When you call <code class="inline-code">.compile()</code> on a <code class="inline-code">StateGraph</code>, you get back a <code class="inline-code">CompiledStateGraph</code> object. This compiled object is actually a <code class="inline-code">Runnable</code> — the same base interface that <em>every</em> LangChain component implements (chat models, chains, tools, etc.). Because nodes in a parent graph are just functions (or anything <code class="inline-code">Runnable</code>-compatible) that take state and return a partial state update, and because a compiled graph satisfies that same shape, you can literally do:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript">parentGraph.<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;research&quot;</span>, compiledResearchSubgraph);</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript">parentGraph.<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;research&quot;</span>, compiledResearchSubgraph);</code></pre></div>
 <p>and LangGraph treats the entire subgraph as one node. When the parent graph &quot;calls&quot; that node, it actually runs the <em>entire</em> internal subgraph (potentially many of its own nodes and edges) from its <code class="inline-code">START</code> to its <code class="inline-code">END</code>, and only then returns control to the parent.</p>
 <h3 id="the-state-mapping-problem"><a class="heading-anchor" href="#the-state-mapping-problem" aria-hidden="true">#</a>The state-mapping problem</h3>
 <p>Here&#39;s the part that trips people up: <strong>the parent graph and the subgraph each have their own state schema</strong>, and those schemas don&#39;t have to match.</p>
@@ -618,7 +612,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><strong>Goal:</strong> Create a self-contained 2-node subgraph (search → summarize) and plug it into a parent graph as a single node, using the &quot;shared keys&quot; automatic-merge approach.</p>
 <p><strong>Step 1 — Define the subgraph&#39;s own state.</strong></p>
 <p>Create <code class="inline-code">src/lab9-1.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 
@@ -630,7 +624,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 });</code></pre></div>
 <p><em>Why we do this:</em> The subgraph is meant to be reusable and self-contained, so it gets its <em>own</em> state schema, independent of whatever parent graph might eventually use it. <code class="inline-code">topic</code> is the input it needs, <code class="inline-code">searchResults</code> and <code class="inline-code">summary</code> are intermediate/output fields it produces internally.</p>
 <p><strong>Step 2 — Build the subgraph&#39;s two nodes.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
 
 <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">searchNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">ResearchState</span>.<span class="hljs-title class_">State</span></span>) {
   <span class="hljs-comment">// In a real system this would call a search API (e.g., Tavily).</span>
@@ -650,7 +644,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>Why we do this:</em> <code class="inline-code">searchNode</code> reads <code class="inline-code">topic</code> from state and writes <code class="inline-code">searchResults</code>. <code class="inline-code">summarizeNode</code> reads <code class="inline-code">searchResults</code> and writes <code class="inline-code">summary</code>. Each node only touches the part of state it cares about — this is normal LangGraph node design, nothing subgraph-specific yet.</p>
 <p><em>Note:</em> We simulate search with an LLM call to keep this lab dependency-free. In a real project, you&#39;d replace this with an actual search tool call (you&#39;ll learn the tool-calling pattern properly in Chapter 11).</p>
 <p><strong>Step 3 — Wire and compile the subgraph.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> researchSubgraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">ResearchState</span>)
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> researchSubgraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">ResearchState</span>)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;search&quot;</span>, searchNode)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;summarize&quot;</span>, summarizeNode)
   .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;search&quot;</span>)
@@ -659,11 +653,11 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
   .<span class="hljs-title function_">compile</span>();</code></pre></div>
 <p><em>What this does:</em> This is a complete, independently runnable graph at this point. You could call <code class="inline-code">researchSubgraph.invoke({ topic: &quot;...&quot; })</code> right now and get back a full <code class="inline-code">ResearchState</code> object. We&#39;re about to nest it inside something bigger instead.</p>
 <p><em>Verify it works standalone first</em> (good practice before nesting anything):</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> standaloneResult = <span class="hljs-keyword">await</span> researchSubgraph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;the history of the printing press&quot;</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> standaloneResult = <span class="hljs-keyword">await</span> researchSubgraph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;the history of the printing press&quot;</span> });
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Standalone subgraph result:&quot;</span>, standaloneResult.<span class="hljs-property">summary</span>);</code></pre></div>
 <p>Run with <code class="inline-code">npx tsx src/lab9-1.ts</code> — you should see a one-paragraph summary printed. This confirms the subgraph works on its own <em>before</em> we complicate things by nesting it.</p>
 <p><strong>Step 4 — Define a parent graph with an overlapping key.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">ParentState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">ParentState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
   <span class="hljs-attr">topic</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,        <span class="hljs-comment">// shared key name with ResearchState</span>
   <span class="hljs-attr">summary</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,      <span class="hljs-comment">// shared key name with ResearchState</span>
   <span class="hljs-attr">finalReport</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,
@@ -677,7 +671,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 }</code></pre></div>
 <p><em>Why the shared keys matter:</em> <code class="inline-code">ParentState</code> has <code class="inline-code">topic</code> and <code class="inline-code">summary</code> — the exact same field names as <code class="inline-code">ResearchState</code>. This is what enables automatic merging in Step 5.</p>
 <p><strong>Step 5 — Add the compiled subgraph directly as a parent node.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> parentGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">ParentState</span>)
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> parentGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">ParentState</span>)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;research&quot;</span>, researchSubgraph)   <span class="hljs-comment">// &lt;-- the compiled subgraph IS the node</span>
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;writeReport&quot;</span>, writeReportNode)
   .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;research&quot;</span>)
@@ -700,14 +694,14 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <h3 id="lab-92--map-a-subset-of-parent-state-into-a-subgraph39s-own-schema"><a class="heading-anchor" href="#lab-92--map-a-subset-of-parent-state-into-a-subgraph39s-own-schema" aria-hidden="true">#</a>Lab 9.2 — Map a subset of parent state into a subgraph&#39;s own schema</h3>
 <p><strong>Goal:</strong> Handle Situation B — a parent graph whose state shape does <em>not</em> overlap with the subgraph&#39;s expected input — by wrapping the subgraph call in a translation function.</p>
 <p><strong>Step 1 — Imagine a parent with an incompatible shape.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">SupportState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">SupportState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
   <span class="hljs-attr">customerQuestion</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,   <span class="hljs-comment">// no &quot;topic&quot; field here</span>
   <span class="hljs-attr">researchSummary</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,    <span class="hljs-comment">// no &quot;summary&quot; field here</span>
   <span class="hljs-attr">customerReply</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,
 });</code></pre></div>
 <p><em>Why this is Situation B:</em> This parent has no field called <code class="inline-code">topic</code> and no field called <code class="inline-code">summary</code>. If you tried <code class="inline-code">addNode(&quot;research&quot;, researchSubgraph)</code> directly here, nothing would merge — <code class="inline-code">customerQuestion</code> and <code class="inline-code">topic</code> are different names, so the subgraph would receive <code class="inline-code">topic: undefined</code> and silently fail to do useful work.</p>
 <p><strong>Step 2 — Write a translation wrapper node instead of adding the subgraph directly.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">researchWrapperNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">SupportState</span>.<span class="hljs-title class_">State</span></span>) {
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">researchWrapperNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">SupportState</span>.<span class="hljs-title class_">State</span></span>) {
   <span class="hljs-comment">// Step A: translate parent state -&gt; subgraph input shape</span>
   <span class="hljs-keyword">const</span> subgraphInput = { <span class="hljs-attr">topic</span>: state.<span class="hljs-property">customerQuestion</span> };
 
@@ -719,7 +713,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 }</code></pre></div>
 <p><em>Why we do it this way:</em> This three-step pattern (translate in → invoke → translate out) is the general-purpose solution for <em>any</em> schema mismatch, no matter how different the shapes are. It also keeps the translation logic visible and testable in one place, rather than relying on &quot;magic&quot; merging that wouldn&#39;t work here anyway.</p>
 <p><strong>Step 3 — Wire the parent graph using the wrapper, not the raw subgraph.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">replyNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">SupportState</span>.<span class="hljs-title class_">State</span></span>) {
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">replyNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">SupportState</span>.<span class="hljs-title class_">State</span></span>) {
   <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(
     <span class="hljs-string">`A customer asked: &quot;<span class="hljs-subst">${state.customerQuestion}</span>&quot;. Using this research: &quot;<span class="hljs-subst">${state.researchSummary}</span>&quot;, write a brief, friendly reply.`</span>
   );
@@ -745,7 +739,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <h3 id="lab-93--stream-output-through-a-graph-that-contains-a-nested-subgraph"><a class="heading-anchor" href="#lab-93--stream-output-through-a-graph-that-contains-a-nested-subgraph" aria-hidden="true">#</a>Lab 9.3 — Stream output through a graph that contains a nested subgraph</h3>
 <p><strong>Goal:</strong> See the difference between default streaming (subgraph is a black box) and <code class="inline-code">subgraphs: true</code> streaming (you see inside it too).</p>
 <p><strong>Step 1 — Stream the Lab 9.1 parent graph normally.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;--- Default streaming (subgraph hidden) ---&quot;</span>);
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;--- Default streaming (subgraph hidden) ---&quot;</span>);
 <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> <span class="hljs-keyword">await</span> parentGraph.<span class="hljs-title function_">stream</span>(
   { <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;the invention of the wheel&quot;</span> },
   { <span class="hljs-attr">streamMode</span>: <span class="hljs-string">&quot;updates&quot;</span> }
@@ -754,7 +748,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 }</code></pre></div>
 <p><em>Expected result:</em> You&#39;ll see exactly two updates printed — one for the <code class="inline-code">&quot;research&quot;</code> node (the entire subgraph collapsed into a single update) and one for <code class="inline-code">&quot;writeReport&quot;</code>. You will <em>not</em> see the subgraph&#39;s internal <code class="inline-code">search</code> and <code class="inline-code">summarize</code> steps individually.</p>
 <p><strong>Step 2 — Re-run with <code class="inline-code">subgraphs: true</code>.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n--- Streaming with subgraphs: true (subgraph internals visible) ---&quot;</span>);
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n--- Streaming with subgraphs: true (subgraph internals visible) ---&quot;</span>);
 <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> <span class="hljs-keyword">await</span> parentGraph.<span class="hljs-title function_">stream</span>(
   { <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;the invention of the wheel&quot;</span> },
   { <span class="hljs-attr">streamMode</span>: <span class="hljs-string">&quot;updates&quot;</span>, <span class="hljs-attr">subgraphs</span>: <span class="hljs-literal">true</span> }
@@ -768,7 +762,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <h3 id="lab-94--reuse-the-same-subgraph-inside-two-different-parent-graphs"><a class="heading-anchor" href="#lab-94--reuse-the-same-subgraph-inside-two-different-parent-graphs" aria-hidden="true">#</a>Lab 9.4 — Reuse the same subgraph inside two different parent graphs</h3>
 <p><strong>Goal:</strong> Prove the core value proposition of subgraphs — write once, use in multiple unrelated parents.</p>
 <p><strong>Step 1 — Reuse <code class="inline-code">researchSubgraph</code> (from Lab 9.1) in a brand new, unrelated parent.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">BlogState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
   <span class="hljs-attr">topic</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,
   <span class="hljs-attr">summary</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,
   <span class="hljs-attr">blogPost</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;,
@@ -851,7 +845,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>When to use it:</em> Best when you want very natural, conversational hand-offs between a small number of peer agents (e.g., a &quot;general support agent&quot; handing off to a &quot;billing agent&quot; mid-conversation), and you want the <em>agents themselves</em> (not a separate router LLM call) to decide when a handoff is appropriate, based on the conversation so far. In LangGraph.js, this pattern is most easily built using the dedicated <code class="inline-code">@langchain/langgraph-swarm</code> package, which provides <code class="inline-code">createSwarm()</code> and <code class="inline-code">createHandoffTool()</code> helpers so you don&#39;t have to hand-build the handoff-tool plumbing yourself.</p>
 <h3 id="how-routing-actually-happens-in-code-command"><a class="heading-anchor" href="#how-routing-actually-happens-in-code-command" aria-hidden="true">#</a>How routing actually happens in code: <code class="inline-code">Command</code></h3>
 <p>You learned about the <code class="inline-code">Command</code> object back in Phase 2 (Control Flow) — it lets a node return both a state update <em>and</em> a routing decision (<code class="inline-code">goto</code>) in one object, instead of relying only on static <code class="inline-code">addConditionalEdges</code>. Multi-agent architectures lean on this heavily: each worker agent&#39;s node, instead of always going to a fixed next node, returns something like:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
   <span class="hljs-attr">update</span>: { <span class="hljs-attr">messages</span>: [aiResponse] },
   <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;supervisor&quot;</span>,   <span class="hljs-comment">// or another worker&#x27;s name, in Network/Swarm patterns</span>
 });</code></pre></div>
@@ -863,7 +857,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <h3 id="lab-101--build-a-supervisor-that-routes-to-a-quotmathquot-or-quotwriterquot-worker-agent"><a class="heading-anchor" href="#lab-101--build-a-supervisor-that-routes-to-a-quotmathquot-or-quotwriterquot-worker-agent" aria-hidden="true">#</a>Lab 10.1 — Build a Supervisor that routes to a &quot;math&quot; or &quot;writer&quot; worker agent</h3>
 <p><strong>Step 1 — Define shared state.</strong></p>
 <p>Create <code class="inline-code">src/lab10-1.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">Command</span>, <span class="hljs-title class_">MessagesAnnotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
@@ -877,7 +871,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 });</code></pre></div>
 <p><em>Why <code class="inline-code">MessagesAnnotation</code>:</em> You met this in Phase 1 — it&#39;s a pre-built state shape for <code class="inline-code">messages: BaseMessage[]</code> with the correct &quot;append, don&#39;t overwrite&quot; reducer already wired up. Reusing it here saves us from re-defining a reducer we already know works.</p>
 <p><strong>Step 2 — Build the supervisor node using structured output.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> routerModel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> routerModel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
 
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">RouteSchema</span> = z.<span class="hljs-title function_">object</span>({
   <span class="hljs-attr">next</span>: z.<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;math&quot;</span>, <span class="hljs-string">&quot;writer&quot;</span>, <span class="hljs-string">&quot;FINISH&quot;</span>]).<span class="hljs-title function_">describe</span>(
@@ -904,7 +898,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>What <code class="inline-code">withStructuredOutput</code> is doing:</em> Instead of asking the model to write free-text like &quot;I think the math worker should handle this&quot; and then trying to parse that with string matching (fragile!), <code class="inline-code">withStructuredOutput(RouteSchema)</code> forces the model&#39;s response to conform exactly to our Zod schema — we get back a guaranteed <code class="inline-code">{ next: &quot;math&quot; | &quot;writer&quot; | &quot;FINISH&quot; }</code> object, no parsing required. This is the standard, reliable way to make an LLM make a <em>routing decision</em> rather than write prose.</p>
 <p><em>What the <code class="inline-code">Command</code> return is doing:</em> <code class="inline-code">goto</code> tells LangGraph which node to run next — directly, dynamically, from inside this node, rather than via a separate static conditional-edge function. <code class="inline-code">update: { next: decision.next }</code> also writes the decision into state, purely so we can inspect/log it; it&#39;s not strictly required for routing to work, since <code class="inline-code">goto</code> already handles that.</p>
 <p><strong>Step 3 — Build the two worker nodes.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> workerModel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> workerModel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
 
 <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">mathNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">SupervisorState</span>.<span class="hljs-title class_">State</span></span>) {
   <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> workerModel.<span class="hljs-title function_">invoke</span>([
@@ -936,7 +930,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>Key detail — <code class="inline-code">goto: &quot;supervisor&quot;</code>:</em> This is the heart of the Supervisor pattern. No matter which worker ran, control <em>always</em> returns to the supervisor next, never directly to another worker, never straight to <code class="inline-code">END</code>. The supervisor alone decides whether the task is finished.</p>
 <p><em>Why <code class="inline-code">name: &quot;math&quot;</code> / <code class="inline-code">name: &quot;writer&quot;</code> on the <code class="inline-code">AIMessage</code>:</em> Tagging which agent produced which message makes the conversation log far easier to debug and display — especially once there are 3+ agents in play.</p>
 <p><strong>Step 4 — Wire the graph.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> supervisorGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">SupervisorState</span>)
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> supervisorGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">SupervisorState</span>)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;supervisor&quot;</span>, supervisorNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;math&quot;</span>, <span class="hljs-string">&quot;writer&quot;</span>, <span class="hljs-variable constant_">END</span>] })
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;math&quot;</span>, mathNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;supervisor&quot;</span>] })
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;writer&quot;</span>, writerNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;supervisor&quot;</span>] })
@@ -945,7 +939,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>Why the <code class="inline-code">{ ends: [...] }</code> option:</em> Because routing decisions happen dynamically via <code class="inline-code">Command.goto</code> rather than static <code class="inline-code">addConditionalEdges()</code>, LangGraph needs you to <em>declare up front</em> the full set of possible destinations for each such node. This isn&#39;t optional boilerplate — it&#39;s what lets LangGraph validate your graph&#39;s structure and draw an accurate diagram, even though the <em>actual</em> destination is only decided at runtime.</p>
 <p><em>Notice there&#39;s no <code class="inline-code">addEdge(&quot;math&quot;, ...)</code> or <code class="inline-code">addEdge(&quot;writer&quot;, ...)</code>:</em> Because both worker nodes return their own <code class="inline-code">Command(goto: &quot;supervisor&quot;)</code>, the routing is fully dynamic — we never declared a static edge for them, and we didn&#39;t need to.</p>
 <p><strong>Step 5 — Run it.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> supervisorGraph.<span class="hljs-title function_">invoke</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> supervisorGraph.<span class="hljs-title function_">invoke</span>({
   <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">&quot;What is 847 * 23, and then write me a one-sentence fun fact about that number?&quot;</span>)],
 });
 
@@ -966,7 +960,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><strong>Goal:</strong> Remove the central supervisor and let <code class="inline-code">math</code> and <code class="inline-code">writer</code> decide for themselves whether to hand off to each other or finish.</p>
 <p><strong>Step 1 — Reuse <code class="inline-code">SupervisorState</code>, but change how workers decide their own next step.</strong></p>
 <p>Create <code class="inline-code">src/lab10-2.ts</code>. We keep the same state shape, but now <em>each worker</em> — not a separate supervisor — makes the routing call.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">Command</span>, <span class="hljs-title class_">MessagesAnnotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
@@ -982,7 +976,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <span class="hljs-keyword">const</span> modelWithRouting = model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">NextSchema</span>);</code></pre></div>
 <p><em>Why this is structurally different from Supervisor, even though the code looks similar:</em> In Lab 10.1, only <em>one</em> node (<code class="inline-code">supervisorNode</code>) ever made a routing decision. Here, <em>every</em> worker node makes its own routing decision after doing its work — there&#39;s no single node whose entire job is &quot;decide who goes next.&quot; That&#39;s the defining trait of Network: routing logic is distributed, not centralized.</p>
 <p><strong>Step 2 — Build worker nodes that do their job AND decide the next step themselves.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">mathNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">NetworkState</span>.<span class="hljs-title class_">State</span></span>) {
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">mathNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">NetworkState</span>.<span class="hljs-title class_">State</span></span>) {
   <span class="hljs-keyword">const</span> answer = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>([
     <span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">`Solve this calculation, show your work briefly:\n\n<span class="hljs-subst">${state.messages.at(-<span class="hljs-number">1</span>)?.content}</span>`</span>),
   ]);
@@ -1019,7 +1013,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 }</code></pre></div>
 <p><em>Notice the key structural difference from Lab 10.1:</em> <code class="inline-code">mathNode</code> can route to <code class="inline-code">&quot;writer&quot;</code> <em>directly</em> — it never has to pass back through a central supervisor first. That&#39;s a direct peer-to-peer handoff, which is the defining capability Network gives you that Supervisor doesn&#39;t.</p>
 <p><strong>Step 3 — Wire the graph (no supervisor node exists at all).</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> networkGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">NetworkState</span>)
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> networkGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">NetworkState</span>)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;math&quot;</span>, mathNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;writer&quot;</span>, <span class="hljs-variable constant_">END</span>] })
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;writer&quot;</span>, writerNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;math&quot;</span>, <span class="hljs-variable constant_">END</span>] })
   .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;math&quot;</span>)   <span class="hljs-comment">// we still need ONE fixed entry point</span>
@@ -1049,7 +1043,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p>This is exactly the org-chart analogy from the theory section, written in code.</p>
 <p><strong>Step 2 — Build the Research Team as a subgraph (reusing the Supervisor pattern from Lab 10.1, scoped to one team).</strong></p>
 <p>Create <code class="inline-code">src/lab10-3.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">Command</span>, <span class="hljs-title class_">MessagesAnnotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
@@ -1101,7 +1095,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
   .<span class="hljs-title function_">compile</span>();</code></pre></div>
 <p><em>What this is:</em> This is the <em>exact same Supervisor pattern</em> from Lab 10.1, just scoped to a smaller, single-purpose team and compiled into its own subgraph. Nothing new conceptually — this is Chapter 9 and the Supervisor pattern combined.</p>
 <p><strong>Step 3 — Build the Writing Team the same way.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// --- Writing Team ---</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// --- Writing Team ---</span>
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">WritingTeamState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({ ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span> });
 
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">WritingRoute</span> = z.<span class="hljs-title function_">object</span>({ <span class="hljs-attr">next</span>: z.<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;draft&quot;</span>, <span class="hljs-string">&quot;edit&quot;</span>, <span class="hljs-string">&quot;FINISH&quot;</span>]) });
@@ -1144,7 +1138,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
   .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;writingSupervisor&quot;</span>)
   .<span class="hljs-title function_">compile</span>();</code></pre></div>
 <p><strong>Step 4 — Build the top-level supervisor that routes between the two TEAMS.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// --- Top-level supervisor ---</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// --- Top-level supervisor ---</span>
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">TopState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({ ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span> });
 
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">TopRoute</span> = z.<span class="hljs-title function_">object</span>({ <span class="hljs-attr">next</span>: z.<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;researchTeam&quot;</span>, <span class="hljs-string">&quot;writingTeam&quot;</span>, <span class="hljs-string">&quot;FINISH&quot;</span>]) });
@@ -1183,7 +1177,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
   .<span class="hljs-title function_">compile</span>();</code></pre></div>
 <p><em>Why we used wrapper nodes here instead of adding <code class="inline-code">researchTeam</code>/<code class="inline-code">writingTeam</code> directly as nodes:</em> Even though the state shapes overlap (both use <code class="inline-code">messages</code>), each team subgraph ends at its own internal <code class="inline-code">END</code>, which doesn&#39;t automatically know to route back to <code class="inline-code">&quot;topSupervisor&quot;</code> afterward. The thin wrapper lets us explicitly <code class="inline-code">.invoke()</code> the team subgraph and then issue our <em>own</em> <code class="inline-code">Command(goto: &quot;topSupervisor&quot;)</code>, giving us hierarchical control flow on top of automatic state merging. This is a nice middle ground between the two patterns from Chapter 9.</p>
 <p><strong>Step 5 — Run it.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> topGraph.<span class="hljs-title function_">invoke</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> topGraph.<span class="hljs-title function_">invoke</span>({
   <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">&quot;Research one interesting fact about octopuses, fact-check it, then write a 2-sentence blurb about it.&quot;</span>)],
 });
 
@@ -1198,11 +1192,11 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <h3 id="lab-104--implement-a-swarm-where-agents-hand-off-based-on-a-handoff-tool-call"><a class="heading-anchor" href="#lab-104--implement-a-swarm-where-agents-hand-off-based-on-a-handoff-tool-call" aria-hidden="true">#</a>Lab 10.4 — Implement a Swarm where agents hand off based on a handoff tool call</h3>
 <p><strong>Goal:</strong> Use the dedicated swarm package to let two peer agents (a general support agent and a billing agent) decide for themselves, via tool calls, when to transfer the conversation.</p>
 <p><strong>Step 1 — Install the swarm package.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-swarm</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-swarm</code></pre></div>
 <p><em>Why a dedicated package instead of hand-building this like Lab 10.2&#39;s Network:</em> Swarm&#39;s defining feature — handoffs via <em>tool calls</em> that also correctly track &quot;who&#39;s the active agent&quot; across multiple separate user turns — involves enough fiddly state-tracking plumbing that the LangGraph team built a small dedicated package for it (<code class="inline-code">createSwarm</code>, <code class="inline-code">createHandoffTool</code>) so you don&#39;t have to reimplement that bookkeeping by hand.</p>
 <p><strong>Step 2 — Create handoff tools.</strong></p>
 <p>Create <code class="inline-code">src/lab10-4.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 <span class="hljs-keyword">import</span> { createReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph/prebuilt&quot;</span>;
 <span class="hljs-keyword">import</span> { createSwarm, createHandoffTool } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-swarm&quot;</span>;
@@ -1224,7 +1218,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 });</code></pre></div>
 <p><em>Why this counts as a &quot;tool&quot; at all:</em> From the model&#39;s point of view, a handoff tool looks exactly like any other tool it could call (you&#39;ll learn the general tool-calling mechanism properly in Chapter 11). The model decides, based on the conversation, &quot;this sounds like a billing question, I should call <code class="inline-code">transferToBilling</code>&quot; — the same way it might decide to call a <code class="inline-code">getWeather</code> tool. The <em>effect</em> of calling it (routing control elsewhere) is handled by the swarm package behind the scenes.</p>
 <p><strong>Step 3 — Build each agent using <code class="inline-code">createReactAgent</code> (a prebuilt agent — don&#39;t worry, Chapter 11 explains this fully; for now, treat it as &quot;an agent with these tools and this prompt&quot;).</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> supportAgent = <span class="hljs-title function_">createReactAgent</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> supportAgent = <span class="hljs-title function_">createReactAgent</span>({
   <span class="hljs-attr">llm</span>: model,
   <span class="hljs-attr">tools</span>: [transferToBilling],
   <span class="hljs-attr">prompt</span>: <span class="hljs-string">&quot;You are a friendly general support agent. Handle general questions yourself. &quot;</span> +
@@ -1241,7 +1235,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 });</code></pre></div>
 <p><em>Why each agent only has the handoff tool to the <em>other</em> agent, not to itself:</em> An agent transferring to itself doesn&#39;t make sense, so we only wire up the one relevant outgoing handoff per agent. In a swarm with more than two agents, each agent would typically get one handoff tool per teammate it&#39;s allowed to transfer to.</p>
 <p><strong>Step 4 — Assemble the swarm.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> checkpointer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>();
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> checkpointer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>();
 
 <span class="hljs-keyword">const</span> swarm = <span class="hljs-title function_">createSwarm</span>({
   <span class="hljs-attr">agents</span>: [supportAgent, billingAgent],
@@ -1249,7 +1243,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 }).<span class="hljs-title function_">compile</span>({ checkpointer });</code></pre></div>
 <p><em>What <code class="inline-code">defaultActiveAgent</code> means:</em> On a brand-new conversation thread, before any handoff has happened, this is who answers first. <em>Why we need a checkpointer here, specifically:</em> Swarm&#39;s &quot;remember who&#39;s currently active&quot; behavior across multiple separate <code class="inline-code">.invoke()</code> calls (i.e., multiple turns of a real conversation) depends on persisted state — exactly the <code class="inline-code">thread_id</code>-based persistence mechanism you learned in Phase 3. Without a checkpointer, every <code class="inline-code">.invoke()</code> would reset back to <code class="inline-code">defaultActiveAgent</code>, defeating the purpose.</p>
 <p><strong>Step 5 — Run a multi-turn conversation and watch the active agent change.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> threadConfig = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;swarm-demo-1&quot;</span> } };
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> threadConfig = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;swarm-demo-1&quot;</span> } };
 
 <span class="hljs-keyword">const</span> turn1 = <span class="hljs-keyword">await</span> swarm.<span class="hljs-title function_">invoke</span>(
   { <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">&quot;Hi, what are your support hours?&quot;</span>)] },
@@ -1311,7 +1305,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p>Because the model decides <strong>which</strong> tool to call and <strong>with what arguments</strong>, based on the conversation — that&#39;s the whole value. You&#39;re not hardcoding &quot;always call <code class="inline-code">getWeather</code>&quot;; you&#39;re giving the model a <em>capability</em> and letting it decide, contextually, whether and how to use it. This is what separates a &quot;tool-using agent&quot; from a plain script that calls a fixed sequence of functions.</p>
 <h3 id="defining-a-tool"><a class="heading-anchor" href="#defining-a-tool" aria-hidden="true">#</a>Defining a tool</h3>
 <p>In LangChain.js, you define a tool with the <code class="inline-code">tool()</code> helper, giving it a function, a name, a description, and a Zod schema describing its arguments:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { tool } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/tools&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { tool } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/tools&quot;</span>;
 <span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
 
 <span class="hljs-keyword">const</span> getWeather = <span class="hljs-title function_">tool</span>(
@@ -1370,7 +1364,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><strong>Goal:</strong> Build the agent → tools → agent loop by hand, so you fully understand what <code class="inline-code">createReactAgent</code> automates before you start relying on it.</p>
 <p><strong>Step 1 — Define two simple tools.</strong></p>
 <p>Create <code class="inline-code">src/lab11-1.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { tool } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/tools&quot;</span>;
 <span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
@@ -1417,17 +1411,17 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>Why two tools instead of one:</em> With only one tool available, you can&#39;t really observe the model&#39;s <em>selection</em> behavior — it either calls the one tool or it doesn&#39;t. With two clearly different tools, you can verify the model picks the <em>right</em> one for a given question, which is the actual skill being tested here.</p>
 <p><em>Note on <code class="inline-code">eval</code>:</em> We use it only to keep this lab&#39;s focus on graph wiring rather than writing a safe expression parser. Never use raw <code class="inline-code">eval</code> on untrusted input in a real application — for production, use a dedicated math expression library.</p>
 <p><strong>Step 2 — Bind the tools to the model.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
 <span class="hljs-keyword">const</span> modelWithTools = model.<span class="hljs-title function_">bindTools</span>(tools);</code></pre></div>
 <p><em>What <code class="inline-code">.bindTools()</code> does:</em> It returns a new model instance that, on every call, includes the tool definitions (names, descriptions, schemas) as part of the request to the LLM API. The model provider&#39;s API uses this to decide when to emit a <code class="inline-code">tool_calls</code> field instead of plain text. Without this binding step, the model has no idea these tools even exist.</p>
 <p><strong>Step 3 — Build the agent node.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">agentNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">agentNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
   <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> modelWithTools.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
   <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
 }</code></pre></div>
 <p><em>What&#39;s happening:</em> This node just sends the full conversation history to the tool-bound model and appends whatever it returns (which might be a plain answer, or might be an <code class="inline-code">AIMessage</code> containing <code class="inline-code">tool_calls</code>) to the message list. Note this node does <em>not</em> contain any logic about whether to call tools — that decision lives entirely inside the LLM call itself, based on the bound tool definitions.</p>
 <p><strong>Step 4 — Add <code class="inline-code">ToolNode</code> and the routing logic.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> toolNode = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ToolNode</span>(tools);
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> toolNode = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ToolNode</span>(tools);
 
 <span class="hljs-keyword">function</span> <span class="hljs-title function_">shouldContinue</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>): <span class="hljs-string">&quot;tools&quot;</span> | <span class="hljs-keyword">typeof</span> <span class="hljs-variable constant_">END</span> {
   <span class="hljs-keyword">const</span> lastMessage = state.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>) <span class="hljs-keyword">as</span> <span class="hljs-title class_">AIMessage</span>;
@@ -1439,7 +1433,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>What <code class="inline-code">ToolNode</code> does internally, in plain terms:</em> It looks at the most recent <code class="inline-code">AIMessage</code>&#39;s <code class="inline-code">tool_calls</code> array, and for each one, finds the tool in the list you gave it whose <code class="inline-code">name</code> matches, runs that tool&#39;s function with the provided arguments, and produces a <code class="inline-code">ToolMessage</code> with the result — all without you writing any of that matching/execution/wrapping logic yourself.</p>
 <p><em>What <code class="inline-code">shouldContinue</code> does:</em> This is the conditional-edge routing function (familiar from Phase 2). It inspects the latest message: if it has pending tool calls, route to <code class="inline-code">&quot;tools&quot;</code>; otherwise, the model gave a final answer, so route to <code class="inline-code">END</code>.</p>
 <p><strong>Step 5 — Wire the loop.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> agentGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> agentGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, agentNode)
   .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;tools&quot;</span>, toolNode)
   .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
@@ -1448,7 +1442,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
   .<span class="hljs-title function_">compile</span>();</code></pre></div>
 <p><em>Why <code class="inline-code">addEdge(&quot;tools&quot;, &quot;agent&quot;)</code> is the most important line in this lab:</em> After a tool runs, control goes <em>back</em> to the agent node, not to <code class="inline-code">END</code>. This is what allows multi-step tool use — the model can call one tool, see the result, decide it needs a second tool, call that, see its result, and only then produce a final answer. Without this edge looping back, the agent could only ever call one tool and then the graph would have nowhere to send it next.</p>
 <p><strong>Step 6 — Run it with a question requiring both tools.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> agentGraph.<span class="hljs-title function_">invoke</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> agentGraph.<span class="hljs-title function_">invoke</span>({
   <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">&quot;What&#x27;s the weather in Tokyo, and what is 234 * 18?&quot;</span>)],
 });
 
@@ -1468,7 +1462,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><strong>Goal:</strong> Rebuild Lab 11.1&#39;s exact capability using the prebuilt agent, and see directly how much boilerplate it removes.</p>
 <p><strong>Step 1 — The entire agent, in one call.</strong></p>
 <p>Create <code class="inline-code">src/lab11-2.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { createReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph/prebuilt&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
@@ -1530,7 +1524,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><strong>Goal:</strong> Show that <code class="inline-code">createReactAgent</code> isn&#39;t a black box — you can shape its behavior and extend its state without abandoning it for a fully custom graph.</p>
 <p><strong>Step 1 — Add a custom system prompt.</strong></p>
 <p>Create <code class="inline-code">src/lab11-3.ts</code>, reusing the tools from Lab 11.2:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { createReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph/prebuilt&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
@@ -1548,7 +1542,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 );
 
 <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> pirateAgent = <span class="hljs-title function_">createReactAgent</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> pirateAgent = <span class="hljs-title function_">createReactAgent</span>({
   <span class="hljs-attr">llm</span>: model,
   <span class="hljs-attr">tools</span>: [getWeather],
   <span class="hljs-attr">prompt</span>: <span class="hljs-string">&quot;You are a friendly pirate-themed weather assistant. &quot;</span> +
@@ -1561,7 +1555,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Pirate agent:&quot;</span>, pirateResult.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);</code></pre></div>
 <p><em>Why this matters:</em> The <code class="inline-code">prompt</code> option is how you shape <em>tone, persona, and reasoning style</em> without touching the underlying agent/tool loop at all. This is the single most common customization you&#39;ll reach for.</p>
 <p><strong>Step 2 — Extend the state schema with a custom field.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// Custom state: messages (required by createReactAgent) + a userTier field</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// Custom state: messages (required by createReactAgent) + a userTier field</span>
 <span class="hljs-comment">// the agent&#x27;s tools or pre-model hook could use to adjust behavior.</span>
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">CustomAgentState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
   ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span>,
@@ -1598,7 +1592,7 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><strong>Goal:</strong> Use a hook to run custom logic — here, simple input validation/sanitization — every time, right before the model is called, without writing a fully custom graph.</p>
 <p><strong>Step 1 — Define a pre-model hook function.</strong></p>
 <p>Create <code class="inline-code">src/lab11-4.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { createReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph/prebuilt&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-title class_">AIMessage</span>, <span class="hljs-title class_">RemoveMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
@@ -1630,13 +1624,13 @@ npm install @langchain/langgraph @langchain/core @langchain/openai zod</code></p
 <p><em>Why a hook instead of a separate graph node:</em> You could build this as its own node in a fully custom graph, wired in before the agent node. But for a behavior this small and generic (&quot;always do X right before calling the model, every single loop iteration&quot;), a hook keeps you inside the simpler <code class="inline-code">createReactAgent</code> setup rather than forcing a full rebuild. This is a perfect example of the &quot;customization points cover more than you&#39;d expect&quot; point from the theory section.</p>
 <p><em>What <code class="inline-code">RemoveMessage</code> does:</em> This is a special message type whose entire purpose is &quot;tell the reducer to delete the message with this <code class="inline-code">id</code> from state,&quot; rather than adding a new message. Returning a list of <code class="inline-code">RemoveMessage</code> objects from a node (or hook) is the standard LangGraph pattern for trimming or pruning conversation history, since the default <code class="inline-code">messages</code> reducer normally only knows how to <em>append</em>.</p>
 <p><strong>Step 2 — Wire the hook into the agent.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> trimmedAgent = <span class="hljs-title function_">createReactAgent</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> trimmedAgent = <span class="hljs-title function_">createReactAgent</span>({
   <span class="hljs-attr">llm</span>: model,
   <span class="hljs-attr">tools</span>: [getWeather],
   <span class="hljs-attr">preModelHook</span>: trimHistoryHook,
 });</code></pre></div>
 <p><strong>Step 3 — Simulate a long conversation and confirm trimming happens.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">let</span> state = { <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">&quot;Hi, I&#x27;m planning a trip.&quot;</span>)] };
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">let</span> state = { <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">&quot;Hi, I&#x27;m planning a trip.&quot;</span>)] };
 state = <span class="hljs-keyword">await</span> trimmedAgent.<span class="hljs-title function_">invoke</span>(state) <span class="hljs-keyword">as</span> <span class="hljs-keyword">typeof</span> state;
 
 <span class="hljs-keyword">const</span> fillerTurns = [
@@ -1691,7 +1685,7 @@ state = <span class="hljs-keyword">await</span> trimmedAgent.<span class="hljs-t
 <h2 id="what-you39re-building"><a class="heading-anchor" href="#what-you39re-building" aria-hidden="true">#</a>What you&#39;re building</h2>
 <p>A single, end-to-end system that uses <strong>every concept from this phase together</strong>: subgraphs, a hierarchical multi-agent architecture, and tool-calling prebuilt agents. The system takes a topic from the user and produces a short, fact-checked, well-written article about it.</p>
 <p><strong>Architecture:</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">                         ┌────────────────────┐
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">                         ┌────────────────────┐
                          │   Top Supervisor    │
                          │ (routes to teams)   │
                          └─────────┬───────────┘
@@ -1710,7 +1704,7 @@ state = <span class="hljs-keyword">await</span> trimmedAgent.<span class="hljs-t
 <h2 id="step-by-step-build"><a class="heading-anchor" href="#step-by-step-build" aria-hidden="true">#</a>Step-by-step build</h2>
 <p><strong>Step 1 — Define tools for the Research Team.</strong></p>
 <p>Create <code class="inline-code">src/final-project.ts</code>:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">Command</span>, <span class="hljs-title class_">MessagesAnnotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
 <span class="hljs-keyword">import</span> { createReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph/prebuilt&quot;</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
@@ -1750,7 +1744,7 @@ state = <span class="hljs-keyword">await</span> trimmedAgent.<span class="hljs-t
 );</code></pre></div>
 <p><em>Why these are tools rather than plain subgraph nodes (as we did back in Chapter 9&#39;s Lab 9.1):</em> This time we want the <em>researcher agent itself</em> to decide, dynamically, how many searches to run and which claims are worth fact-checking — that&#39;s a tool-calling decision, not a fixed pipeline. This is a deliberate design choice to combine Chapter 11&#39;s pattern with Chapter 9&#39;s structure, rather than just repeating Lab 9.1.</p>
 <p><strong>Step 2 — Build the Research Team as a subgraph wrapping a <code class="inline-code">createReactAgent</code>.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">ResearchTeamState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({ ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">ResearchTeamState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({ ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span> });
 
 <span class="hljs-keyword">const</span> researcherAgent = <span class="hljs-title function_">createReactAgent</span>({
   <span class="hljs-attr">llm</span>: model,
@@ -1766,7 +1760,7 @@ state = <span class="hljs-keyword">await</span> trimmedAgent.<span class="hljs-t
   .<span class="hljs-title function_">compile</span>();</code></pre></div>
 <p><em>What&#39;s notable here:</em> <code class="inline-code">researcherAgent</code> (a compiled <code class="inline-code">createReactAgent</code> graph) is itself being used as a node inside <code class="inline-code">researchTeam</code> — proving subgraphs aren&#39;t limited to nesting only hand-built <code class="inline-code">StateGraph</code>s; any compiled graph, including a prebuilt one, works the same way, because <code class="inline-code">createReactAgent</code>&#39;s output is also just a <code class="inline-code">CompiledStateGraph</code>.</p>
 <p><strong>Step 3 — Build the Writing Team the same way (no tools needed for pure writing).</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">WritingTeamState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({ ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">WritingTeamState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({ ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span> });
 
 <span class="hljs-keyword">const</span> writerAgent = <span class="hljs-title function_">createReactAgent</span>({
   <span class="hljs-attr">llm</span>: model,
@@ -1781,7 +1775,7 @@ state = <span class="hljs-keyword">await</span> trimmedAgent.<span class="hljs-t
   .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;writer&quot;</span>, <span class="hljs-variable constant_">END</span>)
   .<span class="hljs-title function_">compile</span>();</code></pre></div>
 <p><strong>Step 4 — Build the top-level supervisor (same pattern as Lab 10.3).</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">TopState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({ ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span> });
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">TopState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({ ...<span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-property">spec</span> });
 
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">TopRoute</span> = z.<span class="hljs-title function_">object</span>({ <span class="hljs-attr">next</span>: z.<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;researchTeam&quot;</span>, <span class="hljs-string">&quot;writingTeam&quot;</span>, <span class="hljs-string">&quot;FINISH&quot;</span>]) });
 <span class="hljs-keyword">const</span> topRouter = model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">TopRoute</span>);
@@ -1820,7 +1814,7 @@ state = <span class="hljs-keyword">await</span> trimmedAgent.<span class="hljs-t
   .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;topSupervisor&quot;</span>)
   .<span class="hljs-title function_">compile</span>();</code></pre></div>
 <p><strong>Step 5 — Run the full system.</strong></p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> finalGraph.<span class="hljs-title function_">invoke</span>({
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> finalGraph.<span class="hljs-title function_">invoke</span>({
   <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">&quot;Write me a short article about the history of tea.&quot;</span>)],
 });
 
@@ -1846,6 +1840,42 @@ state = <span class="hljs-keyword">await</span> trimmedAgent.<span class="hljs-t
   <div class="scroll-progress-bar" id="scroll-bar"></div>
 </div>
 <script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
   (function() {
     var bar = null;
     var ticking = false;
