@@ -604,6 +604,9 @@ table code.inline-code{white-space:nowrap;}
   padding-top:18px;
   border-top:1px solid var(--border);
 }
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
 
 /* ---------- scroll progress bar ---------- */
 .scroll-progress-container {
@@ -632,11 +635,15 @@ table code.inline-code{white-space:nowrap;}
 </button>
 <header class="top-banner">
   <h1>${escapeHtml(title)}</h1>
-  <div class="subtitle">Generated reference guide</div>
 </header>
 <main class="article-wrap">
 ${bodyHtml}
-<div class="doc-footer">Converted from Markdown &middot; ${new Date().toISOString().slice(0, 10)}</div>
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
 </main>
 <div class="scroll-progress-container">
   <div class="scroll-progress-bar" id="scroll-bar"></div>
