@@ -1,0 +1,15 @@
+{
+  "name": "md2html",
+  "version": "1.0.0",
+  "description": "Converts structured Markdown guides into self-contained, styled HTML files.",
+  "main": "convert.js",
+  "type": "commonjs",
+  "scripts": {
+    "convert": "node convert.js"
+  },
+  "dependencies": {
+    "github-slugger": "^2.0.0",
+    "highlight.js": "^11.9.0",
+    "marked": "^9.1.6"
+  }
+}

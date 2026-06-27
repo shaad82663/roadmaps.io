@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 3: Persistence &amp; Memory</title>
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+.theme-toggle .icon-moon{display:none;}
+[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
+[data-theme="dark"] .theme-toggle .icon-moon{display:inline;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="
+  (function(){
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+  })();
+">
+  <span class="icon-sun">&#9728;&#65039;</span>
+  <span class="icon-moon">&#127769;</span>
+</button>
+<header class="top-banner">
+  <h1>Phase 3: Persistence &amp; Memory</h1>
+  <div class="subtitle">Generated reference guide</div>
+</header>
+<main class="article-wrap">
+<h1 id="phase-3-persistence-amp-memory"><a class="heading-anchor" href="#phase-3-persistence-amp-memory" aria-hidden="true">#</a>Phase 3: Persistence &amp; Memory</h1>
+<h2 id="langgraph-mastery-roadmap--deep-study-guide"><a class="heading-anchor" href="#langgraph-mastery-roadmap--deep-study-guide" aria-hidden="true">#</a>LangGraph Mastery Roadmap — Deep Study Guide</h2>
+<p><strong>Stack used throughout:</strong> Node.js + TypeScript, <code class="inline-code">@langchain/langgraph</code>, <code class="inline-code">@langchain/openai</code> (OpenAI models for any LLM calls), <code class="inline-code">@langchain/langgraph-checkpoint-sqlite</code> / <code class="inline-code">@langchain/langgraph-checkpoint-postgres</code> where relevant.</p>
+<blockquote class="quote-plain"><p><strong>How to use this guide:</strong> Read each &quot;Concept and Theory&quot; section slowly — don&#39;t skip the analogies, they&#39;re doing real explanatory work. Then physically type out (don&#39;t copy-paste) the Practical Lab code at least once. Finally, answer the Knowledge Check questions out loud or in writing before moving on. This phase assumes you&#39;ve completed Phase 1 (Foundation: graphs, state, nodes/edges) and Phase 2 (Control Flow: conditional edges, Command/Send). If a term like &quot;node,&quot; &quot;edge,&quot; or &quot;StateGraph&quot; feels unfamiliar, pause and review Phase 1 first — this guide builds directly on top of it.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ol>
+<li><a href="#unit-5--checkpointers">Unit 5 — Checkpointers</a></li>
+<li><a href="#unit-6--state-management--time-travel">Unit 6 — State Management &amp; Time Travel</a></li>
+<li><a href="#unit-7--long-term-memory-store-api">Unit 7 — Long-Term Memory (Store API)</a></li>
+<li><a href="#phase-3-final-project--persistent-research-companion">Phase 3 Final Project — Persistent Research Companion</a></li>
+<li><a href="#phase-3-master-cheat-sheet">Phase 3 Master Cheat Sheet</a></li>
+</ol>
+<hr>
+<h1 id="unit-5--checkpointers"><a class="heading-anchor" href="#unit-5--checkpointers" aria-hidden="true">#</a>Unit 5 — Checkpointers</h1>
+<h2 id="51-concept-and-theory"><a class="heading-anchor" href="#51-concept-and-theory" aria-hidden="true">#</a>5.1 Concept and Theory</h2>
+<h3 id="511-the-problem-checkpointers-solve"><a class="heading-anchor" href="#511-the-problem-checkpointers-solve" aria-hidden="true">#</a>5.1.1 The problem checkpointers solve</h3>
+<p>Every graph you&#39;ve built so far has lived and died inside a single <code class="inline-code">.invoke()</code> call. The moment that function returns, the graph&#39;s memory of what just happened evaporates. If you call it again, it starts from zero.</p>
+<p>Think about what a real conversation needs. When you talk to a person, they don&#39;t forget what you said three sentences ago. They carry the thread forward. A LangGraph graph, by default, is like someone with severe short-term memory loss: brilliant in the moment, but unable to retain anything once the conversation pauses.</p>
+<p>A <strong>Checkpointer</strong> is the piece of infrastructure that fixes this. It is an object you attach to your graph at compile time, and its job is simple: after every &quot;super-step&quot; (every time one or more nodes finish running), it takes a snapshot of the entire graph state and saves it somewhere durable. The next time you call the graph with the same conversation identifier, LangGraph loads that snapshot back in before running anything, so the graph picks up exactly where it left off.</p>
+<h3 id="512-why-this-matters--three-real-reasons"><a class="heading-anchor" href="#512-why-this-matters--three-real-reasons" aria-hidden="true">#</a>5.1.2 Why this matters — three real reasons</h3>
+<ol>
+<li><strong>Multi-turn conversations.</strong> A chatbot needs to remember turn 1 when answering turn 5. Without a checkpointer, you&#39;d have to manually re-send the entire conversation history yourself, every single time, and manage that bookkeeping in your own application code.</li>
+<li><strong>Pausing for humans.</strong> Phase 4 (Human-in-the-Loop) is built entirely on top of checkpointers. To pause a graph mid-execution and resume it later — possibly hours later, possibly after a server restart — the state has to be saved somewhere outside the process&#39;s memory.</li>
+<li><strong>Crash recovery.</strong> If your Node.js process crashes halfway through a long-running graph, a durable checkpointer lets you resume from the last successful step instead of starting over.</li>
+</ol>
+<h3 id="513-the-analogy-video-game-save-files"><a class="heading-anchor" href="#513-the-analogy-video-game-save-files" aria-hidden="true">#</a>5.1.3 The analogy: video game save files</h3>
+<p>Picture a video game with a save system. Every time you reach a checkpoint flag, the game writes your position, inventory, and stats to a save file. If you turn off the console and come back tomorrow, you load that save file and you&#39;re right back where you stood. You didn&#39;t have to replay the whole level.</p>
+<p>A LangGraph checkpoint is exactly that save file, except it&#39;s automatic — you don&#39;t call &quot;save&quot; yourself. LangGraph saves after every super-step on its own, as long as you&#39;ve given it a checkpointer to save <em>to</em>.</p>
+<h3 id="514-the-three-checkpointer-implementations-you-need-to-know"><a class="heading-anchor" href="#514-the-three-checkpointer-implementations-you-need-to-know" aria-hidden="true">#</a>5.1.4 The three checkpointer implementations you need to know</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Checkpointer</th>
+<th>Where it stores data</th>
+<th>Survives process restart?</th>
+<th>When to use it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">MemorySaver</code></td>
+<td>A JavaScript object in RAM</td>
+<td>No</td>
+<td>Local development, unit tests, quick experiments</td>
+</tr>
+<tr>
+<td><code class="inline-code">SqliteSaver</code></td>
+<td>A <code class="inline-code">.sqlite</code> file on disk</td>
+<td>Yes</td>
+<td>Single-machine apps, prototypes, small production tools, desktop apps</td>
+</tr>
+<tr>
+<td><code class="inline-code">PostgresSaver</code></td>
+<td>A Postgres database</td>
+<td>Yes</td>
+<td>Real production systems, multi-server deployments, anything that needs to scale</td>
+</tr>
+</tbody>
+</table></div>
+<p>All three implement the exact same interface. This is a deliberate design choice in LangGraph: you can develop with <code class="inline-code">MemorySaver</code> and swap in <code class="inline-code">PostgresSaver</code> for production by changing <strong>one line of code</strong>. Nothing else about your graph changes.</p>
+<h3 id="515-thread_id--how-langgraph-tells-conversations-apart"><a class="heading-anchor" href="#515-thread_id--how-langgraph-tells-conversations-apart" aria-hidden="true">#</a>5.1.5 <code class="inline-code">thread_id</code> — how LangGraph tells conversations apart</h3>
+<p>A single compiled graph is not tied to one conversation. It&#39;s more like a <em>template</em> for a conversation. The thing that makes one run different from another is a configuration value called <code class="inline-code">thread_id</code>.</p>
+<p>Think of <code class="inline-code">thread_id</code> like a hotel room number. The hotel building (your compiled graph) is the same physical structure for everyone, but room 204&#39;s contents are completely separate from room 305&#39;s. When you call your graph with <code class="inline-code">thread_id: &quot;room-204&quot;</code>, the checkpointer only loads and saves state under that specific key. Calling the same graph with <code class="inline-code">thread_id: &quot;room-305&quot;</code> gives you a totally independent, isolated conversation — even though it&#39;s the exact same compiled graph object in your code.</p>
+<p>This is what lets one deployed graph serve thousands of simultaneous users without their conversations bleeding into each other.</p>
+<h3 id="516-what39s-actually-inside-a-checkpoint"><a class="heading-anchor" href="#516-what39s-actually-inside-a-checkpoint" aria-hidden="true">#</a>5.1.6 What&#39;s actually inside a checkpoint</h3>
+<p>A checkpoint is not just &quot;the state.&quot; It&#39;s a structured record containing:</p>
+<ul>
+<li><strong><code class="inline-code">channel_values</code></strong> — the actual state snapshot (your <code class="inline-code">messages</code>, <code class="inline-code">counter</code>, or whatever fields you defined in your schema)</li>
+<li><strong><code class="inline-code">channel_versions</code></strong> — version numbers used internally so LangGraph knows which channels changed at which step</li>
+<li><strong>Step metadata</strong> — which step number this is, what triggered it, and a timestamp</li>
+<li><strong>A unique checkpoint <code class="inline-code">id</code></strong> — so each individual snapshot in history can be addressed directly (this becomes critical in Unit 6 for time travel)</li>
+</ul>
+<p>Every time a super-step completes, a <em>new</em> checkpoint is written — old checkpoints are not overwritten. This means a checkpointer doesn&#39;t just store &quot;the current state,&quot; it stores the <strong>entire history</strong> of how that thread evolved, one snapshot per step. That history is what Unit 6 (time travel) is built on.</p>
+<h3 id="517-how-compiling-with-a-checkpointer-changes-behavior"><a class="heading-anchor" href="#517-how-compiling-with-a-checkpointer-changes-behavior" aria-hidden="true">#</a>5.1.7 How compiling with a checkpointer changes behavior</h3>
+<p>Without a checkpointer:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = graph.<span class="hljs-title function_">compile</span>();
+<span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [...] }); <span class="hljs-comment">// stateless, one-shot</span></code></pre></div>
+<p>With a checkpointer:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = graph.<span class="hljs-title function_">compile</span>({ checkpointer });
+<span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(
+  { <span class="hljs-attr">messages</span>: [...] },
+  { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;user-42&quot;</span> } } <span class="hljs-comment">// required once a checkpointer is attached</span>
+);</code></pre></div>
+<p>The moment you attach a checkpointer, LangGraph <strong>requires</strong> a <code class="inline-code">thread_id</code> in the config of every call. This makes sense once you think about it: the checkpointer needs to know <em>which</em> save file to read from and write to. Forgetting to pass <code class="inline-code">thread_id</code> is the single most common beginner mistake with checkpointers, and LangGraph will throw a clear error if you omit it.</p>
+<hr>
+<h2 id="52-practical-lab"><a class="heading-anchor" href="#52-practical-lab" aria-hidden="true">#</a>5.2 Practical Lab</h2>
+<h3 id="lab-51--from-stateless-to-stateful-with-memorysaver"><a class="heading-anchor" href="#lab-51--from-stateless-to-stateful-with-memorysaver" aria-hidden="true">#</a>Lab 5.1 — From stateless to stateful with <code class="inline-code">MemorySaver</code></h3>
+<p><strong>Goal:</strong> Take a simple chatbot graph and make it remember previous turns using <code class="inline-code">MemorySaver</code>, then prove that two different <code class="inline-code">thread_id</code>s stay isolated.</p>
+<h4 id="step-0--project-setup"><a class="heading-anchor" href="#step-0--project-setup" aria-hidden="true">#</a>Step 0 — Project setup</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> langgraph-phase3 &amp;&amp; <span class="hljs-built_in">cd</span> langgraph-phase3
+npm init -y
+npm install typescript ts-node @types/node --save-dev
+npm install @langchain/langgraph @langchain/openai @langchain/core zod
+npx tsc --init</code></pre></div>
+<p><strong>Why we&#39;re doing this:</strong> <code class="inline-code">@langchain/langgraph</code> is the graph engine itself. <code class="inline-code">@langchain/openai</code> gives us a chat model wrapper that knows how to call OpenAI&#39;s API in the shape LangGraph expects. <code class="inline-code">zod</code> is what we&#39;ll use to define our state schema with runtime validation (the modern recommended approach over plain TypeScript types, because it lets LangGraph validate inputs at runtime, not just compile time). <code class="inline-code">ts-node</code> lets us run <code class="inline-code">.ts</code> files directly without a separate compile step, which is faster for learning.</p>
+<p><strong>Expected result:</strong> A <code class="inline-code">package.json</code>, <code class="inline-code">node_modules/</code>, and <code class="inline-code">tsconfig.json</code> in your folder. No errors in the terminal.</p>
+<p><strong>Common mistake:</strong> Forgetting <code class="inline-code">--save-dev</code> for <code class="inline-code">typescript</code>/<code class="inline-code">ts-node</code> means it still works, but it&#39;s good practice to keep build tooling separate from runtime dependencies. If you forget, it&#39;s not a bug — just slightly messier dependency hygiene.</p>
+<h4 id="step-1--set-your-api-key"><a class="heading-anchor" href="#step-1--set-your-api-key" aria-hidden="true">#</a>Step 1 — Set your API key</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">export</span> OPENAI_API_KEY=<span class="hljs-string">&quot;sk-...your-key-here...&quot;</span></code></pre></div>
+<p><strong>Why:</strong> <code class="inline-code">@langchain/openai</code>&#39;s <code class="inline-code">ChatOpenAI</code> class automatically reads this environment variable. You never hard-code keys in source files — if you accidentally commit a key to git, it can be scraped and abused within minutes.</p>
+<p><strong>Verify:</strong> Run <code class="inline-code">echo $OPENAI_API_KEY</code> (Mac/Linux) and confirm it prints your key. On Windows PowerShell use <code class="inline-code">$env:OPENAI_API_KEY=&quot;sk-...&quot;</code>.</p>
+<h4 id="step-2--build-the-base-graph-no-memory-yet"><a class="heading-anchor" href="#step-2--build-the-base-graph-no-memory-yet" aria-hidden="true">#</a>Step 2 — Build the base graph (no memory yet)</h4>
+<p>Create <code class="inline-code">src/lab5-1.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+
+<span class="hljs-comment">// MessagesAnnotation is a prebuilt schema: { messages: BaseMessage[] }</span>
+<span class="hljs-comment">// with a reducer that APPENDS new messages instead of overwriting the array.</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] }; <span class="hljs-comment">// returned messages get appended, not replace the array</span>
+}
+
+<span class="hljs-keyword">const</span> builder = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-variable constant_">END</span>);
+
+<span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>(); <span class="hljs-comment">// &lt;-- <span class="hljs-doctag">NOTE:</span> no checkpointer yet</span>
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> r1 = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;My name is Shaad.&quot;</span> }] });
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Turn 1:&quot;</span>, r1.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+
+  <span class="hljs-keyword">const</span> r2 = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What is my name?&quot;</span> }] });
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Turn 2:&quot;</span>, r2.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>What each piece means:</strong></p>
+<ul>
+<li><code class="inline-code">MessagesAnnotation</code> is a ready-made state schema LangGraph ships with specifically for chat-style graphs. Its <code class="inline-code">messages</code> field uses a reducer that <strong>appends</strong> new messages to the existing array, rather than replacing it — that&#39;s why returning <code class="inline-code">{ messages: [response] }</code> from a node adds to history instead of wiping it.</li>
+<li><code class="inline-code">model.invoke(state.messages)</code> sends the <em>entire current message list</em> to OpenAI each call. The model itself has no memory; LangGraph (and you) are responsible for handing it the full context every time.</li>
+<li>Compiling with no <code class="inline-code">{ checkpointer }</code> option means <code class="inline-code">app</code> is purely stateless between <code class="inline-code">.invoke()</code> calls.</li>
+</ul>
+<p><strong>Run it:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/lab5-1.ts</code></pre></div>
+<p><strong>Expected result:</strong> Turn 1 gets a reasonable greeting acknowledging the name. Turn 2 — and this is the important part — the model will say something like <em>&quot;I don&#39;t have access to your name&quot;</em> because each <code class="inline-code">.invoke()</code> call starts a brand-new <code class="inline-code">messages</code> array. Nothing carried over.</p>
+<p><strong>This &quot;failure&quot; is the whole point of the lab.</strong> You&#39;re about to fix it with one parameter.</p>
+<h4 id="step-3--add-memorysaver-and-a-thread_id"><a class="heading-anchor" href="#step-3--add-memorysaver-and-a-thread_id" aria-hidden="true">#</a>Step 3 — Add <code class="inline-code">MemorySaver</code> and a <code class="inline-code">thread_id</code></h4>
+<p>Create <code class="inline-code">src/lab5-2.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+
+<span class="hljs-keyword">const</span> builder = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-variable constant_">END</span>);
+
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>();
+<span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>({ checkpointer }); <span class="hljs-comment">// &lt;-- the only change</span>
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;shaad-convo-1&quot;</span> } };
+
+  <span class="hljs-keyword">const</span> r1 = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;My name is Shaad.&quot;</span> }] }, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Turn 1:&quot;</span>, r1.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+
+  <span class="hljs-comment">// Same thread_id, so LangGraph loads the saved checkpoint before running this turn</span>
+  <span class="hljs-keyword">const</span> r2 = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What is my name?&quot;</span> }] }, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Turn 2:&quot;</span>, r2.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>What changed and why it works:</strong></p>
+<ul>
+<li><code class="inline-code">new MemorySaver()</code> creates an in-process key-value store, keyed by <code class="inline-code">thread_id</code>.</li>
+<li><code class="inline-code">builder.compile({ checkpointer })</code> tells LangGraph: &quot;after every super-step, persist state into this checkpointer, and before every invocation, load existing state from it first.&quot;</li>
+<li>Passing the <strong>same</strong> <code class="inline-code">config.configurable.thread_id</code> on both calls means: before turn 2 runs, LangGraph loads the saved state (which already contains turn 1&#39;s two messages), appends your new human message to it, runs the node, and saves again.</li>
+</ul>
+<p><strong>Run it:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/lab5-2.ts</code></pre></div>
+<p><strong>Expected result:</strong> Turn 2 should correctly answer <em>&quot;Your name is Shaad.&quot;</em> — proof that state persisted across two separate <code class="inline-code">.invoke()</code> calls.</p>
+<p><strong>Verification step:</strong> Add a <code class="inline-code">console.log((await app.getState(config)).values.messages.length)</code> after turn 2. It should print <code class="inline-code">4</code> (2 human + 2 AI messages), confirming the full history accumulated correctly.</p>
+<h4 id="step-4--prove-thread-isolation"><a class="heading-anchor" href="#step-4--prove-thread-isolation" aria-hidden="true">#</a>Step 4 — Prove thread isolation</h4>
+<p>Append this to the bottom of <code class="inline-code">main()</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts">  <span class="hljs-keyword">const</span> otherConfig = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;different-user&quot;</span> } };
+  <span class="hljs-keyword">const</span> r3 = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What is my name?&quot;</span> }] }, otherConfig);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Different thread:&quot;</span>, r3.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);</code></pre></div>
+<p><strong>Expected result:</strong> The model should say it doesn&#39;t know the name — because <code class="inline-code">&quot;different-user&quot;</code> is a brand-new, empty thread that has never seen &quot;Shaad.&quot; This proves <code class="inline-code">thread_id</code> truly isolates conversations on the same compiled graph.</p>
+<p><strong>Common beginner mistakes:</strong></p>
+<ol>
+<li><strong>Forgetting <code class="inline-code">config</code> on the second call.</strong> If you only pass <code class="inline-code">config</code> on the first <code class="inline-code">.invoke()</code> but not the second, LangGraph treats the second call as <code class="inline-code">thread_id: undefined</code>, which either errors or starts a fresh anonymous thread — memory will appear &quot;broken&quot; even though your code is otherwise correct.</li>
+<li><strong>Reusing the same <code class="inline-code">thread_id</code> across genuinely different users in production.</strong> This is a privacy bug, not just a logic bug — User B would see User A&#39;s conversation history.</li>
+<li><strong>Expecting <code class="inline-code">MemorySaver</code> to survive a restart.</strong> It&#39;s RAM-only. Stop and restart your <code class="inline-code">ts-node</code> process and the memory is gone. That&#39;s expected — it&#39;s a dev tool, not a production store.</li>
+</ol>
+<h3 id="lab-52--durable-persistence-with-sqlitesaver"><a class="heading-anchor" href="#lab-52--durable-persistence-with-sqlitesaver" aria-hidden="true">#</a>Lab 5.2 — Durable persistence with <code class="inline-code">SqliteSaver</code></h3>
+<p><strong>Goal:</strong> Swap <code class="inline-code">MemorySaver</code> for <code class="inline-code">SqliteSaver</code> and prove state survives a full process restart.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-checkpoint-sqlite better-sqlite3</code></pre></div>
+<p><strong>Why:</strong> <code class="inline-code">SqliteSaver</code> needs an actual SQLite driver to talk to a file on disk; <code class="inline-code">better-sqlite3</code> is the native binding LangGraph&#39;s package uses under the hood.</p>
+<p>Create <code class="inline-code">src/lab5-3.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">SqliteSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-sqlite&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+
+<span class="hljs-keyword">const</span> builder = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-variable constant_">END</span>);
+
+<span class="hljs-comment">// Writes to (and creates, if missing) a real file on disk</span>
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-title class_">SqliteSaver</span>.<span class="hljs-title function_">fromConnString</span>(<span class="hljs-string">&quot;./checkpoints.sqlite&quot;</span>);
+<span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>({ checkpointer });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;persistent-convo&quot;</span> } };
+  <span class="hljs-keyword">const</span> userMsg = process.<span class="hljs-property">argv</span>[<span class="hljs-number">2</span>] ?? <span class="hljs-string">&quot;Hello!&quot;</span>;
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: userMsg }] }, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Assistant:&quot;</span>, result.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>Run it twice, as two completely separate process invocations:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;My favorite color is teal.&quot;</span>
+npx ts-node src/lab5-3.ts <span class="hljs-string">&quot;What is my favorite color?&quot;</span></code></pre></div>
+<p><strong>Expected result:</strong> The second command — a <strong>brand new Node.js process</strong> with zero in-memory state — correctly answers &quot;teal.&quot; This is the proof that matters: persistence survived across process boundaries, not just across function calls within one running program.</p>
+<p><strong>Verify on disk:</strong> Run <code class="inline-code">ls -la checkpoints.sqlite</code> — you should see a real file with a nonzero size. Optionally inspect it with <code class="inline-code">sqlite3 checkpoints.sqlite &quot;.tables&quot;</code> if you have the <code class="inline-code">sqlite3</code> CLI installed; you&#39;ll see tables like <code class="inline-code">checkpoints</code> and <code class="inline-code">writes</code>.</p>
+<p><strong>Common mistakes:</strong></p>
+<ul>
+<li>Installing <code class="inline-code">better-sqlite3</code> without build tools present (on some Linux machines you may need <code class="inline-code">apt install build-essential python3</code> first) — if <code class="inline-code">npm install</code> fails with node-gyp errors, this is almost always the cause.</li>
+<li>Forgetting that <code class="inline-code">SqliteSaver.fromConnString</code> is <strong>synchronous setup</strong> — you don&#39;t need to <code class="inline-code">await</code> it, only the graph calls themselves are async.</li>
+<li>Pointing two different graphs at the same <code class="inline-code">.sqlite</code> file with overlapping <code class="inline-code">thread_id</code>s by accident — checkpoints are keyed by <code class="inline-code">thread_id</code> regardless of which graph wrote them, so reusing IDs across unrelated graphs can produce confusing state shapes if their schemas differ.</li>
+</ul>
+<h3 id="lab-53--two-parallel-threads-one-graph-one-process"><a class="heading-anchor" href="#lab-53--two-parallel-threads-one-graph-one-process" aria-hidden="true">#</a>Lab 5.3 — Two parallel threads, one graph, one process</h3>
+<p><strong>Goal:</strong> Demonstrate that a single compiled graph instance can safely juggle many independent conversations concurrently — this is exactly how a real chat server behaves.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>() });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> alice = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } };
+  <span class="hljs-keyword">const</span> bob = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;bob&quot;</span> } };
+
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;I like cats.&quot;</span> }] }, alice);
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;I like dogs.&quot;</span> }] }, bob);
+
+  <span class="hljs-comment">// Run both follow-ups concurrently with Promise.all to mimic real traffic</span>
+  <span class="hljs-keyword">const</span> [aliceReply, bobReply] = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>([
+    app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What do I like?&quot;</span> }] }, alice),
+    app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What do I like?&quot;</span> }] }, bob),
+  ]);
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Alice:&quot;</span>, aliceReply.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Bob:&quot;</span>, bobReply.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+}
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>Expected result:</strong> Alice&#39;s answer mentions cats; Bob&#39;s mentions dogs — despite both requests being sent concurrently through the same <code class="inline-code">app</code> object. <strong>Verify</strong> by checking the two responses never cross-contaminate, even if you run this 5 times.</p>
+<h4 id="step--inspect-a-raw-checkpoint-object"><a class="heading-anchor" href="#step--inspect-a-raw-checkpoint-object" aria-hidden="true">#</a>Step — Inspect a raw checkpoint object</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> raw = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">getState</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(raw, <span class="hljs-literal">null</span>, <span class="hljs-number">2</span>));</code></pre></div>
+<p><strong>What to look for in the output:</strong> a <code class="inline-code">values</code> field (your actual state), a <code class="inline-code">next</code> field (which node would run next, empty if the graph finished), and <code class="inline-code">config</code> containing the <code class="inline-code">thread_id</code> and a <code class="inline-code">checkpoint_id</code>. This structure is the foundation for everything in Unit 6.</p>
+<hr>
+<h2 id="53-knowledge-check--unit-5"><a class="heading-anchor" href="#53-knowledge-check--unit-5" aria-hidden="true">#</a>5.3 Knowledge Check — Unit 5</h2>
+<h3 id="summary"><a class="heading-anchor" href="#summary" aria-hidden="true">#</a>Summary</h3>
+<p>A <strong>Checkpointer</strong> persists graph state after every super-step, keyed by a <code class="inline-code">thread_id</code>. <code class="inline-code">MemorySaver</code> is for development (RAM only, lost on restart). <code class="inline-code">SqliteSaver</code> and <code class="inline-code">PostgresSaver</code> are durable, disk/database-backed options for production. Attaching a checkpointer makes <code class="inline-code">thread_id</code> mandatory in every call&#39;s config. The same compiled graph can safely serve unlimited independent conversations because each <code class="inline-code">thread_id</code> is fully isolated.</p>
+<h3 id="key-takeaways"><a class="heading-anchor" href="#key-takeaways" aria-hidden="true">#</a>Key Takeaways</h3>
+<ul>
+<li>No checkpointer = stateless graph; every <code class="inline-code">.invoke()</code> is amnesia.</li>
+<li><code class="inline-code">thread_id</code> is the &quot;room number&quot; that separates one conversation&#39;s state from another&#39;s on the same graph.</li>
+<li>All checkpointer implementations share one interface — swapping <code class="inline-code">MemorySaver</code> → <code class="inline-code">SqliteSaver</code> → <code class="inline-code">PostgresSaver</code> is a one-line change.</li>
+<li>A checkpoint stores more than current state — it stores step metadata and a unique ID per snapshot, enabling history traversal later.</li>
+</ul>
+<h3 id="practice-questions"><a class="heading-anchor" href="#practice-questions" aria-hidden="true">#</a>Practice Questions</h3>
+<ol>
+<li>What happens if you call <code class="inline-code">app.invoke()</code> on a graph compiled with a checkpointer, but you forget to pass <code class="inline-code">thread_id</code>?</li>
+<li>Why is <code class="inline-code">MemorySaver</code> unsuitable for production, even for a low-traffic app?</li>
+<li>If two users are accidentally given the same <code class="inline-code">thread_id</code>, what privacy problem occurs?</li>
+<li>True or false: switching from <code class="inline-code">SqliteSaver</code> to <code class="inline-code">PostgresSaver</code> requires rewriting your graph&#39;s nodes and edges.</li>
+</ol>
+<h3 id="exercises"><a class="heading-anchor" href="#exercises" aria-hidden="true">#</a>Exercises</h3>
+<ol>
+<li>Modify Lab 5.1&#39;s graph to add a second node, <code class="inline-code">summarize</code>, that runs after <code class="inline-code">agent</code> and prints a one-line summary of the conversation so far. Confirm the summary correctly reflects multi-turn history once a checkpointer is attached.</li>
+<li>Write a small CLI loop (using Node&#39;s <code class="inline-code">readline</code>) that lets you chat with the Lab 5.2 graph interactively in your terminal, all under one fixed <code class="inline-code">thread_id</code>, until you type <code class="inline-code">exit</code>.</li>
+</ol>
+<h3 id="mini-project"><a class="heading-anchor" href="#mini-project" aria-hidden="true">#</a>Mini Project</h3>
+<p>Build a <strong>&quot;Two Customer Support Agents&quot;</strong> simulator: one compiled graph, <code class="inline-code">SqliteSaver</code> persistence, and two hard-coded <code class="inline-code">thread_id</code>s representing two different customers asking about order status. Seed each thread with different fake &quot;order info&quot; in the first message, then ask a follow-up question on each thread and confirm the answers don&#39;t mix up.</p>
+<hr>
+<h1 id="unit-6--state-management-amp-time-travel"><a class="heading-anchor" href="#unit-6--state-management-amp-time-travel" aria-hidden="true">#</a>Unit 6 — State Management &amp; Time Travel</h1>
+<h2 id="61-concept-and-theory"><a class="heading-anchor" href="#61-concept-and-theory" aria-hidden="true">#</a>6.1 Concept and Theory</h2>
+<h3 id="611-from-quotsaveloadquot-to-quotexplore-historyquot"><a class="heading-anchor" href="#611-from-quotsaveloadquot-to-quotexplore-historyquot" aria-hidden="true">#</a>6.1.1 From &quot;save/load&quot; to &quot;explore history&quot;</h3>
+<p>Unit 5 gave your graph a memory. Unit 6 gives you <strong>X-ray vision into that memory</strong>. Once a checkpointer is attached, LangGraph isn&#39;t just saving &quot;the latest state&quot; — it&#39;s saving a brand-new checkpoint after <em>every single super-step</em>. That means a thread with 10 turns doesn&#39;t have 1 saved state, it has a full timeline of intermediate states, like frames in a film reel.</p>
+<p>Four methods let you work with that timeline:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>What it does</th>
+<th>Analogy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">getState(config)</code></td>
+<td>Returns the <em>current</em> (most recent) snapshot for a thread</td>
+<td>Reading today&#39;s page in a diary</td>
+</tr>
+<tr>
+<td><code class="inline-code">updateState(config, values)</code></td>
+<td>Manually injects/overwrites state outside normal node execution</td>
+<td>Crossing something out and rewriting it in the diary by hand</td>
+</tr>
+<tr>
+<td><code class="inline-code">getStateHistory(config)</code></td>
+<td>Returns every checkpoint ever saved for a thread, newest first</td>
+<td>Reading every page of the diary from the beginning</td>
+</tr>
+<tr>
+<td>Resuming from a past <code class="inline-code">checkpoint_id</code></td>
+<td>Re-runs the graph starting from an earlier snapshot</td>
+<td>Tearing out today&#39;s page and continuing the story from last Tuesday instead</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="612-getstate--reading-the-present"><a class="heading-anchor" href="#612-getstate--reading-the-present" aria-hidden="true">#</a>6.1.2 <code class="inline-code">getState()</code> — reading the present</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> snapshot = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">getState</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } });</code></pre></div>
+<p>This returns a <code class="inline-code">StateSnapshot</code> object with (among other fields):</p>
+<ul>
+<li><code class="inline-code">values</code> — the actual state values (e.g., <code class="inline-code">{ messages: [...] }</code>)</li>
+<li><code class="inline-code">next</code> — an array of node names that <em>would</em> run next if you invoked again (empty <code class="inline-code">[]</code> means the graph has fully finished; non-empty means it&#39;s paused, e.g., at a human-in-the-loop interrupt from Phase 4)</li>
+<li><code class="inline-code">config</code> — contains the exact <code class="inline-code">checkpoint_id</code> of this snapshot, which uniquely addresses this single moment in time</li>
+</ul>
+<h3 id="613-updatestate--editing-history-by-hand"><a class="heading-anchor" href="#613-updatestate--editing-history-by-hand" aria-hidden="true">#</a>6.1.3 <code class="inline-code">updateState()</code> — editing history by hand</h3>
+<p>Sometimes you, the developer (or a human reviewer), need to correct the state without running a node. Maybe a tool returned bad data and you want to patch it before the graph continues, or a human needs to edit a draft message before it&#39;s sent (this becomes essential in Phase 4).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">await</span> app.<span class="hljs-title function_">updateState</span>(
+  { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } },
+  { <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Correction: I actually prefer dogs, not cats.&quot;</span> }] }
+);</code></pre></div>
+<p><strong>Critical detail:</strong> <code class="inline-code">updateState()</code> runs through the <strong>same reducers</strong> your schema defines. If your <code class="inline-code">messages</code> field uses an append-only reducer, calling <code class="inline-code">updateState</code> with a new message <em>appends</em> it — it does not wipe the array. If you want to truly overwrite a field, your reducer needs to support that (e.g., a &quot;last value wins&quot; reducer for non-message fields like a <code class="inline-code">status: string</code>).</p>
+<p><code class="inline-code">updateState()</code> also creates a <strong>brand new checkpoint</strong> — it doesn&#39;t mutate an old one. This keeps the &quot;every checkpoint is immutable history&quot; guarantee intact, which matters enormously for the next concept: time travel.</p>
+<h3 id="614-getstatehistory--walking-the-timeline"><a class="heading-anchor" href="#614-getstatehistory--walking-the-timeline" aria-hidden="true">#</a>6.1.4 <code class="inline-code">getStateHistory()</code> — walking the timeline</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> snap <span class="hljs-keyword">of</span> app.<span class="hljs-title function_">getStateHistory</span>({ <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span> } })) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(snap.<span class="hljs-property">config</span>.<span class="hljs-property">configurable</span>?.<span class="hljs-property">checkpoint_id</span>, snap.<span class="hljs-property">values</span>);
+}</code></pre></div>
+<p>This is an <strong>async generator</strong> — it yields snapshots one at a time, ordered from most recent to oldest, all the way back to the very first checkpoint of the thread. Each yielded snapshot is a complete, independently addressable point-in-time copy of state, each with its own <code class="inline-code">checkpoint_id</code>.</p>
+<h3 id="615-time-travel--replay-and-forking"><a class="heading-anchor" href="#615-time-travel--replay-and-forking" aria-hidden="true">#</a>6.1.5 Time travel — replay and forking</h3>
+<p>This is the part that makes checkpointers feel like magic the first time you see it. Because every checkpoint is immutable and individually addressable by <code class="inline-code">checkpoint_id</code>, you can tell LangGraph: <em>&quot;don&#39;t resume from the latest state — resume from this specific checkpoint three steps ago.&quot;</em></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> historicalConfig = {
+  <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;alice&quot;</span>, <span class="hljs-attr">checkpoint_id</span>: <span class="hljs-string">&quot;1ef7a3c2-...&quot;</span> }
+};
+<span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(<span class="hljs-literal">null</span>, historicalConfig);</code></pre></div>
+<p>Passing <code class="inline-code">null</code> as the input (instead of a new message) tells LangGraph: <em>&quot;don&#39;t add new input, just continue execution from wherever this checkpoint left off.&quot;</em> You can also pass new input here — and that&#39;s exactly how <strong>forking</strong> works.</p>
+<p><strong>The crucial insight:</strong> when you resume from a past checkpoint, you are <strong>not deleting</strong> the &quot;future&quot; checkpoints that came after it. You are creating a <strong>new branch</strong>. The original timeline still exists in history; you&#39;ve simply started a second, parallel timeline that also begins from that earlier point. Think of it like a save-file &quot;fork&quot; in a game speedrun community: you don&#39;t erase your first playthrough by loading an earlier save and playing differently — you now just have two distinct playthroughs sharing a common ancestor checkpoint.</p>
+<h3 id="616-why-this-is-genuinely-useful-not-just-a-neat-trick"><a class="heading-anchor" href="#616-why-this-is-genuinely-useful-not-just-a-neat-trick" aria-hidden="true">#</a>6.1.6 Why this is genuinely useful, not just a neat trick</h3>
+<ol>
+<li><strong>Debugging.</strong> If a multi-step agent went wrong at step 7, you can jump straight to the checkpoint right before step 7, inspect exactly what state it saw, and re-run just that step in isolation — instead of re-running the whole 7-step pipeline from scratch every time you tweak a prompt.</li>
+<li><strong>Undo / redo.</strong> A &quot;regenerate this response&quot; button in a chat UI is, under the hood, just: load the checkpoint <em>before</em> the bad AI response, then invoke again (which forks a new branch with a fresh model call).</li>
+<li><strong>&quot;What-if&quot; exploration.</strong> Compare two different responses to the same situation by forking from one shared earlier checkpoint and sending two different follow-up inputs.</li>
+</ol>
+<h3 id="617-an-important-nuance-checkpoint-ids-vs-thread-ids"><a class="heading-anchor" href="#617-an-important-nuance-checkpoint-ids-vs-thread-ids" aria-hidden="true">#</a>6.1.7 An important nuance: checkpoint IDs vs. thread IDs</h3>
+<p>Don&#39;t confuse these two identifiers:</p>
+<ul>
+<li><code class="inline-code">thread_id</code> — identifies an entire <em>conversation lineage</em> (can contain many branches).</li>
+<li><code class="inline-code">checkpoint_id</code> — identifies one <em>exact moment</em> within that lineage.</li>
+</ul>
+<p>Omitting <code class="inline-code">checkpoint_id</code> from your config (just passing <code class="inline-code">thread_id</code>) always means &quot;use the latest checkpoint on the main timeline.&quot; Including a specific <code class="inline-code">checkpoint_id</code> means &quot;time travel to exactly here.&quot;</p>
+<h2 id="62-practical-lab"><a class="heading-anchor" href="#62-practical-lab" aria-hidden="true">#</a>6.2 Practical Lab</h2>
+<h3 id="lab-61--printing-full-state-history"><a class="heading-anchor" href="#lab-61--printing-full-state-history" aria-hidden="true">#</a>Lab 6.1 — Printing full state history</h3>
+<p>Create <code class="inline-code">src/lab6-1.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>();
+<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ checkpointer });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;history-demo&quot;</span> } };
+
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Step one: remember the number 7.&quot;</span> }] }, config);
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Step two: remember the number 14.&quot;</span> }] }, config);
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What numbers have I given you?&quot;</span> }] }, config);
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n--- Full checkpoint history (newest first) ---&quot;</span>);
+  <span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> snap <span class="hljs-keyword">of</span> app.<span class="hljs-title function_">getStateHistory</span>(config)) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+      <span class="hljs-string">`[<span class="hljs-subst">${i++}</span>] checkpoint_id=<span class="hljs-subst">${snap.config.configurable?.checkpoint_id}</span> | `</span> +
+      <span class="hljs-string">`messages_count=<span class="hljs-subst">${snap.values.messages.length}</span> | next=<span class="hljs-subst">${<span class="hljs-built_in">JSON</span>.stringify(snap.next)}</span>`</span>
+    );
+  }
+}
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>What we&#39;re verifying:</strong> You should see <strong>six</strong> checkpoints, not three. Why six and not three? Because each <code class="inline-code">.invoke()</code> call produces <strong>two</strong> super-steps: one for the <code class="inline-code">START → agent</code> transition consuming your input, and the resulting state after <code class="inline-code">agent</code> runs. Counting checkpoints, rather than assuming 1-per-invoke, is the kind of detail that trips up beginners — <strong>always print and count, never assume.</strong></p>
+<p><strong>Common mistake:</strong> Trying to use <code class="inline-code">for (const snap of ...)</code> (without <code class="inline-code">await</code>) — <code class="inline-code">getStateHistory</code> returns an <strong>async</strong> iterator, so the loop must be <code class="inline-code">for await (...)</code>. Forgetting <code class="inline-code">await</code> here throws a TypeScript/runtime error about iterables.</p>
+<h3 id="lab-62--manually-correcting-state-with-updatestate"><a class="heading-anchor" href="#lab-62--manually-correcting-state-with-updatestate" aria-hidden="true">#</a>Lab 6.2 — Manually correcting state with <code class="inline-code">updateState()</code></h3>
+<p>Create <code class="inline-code">src/lab6-2.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>() });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;correction-demo&quot;</span> } };
+
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;My order number is A100.&quot;</span> }] }, config);
+
+  <span class="hljs-comment">// Oops — the order number was actually wrong. Inject a correction directly into state.</span>
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">updateState</span>(config, {
+    <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Correction: the real order number is B200, ignore A100.&quot;</span> }],
+  });
+
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What is my order number?&quot;</span> }] }, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Final answer:&quot;</span>, result.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+}
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>Expected result:</strong> The model answers &quot;B200&quot; — proving the manually-injected correction message became part of the real conversation history the model sees on the next turn, exactly as if a human had typed it.</p>
+<p><strong>Verify:</strong> Print <code class="inline-code">(await app.getState(config)).values.messages.map(m =&gt; m.content)</code> and confirm the correction message appears in order, sandwiched between the original message and the final question.</p>
+<h3 id="lab-63--replaying-from-an-earlier-checkpoint"><a class="heading-anchor" href="#lab-63--replaying-from-an-earlier-checkpoint" aria-hidden="true">#</a>Lab 6.3 — Replaying from an earlier checkpoint</h3>
+<p>Create <code class="inline-code">src/lab6-3.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.9</span> }); <span class="hljs-comment">// higher temp = more varied replies</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>() });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;replay-demo&quot;</span> } };
+
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Tell me a one-line fun fact about octopuses.&quot;</span> }] }, config);
+
+  <span class="hljs-comment">// Collect all checkpoints so we can grab one from BEFORE the model&#x27;s reply was generated</span>
+  <span class="hljs-keyword">const</span> history = [];
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> snap <span class="hljs-keyword">of</span> app.<span class="hljs-title function_">getStateHistory</span>(config)) history.<span class="hljs-title function_">push</span>(snap);
+
+  <span class="hljs-comment">// history[0] = latest (after model replied). The one right before that (history[1])</span>
+  <span class="hljs-comment">// is the moment right after the human message was added but BEFORE the model answered.</span>
+  <span class="hljs-keyword">const</span> beforeReply = history[<span class="hljs-number">1</span>];
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Replaying from checkpoint right after the human question, before any AI answer...&quot;</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;State at that point:&quot;</span>, beforeReply.<span class="hljs-property">values</span>.<span class="hljs-property">messages</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">m</span>: <span class="hljs-built_in">any</span></span>) =&gt;</span> m.<span class="hljs-property">content</span>));
+
+  <span class="hljs-keyword">const</span> replayConfig = {
+    <span class="hljs-attr">configurable</span>: {
+      <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;replay-demo&quot;</span>,
+      <span class="hljs-attr">checkpoint_id</span>: beforeReply.<span class="hljs-property">config</span>.<span class="hljs-property">configurable</span>?.<span class="hljs-property">checkpoint_id</span>,
+    },
+  };
+
+  <span class="hljs-comment">// Passing null = &quot;just continue from here,&quot; which re-runs the agent node and</span>
+  <span class="hljs-comment">// generates a NEW answer, forking a second branch from that same point.</span>
+  <span class="hljs-keyword">const</span> replayed = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(<span class="hljs-literal">null</span>, replayConfig);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;New (forked) answer:&quot;</span>, replayed.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+}
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>Expected result:</strong> A second, independently generated fun fact — possibly different wording from the first run because of <code class="inline-code">temperature: 0.9</code>. Both answers now exist in the thread&#39;s history as two diverging branches sharing the same starting checkpoint.</p>
+<p><strong>Verify the fork happened correctly:</strong> Loop through <code class="inline-code">getStateHistory</code> again after this run. You should see <strong>two different checkpoints</strong> that both have the same parent, each containing a different AI message — concrete proof of branching, not overwriting.</p>
+<p><strong>Common mistakes:</strong></p>
+<ol>
+<li>Assuming <code class="inline-code">history[0]</code> (the newest checkpoint) is &quot;before the reply&quot; — it&#39;s actually the opposite, the newest checkpoint is the <em>most processed</em> one. Always print <code class="inline-code">next</code> and <code class="inline-code">messages</code> for each entry to be sure which checkpoint represents which moment, rather than guessing by index.</li>
+<li>Forgetting to pass <code class="inline-code">null</code> as the first argument to <code class="inline-code">.invoke()</code> when resuming — passing <code class="inline-code">{}</code> or omitting the argument entirely can cause type errors, since <code class="inline-code">null</code> is the explicit LangGraph convention for &quot;no new input, just continue.&quot;</li>
+</ol>
+<h3 id="lab-64--forking-into-two-diverging-conversation-branches"><a class="heading-anchor" href="#lab-64--forking-into-two-diverging-conversation-branches" aria-hidden="true">#</a>Lab 6.4 — Forking into two diverging conversation branches</h3>
+<p>Extend Lab 6.3: after creating the forked branch, send <strong>different</strong> follow-up questions down each branch and confirm they evolve independently.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-comment">// continuing from Lab 6.3&#x27;s &quot;replayConfig&quot; checkpoint...</span>
+<span class="hljs-keyword">const</span> branchA = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(
+  { <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Make that fact sillier.&quot;</span> }] },
+  replayConfig
+);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Branch A:&quot;</span>, branchA.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+
+<span class="hljs-comment">// Re-fetch the SAME original checkpoint again to start a second, separate branch</span>
+<span class="hljs-keyword">const</span> branchB = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(
+  { <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Make that fact more scientific.&quot;</span> }] },
+  replayConfig
+);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Branch B:&quot;</span>, branchB.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);</code></pre></div>
+<p><strong>Expected result:</strong> Branch A reads playful, Branch B reads technical — and crucially, neither branch &quot;remembers&quot; the other&#39;s follow-up question, because they both forked independently from the same shared ancestor checkpoint rather than from each other.</p>
+<hr>
+<h2 id="63-knowledge-check--unit-6"><a class="heading-anchor" href="#63-knowledge-check--unit-6" aria-hidden="true">#</a>6.3 Knowledge Check — Unit 6</h2>
+<h3 id="summary-1"><a class="heading-anchor" href="#summary-1" aria-hidden="true">#</a>Summary</h3>
+<p>Because every super-step writes an <strong>immutable, individually addressable</strong> checkpoint, LangGraph threads aren&#39;t just &quot;current state&quot; — they&#39;re a full timeline. <code class="inline-code">getState()</code> reads the latest snapshot. <code class="inline-code">updateState()</code> writes a manual correction (passed through your reducers) as a new checkpoint. <code class="inline-code">getStateHistory()</code> walks the entire timeline. Invoking with a specific <code class="inline-code">checkpoint_id</code> performs time travel: resuming execution from that exact past moment, which <strong>forks</strong> a new branch rather than erasing the original future.</p>
+<h3 id="key-takeaways-1"><a class="heading-anchor" href="#key-takeaways-1" aria-hidden="true">#</a>Key Takeaways</h3>
+<ul>
+<li>A <code class="inline-code">thread_id</code> can contain many branches; a <code class="inline-code">checkpoint_id</code> pinpoints exactly one moment.</li>
+<li><code class="inline-code">updateState()</code> respects your schema&#39;s reducers — it appends to append-only fields, it doesn&#39;t necessarily overwrite.</li>
+<li>Passing <code class="inline-code">null</code> as input to <code class="inline-code">.invoke()</code> means &quot;just continue from this checkpoint,&quot; enabling clean forking.</li>
+<li>Time travel never deletes history — it only ever adds new branches.</li>
+</ul>
+<h3 id="practice-questions-1"><a class="heading-anchor" href="#practice-questions-1" aria-hidden="true">#</a>Practice Questions</h3>
+<ol>
+<li>Why does a single <code class="inline-code">.invoke()</code> call often produce more than one checkpoint?</li>
+<li>If you call <code class="inline-code">updateState()</code> on a <code class="inline-code">messages</code> field that uses an append-only reducer, does it replace the array or add to it?</li>
+<li>What does passing <code class="inline-code">checkpoint_id</code> (in addition to <code class="inline-code">thread_id</code>) into a config actually change about an <code class="inline-code">.invoke()</code> call?</li>
+<li>Does resuming from an old checkpoint delete the checkpoints that came after it on the original timeline?</li>
+</ol>
+<h3 id="exercises-1"><a class="heading-anchor" href="#exercises-1" aria-hidden="true">#</a>Exercises</h3>
+<ol>
+<li>Build a small &quot;undo button&quot; function: <code class="inline-code">async function undoLastTurn(threadId)</code> that finds the checkpoint from <em>before</em> the most recent AI message and re-invokes from there with no new input, effectively regenerating the last response.</li>
+<li>Write a function that prints a thread&#39;s history as an indented tree-like structure showing where branches diverged (hint: each <code class="inline-code">StateSnapshot</code> has a <code class="inline-code">parentConfig</code> field pointing to its parent checkpoint).</li>
+</ol>
+<h3 id="mini-project-1"><a class="heading-anchor" href="#mini-project-1" aria-hidden="true">#</a>Mini Project</h3>
+<p>Build a <strong>&quot;Compare 3 Answers&quot; CLI tool</strong>: ask the model one question, capture the checkpoint right before its answer, then fork from that single checkpoint three separate times with slightly different system instructions (e.g., &quot;answer formally,&quot; &quot;answer casually,&quot; &quot;answer with a joke&quot;) and print all three resulting branches side by side.</p>
+<hr>
+<h1 id="unit-7--long-term-memory-store-api"><a class="heading-anchor" href="#unit-7--long-term-memory-store-api" aria-hidden="true">#</a>Unit 7 — Long-Term Memory (Store API)</h1>
+<h2 id="71-concept-and-theory"><a class="heading-anchor" href="#71-concept-and-theory" aria-hidden="true">#</a>7.1 Concept and Theory</h2>
+<h3 id="711-two-very-different-kinds-of-quotmemoryquot"><a class="heading-anchor" href="#711-two-very-different-kinds-of-quotmemoryquot" aria-hidden="true">#</a>7.1.1 Two very different kinds of &quot;memory&quot;</h3>
+<p>So far, &quot;memory&quot; has meant one thing: a checkpointer remembering everything that happened <strong>inside one <code class="inline-code">thread_id</code></strong>. That&#39;s called <strong>short-term memory</strong> — it&#39;s scoped to a single conversation, and it includes <em>everything</em>, in full detail, in order.</p>
+<p>But real assistants need a second kind of memory entirely. Imagine you tell a friend &quot;I&#39;m vegetarian&quot; in one conversation, and a week later, in a completely unrelated conversation, they still remember that fact and recommend a vegetarian restaurant. That fact didn&#39;t belong to one specific conversation thread — it belongs to <strong>you</strong>, across all conversations. That&#39;s <strong>long-term memory</strong>, and in LangGraph it&#39;s handled by a completely separate piece of infrastructure called the <strong>Store</strong>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Short-term memory (Checkpointer)</th>
+<th>Long-term memory (Store)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scope</td>
+<td>One <code class="inline-code">thread_id</code></td>
+<td>Across all threads, often per-user</td>
+</tr>
+<tr>
+<td>Contents</td>
+<td>Full raw conversation history</td>
+<td>Distilled facts, preferences, summaries</td>
+</tr>
+<tr>
+<td>Access pattern</td>
+<td>Loaded automatically by <code class="inline-code">thread_id</code></td>
+<td>Explicitly read/written by your nodes via <code class="inline-code">put</code>/<code class="inline-code">get</code>/<code class="inline-code">search</code></td>
+</tr>
+<tr>
+<td>Analogy</td>
+<td>A single diary entry&#39;s full text</td>
+<td>An index card in a permanent Rolodex about a person</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="712-the-store-interface"><a class="heading-anchor" href="#712-the-store-interface" aria-hidden="true">#</a>7.1.2 The <code class="inline-code">Store</code> interface</h3>
+<p>LangGraph&#39;s <code class="inline-code">Store</code> API gives you three core operations, all namespaced:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(namespace, key, value);
+<span class="hljs-keyword">const</span> item = <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">get</span>(namespace, key);
+<span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">search</span>(namespace, { <span class="hljs-attr">query</span>: <span class="hljs-string">&quot;some natural language query&quot;</span> });</code></pre></div>
+<ul>
+<li><strong><code class="inline-code">namespace</code></strong> — a tuple (e.g., <code class="inline-code">[&quot;users&quot;, &quot;shaad-id-123&quot;]</code>) that scopes where a memory lives. Think of it as a folder path — you choose how granular it is (per-user, per-organization, per-feature).</li>
+<li><strong><code class="inline-code">key</code></strong> — a unique identifier within that namespace for one specific memory item (e.g., <code class="inline-code">&quot;dietary_preference&quot;</code>).</li>
+<li><strong><code class="inline-code">value</code></strong> — any JSON-serializable object: <code class="inline-code">{ text: &quot;User is vegetarian&quot;, source: &quot;2026-06-10 conversation&quot; }</code>.</li>
+</ul>
+<p><code class="inline-code">search()</code> is the powerful one: rather than knowing the exact <code class="inline-code">key</code> in advance, you give it a natural-language query, and a <strong>semantic-search-capable</strong> store backend (one configured with an embeddings model) returns the most relevant stored memories — even if the wording doesn&#39;t match exactly. This is what lets an agent &quot;remember&quot; something relevant without you writing exact-match retrieval logic.</p>
+<h3 id="713-inmemorystore-vs-persistent-stores"><a class="heading-anchor" href="#713-inmemorystore-vs-persistent-stores" aria-hidden="true">#</a>7.1.3 <code class="inline-code">InMemoryStore</code> vs. persistent stores</h3>
+<p>Just like checkpointers, stores have a development version and production versions:</p>
+<ul>
+<li><strong><code class="inline-code">InMemoryStore</code></strong> — RAM-only, lost on restart, perfect for learning and local dev. Can optionally be configured with an embeddings function so <code class="inline-code">search()</code> does real semantic similarity matching instead of just exact-key lookups.</li>
+<li><strong>Persistent stores</strong> (e.g., Postgres-backed) — durable, used in real deployments where long-term memory must survive restarts and scale across many users.</li>
+</ul>
+<h3 id="714-namespacing-patterns"><a class="heading-anchor" href="#714-namespacing-patterns" aria-hidden="true">#</a>7.1.4 Namespacing patterns</h3>
+<p>A namespace is just an array of strings you design yourself, but a few patterns are extremely common:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts">[<span class="hljs-string">&quot;users&quot;</span>, userId]                       <span class="hljs-comment">// one folder per user</span>
+[<span class="hljs-string">&quot;users&quot;</span>, userId, <span class="hljs-string">&quot;preferences&quot;</span>]        <span class="hljs-comment">// sub-folder for a category of memory</span>
+[<span class="hljs-string">&quot;org&quot;</span>, orgId, <span class="hljs-string">&quot;users&quot;</span>, userId]         <span class="hljs-comment">// multi-tenant apps: org first, then user</span></code></pre></div>
+<p>The deeper/more specific your namespace, the more precisely scoped your <code class="inline-code">search()</code> calls become. <code class="inline-code">search([&quot;users&quot;, &quot;shaad-id-123&quot;], { query: &quot;food&quot; })</code> only ever searches Shaad&#39;s own memories — it physically cannot leak another user&#39;s data, because the namespace boundary is enforced by the store itself, not by application-level filtering you&#39;d have to remember to write correctly every time.</p>
+<h3 id="715-three-flavors-of-long-term-memory-a-useful-mental-model"><a class="heading-anchor" href="#715-three-flavors-of-long-term-memory-a-useful-mental-model" aria-hidden="true">#</a>7.1.5 Three flavors of long-term memory (a useful mental model)</h3>
+<p>Borrowed loosely from how human memory researchers describe things, and genuinely useful for designing what to store:</p>
+<ol>
+<li><strong>Semantic memory</strong> — standalone facts: <em>&quot;User prefers Python over Java.&quot; &quot;User&#39;s company is based in Toronto.&quot;</em> These are timeless-ish facts you&#39;d recall regardless of when they were said.</li>
+<li><strong>Episodic memory</strong> — memory of specific past <em>events</em> or <em>examples</em>: <em>&quot;Last time the user asked for a resume rewrite, they wanted bullet points under 25 words.&quot;</em> Useful for few-shot-style retrieval of past successful interactions.</li>
+<li><strong>Procedural memory</strong> — memory of <em>how to do something</em>, often expressed as rules or instructions the system itself should follow: <em>&quot;Always confirm budget before suggesting venues.&quot;</em> This can even be used to let an agent update its own system prompt over time based on feedback.</li>
+</ol>
+<p>You don&#39;t need to rigidly categorize every memory you store, but thinking in these three buckets helps you decide <em>what&#39;s worth writing to the Store at all</em> — not everything that happens in a conversation deserves to become a permanent memory.</p>
+<h3 id="716-where-the-store-plugs-into-a-graph"><a class="heading-anchor" href="#716-where-the-store-plugs-into-a-graph" aria-hidden="true">#</a>7.1.6 Where the Store plugs into a graph</h3>
+<p>The Store is attached at <code class="inline-code">.compile()</code> time, exactly like a checkpointer, and the two are completely independent of each other — you can have a checkpointer with no store, a store with no checkpointer, or (most commonly) both together:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>({ checkpointer, store });</code></pre></div>
+<p>Inside a node, you access the store through the node function&#39;s second argument, <code class="inline-code">config</code>, which LangGraph injects automatically — specifically via <code class="inline-code">config.store</code> in recent LangGraph.js versions, or by accepting <code class="inline-code">store</code> as an explicit constructor parameter depending on the exact version you&#39;re using. The key idea regardless of exact syntax: <strong>nodes read and write long-term memory explicitly</strong>, unlike checkpointing, which happens automatically. You decide exactly what&#39;s worth remembering forever and what should just live and die with the conversation thread.</p>
+<h2 id="72-practical-lab"><a class="heading-anchor" href="#72-practical-lab" aria-hidden="true">#</a>7.2 Practical Lab</h2>
+<h3 id="lab-71--storing-and-retrieving-a-user-preference-across-threads"><a class="heading-anchor" href="#lab-71--storing-and-retrieving-a-user-preference-across-threads" aria-hidden="true">#</a>Lab 7.1 — Storing and retrieving a user preference across threads</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-checkpoint  <span class="hljs-comment"># if not already present</span></code></pre></div>
+<p>Create <code class="inline-code">src/lab7-1.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InMemoryStore</span>();
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>();
+
+<span class="hljs-comment">// userId is hardcoded here for clarity. In a real app this comes from your auth layer.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">USER_NAMESPACE</span> = [<span class="hljs-string">&quot;users&quot;</span>, <span class="hljs-string">&quot;shaad-id-123&quot;</span>];
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+
+<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ checkpointer, store });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// --- &quot;Conversation 1&quot; (thread A) ---</span>
+  <span class="hljs-keyword">const</span> threadA = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;convo-A&quot;</span> } };
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;I&#x27;m vegetarian, please remember that.&quot;</span> }] }, threadA);
+
+  <span class="hljs-comment">// Manually write a distilled long-term fact to the Store (this is YOUR design decision,</span>
+  <span class="hljs-comment">// not something LangGraph infers automatically from the conversation).</span>
+  <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(<span class="hljs-variable constant_">USER_NAMESPACE</span>, <span class="hljs-string">&quot;dietary_preference&quot;</span>, {
+    <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;User is vegetarian.&quot;</span>,
+    <span class="hljs-attr">noted_on</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
+  });
+
+  <span class="hljs-comment">// --- &quot;Conversation 2&quot; (a totally separate thread_id, simulating a new session days later) ---</span>
+  <span class="hljs-keyword">const</span> threadB = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;convo-B&quot;</span> } };
+  <span class="hljs-keyword">const</span> remembered = <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">get</span>(<span class="hljs-variable constant_">USER_NAMESPACE</span>, <span class="hljs-string">&quot;dietary_preference&quot;</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Recalled from long-term memory:&quot;</span>, remembered?.<span class="hljs-property">value</span>);
+
+  <span class="hljs-comment">// Inject that recalled fact into the new thread&#x27;s context before answering</span>
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(
+    {
+      <span class="hljs-attr">messages</span>: [
+        { <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">`Known fact about user: <span class="hljs-subst">${remembered?.value.text}</span>`</span> },
+        { <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Recommend a restaurant for dinner tonight.&quot;</span> },
+      ],
+    },
+    threadB
+  );
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Assistant (new thread):&quot;</span>, result.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+}
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>What&#39;s happening, step by step:</strong></p>
+<ol>
+<li>We compile the graph with <strong>both</strong> a checkpointer (short-term, per-thread) and a store (long-term, per-user).</li>
+<li>In thread A, after the user states a preference, we manually <code class="inline-code">store.put()</code> a distilled fact. Note this is a deliberate, explicit write — LangGraph does not automatically decide &quot;this sentence is worth remembering forever.&quot; That judgment call belongs to your application logic (often: a small LLM call whose only job is &quot;extract durable facts from this message, if any&quot;).</li>
+<li>In thread B — a brand-new, otherwise-empty conversation — we <code class="inline-code">store.get()</code> the fact back and manually splice it into the prompt as a system message before the model answers.</li>
+</ol>
+<p><strong>Expected result:</strong> Despite <code class="inline-code">convo-B</code> having zero shared checkpoint history with <code class="inline-code">convo-A</code>, the restaurant recommendation should respect the vegetarian preference — proof that long-term memory crossed the thread boundary that short-term memory cannot.</p>
+<p><strong>Verify:</strong> Try omitting the <code class="inline-code">store.get()</code>/system-message injection step and re-running thread B&#39;s question. The recommendation should no longer reliably account for the dietary preference, confirming the memory genuinely came from the Store, not from the model &quot;guessing.&quot;</p>
+<p><strong>Common mistakes:</strong></p>
+<ol>
+<li>Confusing <code class="inline-code">store.put(namespace, key, value)</code>&#39;s argument order — <code class="inline-code">namespace</code> always comes first, then <code class="inline-code">key</code>, then <code class="inline-code">value</code>. Swapping <code class="inline-code">key</code> and <code class="inline-code">namespace</code> silently creates a malformed namespace rather than throwing an obvious error.</li>
+<li>Expecting the Store to automatically inject memories into prompts. It does not — <em>you</em> decide what to retrieve and <em>you</em> decide how to splice it into the message list. The Store is a database, not a magic context-injector.</li>
+<li>Using a single global namespace (e.g., just <code class="inline-code">[&quot;memories&quot;]</code>) for all users — this works fine in a single-user demo but is a serious bug in any multi-user app, since <code class="inline-code">search()</code> and <code class="inline-code">get()</code> would then mix everyone&#39;s data together.</li>
+</ol>
+<h3 id="lab-72--semantic-search-over-memories"><a class="heading-anchor" href="#lab-72--semantic-search-over-memories" aria-hidden="true">#</a>Lab 7.2 — Semantic search over memories</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> embeddings = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIEmbeddings</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;text-embedding-3-small&quot;</span> });
+
+<span class="hljs-comment">// Configuring InMemoryStore with an embeddings function enables real semantic search,</span>
+<span class="hljs-comment">// not just exact key lookups.</span>
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InMemoryStore</span>({
+  <span class="hljs-attr">index</span>: {
+    embeddings,
+    <span class="hljs-attr">dims</span>: <span class="hljs-number">1536</span>, <span class="hljs-comment">// matches text-embedding-3-small&#x27;s output dimension</span>
+  },
+});
+
+<span class="hljs-keyword">const</span> ns = [<span class="hljs-string">&quot;users&quot;</span>, <span class="hljs-string">&quot;shaad-id-123&quot;</span>];
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(ns, <span class="hljs-string">&quot;fact-1&quot;</span>, { <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;User is vegetarian and avoids dairy.&quot;</span> });
+  <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(ns, <span class="hljs-string">&quot;fact-2&quot;</span>, { <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;User&#x27;s preferred programming language is TypeScript.&quot;</span> });
+  <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(ns, <span class="hljs-string">&quot;fact-3&quot;</span>, { <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;User lives in Delhi, India and works remotely.&quot;</span> });
+  <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(ns, <span class="hljs-string">&quot;fact-4&quot;</span>, { <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;User dislikes overly long meetings, prefers async updates.&quot;</span> });
+
+  <span class="hljs-comment">// Notice: the query below shares almost no exact words with &quot;fact-1&quot;&#x27;s text,</span>
+  <span class="hljs-comment">// yet semantic search should still surface it as the top (or near-top) match.</span>
+  <span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">search</span>(ns, { <span class="hljs-attr">query</span>: <span class="hljs-string">&quot;What food restrictions does the user have?&quot;</span> });
+  results.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(r.<span class="hljs-property">key</span>, <span class="hljs-string">&quot;→&quot;</span>, r.<span class="hljs-property">value</span>.<span class="hljs-property">text</span>, <span class="hljs-string">&quot;(score:&quot;</span>, r.<span class="hljs-property">score</span>, <span class="hljs-string">&quot;)&quot;</span>));
+}
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>Expected result:</strong> <code class="inline-code">fact-1</code> (vegetarian/dairy) should rank highest, despite the query never using the words &quot;vegetarian&quot; or &quot;dairy.&quot; This is the core value of semantic search: retrieval by <strong>meaning</strong>, not by literal keyword overlap.</p>
+<p><strong>Verify:</strong> Run a second query, <code class="inline-code">&quot;Does the user enjoy back-to-back calls?&quot;</code>, and confirm <code class="inline-code">fact-4</code> ranks highest this time, even though &quot;back-to-back calls&quot; and &quot;long meetings&quot; share almost no vocabulary.</p>
+<p><strong>Common mistake:</strong> Forgetting that <code class="inline-code">dims</code> must match your embeddings model&#39;s actual output size. <code class="inline-code">text-embedding-3-small</code> is 1536; if you switch models (e.g., to <code class="inline-code">text-embedding-3-large</code>, which is 3072), forgetting to update <code class="inline-code">dims</code> causes a dimension-mismatch error at write time, not at query time, so test this immediately after switching embedding models rather than discovering it later.</p>
+<h3 id="lab-73--namespacing-memories-per-simulated-user"><a class="heading-anchor" href="#lab-73--namespacing-memories-per-simulated-user" aria-hidden="true">#</a>Lab 7.3 — Namespacing memories per simulated user</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">rememberFact</span>(<span class="hljs-params"><span class="hljs-attr">store</span>: <span class="hljs-title class_">InMemoryStore</span>, <span class="hljs-attr">userId</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">key</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>([<span class="hljs-string">&quot;users&quot;</span>, userId], key, { text });
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">recallFacts</span>(<span class="hljs-params"><span class="hljs-attr">store</span>: <span class="hljs-title class_">InMemoryStore</span>, <span class="hljs-attr">userId</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">return</span> store.<span class="hljs-title function_">search</span>([<span class="hljs-string">&quot;users&quot;</span>, userId], { query });
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">rememberFact</span>(store, <span class="hljs-string">&quot;user-shaad&quot;</span>, <span class="hljs-string">&quot;role&quot;</span>, <span class="hljs-string">&quot;Works as a professional resume writer.&quot;</span>);
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">rememberFact</span>(store, <span class="hljs-string">&quot;user-alex&quot;</span>, <span class="hljs-string">&quot;role&quot;</span>, <span class="hljs-string">&quot;Works as a backend engineer.&quot;</span>);
+
+  <span class="hljs-keyword">const</span> shaadResults = <span class="hljs-keyword">await</span> <span class="hljs-title function_">recallFacts</span>(store, <span class="hljs-string">&quot;user-shaad&quot;</span>, <span class="hljs-string">&quot;What does this person do for work?&quot;</span>);
+  <span class="hljs-keyword">const</span> alexResults = <span class="hljs-keyword">await</span> <span class="hljs-title function_">recallFacts</span>(store, <span class="hljs-string">&quot;user-alex&quot;</span>, <span class="hljs-string">&quot;What does this person do for work?&quot;</span>);
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Shaad&#x27;s memories:&quot;</span>, shaadResults.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> r.<span class="hljs-property">value</span>.<span class="hljs-property">text</span>));
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Alex&#x27;s memories:&quot;</span>, alexResults.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> r.<span class="hljs-property">value</span>.<span class="hljs-property">text</span>));
+}
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>Expected result:</strong> Each call only ever returns that specific user&#39;s data — never a mix. <strong>Verify</strong> by deliberately calling <code class="inline-code">recallFacts(store, &quot;user-shaad&quot;, ...)</code> and confirming Alex&#39;s &quot;backend engineer&quot; fact never appears, no matter how broad the query.</p>
+<h3 id="lab-74--a-node-that-writes-to-long-term-memory-automatically"><a class="heading-anchor" href="#lab-74--a-node-that-writes-to-long-term-memory-automatically" aria-hidden="true">#</a>Lab 7.4 — A node that writes to long-term memory automatically</h3>
+<p>This lab combines everything: a node that, after every turn, asks a small LLM call &quot;did the user just state a durable preference?&quot; and writes it to the Store if so — without you manually calling <code class="inline-code">store.put()</code> from outside the graph like in Lab 7.1.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span>, <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+<span class="hljs-keyword">const</span> extractorModel = model.<span class="hljs-title function_">withStructuredOutput</span>(
+  z.<span class="hljs-title function_">object</span>({
+    <span class="hljs-attr">has_durable_fact</span>: z.<span class="hljs-title function_">boolean</span>(),
+    <span class="hljs-attr">fact_text</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">optional</span>(),
+  })
+);
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InMemoryStore</span>();
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">USER_ID</span> = <span class="hljs-string">&quot;shaad-id-123&quot;</span>;
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">callModel</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+
+<span class="hljs-comment">// Runs AFTER the agent replies. Looks at the latest human message and decides</span>
+<span class="hljs-comment">// whether it contains a fact worth remembering forever.</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">memoryWriter</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> lastHuman = [...state.<span class="hljs-property">messages</span>].<span class="hljs-title function_">reverse</span>().<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> m.<span class="hljs-property">getType</span>?.() === <span class="hljs-string">&quot;human&quot;</span>);
+  <span class="hljs-keyword">if</span> (!lastHuman) <span class="hljs-keyword">return</span> {};
+
+  <span class="hljs-keyword">const</span> extraction = <span class="hljs-keyword">await</span> extractorModel.<span class="hljs-title function_">invoke</span>([
+    { <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;Decide if this message states a durable personal fact or preference worth remembering long-term. If yes, extract it as a clean standalone sentence.&quot;</span> },
+    { <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-title class_">String</span>(lastHuman.<span class="hljs-property">content</span>) },
+  ]);
+
+  <span class="hljs-keyword">if</span> (extraction.<span class="hljs-property">has_durable_fact</span> &amp;&amp; extraction.<span class="hljs-property">fact_text</span>) {
+    <span class="hljs-keyword">const</span> key = <span class="hljs-string">`fact-<span class="hljs-subst">${<span class="hljs-built_in">Date</span>.now()}</span>`</span>; <span class="hljs-comment">// simple unique key per memory</span>
+    <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>([<span class="hljs-string">&quot;users&quot;</span>, <span class="hljs-variable constant_">USER_ID</span>], key, { <span class="hljs-attr">text</span>: extraction.<span class="hljs-property">fact_text</span> });
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;[memory] stored:&quot;</span>, extraction.<span class="hljs-property">fact_text</span>);
+  }
+  <span class="hljs-keyword">return</span> {};
+}
+
+<span class="hljs-keyword">const</span> app = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, callModel)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;memory_writer&quot;</span>, memoryWriter)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-string">&quot;memory_writer&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;memory_writer&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>(), store });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;auto-memory-demo&quot;</span> } };
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;By the way, I&#x27;m allergic to peanuts.&quot;</span> }] }, config);
+  <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-string">&quot;What&#x27;s the weather like today?&quot;</span> }] }, config); <span class="hljs-comment">// should NOT trigger a memory write</span>
+
+  <span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">search</span>([<span class="hljs-string">&quot;users&quot;</span>, <span class="hljs-variable constant_">USER_ID</span>], { <span class="hljs-attr">query</span>: <span class="hljs-string">&quot;allergies&quot;</span> });
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Stored memories matching &#x27;allergies&#x27;:&quot;</span>, results.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> r.<span class="hljs-property">value</span>.<span class="hljs-property">text</span>));
+}
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>What each piece means:</strong></p>
+<ul>
+<li><code class="inline-code">withStructuredOutput(zodSchema)</code> forces the model to respond in a guaranteed JSON shape matching your Zod schema, instead of free-text — critical for reliably parsing &quot;should I remember this or not?&quot; decisions in code.</li>
+<li>The <code class="inline-code">memory_writer</code> node runs as a <strong>separate graph step</strong> after <code class="inline-code">agent</code>, demonstrating that a single turn can do more than one thing: generate a reply <em>and</em> maintain long-term memory, as two distinct, individually testable nodes.</li>
+<li>The weather question deliberately should <strong>not</strong> produce a memory write, proving the extraction step is discriminating, not blindly storing everything.</li>
+</ul>
+<p><strong>Expected result:</strong> Console shows <code class="inline-code">[memory] stored: User is allergic to peanuts.</code> (or similar wording) after the first turn, and nothing after the second. The final search confirms the peanut allergy fact is retrievable.</p>
+<p><strong>Common mistakes:</strong></p>
+<ol>
+<li>Using the full <code class="inline-code">model</code> instead of <code class="inline-code">extractorModel</code> and trying to manually parse free text for &quot;yes/no&quot; — this is fragile compared to <code class="inline-code">withStructuredOutput</code>, which guarantees a parseable shape.</li>
+<li>Forgetting to filter for the <em>human</em> message specifically — if you accidentally extract from the AI&#39;s own reply, you risk the model &quot;remembering&quot; things it said rather than things the user said.</li>
+<li>Calling the extraction model on every single message in a long thread (not just the latest one) — this wastes API calls and money. Only look at what&#39;s new since the last memory-write pass.</li>
+</ol>
+<hr>
+<h2 id="73-knowledge-check--unit-7"><a class="heading-anchor" href="#73-knowledge-check--unit-7" aria-hidden="true">#</a>7.3 Knowledge Check — Unit 7</h2>
+<h3 id="summary-2"><a class="heading-anchor" href="#summary-2" aria-hidden="true">#</a>Summary</h3>
+<p><strong>Short-term memory</strong> (Checkpointer) is automatic, thread-scoped, and stores raw conversation history. <strong>Long-term memory</strong> (Store) is explicit, cross-thread, and stores distilled facts you choose to persist via <code class="inline-code">put()</code>/<code class="inline-code">get()</code>/<code class="inline-code">search()</code>, scoped by a <code class="inline-code">namespace</code> array (commonly per-user). <code class="inline-code">InMemoryStore</code> configured with an embeddings function supports true semantic search, retrieving relevant memories by meaning rather than exact wording. A common, powerful pattern is a dedicated node that runs an extraction LLM call after each turn to decide what&#39;s worth writing to long-term memory.</p>
+<h3 id="key-takeaways-2"><a class="heading-anchor" href="#key-takeaways-2" aria-hidden="true">#</a>Key Takeaways</h3>
+<ul>
+<li>Checkpointer = automatic, per-thread, everything. Store = manual, per-user (or however you namespace it), curated.</li>
+<li><code class="inline-code">namespace</code> is your access-control boundary — design it deliberately per user/org to prevent data leakage.</li>
+<li><code class="inline-code">search()</code> requires an embeddings-configured store to do real semantic matching; without one, it falls back to simpler matching.</li>
+<li>Not every message deserves to become a long-term memory — deciding what&#39;s &quot;durable&quot; is an explicit design and extraction step you own.</li>
+</ul>
+<h3 id="practice-questions-2"><a class="heading-anchor" href="#practice-questions-2" aria-hidden="true">#</a>Practice Questions</h3>
+<ol>
+<li>What&#39;s the fundamental scope difference between a Checkpointer and a Store?</li>
+<li>Why might <code class="inline-code">store.search(&quot;food restrictions&quot;)</code> correctly return a memory about &quot;vegetarian and avoids dairy&quot; even though none of those words match exactly?</li>
+<li>What real-world problem occurs if you use the same namespace, like <code class="inline-code">[&quot;memories&quot;]</code>, for every user in a multi-tenant app?</li>
+<li>Why use <code class="inline-code">withStructuredOutput</code> in the memory-writer node instead of asking the model to &quot;answer yes or no in plain text&quot;?</li>
+</ol>
+<h3 id="exercises-2"><a class="heading-anchor" href="#exercises-2" aria-hidden="true">#</a>Exercises</h3>
+<ol>
+<li>Extend Lab 7.4 so the memory-writer node also assigns a category (<code class="inline-code">&quot;dietary&quot;</code>, <code class="inline-code">&quot;professional&quot;</code>, <code class="inline-code">&quot;preference&quot;</code>, <code class="inline-code">&quot;other&quot;</code>) to each stored fact, and store that category as part of the value object.</li>
+<li>Build a <code class="inline-code">forgetFact(userId, key)</code> helper using the Store&#39;s <code class="inline-code">delete()</code> method (check your installed version&#39;s API; some versions expose <code class="inline-code">store.delete(namespace, key)</code>), and write a small test proving a deleted memory no longer appears in <code class="inline-code">search()</code> results.</li>
+</ol>
+<h3 id="mini-project-2"><a class="heading-anchor" href="#mini-project-2" aria-hidden="true">#</a>Mini Project</h3>
+<p>Build a <strong>&quot;Returning Customer&quot; demo</strong>: simulate three separate conversation sessions (three different <code class="inline-code">thread_id</code>s) spread across a fictional week. In session 1, the user mentions their budget and travel dates for a trip. In session 2 (new thread), the assistant should recall those facts via the Store without the user repeating them, and the user adds a new preference (e.g., &quot;I prefer window seats&quot;). In session 3 (another new thread), confirm <strong>all</strong> accumulated facts from sessions 1 and 2 are available and correctly influence a final recommendation.</p>
+<hr>
+<h1 id="phase-3-final-project--persistent-research-companion"><a class="heading-anchor" href="#phase-3-final-project--persistent-research-companion" aria-hidden="true">#</a>Phase 3 Final Project — Persistent Research Companion</h1>
+<h2 id="project-brief"><a class="heading-anchor" href="#project-brief" aria-hidden="true">#</a>Project Brief</h2>
+<p>You will build a command-line <strong>&quot;Research Companion&quot;</strong> assistant that combines everything from Units 5, 6, and 7 into one coherent application:</p>
+<ul>
+<li><strong>Checkpointer (Unit 5):</strong> Every research session is a <code class="inline-code">thread_id</code>. Conversations persist across CLI restarts using <code class="inline-code">SqliteSaver</code>.</li>
+<li><strong>Time travel (Unit 6):</strong> A <code class="inline-code">/regenerate</code> command lets the user discard the assistant&#39;s last answer and get a fresh one, implemented as a fork from the checkpoint right before that answer.</li>
+<li><strong>Long-term memory (Unit 7):</strong> The assistant remembers the user&#39;s research interests and preferred answer style (e.g., &quot;always include sources,&quot; &quot;keep answers under 100 words&quot;) across <strong>all</strong> sessions, not just the current thread, via the Store.</li>
+</ul>
+<p>This mirrors a real production pattern: thread-scoped conversation + cross-session personalization + the ability to undo/redo, all running on Node/TS with OpenAI as the model provider.</p>
+<h2 id="architecture-diagram-described"><a class="heading-anchor" href="#architecture-diagram-described" aria-hidden="true">#</a>Architecture Diagram (described)</h2>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">START
+  ↓
+[load_long_term_context]  ← reads relevant memories from Store, injects as system message
+  ↓
+[agent]  ← ChatOpenAI call, sees short-term thread history + injected long-term context
+  ↓
+[memory_writer]  ← extracts any new durable facts from this turn, writes to Store
+  ↓
+END</code></pre></div>
+<h2 id="full-implementation"><a class="heading-anchor" href="#full-implementation" aria-hidden="true">#</a>Full Implementation</h2>
+<h3 id="step-1--install-everything-needed"><a class="heading-anchor" href="#step-1--install-everything-needed" aria-hidden="true">#</a>Step 1 — Install everything needed</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph @langchain/openai @langchain/core zod
+npm install @langchain/langgraph-checkpoint-sqlite better-sqlite3
+npm install readline</code></pre></div>
+<h3 id="step-2--srcfinal-projectts"><a class="heading-anchor" href="#step-2--srcfinal-projectts" aria-hidden="true">#</a>Step 2 — <code class="inline-code">src/final-project.ts</code></h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> readline <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;readline&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">MessagesAnnotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">SqliteSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-sqlite&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span>, <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+
+<span class="hljs-comment">// ---------- Setup: model, embeddings, persistence ----------</span>
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.3</span> });
+<span class="hljs-keyword">const</span> extractorModel = model.<span class="hljs-title function_">withStructuredOutput</span>(
+  z.<span class="hljs-title function_">object</span>({
+    <span class="hljs-attr">has_durable_fact</span>: z.<span class="hljs-title function_">boolean</span>(),
+    <span class="hljs-attr">fact_text</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">optional</span>(),
+  })
+);
+<span class="hljs-keyword">const</span> embeddings = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIEmbeddings</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;text-embedding-3-small&quot;</span> });
+
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-title class_">SqliteSaver</span>.<span class="hljs-title function_">fromConnString</span>(<span class="hljs-string">&quot;./research_companion.sqlite&quot;</span>);
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InMemoryStore</span>({ <span class="hljs-attr">index</span>: { embeddings, <span class="hljs-attr">dims</span>: <span class="hljs-number">1536</span> } });
+
+<span class="hljs-comment">// In a real app, USER_ID would come from auth. Hardcoded for this CLI demo.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">USER_ID</span> = <span class="hljs-string">&quot;shaad-id-123&quot;</span>;
+<span class="hljs-keyword">const</span> userNamespace = [<span class="hljs-string">&quot;users&quot;</span>, <span class="hljs-variable constant_">USER_ID</span>];
+
+<span class="hljs-comment">// ---------- Node 1: load relevant long-term memories before answering ----------</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadLongTermContext</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> lastHuman = [...state.<span class="hljs-property">messages</span>].<span class="hljs-title function_">reverse</span>().<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> m.<span class="hljs-property">getType</span>?.() === <span class="hljs-string">&quot;human&quot;</span>);
+  <span class="hljs-keyword">if</span> (!lastHuman) <span class="hljs-keyword">return</span> {};
+
+  <span class="hljs-keyword">const</span> memories = <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">search</span>(userNamespace, { <span class="hljs-attr">query</span>: <span class="hljs-title class_">String</span>(lastHuman.<span class="hljs-property">content</span>) });
+  <span class="hljs-keyword">if</span> (memories.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> {};
+
+  <span class="hljs-keyword">const</span> contextText = memories.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> <span class="hljs-string">`- <span class="hljs-subst">${m.value.text}</span>`</span>).<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n&quot;</span>);
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">messages</span>: [
+      {
+        <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;system&quot;</span>,
+        <span class="hljs-attr">content</span>: <span class="hljs-string">`Relevant known facts about this user from past sessions:\n<span class="hljs-subst">${contextText}</span>`</span>,
+      },
+    ],
+  };
+}
+
+<span class="hljs-comment">// ---------- Node 2: the actual answering agent ----------</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">agent</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(state.<span class="hljs-property">messages</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">messages</span>: [response] };
+}
+
+<span class="hljs-comment">// ---------- Node 3: extract and persist any new durable facts ----------</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">memoryWriter</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">MessagesAnnotation</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> lastHuman = [...state.<span class="hljs-property">messages</span>].<span class="hljs-title function_">reverse</span>().<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> m.<span class="hljs-property">getType</span>?.() === <span class="hljs-string">&quot;human&quot;</span>);
+  <span class="hljs-keyword">if</span> (!lastHuman) <span class="hljs-keyword">return</span> {};
+
+  <span class="hljs-keyword">const</span> extraction = <span class="hljs-keyword">await</span> extractorModel.<span class="hljs-title function_">invoke</span>([
+    {
+      <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;system&quot;</span>,
+      <span class="hljs-attr">content</span>:
+        <span class="hljs-string">&quot;Decide if this message states a durable research interest or answer-style preference &quot;</span> +
+        <span class="hljs-string">&quot;worth remembering across future sessions (e.g. topics of interest, formatting preferences). &quot;</span> +
+        <span class="hljs-string">&quot;If yes, extract it as a clean standalone sentence.&quot;</span>,
+    },
+    { <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: <span class="hljs-title class_">String</span>(lastHuman.<span class="hljs-property">content</span>) },
+  ]);
+
+  <span class="hljs-keyword">if</span> (extraction.<span class="hljs-property">has_durable_fact</span> &amp;&amp; extraction.<span class="hljs-property">fact_text</span>) {
+    <span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>(userNamespace, <span class="hljs-string">`fact-<span class="hljs-subst">${<span class="hljs-built_in">Date</span>.now()}</span>`</span>, { <span class="hljs-attr">text</span>: extraction.<span class="hljs-property">fact_text</span> });
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`\n[memory saved] <span class="hljs-subst">${extraction.fact_text}</span>`</span>);
+  }
+  <span class="hljs-keyword">return</span> {};
+}
+
+<span class="hljs-keyword">const</span> builder = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">MessagesAnnotation</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;load_long_term_context&quot;</span>, loadLongTermContext)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;agent&quot;</span>, agent)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;memory_writer&quot;</span>, memoryWriter)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;load_long_term_context&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;load_long_term_context&quot;</span>, <span class="hljs-string">&quot;agent&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;agent&quot;</span>, <span class="hljs-string">&quot;memory_writer&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;memory_writer&quot;</span>, <span class="hljs-variable constant_">END</span>);
+
+<span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>({ checkpointer, store });
+
+<span class="hljs-comment">// ---------- Time travel: regenerate the last answer ----------</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">regenerateLastAnswer</span>(<span class="hljs-params"><span class="hljs-attr">threadId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: threadId } };
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">history</span>: <span class="hljs-built_in">any</span>[] = [];
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> snap <span class="hljs-keyword">of</span> app.<span class="hljs-title function_">getStateHistory</span>(config)) history.<span class="hljs-title function_">push</span>(snap);
+
+  <span class="hljs-comment">// Find the most recent checkpoint whose `next` step was &quot;agent&quot; (i.e., right</span>
+  <span class="hljs-comment">// before the model generated its last reply) by scanning for the snapshot</span>
+  <span class="hljs-comment">// immediately preceding the latest AI message.</span>
+  <span class="hljs-keyword">const</span> target = history.<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">snap, i</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> msgs = snap.<span class="hljs-property">values</span>.<span class="hljs-property">messages</span> ?? [];
+    <span class="hljs-keyword">const</span> lastMsg = msgs.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">return</span> lastMsg?.<span class="hljs-property">getType</span>?.() === <span class="hljs-string">&quot;human&quot;</span>; <span class="hljs-comment">// last message is human = agent hasn&#x27;t replied yet at this point</span>
+  });
+
+  <span class="hljs-keyword">if</span> (!target) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Nothing to regenerate yet.&quot;</span>);
+    <span class="hljs-keyword">return</span>;
+  }
+
+  <span class="hljs-keyword">const</span> replayConfig = {
+    <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: threadId, <span class="hljs-attr">checkpoint_id</span>: target.<span class="hljs-property">config</span>.<span class="hljs-property">configurable</span>?.<span class="hljs-property">checkpoint_id</span> },
+  };
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(<span class="hljs-literal">null</span>, replayConfig);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n[Regenerated] Assistant:&quot;</span>, result.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+}
+
+<span class="hljs-comment">// ---------- CLI loop ----------</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> threadId = process.<span class="hljs-property">argv</span>[<span class="hljs-number">2</span>] ?? <span class="hljs-string">&quot;default-session&quot;</span>;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Research Companion — session &quot;<span class="hljs-subst">${threadId}</span>&quot;`</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Type a message, or &#x27;/regenerate&#x27; to redo the last answer, or &#x27;exit&#x27; to quit.\n&quot;</span>);
+
+  <span class="hljs-keyword">const</span> rl = readline.<span class="hljs-title function_">createInterface</span>({ <span class="hljs-attr">input</span>: process.<span class="hljs-property">stdin</span>, <span class="hljs-attr">output</span>: process.<span class="hljs-property">stdout</span> });
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: threadId } };
+
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">ask</span> = (<span class="hljs-params"></span>) =&gt;
+    rl.<span class="hljs-title function_">question</span>(<span class="hljs-string">&quot;&gt; &quot;</span>, <span class="hljs-title function_">async</span> (input) =&gt; {
+      <span class="hljs-keyword">if</span> (input.<span class="hljs-title function_">trim</span>() === <span class="hljs-string">&quot;exit&quot;</span>) {
+        rl.<span class="hljs-title function_">close</span>();
+        <span class="hljs-keyword">return</span>;
+      }
+      <span class="hljs-keyword">if</span> (input.<span class="hljs-title function_">trim</span>() === <span class="hljs-string">&quot;/regenerate&quot;</span>) {
+        <span class="hljs-keyword">await</span> <span class="hljs-title function_">regenerateLastAnswer</span>(threadId);
+        <span class="hljs-title function_">ask</span>();
+        <span class="hljs-keyword">return</span>;
+      }
+
+      <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [{ <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-attr">content</span>: input }] }, config);
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Assistant:&quot;</span>, result.<span class="hljs-property">messages</span>.<span class="hljs-title function_">at</span>(-<span class="hljs-number">1</span>)?.<span class="hljs-property">content</span>);
+      <span class="hljs-title function_">ask</span>();
+    });
+
+  <span class="hljs-title function_">ask</span>();
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<h3 id="step-3--run-it-across-multiple-sessions-to-test-everything"><a class="heading-anchor" href="#step-3--run-it-across-multiple-sessions-to-test-everything" aria-hidden="true">#</a>Step 3 — Run it across multiple sessions to test everything</h3>
+<p><strong>Session 1 (new terminal run):</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/final-project.ts research-session-1</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">&gt; I&#x27;m researching the history of submarine cables. Please always include at least one source in your answers.
+Assistant: ...
+[memory saved] User is researching the history of submarine cables and wants sources included in answers.
+&gt; exit</code></pre></div>
+<p><strong>Session 2 — a completely new thread, simulating a different day:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx ts-node src/final-project.ts research-session-2</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">&gt; What&#x27;s a good starting topic for me today?
+Assistant: Given your interest in submarine cable history... [includes a source, unprompted]</code></pre></div>
+<p><strong>Verify:</strong> the assistant references the submarine-cable topic and includes a source <strong>without you repeating that preference</strong>, proving cross-session long-term memory worked (Unit 7).</p>
+<p><strong>Now test time travel:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">&gt; Tell me a fact about the first transatlantic cable.
+Assistant: &lt;some answer&gt;
+&gt; /regenerate
+[Regenerated] Assistant: &lt;a different answer to the same underlying question&gt;</code></pre></div>
+<p><strong>Verify:</strong> the regenerated answer is generated fresh (not identical wording), and <code class="inline-code">getStateHistory</code> for this thread now shows two divergent branches from the same shared checkpoint (Unit 6).</p>
+<p><strong>Now test durability:</strong>
+Close the terminal entirely, then re-run with <code class="inline-code">research-session-2</code> again. Ask a follow-up referencing earlier context — it should still work because <code class="inline-code">SqliteSaver</code> persisted it to <code class="inline-code">research_companion.sqlite</code> on disk (Unit 5).</p>
+<h2 id="stretch-goals-optional-push-your-understanding-further"><a class="heading-anchor" href="#stretch-goals-optional-push-your-understanding-further" aria-hidden="true">#</a>Stretch Goals (optional, push your understanding further)</h2>
+<ol>
+<li>Add a <code class="inline-code">/forget &lt;topic&gt;</code> command that searches the Store for matching memories and deletes them.</li>
+<li>Add a second extraction pass that categorizes memories (<code class="inline-code">interest</code>, <code class="inline-code">style_preference</code>, <code class="inline-code">fact</code>) and only injects <code class="inline-code">style_preference</code> memories into <em>every</em> turn&#39;s system message, while <code class="inline-code">interest</code> memories are only injected when <code class="inline-code">search()</code> finds them relevant to the current question.</li>
+<li>Swap <code class="inline-code">SqliteSaver</code> for <code class="inline-code">PostgresSaver</code> and confirm the exact same application code works unmodified against a real Postgres database — this is the &quot;swap one line for production&quot; guarantee from Unit 5 in action.</li>
+</ol>
+<hr>
+<h1 id="phase-3-master-cheat-sheet"><a class="heading-anchor" href="#phase-3-master-cheat-sheet" aria-hidden="true">#</a>Phase 3 Master Cheat Sheet</h1>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span></div><pre><code class="hljs language-ts"><span class="hljs-comment">// ── Checkpointer setup ──────────────────────────────────────</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MemorySaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;                          <span class="hljs-comment">// dev only, RAM</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">SqliteSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-sqlite&quot;</span>;        <span class="hljs-comment">// disk-durable</span>
+<span class="hljs-comment">// import { PostgresSaver } from &quot;@langchain/langgraph-checkpoint-postgres&quot;; // production</span>
+
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>();
+<span class="hljs-comment">// const checkpointer = SqliteSaver.fromConnString(&quot;./db.sqlite&quot;);</span>
+
+<span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>({ checkpointer });
+<span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;some-id&quot;</span> } }; <span class="hljs-comment">// REQUIRED on every call</span>
+
+<span class="hljs-comment">// ── State inspection &amp; time travel ──────────────────────────</span>
+<span class="hljs-keyword">await</span> app.<span class="hljs-title function_">getState</span>(config);                       <span class="hljs-comment">// current snapshot</span>
+<span class="hljs-keyword">await</span> app.<span class="hljs-title function_">updateState</span>(config, { ...values });      <span class="hljs-comment">// manual patch, goes through reducers</span>
+<span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> snap <span class="hljs-keyword">of</span> app.<span class="hljs-title function_">getStateHistory</span>(config)) { <span class="hljs-comment">/* full timeline, newest first */</span> }
+
+<span class="hljs-keyword">const</span> replayConfig = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;x&quot;</span>, <span class="hljs-attr">checkpoint_id</span>: <span class="hljs-string">&quot;...&quot;</span> } };
+<span class="hljs-keyword">await</span> app.<span class="hljs-title function_">invoke</span>(<span class="hljs-literal">null</span>, replayConfig);              <span class="hljs-comment">// resume/fork from a past moment</span>
+
+<span class="hljs-comment">// ── Long-term memory (Store) ────────────────────────────────</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">InMemoryStore</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InMemoryStore</span>({ <span class="hljs-attr">index</span>: { embeddings, <span class="hljs-attr">dims</span>: <span class="hljs-number">1536</span> } }); <span class="hljs-comment">// semantic search</span>
+
+<span class="hljs-keyword">await</span> store.<span class="hljs-title function_">put</span>([<span class="hljs-string">&quot;users&quot;</span>, userId], <span class="hljs-string">&quot;key&quot;</span>, { <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;...&quot;</span> });
+<span class="hljs-keyword">await</span> store.<span class="hljs-title function_">get</span>([<span class="hljs-string">&quot;users&quot;</span>, userId], <span class="hljs-string">&quot;key&quot;</span>);
+<span class="hljs-keyword">await</span> store.<span class="hljs-title function_">search</span>([<span class="hljs-string">&quot;users&quot;</span>, userId], { <span class="hljs-attr">query</span>: <span class="hljs-string">&quot;natural language question&quot;</span> });
+
+<span class="hljs-keyword">const</span> app = builder.<span class="hljs-title function_">compile</span>({ checkpointer, store }); <span class="hljs-comment">// both can be combined freely</span></code></pre></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>One-line reminder</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Checkpointer</td>
+<td>Auto-saves full state, per <code class="inline-code">thread_id</code>, after every super-step</td>
+</tr>
+<tr>
+<td><code class="inline-code">thread_id</code></td>
+<td>Isolates one conversation from another on the same graph</td>
+</tr>
+<tr>
+<td><code class="inline-code">getState</code></td>
+<td>Read the latest snapshot</td>
+</tr>
+<tr>
+<td><code class="inline-code">updateState</code></td>
+<td>Manually patch state (through reducers), creates a new checkpoint</td>
+</tr>
+<tr>
+<td><code class="inline-code">getStateHistory</code></td>
+<td>Walk every checkpoint ever saved for a thread</td>
+</tr>
+<tr>
+<td>Time travel</td>
+<td>Invoke with an old <code class="inline-code">checkpoint_id</code> → forks a new branch, never deletes the old one</td>
+</tr>
+<tr>
+<td>Store</td>
+<td>Manual, cross-thread, curated long-term memory, namespaced (usually per-user)</td>
+</tr>
+<tr>
+<td><code class="inline-code">search()</code></td>
+<td>Semantic retrieval by meaning, requires an embeddings-configured store</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>You&#39;ve completed Phase 3.</strong> You can now build agents that remember conversations durably, inspect and rewind their own history, and carry meaningful facts about a user across completely separate sessions — the three pillars every production-grade conversational system needs before tackling Phase 4 (Human-in-the-Loop), which builds directly on the <code class="inline-code">interrupt()</code>/checkpoint mechanics you just learned.</p>
+
+<div class="doc-footer">Converted from Markdown &middot; 2026-06-27</div>
+</main>
+</body>
+</html>

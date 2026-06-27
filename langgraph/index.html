@@ -929,8 +929,26 @@
 
       const phaseNum = phaseMap[unit.phase];
       if (phaseNum) {
+        const htmlPath = `phases/phase_${phaseNum}.html`;
         const pdfPath = `phases/phase_${phaseNum}.pdf`;
-        window.open(pdfPath, '_blank');
+
+        // Check if the HTML file exists
+        fetch(htmlPath)
+          .then(res => {
+            if (res.ok) {
+              window.open(htmlPath, '_blank');
+            } else {
+              window.open(pdfPath, '_blank');
+            }
+          })
+          .catch(() => {
+            // Fallback for local files / CORS issues on file:// protocol
+            if (window.location.protocol === 'file:') {
+              window.open(htmlPath, '_blank');
+            } else {
+              window.open(pdfPath, '_blank');
+            }
+          });
       } else {
         console.error('Unknown phase:', unit.phase);
       }

@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 4 — Human-in-the-Loop (HITL)</title>
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+.theme-toggle .icon-moon{display:none;}
+[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
+[data-theme="dark"] .theme-toggle .icon-moon{display:inline;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="
+  (function(){
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+  })();
+">
+  <span class="icon-sun">&#9728;&#65039;</span>
+  <span class="icon-moon">&#127769;</span>
+</button>
+<header class="top-banner">
+  <h1>Phase 4 — Human-in-the-Loop (HITL)</h1>
+  <div class="subtitle">Generated reference guide</div>
+</header>
+<main class="article-wrap">
+<h1 id="phase-4--human-in-the-loop-hitl"><a class="heading-anchor" href="#phase-4--human-in-the-loop-hitl" aria-hidden="true">#</a>Phase 4 — Human-in-the-Loop (HITL)</h1>
+<blockquote class="quote-plain"><p><strong>Roadmap position:</strong> Unit 08 — &quot;Human-in-the-loop&quot;
+<strong>Phase:</strong> 4 of 6 (Foundation → Control Flow → Persistence &amp; Memory → <strong>Human-in-the-Loop</strong> → Multi-Agent &amp; Tools → Production)
+<strong>Difficulty:</strong> Advanced (but explained from zero assumed knowledge)
+<strong>Stack used in every lab:</strong> Node.js + TypeScript, <code class="inline-code">@langchain/langgraph</code>, <code class="inline-code">@langchain/openai</code> (OpenAI API for any LLM calls)</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ol>
+<li><a href="#0-before-you-start--setup">Before You Start — Setup</a></li>
+<li><a href="#1-why-human-in-the-loop-exists">Why Human-in-the-Loop Exists</a></li>
+<li><a href="#2-topic-1--interrupt-dynamically-pausing-execution">Topic 1 — <code class="inline-code">interrupt()</code>: Dynamically Pausing Execution</a></li>
+<li><a href="#3-topic-2--static-breakpoints-interruptbefore--interruptafter">Topic 2 — Static Breakpoints: <code class="inline-code">interruptBefore</code> / <code class="inline-code">interruptAfter</code></a></li>
+<li><a href="#4-topic-3--resuming-a-paused-graph-with-commandresume">Topic 3 — Resuming a Paused Graph with <code class="inline-code">Command(resume=...)</code></a></li>
+<li><a href="#5-topic-4--approval-workflows-for-sensitive-actions">Topic 4 — Approval Workflows for Sensitive Actions</a></li>
+<li><a href="#6-topic-5--editing-state-during-a-pause-human-correction">Topic 5 — Editing State During a Pause (Human Correction)</a></li>
+<li><a href="#7-phase-4-final-project--human-approved-email-assistant">Phase 4 Final Project — Human-Approved Email Assistant</a></li>
+<li><a href="#8-phase-4-master-knowledge-check">Phase 4 Master Knowledge Check</a></li>
+<li><a href="#9-glossary-phase-4-terms">Glossary (Phase 4 terms)</a></li>
+</ol>
+<hr>
+<h2 id="0-before-you-start--setup"><a class="heading-anchor" href="#0-before-you-start--setup" aria-hidden="true">#</a>0. Before You Start — Setup</h2>
+<p>Before touching any HITL concepts, get a working project. We&#39;ll reuse this exact project for every lab in this phase — just add new files.</p>
+<h3 id="why-this-setup-matters"><a class="heading-anchor" href="#why-this-setup-matters" aria-hidden="true">#</a>Why this setup matters</h3>
+<p>LangGraph&#39;s human-in-the-loop features <strong>only work with a checkpointer</strong>. A checkpointer is the component that saves the graph&#39;s state to memory/disk every time it pauses, so that when a human responds hours (or days) later, the graph can pick up exactly where it left off. If you skip this, &quot;pausing&quot; is impossible — the graph would just lose all its progress. Think of a checkpointer like a <strong>video game&#39;s save file</strong>: without it, &quot;pause and resume later&quot; doesn&#39;t exist, you&#39;d have to start the level over.</p>
+<h3 id="step-by-step-setup"><a class="heading-anchor" href="#step-by-step-setup" aria-hidden="true">#</a>Step-by-step setup</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> langgraph-hitl-phase4
+<span class="hljs-built_in">cd</span> langgraph-hitl-phase4
+npm init -y
+npm install @langchain/langgraph @langchain/openai @langchain/core zod dotenv
+npm install -D typescript tsx @types/node
+npx tsc --init</code></pre></div>
+<p><strong>What each command does:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+<th>Why we need it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">npm init -y</code></td>
+<td>Creates a <code class="inline-code">package.json</code> with default values</td>
+<td>Every Node project needs this manifest file to track dependencies</td>
+</tr>
+<tr>
+<td><code class="inline-code">npm install @langchain/langgraph</code></td>
+<td>Installs LangGraph.js — the graph engine</td>
+<td>This is the core library this entire roadmap is about</td>
+</tr>
+<tr>
+<td><code class="inline-code">npm install @langchain/openai</code></td>
+<td>Installs the OpenAI chat-model wrapper</td>
+<td>Lets us call GPT models from inside graph nodes</td>
+</tr>
+<tr>
+<td><code class="inline-code">npm install @langchain/core</code></td>
+<td>Installs shared LangChain primitives (messages, runnables)</td>
+<td><code class="inline-code">@langchain/langgraph</code> depends on these types</td>
+</tr>
+<tr>
+<td><code class="inline-code">npm install zod</code></td>
+<td>Installs a schema-validation library</td>
+<td>We use it to define our graph&#39;s <code class="inline-code">State</code> shape with type safety</td>
+</tr>
+<tr>
+<td><code class="inline-code">npm install -D typescript tsx @types/node</code></td>
+<td>Dev tools: TypeScript compiler, a TS runner, Node type definitions</td>
+<td><code class="inline-code">tsx</code> lets us run <code class="inline-code">.ts</code> files directly (<code class="inline-code">npx tsx file.ts</code>) without a manual build step</td>
+</tr>
+<tr>
+<td><code class="inline-code">npx tsc --init</code></td>
+<td>Generates a <code class="inline-code">tsconfig.json</code></td>
+<td>Configures how TypeScript compiles your code</td>
+</tr>
+</tbody>
+</table></div>
+<p>Open the generated <code class="inline-code">tsconfig.json</code> and make sure these are set (edit if needed):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;compilerOptions&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;target&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ES2020&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;module&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;commonjs&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;esModuleInterop&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;strict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;skipLibCheck&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<p>Create a <code class="inline-code">.env</code> file in your project root:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">OPENAI_API_KEY=sk-your-key-here</code></pre></div>
+<p><strong>Why a <code class="inline-code">.env</code> file?</strong> Hardcoding API keys directly in your code is a security risk — if you ever push your code to GitHub, your key is exposed to the world (and bots will find and abuse it within minutes). <code class="inline-code">.env</code> keeps secrets out of your source code. Add <code class="inline-code">.env</code> to a <code class="inline-code">.gitignore</code> file too.</p>
+<h3 id="verify-your-setup-works"><a class="heading-anchor" href="#verify-your-setup-works" aria-hidden="true">#</a>Verify your setup works</h3>
+<p>Create <code class="inline-code">00-check.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(<span class="hljs-string">&quot;Say &#x27;setup works&#x27; and nothing else.&quot;</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(response.<span class="hljs-property">content</span>);
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p>Run it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx 00-check.ts</code></pre></div>
+<p><strong>Expected result:</strong> the console prints <code class="inline-code">setup works</code> (or very close to it).</p>
+<p><strong>How to verify it worked:</strong> If you see text output and no red error stack trace, your API key and packages are correctly wired up. If you get an <code class="inline-code">Incorrect API key</code> error, double check your <code class="inline-code">.env</code> file has no extra spaces or quotes around the key.</p>
+<p><strong>Common beginner mistakes:</strong></p>
+<ul>
+<li>Forgetting <code class="inline-code">import &quot;dotenv/config&quot;;</code> at the very top — without it, <code class="inline-code">process.env.OPENAI_API_KEY</code> is <code class="inline-code">undefined</code> and you&#39;ll get an auth error.</li>
+<li>Putting the <code class="inline-code">.env</code> file in the wrong folder (it must sit next to <code class="inline-code">package.json</code>, in the project root).</li>
+<li>Using a model name that doesn&#39;t exist (typos like <code class="inline-code">gpt-4o-min</code>) — you&#39;ll get a &quot;model not found&quot; error.</li>
+</ul>
+<hr>
+<h2 id="1-why-human-in-the-loop-exists"><a class="heading-anchor" href="#1-why-human-in-the-loop-exists" aria-hidden="true">#</a>1. Why Human-in-the-Loop Exists</h2>
+<h3 id="the-problem-in-plain-english"><a class="heading-anchor" href="#the-problem-in-plain-english" aria-hidden="true">#</a>The problem in plain English</h3>
+<p>Imagine you built an AI assistant that can read your email and <strong>send replies on your behalf</strong>. Fully autonomous AI agents are powerful, but they&#39;re also a little scary in high-stakes situations:</p>
+<ul>
+<li>What if the agent misreads the situation and sends an angry email to your boss?</li>
+<li>What if it&#39;s about to charge a customer&#39;s credit card the wrong amount?</li>
+<li>What if it&#39;s going to delete a database table?</li>
+</ul>
+<p>In all of these cases, you don&#39;t want to ban the AI from ever doing these actions — you just want a <strong>human to glance at it first</strong> and say &quot;yes, go ahead&quot; or &quot;no, stop.&quot; That&#39;s the entire idea behind Human-in-the-Loop (HITL).</p>
+<h3 id="analogy-the-bank-wire-transfer"><a class="heading-anchor" href="#analogy-the-bank-wire-transfer" aria-hidden="true">#</a>Analogy: the bank wire transfer</h3>
+<p>Think about how banks handle large wire transfers. A teller (or an automated system) prepares the transfer, but for amounts over a certain threshold, the transaction doesn&#39;t go through automatically — it sits in a queue waiting for a manager&#39;s approval. The system isn&#39;t redesigned from scratch; it simply <strong>pauses at one specific point</strong> and waits for a signal before continuing. That pause-and-resume mechanic is exactly what LangGraph&#39;s HITL tools give you, except the &quot;teller&quot; is your AI agent and the &quot;manager&quot; is you (or any human reviewer) using your application&#39;s UI.</p>
+<h3 id="why-earlier-phases-couldn39t-do-this"><a class="heading-anchor" href="#why-earlier-phases-couldn39t-do-this" aria-hidden="true">#</a>Why earlier phases couldn&#39;t do this</h3>
+<p>In Phase 1–2 you learned that a LangGraph graph is just a state machine made of nodes and edges, and in Phase 3 you learned about checkpointers, which let a graph save and reload its state. HITL is the natural next step: <strong>because the graph&#39;s state can already be saved to a checkpointer, LangGraph can literally stop running mid-graph, return control to your application, and wait — possibly for milliseconds, possibly for days — until a human provides an answer.</strong> Nothing is lost while it waits, because the checkpointer remembers everything.</p>
+<h3 id="the-four-building-blocks-of-hitl-what-this-phase-teaches"><a class="heading-anchor" href="#the-four-building-blocks-of-hitl-what-this-phase-teaches" aria-hidden="true">#</a>The four building blocks of HITL (what this phase teaches)</h3>
+<ol>
+<li><strong><code class="inline-code">interrupt()</code></strong> — a function you call <em>inside a node</em> to dynamically pause and ask the human something, then continue from that exact point once they answer.</li>
+<li><strong>Static breakpoints (<code class="inline-code">interruptBefore</code> / <code class="inline-code">interruptAfter</code>)</strong> — a way to tell the <em>compiled graph</em> &quot;always pause right before/after this specific node,&quot; without writing any pause logic inside the node itself.</li>
+<li><strong><code class="inline-code">Command(resume=...)</code></strong> — how your application tells a paused graph &quot;here&#39;s the human&#39;s answer, please continue.&quot;</li>
+<li><strong>Approval workflows</strong> — the real-world <em>pattern</em> that combines the three tools above: pause before a risky action, show it to a human, let them approve/reject/edit, then continue or reroute accordingly.</li>
+</ol>
+<h3 id="when-to-use-hitl-and-when-not-to"><a class="heading-anchor" href="#when-to-use-hitl-and-when-not-to" aria-hidden="true">#</a>When to use HITL (and when not to)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Use HITL when...</th>
+<th>Don&#39;t bother with HITL when...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The action is irreversible (sending money, sending an email, deleting data)</td>
+<td>The action is read-only (searching, summarizing, answering a question)</td>
+</tr>
+<tr>
+<td>The AI&#39;s confidence/accuracy is genuinely uncertain</td>
+<td>The task is simple, low-stakes, and well-tested</td>
+</tr>
+<tr>
+<td>Regulations or company policy require sign-off</td>
+<td>You&#39;re prototyping and want fast iteration without manual clicks</td>
+</tr>
+<tr>
+<td>You want a human to fill in missing information the AI can&#39;t know</td>
+<td>All the information is already available in state</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="a-mental-model-to-hold-onto"><a class="heading-anchor" href="#a-mental-model-to-hold-onto" aria-hidden="true">#</a>A mental model to hold onto</h3>
+<p>Picture your graph as a hallway with rooms (nodes) connected by doors (edges). Normally, execution walks from room to room without stopping. HITL adds a <strong>locked door</strong> at certain points. The graph can knock — that&#39;s <code class="inline-code">interrupt()</code> — and it will wait at that locked door, doing absolutely nothing, burning no compute, until someone on the other side (your application, controlled by a human) turns the key and says &quot;continue&quot; — that&#39;s <code class="inline-code">Command(resume=...)</code>. Crucially, <strong>the graph doesn&#39;t restart from room one when it resumes</strong> — it picks up in the exact same room, with all the furniture (state) exactly as it was left.</p>
+<h3 id="knowledge-check--section-1"><a class="heading-anchor" href="#knowledge-check--section-1" aria-hidden="true">#</a>Knowledge Check — Section 1</h3>
+<p><strong>Summary:</strong> Human-in-the-loop lets a LangGraph graph pause at a deliberate point, hand control back to a human for review or input, and then resume from that exact spot — all powered by the checkpointer&#39;s ability to persist state. It exists because fully autonomous agents are risky for irreversible or high-stakes actions.</p>
+<p><strong>Key takeaways:</strong></p>
+<ul>
+<li>HITL requires a checkpointer — no checkpointer, no pausing.</li>
+<li>The graph genuinely freezes; no computation happens while paused.</li>
+<li>There are two ways to pause: dynamically from inside a node (<code class="inline-code">interrupt()</code>) or statically when compiling the graph (<code class="inline-code">interruptBefore</code>/<code class="inline-code">interruptAfter</code>).</li>
+<li>Resuming is done by passing <code class="inline-code">Command(resume=...)</code> back into the graph.</li>
+</ul>
+<p><strong>Practice questions:</strong></p>
+<ol>
+<li>Why can&#39;t a graph pause without a checkpointer attached?</li>
+<li>Give two real-world examples (outside of email/banking) where you&#39;d want a human approval step before an AI agent acts.</li>
+<li>What&#39;s the difference between an action being &quot;irreversible&quot; vs. &quot;low-stakes&quot; — why does that distinction matter for deciding whether to add HITL?</li>
+</ol>
+<p><strong>Mini exercise:</strong> Write (in plain English, no code yet) a one-paragraph description of an agent you&#39;d want to build that needs a human approval step, identifying exactly <em>which single action</em> in that agent&#39;s flow should be gated by HITL.</p>
+<hr>
+<h2 id="2-topic-1--interrupt-dynamically-pausing-execution"><a class="heading-anchor" href="#2-topic-1--interrupt-dynamically-pausing-execution" aria-hidden="true">#</a>2. Topic 1 — <code class="inline-code">interrupt()</code>: Dynamically Pausing Execution</h2>
+<h3 id="21-concept-and-theory"><a class="heading-anchor" href="#21-concept-and-theory" aria-hidden="true">#</a>2.1 Concept and Theory</h3>
+<h4 id="what-is-interrupt"><a class="heading-anchor" href="#what-is-interrupt" aria-hidden="true">#</a>What is <code class="inline-code">interrupt()</code>?</h4>
+<p><code class="inline-code">interrupt()</code> is a function you import from <code class="inline-code">@langchain/langgraph</code> and call <strong>from inside a node&#39;s function body</strong>. When a node calls <code class="inline-code">interrupt(someValue)</code>, three things happen:</p>
+<ol>
+<li>The graph <strong>immediately stops executing</strong> at that exact line.</li>
+<li>The <code class="inline-code">someValue</code> you passed in is sent back out to whatever code called <code class="inline-code">graph.invoke()</code> (your application), packaged inside the result as an &quot;interrupt&quot; payload.</li>
+<li>The graph&#39;s state — everything computed so far, including the partial work of the <em>current</em> node, up to that point — is preserved by the checkpointer.</li>
+</ol>
+<p>Your application can now show that payload to a human (e.g., render it as a question in a chat UI), wait for their response, and then call the graph again with <code class="inline-code">Command(resume=humanAnswer)</code>. The node that called <code class="inline-code">interrupt()</code> will <strong>resume from that exact line</strong>, and <code class="inline-code">interrupt()</code> itself will behave as if it <em>returned</em> the human&#39;s answer — like waking up from a pause with the answer already in hand.</p>
+<h4 id="why-does-it-exist-conceptually"><a class="heading-anchor" href="#why-does-it-exist-conceptually" aria-hidden="true">#</a>Why does it exist, conceptually?</h4>
+<p>Without <code class="inline-code">interrupt()</code>, the only way to &quot;ask a question mid-task&quot; would be to manually split your node into two separate nodes and write custom routing logic to simulate a pause. <code class="inline-code">interrupt()</code> removes that complexity: you can write a node as one continuous piece of logic — &quot;do step A, ask a question, do step B based on the answer&quot; — and let LangGraph handle the pausing/resuming machinery for you under the hood.</p>
+<h4 id="analogy-a-phone-call-placed-on-hold"><a class="heading-anchor" href="#analogy-a-phone-call-placed-on-hold" aria-hidden="true">#</a>Analogy: a phone call placed on hold</h4>
+<p>Imagine you&#39;re a customer service rep mid-conversation with a customer, and you need to check something with your manager. You don&#39;t hang up the phone and call the customer back from scratch — you say &quot;please hold,&quot; walk over, ask your manager, walk back, and continue the <em>same</em> conversation exactly where you left off. <code class="inline-code">interrupt()</code> is &quot;please hold.&quot; The conversation&#39;s context (the call) isn&#39;t lost; it&#39;s just paused.</p>
+<h4 id="how-it-actually-works-under-the-hood"><a class="heading-anchor" href="#how-it-actually-works-under-the-hood" aria-hidden="true">#</a>How it actually works under the hood</h4>
+<p>This is the part beginners often find confusing, so let&#39;s slow down:</p>
+<ul>
+<li>When <code class="inline-code">interrupt()</code> is called, LangGraph throws a special internal signal that <strong>unwinds execution out of the node and out of the graph</strong>, back to your <code class="inline-code">invoke()</code>/<code class="inline-code">stream()</code> call.</li>
+<li>Your call to <code class="inline-code">graph.invoke()</code> returns <em>without error</em> — instead, the special interrupt information is attached to the result (or surfaced via the <code class="inline-code">stream()</code> event of type <code class="inline-code">&quot;__interrupt__&quot;</code>).</li>
+<li>When you later call <code class="inline-code">graph.invoke(new Command({ resume: humanAnswer }), config)</code> using the <strong>same <code class="inline-code">thread_id</code></strong>, LangGraph reloads the last checkpoint and <strong>re-runs the node from the beginning of its function body</strong> — but this time, every <code class="inline-code">interrupt()</code> call that has <em>already been answered</em> (in execution order) immediately returns the previously-given answer instead of pausing again.</li>
+</ul>
+<p>This last point is critical: <strong>the node function re-runs from the top</strong>, not from the middle. This means any code in the node <em>before</em> the <code class="inline-code">interrupt()</code> call will run again on resume. For most nodes this is harmless (e.g., re-reading values from state), but it means you should avoid doing things with real side effects (like calling a paid API or sending an email) <em>before</em> an <code class="inline-code">interrupt()</code> call inside the same node — because that side effect would happen again every time the node re-runs after a resume. If you need multiple interrupts in one node, or side effects mixed with interrupts, structure your node carefully (we&#39;ll practice this in the lab).</p>
+<h4 id="syntax"><a class="heading-anchor" href="#syntax" aria-hidden="true">#</a>Syntax</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> { interrupt } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">myNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> humanAnswer = <span class="hljs-title function_">interrupt</span>({
+    <span class="hljs-attr">question</span>: <span class="hljs-string">&quot;Should I proceed with this refund?&quot;</span>,
+    <span class="hljs-attr">amount</span>: state.<span class="hljs-property">refundAmount</span>,
+  });
+  <span class="hljs-comment">// Execution PAUSES here until resumed.</span>
+  <span class="hljs-comment">// Once resumed, `humanAnswer` holds whatever value was passed to Command({ resume: ... })</span>
+
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">approved</span>: humanAnswer === <span class="hljs-string">&quot;yes&quot;</span> };
+}</code></pre></div>
+<h4 id="when-to-use-interrupt-vs-static-breakpoints-preview"><a class="heading-anchor" href="#when-to-use-interrupt-vs-static-breakpoints-preview" aria-hidden="true">#</a>When to use <code class="inline-code">interrupt()</code> vs. static breakpoints (preview)</h4>
+<p><code class="inline-code">interrupt()</code> is best when the <em>decision to pause</em> depends on <strong>runtime data</strong> — e.g., &quot;only pause if the refund amount is over $500.&quot; Static breakpoints (next topic) are best when you always want to pause at the same fixed point in the graph, regardless of the data. We&#39;ll compare them directly in Topic 2.</p>
+<h3 id="22-practical-lab--asking-a-clarifying-question-mid-execution"><a class="heading-anchor" href="#22-practical-lab--asking-a-clarifying-question-mid-execution" aria-hidden="true">#</a>2.2 Practical Lab — Asking a Clarifying Question Mid-Execution</h3>
+<p><strong>Goal:</strong> Build a tiny LangGraph agent that drafts a birthday message, but if it doesn&#39;t know the recipient&#39;s name, it pauses and asks you for it using <code class="inline-code">interrupt()</code> — then finishes the draft once you reply.</p>
+<h4 id="step-1--define-the-state-schema"><a class="heading-anchor" href="#step-1--define-the-state-schema" aria-hidden="true">#</a>Step 1 — Define the state schema</h4>
+<p>Create a file called <code class="inline-code">01-interrupt-basic.ts</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span>, interrupt, <span class="hljs-title class_">Command</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">State</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">recipientName</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_old, next</span>) =&gt;</span> next,
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span>,
+  }),
+  <span class="hljs-attr">draft</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_old, next</span>) =&gt;</span> next,
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span>,
+  }),
+});</code></pre></div>
+<p><strong>Why we do this:</strong> This is the same <code class="inline-code">Annotation.Root</code> pattern from Phase 1 (State &amp; Schema). We need two fields: <code class="inline-code">recipientName</code> (which might start empty and get filled in by a human) and <code class="inline-code">draft</code> (the message we generate). The <code class="inline-code">reducer: (_old, next) =&gt; next</code> simply means &quot;always overwrite with the newest value&quot; — the simplest possible reducer, appropriate here because we&#39;re not merging lists or accumulating anything.</p>
+<h4 id="step-2--write-the-node-that-conditionally-interrupts"><a class="heading-anchor" href="#step-2--write-the-node-that-conditionally-interrupts" aria-hidden="true">#</a>Step 2 — Write the node that conditionally interrupts</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.7</span> });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">draftMessageNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">let</span> name = state.<span class="hljs-property">recipientName</span>;
+
+  <span class="hljs-keyword">if</span> (!name) {
+    <span class="hljs-comment">// No name in state yet — pause and ask a human for it.</span>
+    name = <span class="hljs-title function_">interrupt</span>({
+      <span class="hljs-attr">question</span>: <span class="hljs-string">&quot;I don&#x27;t have the recipient&#x27;s name. Who is this birthday message for?&quot;</span>,
+    });
+  }
+
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(
+    <span class="hljs-string">`Write a short, warm, two-sentence birthday message for someone named <span class="hljs-subst">${name}</span>.`</span>
+  );
+
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">recipientName</span>: name, <span class="hljs-attr">draft</span>: response.<span class="hljs-property">content</span> <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span> };
+}</code></pre></div>
+<p><strong>Why we do this:</strong></p>
+<ul>
+<li>We check <code class="inline-code">if (!name)</code> — this means the <code class="inline-code">interrupt()</code> call only happens <em>conditionally</em>, based on runtime state. That&#39;s the key advantage of <code class="inline-code">interrupt()</code> over a static breakpoint: the pause is <em>data-driven</em>.</li>
+<li>We call <code class="inline-code">interrupt({ question: ... })</code> with an object, not a plain string. <strong>Why an object?</strong> In real applications you&#39;ll often want to pass structured information (a question, plus context, plus maybe a list of valid options) so your UI can render something richer than plain text. The payload can be any JSON-serializable value.</li>
+<li>Notice the LLM call (<code class="inline-code">model.invoke(...)</code>) happens <em>after</em> the <code class="inline-code">interrupt()</code>. This is intentional — remember from the theory section that code <em>before</em> an <code class="inline-code">interrupt()</code> re-runs on resume. By putting the (somewhat costly) LLM call <em>after</em> the interrupt, we avoid calling the LLM twice.</li>
+</ul>
+<h4 id="step-3--build-and-compile-the-graph-with-a-checkpointer"><a class="heading-anchor" href="#step-3--build-and-compile-the-graph-with-a-checkpointer" aria-hidden="true">#</a>Step 3 — Build and compile the graph with a checkpointer</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;draftMessage&quot;</span>, draftMessageNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;draftMessage&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;draftMessage&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>() });</code></pre></div>
+<p><strong>Why we do this:</strong> Just like in Phase 3, the <code class="inline-code">checkpointer</code> is <strong>mandatory</strong> for any HITL feature to work. <code class="inline-code">MemorySaver</code> is fine for this local lab (it&#39;s in-memory and disappears when the script ends); in Topic 5 and the Final Project we&#39;ll discuss when you&#39;d want a persistent one like <code class="inline-code">SqliteSaver</code> instead.</p>
+<h4 id="step-4--run-it-and-observe-the-interrupt"><a class="heading-anchor" href="#step-4--run-it-and-observe-the-interrupt" aria-hidden="true">#</a>Step 4 — Run it and observe the interrupt</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;birthday-1&quot;</span> } };
+
+  <span class="hljs-comment">// First call — no name provided, so it should interrupt.</span>
+  <span class="hljs-keyword">const</span> result1 = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">recipientName</span>: <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-attr">draft</span>: <span class="hljs-string">&quot;&quot;</span> }, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;--- First invoke result ---&quot;</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(result1, <span class="hljs-literal">null</span>, <span class="hljs-number">2</span>));
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p>Run it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx 01-interrupt-basic.ts</code></pre></div>
+<p><strong>Expected result:</strong> Instead of a normal <code class="inline-code">{ recipientName, draft }</code> object, you should see a result that includes an <code class="inline-code">__interrupt__</code> field, something like:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;recipientName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;draft&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;__interrupt__&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;value&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;question&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;I don&#x27;t have the recipient&#x27;s name. Who is this birthday message for?&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;resumable&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+      ...
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<p><strong>How to verify it worked:</strong> The presence of <code class="inline-code">__interrupt__</code> in the output, and the absence of a generated <code class="inline-code">draft</code>, confirms execution paused exactly where we expected — <em>before</em> the LLM call ran. If you instead see a filled-in <code class="inline-code">draft</code>, something is wrong (check that your <code class="inline-code">if (!name)</code> block runs before the <code class="inline-code">model.invoke()</code> call).</p>
+<h4 id="step-5--resume-the-graph-with-the-human39s-answer"><a class="heading-anchor" href="#step-5--resume-the-graph-with-the-human39s-answer" aria-hidden="true">#</a>Step 5 — Resume the graph with the human&#39;s answer</h4>
+<p>Add this to the bottom of <code class="inline-code">main()</code>, replacing the single <code class="inline-code">console.log</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;birthday-1&quot;</span> } };
+
+  <span class="hljs-keyword">const</span> result1 = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">recipientName</span>: <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-attr">draft</span>: <span class="hljs-string">&quot;&quot;</span> }, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;--- Paused. Interrupt payload: ---&quot;</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(result1.<span class="hljs-property">__interrupt__</span>);
+
+  <span class="hljs-comment">// Simulate a human answering the question.</span>
+  <span class="hljs-keyword">const</span> result2 = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: <span class="hljs-string">&quot;Priya&quot;</span> }), config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;--- Resumed. Final result: ---&quot;</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(result2);
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p>Run it again:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx 01-interrupt-basic.ts</code></pre></div>
+<p><strong>Expected result:</strong> The second log should print something like:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;recipientName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Priya&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;draft&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Happy birthday, Priya! Wishing you a day as wonderful as you are.&quot;</span> <span class="hljs-punctuation">}</span></code></pre></div>
+<p><strong>Why this works:</strong> Because we reused the <strong>same <code class="inline-code">thread_id</code> (&quot;birthday-1&quot;)</strong> for both calls, LangGraph loaded the exact checkpoint where execution paused, re-ran <code class="inline-code">draftMessageNode</code> from the top, hit the <code class="inline-code">interrupt()</code> call again — but this time it immediately returned <code class="inline-code">&quot;Priya&quot;</code> (the value we passed via <code class="inline-code">Command({ resume: &quot;Priya&quot; })</code>) instead of pausing again. Execution then continued normally into the LLM call.</p>
+<p><strong>Common beginner mistakes:</strong></p>
+<ul>
+<li><strong>Using a different <code class="inline-code">thread_id</code> on resume.</strong> If you change the <code class="inline-code">thread_id</code> between the two calls, LangGraph has no paused checkpoint to find, and it will start a brand-new run from scratch (and may interrupt again, or behave unexpectedly).</li>
+<li><strong>Forgetting to wrap the resume value in <code class="inline-code">Command({ resume: ... })</code>.</strong> Calling <code class="inline-code">graph.invoke(&quot;Priya&quot;, config)</code> directly does <em>not</em> resume a paused thread — it tries to start a <em>new</em> run using <code class="inline-code">&quot;Priya&quot;</code> as the initial state, which will likely throw a validation error since it doesn&#39;t match your schema.</li>
+<li><strong>Expecting <code class="inline-code">interrupt()</code> to &quot;return&quot; synchronously the first time.</strong> On the <em>first</em> run, <code class="inline-code">interrupt()</code> never returns at all — it throws control out of the function entirely. Beginners sometimes write code after <code class="inline-code">interrupt()</code> expecting it to run immediately and get confused when it doesn&#39;t (until they resume).</li>
+<li><strong>Calling the LLM before the interrupt and not noticing it&#39;s now called twice.</strong> If you swap the order in Step 2 (LLM call first, then <code class="inline-code">interrupt()</code>), the LLM call will silently run again on every resume — wasting API calls. Always think about what&#39;s <em>before</em> vs. <em>after</em> your <code class="inline-code">interrupt()</code> call.</li>
+</ul>
+<h3 id="23-knowledge-check--topic-1"><a class="heading-anchor" href="#23-knowledge-check--topic-1" aria-hidden="true">#</a>2.3 Knowledge Check — Topic 1</h3>
+<p><strong>Summary:</strong> <code class="inline-code">interrupt()</code> is a function called inside a node to dynamically pause graph execution, send a payload to your application, and later resume from that exact point using <code class="inline-code">Command({ resume: ... })</code>, with the node function re-running from its start on resume.</p>
+<p><strong>Key takeaways:</strong></p>
+<ul>
+<li><code class="inline-code">interrupt()</code> requires a checkpointer to be compiled into the graph.</li>
+<li>It pauses <em>conditionally</em>, based on logic you write — unlike static breakpoints.</li>
+<li>The node re-executes from the top on resume; only the <code class="inline-code">interrupt()</code> line itself &quot;remembers&quot; its answer.</li>
+<li>Side effects (LLM calls, API calls, sending data) should generally be placed <em>after</em> the <code class="inline-code">interrupt()</code> call to avoid duplicate execution.</li>
+<li>You must reuse the same <code class="inline-code">thread_id</code> for the pause and the resume to be linked.</li>
+</ul>
+<p><strong>Practice questions:</strong></p>
+<ol>
+<li>What value does <code class="inline-code">interrupt()</code> &quot;return&quot; the very first time it&#39;s called, before any resume happens?</li>
+<li>Why is it risky to place a paid API call <em>before</em> an <code class="inline-code">interrupt()</code> call within the same node?</li>
+<li>What happens if you call <code class="inline-code">graph.invoke()</code> with a new <code class="inline-code">thread_id</code> after a previous thread paused — does it resume the old one?</li>
+</ol>
+<p><strong>Exercise:</strong> Modify the lab so that <code class="inline-code">draftMessageNode</code> <em>also</em> asks (via a second <code class="inline-code">interrupt()</code>) whether the tone should be &quot;funny&quot; or &quot;heartfelt,&quot; and incorporates that into the prompt sent to the LLM. Make sure both interrupts happen <em>before</em> the LLM call.</p>
+<hr>
+<h2 id="3-topic-2--static-breakpoints-interruptbefore--interruptafter"><a class="heading-anchor" href="#3-topic-2--static-breakpoints-interruptbefore--interruptafter" aria-hidden="true">#</a>3. Topic 2 — Static Breakpoints: <code class="inline-code">interruptBefore</code> / <code class="inline-code">interruptAfter</code></h2>
+<h3 id="31-concept-and-theory"><a class="heading-anchor" href="#31-concept-and-theory" aria-hidden="true">#</a>3.1 Concept and Theory</h3>
+<h4 id="what-are-static-breakpoints"><a class="heading-anchor" href="#what-are-static-breakpoints" aria-hidden="true">#</a>What are static breakpoints?</h4>
+<p>Static breakpoints are a <em>compile-time</em> configuration that tells the graph: <strong>&quot;Always pause before (or after) this specific node runs, no matter what.&quot;</strong> Unlike <code class="inline-code">interrupt()</code>, there&#39;s no conditional logic involved and no code added inside the node itself — you simply list node names when calling <code class="inline-code">.compile()</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> graph = workflow.<span class="hljs-title function_">compile</span>({
+  <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>(),
+  <span class="hljs-attr">interruptBefore</span>: [<span class="hljs-string">&quot;sendEmail&quot;</span>],
+});</code></pre></div>
+<p>This means: every single time the graph is about to run the <code class="inline-code">sendEmail</code> node, it stops <em>unconditionally</em>, before that node executes at all, and waits for a resume signal.</p>
+<h4 id="why-does-this-exist-given-that-interrupt-already-exists"><a class="heading-anchor" href="#why-does-this-exist-given-that-interrupt-already-exists" aria-hidden="true">#</a>Why does this exist, given that <code class="inline-code">interrupt()</code> already exists?</h4>
+<p>They solve overlapping but distinct problems:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><code class="inline-code">interrupt()</code></th>
+<th><code class="inline-code">interruptBefore</code> / <code class="inline-code">interruptAfter</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Where defined</td>
+<td>Inside the node&#39;s code</td>
+<td>At <code class="inline-code">.compile()</code> time, outside the node</td>
+</tr>
+<tr>
+<td>Pause condition</td>
+<td>Conditional / dynamic (your <code class="inline-code">if</code> logic)</td>
+<td>Unconditional — always pauses at that node</td>
+</tr>
+<tr>
+<td>Payload sent to human</td>
+<td>Custom — whatever you pass into <code class="inline-code">interrupt(...)</code></td>
+<td>None automatically — you inspect <code class="inline-code">getState()</code> yourself</td>
+</tr>
+<tr>
+<td>Best for</td>
+<td>&quot;Ask a question only when needed,&quot; &quot;fill in missing info,&quot; multi-step Q&amp;A within one node</td>
+<td>&quot;Always require sign-off before this node,&quot; debugging, simple universal gates</td>
+</tr>
+<tr>
+<td>Node code complexity</td>
+<td>Slightly higher (you write the pause logic)</td>
+<td>Zero — the node doesn&#39;t know it&#39;s being paused around</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="analogy-airport-security-vs-a-doctor39s-judgment-call"><a class="heading-anchor" href="#analogy-airport-security-vs-a-doctor39s-judgment-call" aria-hidden="true">#</a>Analogy: airport security vs. a doctor&#39;s judgment call</h4>
+<p><code class="inline-code">interruptBefore</code> is like an <strong>airport security checkpoint</strong> — everyone, no exceptions, stops there and gets checked before boarding, regardless of who they are. <code class="inline-code">interrupt()</code> is like a <strong>doctor deciding mid-checkup</strong> whether to order extra tests — it depends on what they observe in <em>that specific patient</em>. Both are valid forms of &quot;pause and check,&quot; but one is a fixed rule applied universally, and the other is a judgment call baked into the process itself.</p>
+<h4 id="interruptbefore-vs-interruptafter"><a class="heading-anchor" href="#interruptbefore-vs-interruptafter" aria-hidden="true">#</a><code class="inline-code">interruptBefore</code> vs. <code class="inline-code">interruptAfter</code></h4>
+<ul>
+<li><strong><code class="inline-code">interruptBefore: [&quot;nodeName&quot;]</code></strong> — pause <em>before</em> <code class="inline-code">nodeName</code> runs. Useful when you want to review/approve the <strong>inputs</strong> to a node before it acts (e.g., review the email draft before the &quot;send&quot; node fires).</li>
+<li><strong><code class="inline-code">interruptAfter: [&quot;nodeName&quot;]</code></strong> — pause <em>after</em> <code class="inline-code">nodeName</code> finishes, before moving to the next node. Useful when you want to review the <strong>output</strong> a node just produced (e.g., let a human read what the AI generated before it&#39;s shown to an end user).</li>
+</ul>
+<p>You can specify multiple node names in either array, and you can use both together.</p>
+<h4 id="how-resuming-works-with-static-breakpoints"><a class="heading-anchor" href="#how-resuming-works-with-static-breakpoints" aria-hidden="true">#</a>How resuming works with static breakpoints</h4>
+<p>It&#39;s almost identical to <code class="inline-code">interrupt()</code>: you call <code class="inline-code">graph.invoke(null, config)</code> (passing <code class="inline-code">null</code> as input, since there&#39;s nothing new to feed in — just &quot;continue&quot;), or <code class="inline-code">graph.invoke(new Command({ resume: someValue }), config)</code> if you want to also pass data in (more on this combination in Topic 4). The graph&#39;s checkpoint is loaded, and execution simply proceeds from wherever it stopped.</p>
+<h4 id="when-to-prefer-static-breakpoints"><a class="heading-anchor" href="#when-to-prefer-static-breakpoints" aria-hidden="true">#</a>When to prefer static breakpoints</h4>
+<p>Use static breakpoints when:</p>
+<ul>
+<li>The same node should <strong>always</strong> require approval, with no exceptions (e.g., any database deletion).</li>
+<li>You want a clean separation between business logic (in the node) and approval policy (at compile time) — useful when different deployments of the same graph need different approval rules (e.g., a &quot;strict&quot; compiled version with breakpoints vs. a &quot;fast&quot; compiled version without, both built from the same node functions).</li>
+<li>You&#39;re debugging and just want to pause and inspect state at a certain point, temporarily, without modifying node code.</li>
+</ul>
+<h3 id="32-practical-lab--approving-a-quotsend-emailquot-node"><a class="heading-anchor" href="#32-practical-lab--approving-a-quotsend-emailquot-node" aria-hidden="true">#</a>3.2 Practical Lab — Approving a &quot;Send Email&quot; Node</h3>
+<p><strong>Goal:</strong> Build a 2-node graph (<code class="inline-code">draftEmail</code> → <code class="inline-code">sendEmail</code>) where the graph <em>always</em> pauses before <code class="inline-code">sendEmail</code>, regardless of content, and only proceeds once a human manually approves it.</p>
+<h4 id="step-1--define-state-and-the-two-nodes"><a class="heading-anchor" href="#step-1--define-state-and-the-two-nodes" aria-hidden="true">#</a>Step 1 — Define state and the two nodes</h4>
+<p>Create <code class="inline-code">02-static-breakpoint.ts</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span>, <span class="hljs-title class_">Command</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">State</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">topic</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">emailDraft</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">sent</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">boolean</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">false</span> }),
+});
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.5</span> });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">draftEmailNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(
+    <span class="hljs-string">`Write a short professional email (max 4 sentences) about: <span class="hljs-subst">${state.topic}</span>`</span>
+  );
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">emailDraft</span>: response.<span class="hljs-property">content</span> <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span> };
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">sendEmailNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-comment">// In a real app, this is where you&#x27;d call an email-sending API (e.g. SendGrid, Resend).</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;📧 SENDING EMAIL NOW:\n&quot;</span>, state.<span class="hljs-property">emailDraft</span>);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">sent</span>: <span class="hljs-literal">true</span> };
+}</code></pre></div>
+<p><strong>Why we do this:</strong> Notice <code class="inline-code">sendEmailNode</code> contains <strong>zero pause logic</strong> — it doesn&#39;t know or care that a human is approving it. That&#39;s the whole point of static breakpoints: the node stays simple and focused purely on its job (sending the email), and the &quot;should we pause here&quot; decision lives entirely outside it, at compile time.</p>
+<h4 id="step-2--compile-with-interruptbefore"><a class="heading-anchor" href="#step-2--compile-with-interruptbefore" aria-hidden="true">#</a>Step 2 — Compile with <code class="inline-code">interruptBefore</code></h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;draftEmail&quot;</span>, draftEmailNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;sendEmail&quot;</span>, sendEmailNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;draftEmail&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;draftEmail&quot;</span>, <span class="hljs-string">&quot;sendEmail&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;sendEmail&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({
+    <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>(),
+    <span class="hljs-attr">interruptBefore</span>: [<span class="hljs-string">&quot;sendEmail&quot;</span>],
+  });</code></pre></div>
+<p><strong>Why we do this:</strong> <code class="inline-code">interruptBefore: [&quot;sendEmail&quot;]</code> tells LangGraph: &quot;after <code class="inline-code">draftEmail</code> finishes and you&#39;re about to enter <code class="inline-code">sendEmail</code>, stop and wait — every single time, for every thread.&quot;</p>
+<h4 id="step-3--run-inspect-and-approve-manually"><a class="heading-anchor" href="#step-3--run-inspect-and-approve-manually" aria-hidden="true">#</a>Step 3 — Run, inspect, and approve manually</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;email-thread-1&quot;</span> } };
+
+  <span class="hljs-keyword">const</span> result1 = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;rescheduling tomorrow&#x27;s 3pm meeting to 4pm&quot;</span> }, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;--- Graph paused. Current state: ---&quot;</span>);
+
+  <span class="hljs-keyword">const</span> snapshot = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Next node to run:&quot;</span>, snapshot.<span class="hljs-property">next</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Draft so far:&quot;</span>, snapshot.<span class="hljs-property">values</span>.<span class="hljs-property">emailDraft</span>);
+
+  <span class="hljs-comment">// --- Imagine a human reads the draft in a UI and clicks &quot;Approve&quot; ---</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n✅ Human approved. Resuming...\n&quot;</span>);
+
+  <span class="hljs-keyword">const</span> result2 = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(<span class="hljs-literal">null</span>, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;--- Final state: ---&quot;</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(result2);
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p><strong>Why we do this:</strong></p>
+<ul>
+<li><code class="inline-code">graph.getState(config)</code> is a tool from Phase 3 (State Management &amp; Time Travel) — we reuse it here to <strong>inspect exactly what&#39;s waiting to run next</strong> (<code class="inline-code">snapshot.next</code> will show <code class="inline-code">[&quot;sendEmail&quot;]</code>) and to read the draft a human would need to review.</li>
+<li>Calling <code class="inline-code">graph.invoke(null, config)</code> — passing <code class="inline-code">null</code> instead of new input or a <code class="inline-code">Command</code> — is the simplest way to say &quot;just continue from where you paused, nothing new to add.&quot;</li>
+</ul>
+<p>Run it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx 02-static-breakpoint.ts</code></pre></div>
+<p><strong>Expected result:</strong> You should see the state snapshot print <code class="inline-code">Next node to run: [ &#39;sendEmail&#39; ]</code> and the draft text, <em>then</em> — only after the &quot;Human approved&quot; log line — see <code class="inline-code">📧 SENDING EMAIL NOW:</code> followed by the email content.</p>
+<p><strong>How to verify it worked:</strong> Comment out the <code class="inline-code">graph.invoke(null, config)</code> line and re-run — the <code class="inline-code">📧 SENDING EMAIL NOW</code> line should <em>never</em> print, proving the node truly didn&#39;t execute until you explicitly resumed it.</p>
+<h4 id="step-4--simulate-a-rejection-don39t-resume-at-all"><a class="heading-anchor" href="#step-4--simulate-a-rejection-don39t-resume-at-all" aria-hidden="true">#</a>Step 4 — Simulate a rejection (don&#39;t resume at all)</h4>
+<p>Add a small variation to show how rejection works — simply <em>don&#39;t</em> call the resume <code class="inline-code">invoke</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">simulateRejection</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;email-thread-2&quot;</span> } };
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;firing an underperforming vendor&quot;</span> }, config);
+
+  <span class="hljs-keyword">const</span> snapshot = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Draft pending rejection:&quot;</span>, snapshot.<span class="hljs-property">values</span>.<span class="hljs-property">emailDraft</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;❌ Human rejected — the graph simply stays paused forever. No email is ever sent.&quot;</span>);
+  <span class="hljs-comment">// We never call graph.invoke(null, config) again for this thread_id.</span>
+}</code></pre></div>
+<p><strong>Why this matters:</strong> Rejection in the simplest case is just... not resuming. The thread stays paused indefinitely (or until you decide to delete/expire it). In Topic 4 we&#39;ll build a <em>smarter</em> rejection that reroutes the graph to revise the draft instead of just freezing it forever.</p>
+<p><strong>Common beginner mistakes:</strong></p>
+<ul>
+<li><strong>Forgetting that <code class="inline-code">interruptBefore</code> pauses <em>before</em> the node&#39;s side effects, not after.</strong> If you wanted to review the email <em>after</em> it claims to be sent (for logging purposes, say), you&#39;d use <code class="inline-code">interruptAfter</code> instead.</li>
+<li><strong>Calling <code class="inline-code">graph.invoke({...someNewInput}, config)</code> to resume</strong>, accidentally passing a full new input object instead of <code class="inline-code">null</code> or a <code class="inline-code">Command</code>. This can overwrite state fields unexpectedly depending on your reducers — always use <code class="inline-code">null</code> (or <code class="inline-code">Command</code>) for a &quot;no new input, just continue&quot; resume.</li>
+<li><strong>Listing a node name that doesn&#39;t exist</strong> in <code class="inline-code">interruptBefore</code>/<code class="inline-code">interruptAfter</code> (e.g., a typo) — LangGraph will not error loudly in all versions, so always double-check your node names match exactly what you used in <code class="inline-code">.addNode(...)</code>.</li>
+</ul>
+<h3 id="33-knowledge-check--topic-2"><a class="heading-anchor" href="#33-knowledge-check--topic-2" aria-hidden="true">#</a>3.3 Knowledge Check — Topic 2</h3>
+<p><strong>Summary:</strong> Static breakpoints (<code class="inline-code">interruptBefore</code> / <code class="inline-code">interruptAfter</code>) are configured once at <code class="inline-code">.compile()</code> time and unconditionally pause execution immediately before or after a named node, keeping node functions free of any pause-related code. Resuming is done with <code class="inline-code">graph.invoke(null, config)</code> (or a <code class="inline-code">Command</code>).</p>
+<p><strong>Key takeaways:</strong></p>
+<ul>
+<li><code class="inline-code">interruptBefore</code> pauses before the node&#39;s logic runs; <code class="inline-code">interruptAfter</code> pauses after it finishes.</li>
+<li>No code changes are needed inside the node itself.</li>
+<li><code class="inline-code">graph.getState(config)</code> lets you inspect what&#39;s paused and what will run next.</li>
+<li>&quot;Rejecting&quot; in the simplest form is just never resuming that thread.</li>
+</ul>
+<p><strong>Practice questions:</strong></p>
+<ol>
+<li>What&#39;s the key behavioral difference between <code class="inline-code">interrupt()</code> and <code class="inline-code">interruptBefore</code>?</li>
+<li>If you wanted to let a human review an AI-generated summary <em>after</em> it&#39;s created but <em>before</em> it&#39;s emailed in a separate downstream node, would you use <code class="inline-code">interruptBefore</code> or <code class="inline-code">interruptAfter</code>, and on which node?</li>
+<li>What does <code class="inline-code">snapshot.next</code> tell you, and why is it useful before deciding whether to resume?</li>
+</ol>
+<p><strong>Mini project:</strong> Extend the lab so there are <em>three</em> nodes: <code class="inline-code">draftEmail</code> → <code class="inline-code">sendEmail</code> → <code class="inline-code">logToCustomerRecord</code>. Add a breakpoint so a human reviews the draft before sending, <strong>and</strong> a second breakpoint so a human confirms before the action is logged to a permanent customer record. Print <code class="inline-code">snapshot.next</code> at each pause to confirm both gates work.</p>
+<hr>
+<h2 id="4-topic-3--resuming-a-paused-graph-with-commandresume"><a class="heading-anchor" href="#4-topic-3--resuming-a-paused-graph-with-commandresume" aria-hidden="true">#</a>4. Topic 3 — Resuming a Paused Graph with <code class="inline-code">Command(resume=...)</code></h2>
+<h3 id="41-concept-and-theory"><a class="heading-anchor" href="#41-concept-and-theory" aria-hidden="true">#</a>4.1 Concept and Theory</h3>
+<p>You&#39;ve already used <code class="inline-code">Command({ resume: ... })</code> in the labs above — now let&#39;s go deeper into exactly what it is and why it&#39;s designed the way it is.</p>
+<h4 id="what-is-command"><a class="heading-anchor" href="#what-is-command" aria-hidden="true">#</a>What is <code class="inline-code">Command</code>?</h4>
+<p><code class="inline-code">Command</code> is a special object (you met an earlier use of it in Phase 2, &quot;Command &amp; Send API,&quot; where it combined a state update <em>and</em> a routing decision). In the HITL context, <code class="inline-code">Command</code> is the vehicle for <strong>delivering a human&#39;s response back into a paused graph</strong>. It supports a few relevant fields:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+  <span class="hljs-attr">resume</span>: &lt;any value&gt;,   // the answer to give back to a waiting interrupt()
+  update: &lt;partial state&gt;, // optionally also update state directly (advanced; Topic 5)
+  goto: &lt;node name&gt;,       // optionally also force routing to a specific node (advanced)
+});</code></pre></div>
+<p>For basic HITL, you&#39;ll mostly use just <code class="inline-code">resume</code>.</p>
+<h4 id="why-not-just-call-graphinvokehumananswer-config-directly"><a class="heading-anchor" href="#why-not-just-call-graphinvokehumananswer-config-directly" aria-hidden="true">#</a>Why not just call <code class="inline-code">graph.invoke(humanAnswer, config)</code> directly?</h4>
+<p>Because <code class="inline-code">graph.invoke()</code>&#39;s first argument normally means <strong>&quot;new initial input to merge into state.&quot;</strong> If you passed a raw human answer like <code class="inline-code">&quot;yes&quot;</code> there, LangGraph would try to interpret <code class="inline-code">&quot;yes&quot;</code> as a full or partial <em>state object</em> matching your schema — which would either throw a validation error or silently merge nonsense into your state. Wrapping it in <code class="inline-code">Command({ resume: &quot;yes&quot; })</code> makes the intent unambiguous: <em>&quot;this is an answer to a pending <code class="inline-code">interrupt()</code>, not new top-level state.&quot;</em></p>
+<h4 id="what-quotresumequot-actually-delivers"><a class="heading-anchor" href="#what-quotresumequot-actually-delivers" aria-hidden="true">#</a>What &quot;resume&quot; actually delivers</h4>
+<p>When a node previously called <code class="inline-code">interrupt(payload)</code>, that call is, at the moment of interruption, like a frozen function call waiting for a return value. <code class="inline-code">Command({ resume: humanAnswer })</code> is what makes <code class="inline-code">interrupt(payload)</code> finally &quot;return&quot; — <code class="inline-code">humanAnswer</code> becomes the value that expression evaluates to, exactly as if you&#39;d written:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> humanAnswer = <span class="hljs-comment">/* magically becomes */</span> <span class="hljs-string">&quot;yes&quot;</span>;</code></pre></div>
+<h4 id="multiple-interrupts-in-one-node-and-resume-ordering"><a class="heading-anchor" href="#multiple-interrupts-in-one-node-and-resume-ordering" aria-hidden="true">#</a>Multiple interrupts in one node, and resume ordering</h4>
+<p>If a single node calls <code class="inline-code">interrupt()</code> more than once (you tried this in the Topic 1 exercise), LangGraph tracks them <strong>in the order they occur</strong> during that node&#39;s execution. Resume values are matched to interrupts in that same order on each subsequent run. This is why it&#39;s important to keep the logic <em>before</em> each <code class="inline-code">interrupt()</code> deterministic and side-effect-free — if the order or number of <code class="inline-code">interrupt()</code> calls changes between runs (e.g., because of an <code class="inline-code">if</code> branch that behaves differently), the resume values could get matched to the wrong question. <strong>Best practice: keep the path leading up to each <code class="inline-code">interrupt()</code> call stable and predictable.</strong></p>
+<h4 id="resuming-across-process-restarts"><a class="heading-anchor" href="#resuming-across-process-restarts" aria-hidden="true">#</a>Resuming across process restarts</h4>
+<p>Because the checkpoint is the single source of truth (not anything held in memory in your running Node.js process), you can technically:</p>
+<ol>
+<li>Run a script that pauses on <code class="inline-code">interrupt()</code> and exits completely.</li>
+<li>Hours later, start a <em>brand new</em> Node.js process.</li>
+<li>As long as you use a <strong>persistent checkpointer</strong> (like <code class="inline-code">SqliteSaver</code> or <code class="inline-code">PostgresSaver</code> from Phase 3 — not <code class="inline-code">MemorySaver</code>, which is wiped when the process ends) and the same <code class="inline-code">thread_id</code>, calling <code class="inline-code">graph.invoke(new Command({ resume: ... }), config)</code> from the new process will correctly resume the old, paused run.</li>
+</ol>
+<p>This is the property that makes HITL genuinely useful in production: the human doesn&#39;t need to respond instantly, and your server doesn&#39;t need to stay running and waiting the whole time.</p>
+<h3 id="42-practical-lab--resuming-across-a-simulated-quotrestartquot"><a class="heading-anchor" href="#42-practical-lab--resuming-across-a-simulated-quotrestartquot" aria-hidden="true">#</a>4.2 Practical Lab — Resuming Across a Simulated &quot;Restart&quot;</h3>
+<p><strong>Goal:</strong> Prove to yourself that resuming works even when the &quot;human&#39;s answer&quot; comes from a completely separate script execution, using a persistent SQLite checkpointer instead of <code class="inline-code">MemorySaver</code>.</p>
+<h4 id="step-1--install-the-sqlite-checkpointer-package"><a class="heading-anchor" href="#step-1--install-the-sqlite-checkpointer-package" aria-hidden="true">#</a>Step 1 — Install the SQLite checkpointer package</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-checkpoint-sqlite</code></pre></div>
+<p><strong>Why we do this:</strong> <code class="inline-code">MemorySaver</code> only lives inside one running process&#39;s RAM. To prove a &quot;real&quot; resume across a restart, we need state saved to disk, which <code class="inline-code">SqliteSaver</code> provides (just like in Phase 3, Checkpointers).</p>
+<h4 id="step-2--write-the-quotpausequot-script"><a class="heading-anchor" href="#step-2--write-the-quotpausequot-script" aria-hidden="true">#</a>Step 2 — Write the &quot;pause&quot; script</h4>
+<p>Create <code class="inline-code">03a-resume-pause.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, interrupt } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">SqliteSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-sqlite&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">State</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">question</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">decision</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+});
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">approvalNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> decision = <span class="hljs-title function_">interrupt</span>({ <span class="hljs-attr">ask</span>: <span class="hljs-string">&quot;Approve the $4,200 vendor invoice? (yes/no)&quot;</span> });
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">decision</span>: decision <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span> };
+}
+
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-title class_">SqliteSaver</span>.<span class="hljs-title function_">fromConnString</span>(<span class="hljs-string">&quot;hitl-demo.db&quot;</span>);
+
+<span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;approval&quot;</span>, approvalNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;approval&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;approval&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ checkpointer });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;invoice-9981&quot;</span> } };
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">question</span>: <span class="hljs-string">&quot;approve invoice?&quot;</span> }, config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Process A paused. Interrupt payload:&quot;</span>, result.<span class="hljs-property">__interrupt__</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Exiting process now. The checkpoint is saved in hitl-demo.db.&quot;</span>);
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p>Run it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx 03a-resume-pause.ts</code></pre></div>
+<p><strong>Expected result:</strong> It prints the interrupt payload and exits cleanly. <strong>How to verify:</strong> Check that a new file <code class="inline-code">hitl-demo.db</code> now exists in your project folder — that&#39;s the SQLite database file holding the paused checkpoint.</p>
+<h4 id="step-3--write-a-separate-quotresumequot-script"><a class="heading-anchor" href="#step-3--write-a-separate-quotresumequot-script" aria-hidden="true">#</a>Step 3 — Write a <em>separate</em> &quot;resume&quot; script</h4>
+<p>Create <code class="inline-code">03b-resume-continue.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, interrupt, <span class="hljs-title class_">Command</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">SqliteSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-sqlite&quot;</span>;
+
+<span class="hljs-comment">// IMPORTANT: the graph definition must be IDENTICAL (same nodes, same schema)</span>
+<span class="hljs-comment">// to the one used in the pause script, since we&#x27;re reloading its checkpoint.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">State</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">question</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">decision</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+});
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">approvalNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> decision = <span class="hljs-title function_">interrupt</span>({ <span class="hljs-attr">ask</span>: <span class="hljs-string">&quot;Approve the $4,200 vendor invoice? (yes/no)&quot;</span> });
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">decision</span>: decision <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span> };
+}
+
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-title class_">SqliteSaver</span>.<span class="hljs-title function_">fromConnString</span>(<span class="hljs-string">&quot;hitl-demo.db&quot;</span>);
+
+<span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;approval&quot;</span>, approvalNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;approval&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;approval&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ checkpointer });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;invoice-9981&quot;</span> } }; <span class="hljs-comment">// SAME thread_id as before</span>
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: <span class="hljs-string">&quot;yes&quot;</span> }), config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Process B resumed successfully:&quot;</span>, result);
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p>Run it (notice this is a <strong>completely separate process</strong> from Step 2 — no shared memory at all):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx 03b-resume-continue.ts</code></pre></div>
+<p><strong>Expected result:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text">Process B resumed successfully: { question: &#x27;approve invoice?&#x27;, decision: &#x27;yes&#x27; }</code></pre></div>
+<p><strong>How to verify it worked:</strong> The fact that <code class="inline-code">decision: &#39;yes&#39;</code> appears at all — produced by a script that <em>never set that field itself</em> — proves the resume correctly reattached to the checkpoint left behind by the <em>other</em> process. If you change <code class="inline-code">thread_id</code> in script B to something that wasn&#39;t used in script A, you&#39;ll instead get an error or an entirely fresh run, proving the link is solely based on <code class="inline-code">thread_id</code> + the database file.</p>
+<p><strong>Common beginner mistakes:</strong></p>
+<ul>
+<li><strong>Forgetting that the graph structure (nodes, schema) must match</strong> between the pausing process and the resuming process. If you add/remove/rename nodes between the two runs, LangGraph may not know how to safely resume.</li>
+<li><strong>Using <code class="inline-code">MemorySaver</code> and expecting cross-process resume to work</strong> — it won&#39;t, because <code class="inline-code">MemorySaver</code> only exists in one process&#39;s RAM and is gone the moment that process exits.</li>
+<li><strong>Reusing the same <code class="inline-code">hitl-demo.db</code> thread_id for unrelated runs</strong> — like reusing a variable name, this causes confusing state bleed between unrelated tasks. Use clearly unique, meaningful <code class="inline-code">thread_id</code>s (e.g., prefix with an entity ID: <code class="inline-code">invoice-9981</code>, <code class="inline-code">order-44213</code>).</li>
+</ul>
+<h3 id="43-knowledge-check--topic-3"><a class="heading-anchor" href="#43-knowledge-check--topic-3" aria-hidden="true">#</a>4.3 Knowledge Check — Topic 3</h3>
+<p><strong>Summary:</strong> <code class="inline-code">Command({ resume: value })</code> is the dedicated way to feed a human&#39;s answer back into a graph that&#39;s paused on <code class="inline-code">interrupt()</code>. It avoids ambiguity with normal state input. Because all pause/resume state lives in the checkpointer (not in process memory), resuming can happen from a totally different process — or even days later — as long as you use a persistent checkpointer and the same <code class="inline-code">thread_id</code>.</p>
+<p><strong>Key takeaways:</strong></p>
+<ul>
+<li><code class="inline-code">Command({ resume: ... })</code> ≠ passing raw input to <code class="inline-code">invoke()</code>.</li>
+<li>Multiple <code class="inline-code">interrupt()</code> calls in one node resume in call order.</li>
+<li><code class="inline-code">MemorySaver</code> cannot survive process restarts; use <code class="inline-code">SqliteSaver</code>/<code class="inline-code">PostgresSaver</code> for anything that needs to persist.</li>
+<li>The <code class="inline-code">thread_id</code> is the single link between a paused run and its eventual resume.</li>
+</ul>
+<p><strong>Practice questions:</strong></p>
+<ol>
+<li>Why does <code class="inline-code">Command({ resume: ... })</code> exist instead of just reusing <code class="inline-code">graph.invoke(value, config)</code>?</li>
+<li>What would happen (conceptually) if process B used a <code class="inline-code">thread_id</code> that process A never created?</li>
+<li>Why must the node/graph structure stay consistent between the script that pauses and the script that resumes?</li>
+</ol>
+<p><strong>Exercise:</strong> Modify <code class="inline-code">03b-resume-continue.ts</code> to resume with <code class="inline-code">&quot;no&quot;</code> instead of <code class="inline-code">&quot;yes&quot;</code>, and add a follow-up <code class="inline-code">console.log</code> that prints a different message depending on the <code class="inline-code">decision</code> value — simulating how your app might branch its UI based on the human&#39;s answer.</p>
+<hr>
+<h2 id="5-topic-4--approval-workflows-for-sensitive-actions"><a class="heading-anchor" href="#5-topic-4--approval-workflows-for-sensitive-actions" aria-hidden="true">#</a>5. Topic 4 — Approval Workflows for Sensitive Actions</h2>
+<h3 id="51-concept-and-theory"><a class="heading-anchor" href="#51-concept-and-theory" aria-hidden="true">#</a>5.1 Concept and Theory</h3>
+<p>This topic doesn&#39;t introduce brand-new LangGraph APIs — instead, it teaches the <strong>pattern</strong> of combining everything from Topics 1–3 into something genuinely useful: a real approval gate that can <em>approve</em>, <em>reject-and-revise</em>, or <em>reject-and-abort</em> a sensitive action.</p>
+<h4 id="the-general-shape-of-an-approval-workflow"><a class="heading-anchor" href="#the-general-shape-of-an-approval-workflow" aria-hidden="true">#</a>The general shape of an approval workflow</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span></div><pre><code class="hljs language-text"> generate proposal → [PAUSE: human reviews] → approved? ──yes──&gt; execute action
+                                                  │
+                                                  no
+                                                  │
+                                                  v
+                                         revise proposal ──&gt; [PAUSE again] → ...</code></pre></div>
+<p>This is a <strong>loop with a human in the middle</strong> — structurally similar to the &quot;self-correcting loop&quot; pattern from Phase 2 (Conditional Edges &amp; Branching), except instead of an AI critic deciding whether to loop again, a <em>human</em> decides.</p>
+<h4 id="why-a-conditional-edge-is-the-right-tool-here"><a class="heading-anchor" href="#why-a-conditional-edge-is-the-right-tool-here" aria-hidden="true">#</a>Why a conditional edge is the right tool here</h4>
+<p>After resuming from the pause, we need to <strong>route differently</strong> depending on what the human decided: continue to the sensitive action, or go back and revise. This is exactly what <code class="inline-code">addConditionalEdges()</code> (Phase 2) is for. The routing function reads the <code class="inline-code">decision</code> field set by the <code class="inline-code">interrupt()</code>&#39;s resume value and returns the name of the next node.</p>
+<h4 id="designing-the-interrupt-payload-thoughtfully"><a class="heading-anchor" href="#designing-the-interrupt-payload-thoughtfully" aria-hidden="true">#</a>Designing the interrupt payload thoughtfully</h4>
+<p>A good approval-step <code class="inline-code">interrupt()</code> payload typically includes:</p>
+<ul>
+<li><strong>What the AI is proposing to do</strong> (e.g., the exact email text, the exact dollar amount).</li>
+<li><strong>Why</strong> (a short rationale, if you have one) — this helps the human trust or distrust the proposal faster.</li>
+<li><strong>What responses are valid</strong> (e.g., <code class="inline-code">&quot;approve&quot;</code>, <code class="inline-code">&quot;reject&quot;</code>, or <code class="inline-code">&quot;edit&quot;</code> with new text) — this is essentially a tiny contract between your graph and your UI.</li>
+</ul>
+<h4 id="three-common-outcomes-to-support"><a class="heading-anchor" href="#three-common-outcomes-to-support" aria-hidden="true">#</a>Three common outcomes to support</h4>
+<ol>
+<li><strong>Approve</strong> — proceed exactly as proposed.</li>
+<li><strong>Reject and abort</strong> — stop the whole workflow; nothing happens.</li>
+<li><strong>Reject and revise</strong> — go back and regenerate the proposal, optionally taking human feedback into account (e.g., &quot;make it shorter&quot; or &quot;the amount should be $300, not $500&quot;).</li>
+</ol>
+<p>We&#39;ll build all three in the lab below.</p>
+<h3 id="52-practical-lab--build-an-approval-gate-with-revisereject-branching"><a class="heading-anchor" href="#52-practical-lab--build-an-approval-gate-with-revisereject-branching" aria-hidden="true">#</a>5.2 Practical Lab — Build an Approval Gate with Revise/Reject Branching</h3>
+<p><strong>Goal:</strong> Build a graph that proposes a refund amount to a customer, pauses for human approval, and supports three outcomes: approve &amp; process, reject &amp; abort, or reject &amp; revise with feedback (looping back).</p>
+<h4 id="step-1--define-state"><a class="heading-anchor" href="#step-1--define-state" aria-hidden="true">#</a>Step 1 — Define state</h4>
+<p>Create <code class="inline-code">04-approval-workflow.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span>, interrupt, <span class="hljs-title class_">Command</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">State</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">customerComplaint</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">proposedRefund</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">number</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-number">0</span> }),
+  <span class="hljs-attr">reviewerFeedback</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">status</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-string">&quot;pending&quot;</span> | <span class="hljs-string">&quot;approved&quot;</span> | <span class="hljs-string">&quot;rejected&quot;</span>&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n,
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;pending&quot;</span>,
+  }),
+});</code></pre></div>
+<p><strong>Why we do this:</strong> <code class="inline-code">reviewerFeedback</code> is new — it stores any free-text notes a human reviewer gives when requesting a revision (e.g., &quot;this refund is too high&quot;), so the regeneration step can actually use that feedback instead of guessing blindly again.</p>
+<h4 id="step-2--write-the-proposal-node"><a class="heading-anchor" href="#step-2--write-the-proposal-node" aria-hidden="true">#</a>Step 2 — Write the proposal node</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.3</span> });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">proposeRefundNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> feedbackNote = state.<span class="hljs-property">reviewerFeedback</span>
+    ? <span class="hljs-string">`\nA reviewer previously gave this feedback, take it into account: &quot;<span class="hljs-subst">${state.reviewerFeedback}</span>&quot;`</span>
+    : <span class="hljs-string">&quot;&quot;</span>;
+
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(
+    <span class="hljs-string">`A customer wrote this complaint: &quot;<span class="hljs-subst">${state.customerComplaint}</span>&quot;.
+     Propose a fair refund amount in USD as a single number only (no symbols, no text).<span class="hljs-subst">${feedbackNote}</span>`</span>
+  );
+
+  <span class="hljs-keyword">const</span> amount = <span class="hljs-built_in">parseFloat</span>((response.<span class="hljs-property">content</span> <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span>).<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/[^0-9.]/g</span>, <span class="hljs-string">&quot;&quot;</span>)) || <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">proposedRefund</span>: amount };
+}</code></pre></div>
+<p><strong>Why we do this:</strong> This node is reusable for <em>both</em> the first attempt and any later revision — that&#39;s why it checks <code class="inline-code">state.reviewerFeedback</code> and conditionally includes it in the prompt. This avoids needing two separate &quot;draft&quot; nodes for &quot;first try&quot; vs. &quot;retry.&quot;</p>
+<h4 id="step-3--write-the-human-approval-node"><a class="heading-anchor" href="#step-3--write-the-human-approval-node" aria-hidden="true">#</a>Step 3 — Write the human approval node</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">humanApprovalNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-title function_">interrupt</span>({
+    <span class="hljs-attr">action</span>: <span class="hljs-string">&quot;approve_refund&quot;</span>,
+    <span class="hljs-attr">proposedRefund</span>: state.<span class="hljs-property">proposedRefund</span>,
+    <span class="hljs-attr">customerComplaint</span>: state.<span class="hljs-property">customerComplaint</span>,
+    <span class="hljs-attr">validResponses</span>: [<span class="hljs-string">&quot;approve&quot;</span>, <span class="hljs-string">&quot;reject_abort&quot;</span>, <span class="hljs-string">&quot;reject_revise&quot;</span>],
+  }) <span class="hljs-keyword">as</span> { <span class="hljs-attr">decision</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">feedback</span>?: <span class="hljs-built_in">string</span> };
+
+  <span class="hljs-keyword">if</span> (response.<span class="hljs-property">decision</span> === <span class="hljs-string">&quot;approve&quot;</span>) {
+    <span class="hljs-keyword">return</span> { <span class="hljs-attr">status</span>: <span class="hljs-string">&quot;approved&quot;</span> <span class="hljs-keyword">as</span> <span class="hljs-keyword">const</span> };
+  }
+  <span class="hljs-keyword">if</span> (response.<span class="hljs-property">decision</span> === <span class="hljs-string">&quot;reject_abort&quot;</span>) {
+    <span class="hljs-keyword">return</span> { <span class="hljs-attr">status</span>: <span class="hljs-string">&quot;rejected&quot;</span> <span class="hljs-keyword">as</span> <span class="hljs-keyword">const</span> };
+  }
+  <span class="hljs-comment">// reject_revise</span>
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">status</span>: <span class="hljs-string">&quot;pending&quot;</span> <span class="hljs-keyword">as</span> <span class="hljs-keyword">const</span>, <span class="hljs-attr">reviewerFeedback</span>: response.<span class="hljs-property">feedback</span> ?? <span class="hljs-string">&quot;&quot;</span> };
+}</code></pre></div>
+<p><strong>Why we do this:</strong> Instead of the resume value being a plain string, here we resume with a small <strong>object</strong> (<code class="inline-code">{ decision, feedback }</code>). This is a deliberate design choice — real approval UIs usually need to send back more than one piece of information (the decision <em>and</em> optional notes), and <code class="inline-code">interrupt()</code>/<code class="inline-code">Command({resume})</code> happily support any JSON-serializable shape, not just strings.</p>
+<h4 id="step-4--write-the-quotexecutequot-and-routing-logic"><a class="heading-anchor" href="#step-4--write-the-quotexecutequot-and-routing-logic" aria-hidden="true">#</a>Step 4 — Write the &quot;execute&quot; and routing logic</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">processRefundNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`💸 Processing refund of $<span class="hljs-subst">${state.proposedRefund}</span> for complaint: &quot;<span class="hljs-subst">${state.customerComplaint}</span>&quot;`</span>);
+  <span class="hljs-keyword">return</span> {};
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">routeAfterApproval</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">if</span> (state.<span class="hljs-property">status</span> === <span class="hljs-string">&quot;approved&quot;</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;processRefund&quot;</span>;
+  <span class="hljs-keyword">if</span> (state.<span class="hljs-property">status</span> === <span class="hljs-string">&quot;rejected&quot;</span>) <span class="hljs-keyword">return</span> <span class="hljs-variable constant_">END</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;proposeRefund&quot;</span>; <span class="hljs-comment">// pending =&gt; loop back for a revision</span>
+}</code></pre></div>
+<p><strong>Why we do this:</strong> This is a textbook conditional-edge routing function (Phase 2) — it inspects state set by the previous node and decides the next destination as a plain string. Routing back to <code class="inline-code">&quot;proposeRefund&quot;</code> is what implements the &quot;reject &amp; revise&quot; loop.</p>
+<h4 id="step-5--assemble-the-graph"><a class="heading-anchor" href="#step-5--assemble-the-graph" aria-hidden="true">#</a>Step 5 — Assemble the graph</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;proposeRefund&quot;</span>, proposeRefundNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;humanApproval&quot;</span>, humanApprovalNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;processRefund&quot;</span>, processRefundNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;proposeRefund&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;proposeRefund&quot;</span>, <span class="hljs-string">&quot;humanApproval&quot;</span>)
+  .<span class="hljs-title function_">addConditionalEdges</span>(<span class="hljs-string">&quot;humanApproval&quot;</span>, routeAfterApproval, {
+    <span class="hljs-attr">processRefund</span>: <span class="hljs-string">&quot;processRefund&quot;</span>,
+    <span class="hljs-attr">proposeRefund</span>: <span class="hljs-string">&quot;proposeRefund&quot;</span>,
+    [<span class="hljs-variable constant_">END</span>]: <span class="hljs-variable constant_">END</span>,
+  })
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;processRefund&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>() });</code></pre></div>
+<h4 id="step-6--drive-all-three-outcomes"><a class="heading-anchor" href="#step-6--drive-all-three-outcomes" aria-hidden="true">#</a>Step 6 — Drive all three outcomes</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">runApproveScenario</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n=== SCENARIO 1: Approve ===&quot;</span>);
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;refund-approve&quot;</span> } };
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">customerComplaint</span>: <span class="hljs-string">&quot;My package arrived damaged.&quot;</span> }, config);
+  <span class="hljs-keyword">let</span> snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Proposed:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">proposedRefund</span>);
+
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: { <span class="hljs-attr">decision</span>: <span class="hljs-string">&quot;approve&quot;</span> } }), config);
+  snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Final status:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">status</span>);
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">runRejectAbortScenario</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n=== SCENARIO 2: Reject &amp; Abort ===&quot;</span>);
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;refund-abort&quot;</span> } };
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">customerComplaint</span>: <span class="hljs-string">&quot;Item was one day late.&quot;</span> }, config);
+
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: { <span class="hljs-attr">decision</span>: <span class="hljs-string">&quot;reject_abort&quot;</span> } }), config);
+  <span class="hljs-keyword">const</span> snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Final status:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">status</span>);
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">runReviseScenario</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n=== SCENARIO 3: Reject &amp; Revise, then Approve ===&quot;</span>);
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;refund-revise&quot;</span> } };
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">customerComplaint</span>: <span class="hljs-string">&quot;Product broke after one use, very upset.&quot;</span> }, config);
+  <span class="hljs-keyword">let</span> snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;First proposal:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">proposedRefund</span>);
+
+  <span class="hljs-comment">// Reviewer asks for a lower amount with feedback.</span>
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: { <span class="hljs-attr">decision</span>: <span class="hljs-string">&quot;reject_revise&quot;</span>, <span class="hljs-attr">feedback</span>: <span class="hljs-string">&quot;Cap refunds at $25 for single-use complaints.&quot;</span> } }),
+    config
+  );
+  snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Revised proposal:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">proposedRefund</span>, <span class="hljs-string">&quot;| next node:&quot;</span>, snap.<span class="hljs-property">next</span>);
+
+  <span class="hljs-comment">// Now approve the revised proposal.</span>
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: { <span class="hljs-attr">decision</span>: <span class="hljs-string">&quot;approve&quot;</span> } }), config);
+  snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Final status:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">status</span>);
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">runApproveScenario</span>();
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">runRejectAbortScenario</span>();
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">runReviseScenario</span>();
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p>Run it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx 04-approval-workflow.ts</code></pre></div>
+<p><strong>Expected result:</strong> Three labeled scenario blocks print in your terminal. Scenario 1 ends with <code class="inline-code">Final status: approved</code> and a <code class="inline-code">💸 Processing refund...</code> line. Scenario 2 ends with <code class="inline-code">Final status: rejected</code> and <strong>no</strong> processing line. Scenario 3 shows two different <code class="inline-code">proposedRefund</code> values (the first guess, then a lower revised guess influenced by the feedback) before finally approving.</p>
+<p><strong>How to verify it worked:</strong></p>
+<ul>
+<li>For Scenario 2, confirm <code class="inline-code">💸 Processing refund</code> never printed — proving rejection truly blocks the sensitive action.</li>
+<li>For Scenario 3, confirm the second <code class="inline-code">proposedRefund</code> is different from (ideally lower than) the first, proving the <code class="inline-code">reviewerFeedback</code> was actually incorporated into the regenerated prompt, not ignored.</li>
+</ul>
+<p><strong>Common beginner mistakes:</strong></p>
+<ul>
+<li><strong>Forgetting to map every possible routing function output in <code class="inline-code">addConditionalEdges</code>&#39;s third argument.</strong> If <code class="inline-code">routeAfterApproval</code> can return <code class="inline-code">&quot;processRefund&quot;</code>, <code class="inline-code">&quot;proposeRefund&quot;</code>, or <code class="inline-code">END</code>, <em>all three</em> must appear as keys in that mapping object, or LangGraph will throw a routing error for the missing case.</li>
+<li><strong>Resuming with a plain string <code class="inline-code">&quot;approve&quot;</code> instead of the object shape <code class="inline-code">{ decision: &quot;approve&quot; }</code></strong> the node expects — this causes <code class="inline-code">response.decision</code> to be <code class="inline-code">undefined</code>, silently falling through to the &quot;revise&quot; branch. Always make sure your resume payload&#39;s <em>shape</em> matches exactly what the node destructures.</li>
+<li><strong>Not resetting <code class="inline-code">reviewerFeedback</code></strong> after a successful approval if you reuse the thread for another complaint — stale feedback could leak into unrelated future proposals on the same thread. In production, prefer a fresh <code class="inline-code">thread_id</code> per complaint.</li>
+</ul>
+<h3 id="53-knowledge-check--topic-4"><a class="heading-anchor" href="#53-knowledge-check--topic-4" aria-hidden="true">#</a>5.3 Knowledge Check — Topic 4</h3>
+<p><strong>Summary:</strong> Real approval workflows combine <code class="inline-code">interrupt()</code>, conditional edges, and looping to support three outcomes — approve, reject-and-abort, and reject-and-revise — turning a single pause point into a flexible human-AI negotiation loop.</p>
+<p><strong>Key takeaways:</strong></p>
+<ul>
+<li>The same node can serve both the &quot;first attempt&quot; and &quot;revision&quot; purpose if it conditionally reads feedback from state.</li>
+<li>Resume payloads can be structured objects, not just strings — design them to match what your UI realistically needs to send.</li>
+<li><code class="inline-code">addConditionalEdges</code> after a <code class="inline-code">humanApproval</code> node is what turns a single yes/no into a true branching/looping workflow.</li>
+<li>&quot;Reject &amp; abort&quot; routes straight to <code class="inline-code">END</code>; &quot;reject &amp; revise&quot; routes back to the proposal node, forming a loop.</li>
+</ul>
+<p><strong>Practice questions:</strong></p>
+<ol>
+<li>Why is it useful for <code class="inline-code">proposeRefundNode</code> to handle both the first attempt and revisions, rather than having two separate nodes?</li>
+<li>What would happen if <code class="inline-code">addConditionalEdges</code>&#39;s mapping object was missing the <code class="inline-code">[END]: END</code> entry?</li>
+<li>Design (in words) what fields you&#39;d want in the <code class="inline-code">interrupt()</code> payload for an approval gate on a &quot;delete user account&quot; action — what would a human need to see to make a safe decision?</li>
+</ol>
+<p><strong>Mini project:</strong> Add a maximum-revision-count safeguard: track a <code class="inline-code">revisionCount</code> field in state, increment it on every &quot;reject_revise,&quot; and force the routing function to go straight to <code class="inline-code">END</code> (with a <code class="inline-code">status</code> of <code class="inline-code">&quot;rejected&quot;</code>) if <code class="inline-code">revisionCount</code> exceeds 3 — preventing an endless human-in-the-loop negotiation loop.</p>
+<hr>
+<h2 id="6-topic-5--editing-state-during-a-pause-human-correction"><a class="heading-anchor" href="#6-topic-5--editing-state-during-a-pause-human-correction" aria-hidden="true">#</a>6. Topic 5 — Editing State During a Pause (Human Correction)</h2>
+<h3 id="61-concept-and-theory"><a class="heading-anchor" href="#61-concept-and-theory" aria-hidden="true">#</a>6.1 Concept and Theory</h3>
+<h4 id="the-problem-this-solves"><a class="heading-anchor" href="#the-problem-this-solves" aria-hidden="true">#</a>The problem this solves</h4>
+<p>So far, our humans have only answered <em>questions</em> (yes/no/feedback text) via <code class="inline-code">interrupt()</code>&#39;s resume value. But sometimes a human doesn&#39;t want to answer a question — they want to <strong>directly edit a piece of state themselves</strong>, like fixing a typo in an AI-drafted email, before it continues. This is &quot;human correction,&quot; and LangGraph supports it in two complementary ways:</p>
+<ol>
+<li><strong>Via the resume payload itself</strong> — have the human supply a <em>corrected</em> version of the content as the <code class="inline-code">resume</code> value (e.g., resume with the <em>edited</em> email text instead of just <code class="inline-code">&quot;approve&quot;</code>), and have the node use that corrected text going forward. This is the approach we&#39;ll emphasize, because it composes naturally with everything you&#39;ve already learned.</li>
+<li><strong>Via <code class="inline-code">updateState()</code></strong> (introduced in Phase 3, &quot;State Management &amp; Time Travel&quot;) — while a thread is paused, you can call <code class="inline-code">await graph.updateState(config, { emailDraft: &quot;the human&#39;s edited text&quot; })</code> to directly overwrite a field in the <em>checkpoint</em>, <strong>without</strong> going through any node at all, and then resume normally afterward. This is useful when the correction doesn&#39;t naturally fit as an <code class="inline-code">interrupt()</code>&#39;s return value (e.g., a totally separate admin tool edits the draft before continuing).</li>
+</ol>
+<h4 id="why-two-ways-to-do-quotthe-same-thingquot"><a class="heading-anchor" href="#why-two-ways-to-do-quotthe-same-thingquot" aria-hidden="true">#</a>Why two ways to do &quot;the same thing&quot;?</h4>
+<p>They serve different architectural needs:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pass corrected value through <code class="inline-code">Command({ resume: correctedValue })</code></td>
+<td>The same flow that paused is the one collecting the correction (e.g., one approval UI form with a text box)</td>
+</tr>
+<tr>
+<td><code class="inline-code">graph.updateState(config, {...})</code> directly</td>
+<td>A different process/tool edits state independently of the original pause (e.g., an admin dashboard lets someone fix something on a stalled thread without &quot;answering&quot; any specific interrupt)</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="analogy-editing-a-document"><a class="heading-anchor" href="#analogy-editing-a-document" aria-hidden="true">#</a>Analogy: editing a document</h4>
+<p>Think of Google Docs. If you&#39;re actively in a conversation with a collaborator&#39;s comment thread and you reply with your suggested edit text — that&#39;s like passing a correction through <code class="inline-code">resume</code>. If instead you just open the document yourself and directly retype a sentence, with no comment thread involved at all — that&#39;s like <code class="inline-code">updateState()</code>. Both change the document; they just go through different &quot;doors.&quot;</p>
+<h4 id="a-subtlety-where-does-the-corrected-value-get-used"><a class="heading-anchor" href="#a-subtlety-where-does-the-corrected-value-get-used" aria-hidden="true">#</a>A subtlety: where does the corrected value get used?</h4>
+<p>When you resume with a corrected value, <strong>the node code itself must explicitly use that value</strong> — <code class="inline-code">interrupt()</code> doesn&#39;t automatically know &quot;this is a correction, please overwrite <code class="inline-code">emailDraft</code>.&quot; You write the node to say, in effect: &quot;use whatever I get back from <code class="inline-code">interrupt()</code> as the new draft,&quot; exactly like we did with <code class="inline-code">recipientName</code> in Topic 1&#39;s lab.</p>
+<h3 id="62-practical-lab--let-a-human-edit-a-draft-before-it39s-sent"><a class="heading-anchor" href="#62-practical-lab--let-a-human-edit-a-draft-before-it39s-sent" aria-hidden="true">#</a>6.2 Practical Lab — Let a Human Edit a Draft Before It&#39;s Sent</h3>
+<p><strong>Goal:</strong> Build a graph that drafts a message, pauses for review, and lets a human either approve it as-is or supply fully edited replacement text — which then gets used for the final &quot;send&quot; step.</p>
+<h4 id="step-1--state-and-draft-node"><a class="heading-anchor" href="#step-1--state-and-draft-node" aria-hidden="true">#</a>Step 1 — State and draft node</h4>
+<p>Create <code class="inline-code">05-human-edit.ts</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">StateGraph</span>, <span class="hljs-title class_">Annotation</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span>, <span class="hljs-title class_">MemorySaver</span>, interrupt, <span class="hljs-title class_">Command</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">State</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">topic</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">draft</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">finalText</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+});
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.6</span> });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">draftNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> model.<span class="hljs-title function_">invoke</span>(
+    <span class="hljs-string">`Write a 2-sentence LinkedIn announcement post about: <span class="hljs-subst">${state.topic}</span>`</span>
+  );
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">draft</span>: response.<span class="hljs-property">content</span> <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span> };
+}</code></pre></div>
+<h4 id="step-2--the-review-and-edit-node"><a class="heading-anchor" href="#step-2--the-review-and-edit-node" aria-hidden="true">#</a>Step 2 — The review-and-edit node</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">reviewAndEditNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-keyword">const</span> result = <span class="hljs-title function_">interrupt</span>({
+    <span class="hljs-attr">instructions</span>: <span class="hljs-string">&quot;Review this draft. Either send it as-is, or provide fully edited replacement text.&quot;</span>,
+    <span class="hljs-attr">currentDraft</span>: state.<span class="hljs-property">draft</span>,
+  }) <span class="hljs-keyword">as</span> { <span class="hljs-attr">editedText</span>?: <span class="hljs-built_in">string</span> };
+
+  <span class="hljs-comment">// If the human supplied edited text, use it. Otherwise, keep the original draft.</span>
+  <span class="hljs-keyword">const</span> finalText = result.<span class="hljs-property">editedText</span> &amp;&amp; result.<span class="hljs-property">editedText</span>.<span class="hljs-title function_">trim</span>().<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>
+    ? result.<span class="hljs-property">editedText</span>
+    : state.<span class="hljs-property">draft</span>;
+
+  <span class="hljs-keyword">return</span> { finalText };
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">publishNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">State</span>.<span class="hljs-title class_">State</span></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;📣 PUBLISHED:&quot;</span>, state.<span class="hljs-property">finalText</span>);
+  <span class="hljs-keyword">return</span> {};
+}</code></pre></div>
+<p><strong>Why we do this:</strong> The key line is <code class="inline-code">result.editedText &amp;&amp; result.editedText.trim().length &gt; 0 ? result.editedText : state.draft</code>. This is the explicit logic that decides &quot;did the human actually provide a correction, or did they just approve as-is?&quot; — exactly the subtlety called out in the theory section: <strong>the node must explicitly handle the corrected value</strong>, LangGraph doesn&#39;t do this automatically.</p>
+<h4 id="step-3--graph-assembly"><a class="heading-anchor" href="#step-3--graph-assembly" aria-hidden="true">#</a>Step 3 — Graph assembly</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;draft&quot;</span>, draftNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;reviewAndEdit&quot;</span>, reviewAndEditNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;publish&quot;</span>, publishNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;draft&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;draft&quot;</span>, <span class="hljs-string">&quot;reviewAndEdit&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;reviewAndEdit&quot;</span>, <span class="hljs-string">&quot;publish&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;publish&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({ <span class="hljs-attr">checkpointer</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">MemorySaver</span>() });</code></pre></div>
+<h4 id="step-4--scenario-a-approve-as-is"><a class="heading-anchor" href="#step-4--scenario-a-approve-as-is" aria-hidden="true">#</a>Step 4 — Scenario A: approve as-is</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">approveAsIs</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n=== Approve as-is ===&quot;</span>);
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;post-1&quot;</span> } };
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;our team shipping a new HITL feature&quot;</span> }, config);
+  <span class="hljs-keyword">const</span> snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;AI draft was:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">draft</span>);
+
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: {} }), config); <span class="hljs-comment">// no editedText provided</span>
+  <span class="hljs-keyword">const</span> final = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Used finalText:&quot;</span>, final.<span class="hljs-property">values</span>.<span class="hljs-property">finalText</span>);
+}</code></pre></div>
+<h4 id="step-5--scenario-b-human-edits-the-text"><a class="heading-anchor" href="#step-5--scenario-b-human-edits-the-text" aria-hidden="true">#</a>Step 5 — Scenario B: human edits the text</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">humanEdits</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n=== Human edits the draft ===&quot;</span>);
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;post-2&quot;</span> } };
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;our team shipping a new HITL feature&quot;</span> }, config);
+  <span class="hljs-keyword">const</span> snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;AI draft was:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">draft</span>);
+
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: { <span class="hljs-attr">editedText</span>: <span class="hljs-string">&quot;We just shipped human-in-the-loop approvals — review AI actions before they go live. Try it today!&quot;</span> } }),
+    config
+  );
+  <span class="hljs-keyword">const</span> final = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Used finalText:&quot;</span>, final.<span class="hljs-property">values</span>.<span class="hljs-property">finalText</span>);
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">approveAsIs</span>();
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">humanEdits</span>();
+}
+
+<span class="hljs-title function_">main</span>();</code></pre></div>
+<p>Run it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span></div><pre><code class="hljs language-bash">npx tsx 05-human-edit.ts</code></pre></div>
+<p><strong>Expected result:</strong> In Scenario A, <code class="inline-code">finalText</code> matches the original AI <code class="inline-code">draft</code> exactly. In Scenario B, <code class="inline-code">finalText</code> matches the <strong>human-supplied</strong> sentence, not the AI&#39;s original draft, and the <code class="inline-code">📣 PUBLISHED:</code> line in <code class="inline-code">publishNode</code> reflects the edited version.</p>
+<p><strong>How to verify it worked:</strong> Compare <code class="inline-code">snap.values.draft</code> (the AI&#39;s original) against <code class="inline-code">final.values.finalText</code> (what actually got used) in both scenarios — they should be identical in Scenario A and different in Scenario B.</p>
+<h4 id="step-6--bonus-using-updatestate-for-an-out-of-band-correction"><a class="heading-anchor" href="#step-6--bonus-using-updatestate-for-an-out-of-band-correction" aria-hidden="true">#</a>Step 6 — Bonus: using <code class="inline-code">updateState()</code> for an out-of-band correction</h4>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">adminOverride</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n=== Admin tool edits state directly via updateState() ===&quot;</span>);
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">&quot;post-3&quot;</span> } };
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">topic</span>: <span class="hljs-string">&quot;our quarterly results&quot;</span> }, config);
+
+  <span class="hljs-comment">// Imagine a SEPARATE admin dashboard does this, with no knowledge of &quot;interrupt payloads&quot;:</span>
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">updateState</span>(config, { <span class="hljs-attr">draft</span>: <span class="hljs-string">&quot;Q3 results: revenue up 18% YoY. Full report linked below.&quot;</span> });
+
+  <span class="hljs-comment">// Now resume normally — reviewAndEditNode will interrupt again with the UPDATED draft.</span>
+  <span class="hljs-keyword">const</span> snap = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Draft after admin override:&quot;</span>, snap.<span class="hljs-property">values</span>.<span class="hljs-property">draft</span>);
+
+  <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">invoke</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({ <span class="hljs-attr">resume</span>: {} }), config);
+  <span class="hljs-keyword">const</span> final = <span class="hljs-keyword">await</span> graph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Used finalText:&quot;</span>, final.<span class="hljs-property">values</span>.<span class="hljs-property">finalText</span>);
+}</code></pre></div>
+<p>Add <code class="inline-code">await adminOverride();</code> to <code class="inline-code">main()</code> and re-run. <strong>Expected result:</strong> the printed draft reflects the admin&#39;s overridden text, not the original AI draft, proving <code class="inline-code">updateState()</code> can rewrite state independently of any <code class="inline-code">interrupt()</code> exchange.</p>
+<p><strong>Common beginner mistakes:</strong></p>
+<ul>
+<li><strong>Assuming <code class="inline-code">interrupt()</code> automatically merges the human&#39;s edit into state.</strong> It does not — you must explicitly write the <code class="inline-code">result.editedText ? ... : ...</code> logic yourself.</li>
+<li><strong>Calling <code class="inline-code">updateState()</code> on a thread that isn&#39;t currently paused</strong> (e.g., one that already ran to completion) — this can have unexpected effects since there&#39;s no pending node waiting to consume the change. Generally reserve <code class="inline-code">updateState()</code> for paused threads, matching the use case from Phase 3.</li>
+<li><strong>Forgetting to re-fetch <code class="inline-code">getState()</code> after <code class="inline-code">updateState()</code></strong> to confirm the override actually applied before continuing — silent typos in field names (e.g., <code class="inline-code">Draft</code> instead of <code class="inline-code">draft</code>) will fail to update anything and TypeScript may not catch it if your editor type isn&#39;t strict.</li>
+</ul>
+<h3 id="63-knowledge-check--topic-5"><a class="heading-anchor" href="#63-knowledge-check--topic-5" aria-hidden="true">#</a>6.3 Knowledge Check — Topic 5</h3>
+<p><strong>Summary:</strong> Humans can correct AI-generated content either by supplying replacement values through a <code class="inline-code">resume</code> payload (which the node must explicitly check for and use) or by calling <code class="inline-code">updateState()</code> directly on a paused thread to overwrite state without going through any node logic at all.</p>
+<p><strong>Key takeaways:</strong></p>
+<ul>
+<li><code class="inline-code">interrupt()</code> never auto-applies a correction — your node code decides what &quot;no edit given&quot; vs. &quot;edit given&quot; means.</li>
+<li><code class="inline-code">updateState()</code> is for out-of-band corrections, independent of any specific <code class="inline-code">interrupt()</code> call.</li>
+<li>Always verify a correction took effect with <code class="inline-code">getState()</code> before resuming/continuing.</li>
+</ul>
+<p><strong>Practice questions:</strong></p>
+<ol>
+<li>Why doesn&#39;t <code class="inline-code">interrupt()</code> automatically know that a returned value should replace a draft field?</li>
+<li>When would <code class="inline-code">updateState()</code> be more appropriate than passing a corrected value through <code class="inline-code">resume</code>?</li>
+<li>What bug would occur if <code class="inline-code">reviewAndEditNode</code> always used <code class="inline-code">result.editedText</code> even when it&#39;s <code class="inline-code">undefined</code>, without the fallback check?</li>
+</ol>
+<p><strong>Exercise:</strong> Add a third option to <code class="inline-code">reviewAndEditNode</code> — a <code class="inline-code">&quot;regenerate&quot;</code> instruction (no edited text, no approval, just &quot;try again with this style note: ___&quot;) that routes back to <code class="inline-code">draftNode</code> with a style hint stored in state, similar to the &quot;reject &amp; revise&quot; loop from Topic 4.</p>
+<hr>
+<h2 id="7-phase-4-final-project--human-approved-email-assistant"><a class="heading-anchor" href="#7-phase-4-final-project--human-approved-email-assistant" aria-hidden="true">#</a>7. Phase 4 Final Project — Human-Approved Email Assistant</h2>
+<h3 id="71-project-brief"><a class="heading-anchor" href="#71-project-brief" aria-hidden="true">#</a>7.1 Project Brief</h3>
+<p>You will now combine <strong>everything from this phase</strong> — <code class="inline-code">interrupt()</code>, static breakpoints, <code class="inline-code">Command(resume=...)</code>, full approval workflows, and human edits — into one cohesive, realistic application: an <strong>AI email assistant</strong> that drafts replies to incoming customer messages, and requires human sign-off before anything goes out, with support for approving, editing, or rejecting-and-regenerating.</p>
+<h3 id="72-requirements"><a class="heading-anchor" href="#72-requirements" aria-hidden="true">#</a>7.2 Requirements</h3>
+<p>Your graph must:</p>
+<ol>
+<li><strong>Accept an incoming customer message</strong> as input (a string).</li>
+<li><strong>Classify urgency</strong> (<code class="inline-code">&quot;low&quot;</code>, <code class="inline-code">&quot;medium&quot;</code>, <code class="inline-code">&quot;high&quot;</code>) using the LLM, stored in state.</li>
+<li><strong>Draft a reply</strong> using the LLM, taking the classified urgency into account (e.g., high-urgency replies should sound more immediate).</li>
+<li><strong>Use a static breakpoint (<code class="inline-code">interruptAfter</code>)</strong> on the drafting node, so a human always reviews the draft after it&#39;s generated, before any further logic runs (practicing Topic 2).</li>
+<li><strong>Use a dynamic <code class="inline-code">interrupt()</code></strong> inside a dedicated <code class="inline-code">humanReviewNode</code> to collect the human&#39;s decision and present three options: <code class="inline-code">approve</code>, <code class="inline-code">edit</code> (with replacement text), or <code class="inline-code">reject_regenerate</code> (with feedback) (practicing Topics 1, 4, and 6).</li>
+<li><strong>Route conditionally</strong> based on the decision:<ul>
+<li><code class="inline-code">approve</code> → go straight to a <code class="inline-code">sendReplyNode</code>.</li>
+<li><code class="inline-code">edit</code> → use the edited text as the final reply, then go to <code class="inline-code">sendReplyNode</code>.</li>
+<li><code class="inline-code">reject_regenerate</code> → go back to the drafting node with the feedback incorporated, and repeat (practicing Topic 4&#39;s loop pattern).</li>
+</ul>
+</li>
+<li><strong>Cap regenerations at 2 attempts</strong> — if exceeded, automatically escalate to a <code class="inline-code">humanWritesManuallyNode</code> that pauses and asks the human to simply provide the full final reply text themselves via <code class="inline-code">interrupt()</code>, no more AI attempts.</li>
+<li>Use a <strong>persistent checkpointer</strong> (<code class="inline-code">SqliteSaver</code>), proving (as in Topic 3) that this could survive a real server restart.</li>
+<li>Print clear console output at every stage so you can trace exactly what happened.</li>
+</ol>
+<h3 id="73-suggested-state-schema"><a class="heading-anchor" href="#73-suggested-state-schema" aria-hidden="true">#</a>7.3 Suggested State Schema</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">State</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">customerMessage</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">urgency</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-string">&quot;low&quot;</span> | <span class="hljs-string">&quot;medium&quot;</span> | <span class="hljs-string">&quot;high&quot;</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;low&quot;</span> }),
+  <span class="hljs-attr">draftReply</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">finalReply</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">regenerationCount</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">number</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-number">0</span> }),
+  <span class="hljs-attr">regenerationFeedback</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;&quot;</span> }),
+  <span class="hljs-attr">status</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-string">&quot;pending&quot;</span> | <span class="hljs-string">&quot;approved&quot;</span> | <span class="hljs-string">&quot;sent&quot;</span> | <span class="hljs-string">&quot;rejected&quot;</span>&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_o, n</span>) =&gt;</span> n,
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-string">&quot;pending&quot;</span>,
+  }),
+});</code></pre></div>
+<h3 id="74-suggested-nodegraph-skeleton"><a class="heading-anchor" href="#74-suggested-nodegraph-skeleton" aria-hidden="true">#</a>7.4 Suggested Node/Graph Skeleton</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">typescript</span></div><pre><code class="hljs language-typescript"><span class="hljs-comment">// classifyUrgencyNode -&gt; draftReplyNode --(interruptAfter)--&gt; humanReviewNode</span>
+<span class="hljs-comment">//   humanReviewNode routes to:</span>
+<span class="hljs-comment">//     &quot;approve&quot;            -&gt; sendReplyNode</span>
+<span class="hljs-comment">//     &quot;edit&quot;                -&gt; sendReplyNode (using edited text as finalReply)</span>
+<span class="hljs-comment">//     &quot;reject_regenerate&quot;  -&gt; draftReplyNode (if regenerationCount &lt; 2)</span>
+<span class="hljs-comment">//                          -&gt; humanWritesManuallyNode (if regenerationCount &gt;= 2)</span>
+<span class="hljs-comment">//   humanWritesManuallyNode -&gt; sendReplyNode</span>
+<span class="hljs-comment">//   sendReplyNode -&gt; END</span>
+
+<span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">State</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;classifyUrgency&quot;</span>, classifyUrgencyNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;draftReply&quot;</span>, draftReplyNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;humanReview&quot;</span>, humanReviewNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;humanWritesManually&quot;</span>, humanWritesManuallyNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;sendReply&quot;</span>, sendReplyNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;classifyUrgency&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;classifyUrgency&quot;</span>, <span class="hljs-string">&quot;draftReply&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;draftReply&quot;</span>, <span class="hljs-string">&quot;humanReview&quot;</span>)
+  .<span class="hljs-title function_">addConditionalEdges</span>(<span class="hljs-string">&quot;humanReview&quot;</span>, routeAfterReview, {
+    <span class="hljs-attr">sendReply</span>: <span class="hljs-string">&quot;sendReply&quot;</span>,
+    <span class="hljs-attr">draftReply</span>: <span class="hljs-string">&quot;draftReply&quot;</span>,
+    <span class="hljs-attr">humanWritesManually</span>: <span class="hljs-string">&quot;humanWritesManually&quot;</span>,
+  })
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;humanWritesManually&quot;</span>, <span class="hljs-string">&quot;sendReply&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;sendReply&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>({
+    <span class="hljs-attr">checkpointer</span>: <span class="hljs-title class_">SqliteSaver</span>.<span class="hljs-title function_">fromConnString</span>(<span class="hljs-string">&quot;email-assistant.db&quot;</span>),
+    <span class="hljs-attr">interruptAfter</span>: [<span class="hljs-string">&quot;draftReply&quot;</span>],
+  });</code></pre></div>
+<div class="callout callout-note"><div class="callout-title"><span class="callout-icon">&#128221;</span>Note</div><div class="callout-body"><p><strong>Note:</strong> Since <code class="inline-code">interruptAfter: [&quot;draftReply&quot;]</code> already pauses the graph right after drafting, your <code class="inline-code">humanReviewNode</code>&#39;s <code class="inline-code">interrupt()</code> call effectively becomes the very first thing that runs <em>after</em> you resume from that static breakpoint. This is intentional — it demonstrates that static breakpoints and dynamic <code class="inline-code">interrupt()</code>s can be layered together in the same graph, each serving a distinct purpose (a guaranteed pause point vs. a structured question/answer exchange).</p>
+</div></div>
+<h3 id="75-build-checklist-work-through-in-order"><a class="heading-anchor" href="#75-build-checklist-work-through-in-order" aria-hidden="true">#</a>7.5 Build Checklist (work through in order)</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Step 1: Implement <code class="inline-code">classifyUrgencyNode</code> using a simple LLM call that returns one of <code class="inline-code">&quot;low&quot;|&quot;medium&quot;|&quot;high&quot;</code>.</li>
+<li><input disabled="" type="checkbox"> Step 2: Implement <code class="inline-code">draftReplyNode</code>, incorporating <code class="inline-code">state.urgency</code> and (if present) <code class="inline-code">state.regenerationFeedback</code> into the prompt, similar to Topic 4&#39;s <code class="inline-code">proposeRefundNode</code>.</li>
+<li><input disabled="" type="checkbox"> Step 3: Implement <code class="inline-code">humanReviewNode</code> with a single <code class="inline-code">interrupt()</code> call presenting <code class="inline-code">draftReply</code> and accepting <code class="inline-code">{ decision: &quot;approve&quot; | &quot;edit&quot; | &quot;reject_regenerate&quot;, editedText?: string, feedback?: string }</code>.</li>
+<li><input disabled="" type="checkbox"> Step 4: Implement <code class="inline-code">routeAfterReview</code> to branch on <code class="inline-code">decision</code>, incrementing <code class="inline-code">regenerationCount</code> when looping back, and forcing the escalation path once <code class="inline-code">regenerationCount &gt;= 2</code>.</li>
+<li><input disabled="" type="checkbox"> Step 5: Implement <code class="inline-code">humanWritesManuallyNode</code> with its own <code class="inline-code">interrupt()</code> asking for fully manual reply text.</li>
+<li><input disabled="" type="checkbox"> Step 6: Implement <code class="inline-code">sendReplyNode</code> to print the final reply as &quot;sent.&quot;</li>
+<li><input disabled="" type="checkbox"> Step 7: Test all four end-to-end paths manually (approve / edit / regenerate-then-approve / regenerate-twice-then-manual) using distinct <code class="inline-code">thread_id</code>s, verifying with <code class="inline-code">getState()</code> at each pause.</li>
+<li><input disabled="" type="checkbox"> Step 8: (Stretch goal) Split the pause and resume calls into two separate <code class="inline-code">.ts</code> files/processes, like Topic 3&#39;s lab, to prove this survives a &quot;restart.&quot;</li>
+</ul>
+<h3 id="76-self-check-questions-before-you-consider-it-done"><a class="heading-anchor" href="#76-self-check-questions-before-you-consider-it-done" aria-hidden="true">#</a>7.6 Self-Check Questions Before You Consider It Done</h3>
+<ol>
+<li>If you call <code class="inline-code">getState()</code> right after the static <code class="inline-code">interruptAfter</code> breakpoint fires, does <code class="inline-code">snapshot.next</code> show <code class="inline-code">humanReview</code>? If not, why might that be?</li>
+<li>Does resuming with <code class="inline-code">decision: &quot;edit&quot;</code> correctly bypass the AI&#39;s <code class="inline-code">draftReply</code> entirely and use only the human&#39;s text in <code class="inline-code">sendReplyNode</code>?</li>
+<li>After two regenerations, does the graph definitely <em>stop</em> asking the AI to try again, and definitely route to <code class="inline-code">humanWritesManuallyNode</code> instead?</li>
+<li>If you kill your terminal mid-pause and restart, does resuming with the same <code class="inline-code">thread_id</code> still work correctly (assuming you used <code class="inline-code">SqliteSaver</code>)?</li>
+</ol>
+<hr>
+<h2 id="8-phase-4-master-knowledge-check"><a class="heading-anchor" href="#8-phase-4-master-knowledge-check" aria-hidden="true">#</a>8. Phase 4 Master Knowledge Check</h2>
+<h3 id="summary-of-the-entire-phase"><a class="heading-anchor" href="#summary-of-the-entire-phase" aria-hidden="true">#</a>Summary of the entire phase</h3>
+<p>Human-in-the-Loop lets a LangGraph application safely pause before or after sensitive actions, hand control to a human, and resume exactly where it left off — powered entirely by the checkpointer&#39;s ability to persist state. There are two pause mechanisms (<code class="inline-code">interrupt()</code> for dynamic, data-driven pauses; <code class="inline-code">interruptBefore</code>/<code class="inline-code">interruptAfter</code> for unconditional, structural pauses), one resume mechanism (<code class="inline-code">Command({ resume: ... })</code>), and two ways for a human to directly influence content (returning corrected values through <code class="inline-code">resume</code>, or calling <code class="inline-code">updateState()</code> independently). Real-world approval workflows combine these primitives with conditional edges to support approve / reject-and-abort / reject-and-revise outcomes, often with a safeguard against infinite revision loops.</p>
+<h3 id="key-takeaways-across-the-whole-phase"><a class="heading-anchor" href="#key-takeaways-across-the-whole-phase" aria-hidden="true">#</a>Key takeaways across the whole phase</h3>
+<ul>
+<li><strong>No checkpointer, no HITL</strong> — this is true for every single feature in this phase.</li>
+<li><code class="inline-code">interrupt()</code> = ask a question <em>conditionally</em>, from inside node code, only when your logic decides it&#39;s needed.</li>
+<li><code class="inline-code">interruptBefore</code>/<code class="inline-code">interruptAfter</code> = pause <em>unconditionally</em>, configured outside node code, at compile time.</li>
+<li><code class="inline-code">Command({ resume: value })</code> is the dedicated way to answer a pending <code class="inline-code">interrupt()</code>; <code class="inline-code">graph.invoke(null, config)</code> is enough to continue past a static breakpoint with no new data.</li>
+<li>Code before an <code class="inline-code">interrupt()</code> re-runs on every resume — keep it side-effect-free and deterministic.</li>
+<li>Persistent checkpointers (<code class="inline-code">SqliteSaver</code>, <code class="inline-code">PostgresSaver</code>) let pauses survive process restarts and long delays; <code class="inline-code">MemorySaver</code> does not.</li>
+<li>A robust approval workflow supports at least three outcomes (approve / reject-abort / reject-revise) and should guard against unbounded revision loops.</li>
+<li>Human corrections must be explicitly read and applied by your node logic — nothing happens &quot;automatically.&quot;</li>
+</ul>
+<h3 id="comprehensive-practice-questions"><a class="heading-anchor" href="#comprehensive-practice-questions" aria-hidden="true">#</a>Comprehensive practice questions</h3>
+<ol>
+<li>Explain, in your own words, why <code class="inline-code">interrupt()</code> requires the node function to &quot;re-run from the top&quot; on resume, and what risk that creates.</li>
+<li>Design a routing table (in words) for a content-moderation graph with four possible human decisions: <code class="inline-code">approve</code>, <code class="inline-code">reject</code>, <code class="inline-code">escalate_to_legal</code>, <code class="inline-code">request_more_context</code>. Which existing topic&#39;s pattern would you reuse to build this?</li>
+<li>You need a workflow where <em>every</em> payment over $1,000 always requires approval, but payments under $1,000 should never pause. Would you implement this with <code class="inline-code">interruptBefore</code> alone, <code class="inline-code">interrupt()</code> alone, or a combination? Justify your answer.</li>
+<li>A teammate says: &quot;We don&#39;t need a persistent checkpointer, MemorySaver is fine, because our approvals always happen within the same <code class="inline-code">invoke()</code> call.&quot; Is this teammate&#39;s reasoning correct? Why or why not?</li>
+<li>What&#39;s the smallest possible change you could make to Topic 4&#39;s lab to add a hard cap on revisions, and where exactly would that check belong (which function)?</li>
+</ol>
+<h3 id="capstone-exercise"><a class="heading-anchor" href="#capstone-exercise" aria-hidden="true">#</a>Capstone exercise</h3>
+<p>Sketch (diagram or written description) a <strong>HITL-gated database migration tool</strong>: an agent that proposes a SQL migration script for a database, requires human approval before running it, allows the human to edit the SQL directly, and automatically rolls back any change if a post-run health check (a separate node) fails — feeding that failure back as <code class="inline-code">reviewerFeedback</code>-style context for a possible second human-reviewed attempt. Identify exactly which Phase 4 topic each piece of this design draws from.</p>
+<hr>
+<h2 id="9-glossary-phase-4-terms"><a class="heading-anchor" href="#9-glossary-phase-4-terms" aria-hidden="true">#</a>9. Glossary (Phase 4 terms)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Human-in-the-Loop (HITL)</strong></td>
+<td>A design pattern where a human reviews, approves, edits, or rejects an AI agent&#39;s action before (or after) it takes effect.</td>
+</tr>
+<tr>
+<td><strong><code class="inline-code">interrupt()</code></strong></td>
+<td>A function called inside a node to dynamically and conditionally pause graph execution, sending a payload out and later receiving a resume value back at that exact point.</td>
+</tr>
+<tr>
+<td><strong>Static breakpoint</strong></td>
+<td>An unconditional pause configured at <code class="inline-code">.compile()</code> time via <code class="inline-code">interruptBefore</code> / <code class="inline-code">interruptAfter</code>, requiring no code changes inside the node.</td>
+</tr>
+<tr>
+<td><strong><code class="inline-code">interruptBefore</code></strong></td>
+<td>Compile option causing the graph to pause immediately before a named node runs.</td>
+</tr>
+<tr>
+<td><strong><code class="inline-code">interruptAfter</code></strong></td>
+<td>Compile option causing the graph to pause immediately after a named node finishes.</td>
+</tr>
+<tr>
+<td><strong><code class="inline-code">Command</code></strong></td>
+<td>An object used to control a graph&#39;s continuation; in HITL contexts, primarily used as <code class="inline-code">Command({ resume: value })</code> to answer a pending <code class="inline-code">interrupt()</code>.</td>
+</tr>
+<tr>
+<td><strong>Resume value</strong></td>
+<td>The data passed via <code class="inline-code">Command({ resume: ... })</code> that an <code class="inline-code">interrupt()</code> call effectively &quot;returns&quot; once execution continues.</td>
+</tr>
+<tr>
+<td><strong>Approval workflow</strong></td>
+<td>A pattern combining <code class="inline-code">interrupt()</code>/breakpoints with conditional edges to support approve / reject-abort / reject-revise outcomes.</td>
+</tr>
+<tr>
+<td><strong><code class="inline-code">updateState()</code></strong></td>
+<td>A method (introduced in Phase 3) that directly overwrites a paused thread&#39;s state without going through any node — useful for out-of-band human corrections.</td>
+</tr>
+<tr>
+<td><strong><code class="inline-code">getState()</code></strong></td>
+<td>A method to inspect a thread&#39;s current checkpoint, including <code class="inline-code">values</code> (current state) and <code class="inline-code">next</code> (which node(s) will run next).</td>
+</tr>
+<tr>
+<td><strong>Persistent checkpointer</strong></td>
+<td>A checkpointer backend (e.g., <code class="inline-code">SqliteSaver</code>, <code class="inline-code">PostgresSaver</code>) that survives process restarts, as opposed to <code class="inline-code">MemorySaver</code>.</td>
+</tr>
+<tr>
+<td><strong><code class="inline-code">thread_id</code></strong></td>
+<td>A unique identifier passed in <code class="inline-code">config.configurable</code> that links a paused run to the eventual resume call.</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<p><em>End of Phase 4 — Human-in-the-Loop. Next phase: Multi-Agent &amp; Tools (Subgraphs, Supervisor/Network/Hierarchical/Swarm architectures, ToolNode, and prebuilt agents).</em></p>
+
+<div class="doc-footer">Converted from Markdown &middot; 2026-06-27</div>
+</main>
+</body>
+</html>

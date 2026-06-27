@@ -3,3 +3,5 @@ langchain/phases/temp/*
 langgraph/phases/temp/*
 node_modules/
 package-lock.json
+md2html/node_modules
+md2html/temp/*
