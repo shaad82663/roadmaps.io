@@ -163,7 +163,7 @@ function buildRenderer() {
     const langLabel = lang ? escapeHtml(lang) : "text";
     return (
       `<div class="code-block">` +
-      `<div class="code-block-header"><span class="code-lang">${langLabel}</span></div>` +
+      `<div class="code-block-header"><span class="code-lang">${langLabel}</span><button class="copy-btn" onclick="copyCode(this)" title="Copy to clipboard">Copy</button></div>` +
       `<pre><code class="hljs language-${escapeHtml(langLabel)}">${highlighted}</code></pre>` +
       `</div>\n`
     );
@@ -247,6 +247,7 @@ function pageTemplate({ title, bodyHtml }) {
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>${escapeHtml(title)}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script>
 // Runs before first paint so there is no flash of the wrong theme.
 (function () {
@@ -330,33 +331,32 @@ body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
   transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
 }
 
-/* ---------- theme toggle button ---------- */
+/* ---------- theme toggle button (matches main index.html style) ---------- */
 .theme-toggle{
   position:fixed;
-  top:18px;
-  right:18px;
-  z-index:50;
-  width:44px;
-  height:44px;
+  top:1.5rem;
+  right:1.5rem;
+  width:42px;
+  height:42px;
   border-radius:50%;
-  border:1px solid var(--toggle-border);
   background:var(--toggle-bg);
+  border:1px solid var(--toggle-border);
   color:var(--text);
+  cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  cursor:pointer;
-  font-size:1.2rem;
-  box-shadow:0 4px 14px rgba(0,0,0,0.18);
-  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+  font-size:1.25rem;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:0 4px 20px rgba(0,0,0,0.15);
+  z-index:1000;
+  transition:all 0.3s ease;
 }
-.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:hover{transform:scale(1.1);box-shadow:0 4px 25px rgba(0,0,0,0.25);}
 .theme-toggle:active{transform:scale(0.95);}
-.theme-toggle .icon-moon{display:none;}
-[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
-[data-theme="dark"] .theme-toggle .icon-moon{display:inline;}
 @media (max-width:600px){
-  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+  .theme-toggle{top:1rem;right:1rem;width:38px;height:38px;font-size:1.1rem;}
 }
 
 /* ---------- top banner ---------- */
@@ -479,6 +479,9 @@ code.inline-code{
   text-transform:uppercase;
   padding:8px 16px;
   border-bottom:1px solid var(--code-border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
 .code-block-header::before{
   content:"";
@@ -488,6 +491,32 @@ code.inline-code{
   box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
   margin-right:48px;
   vertical-align:middle;
+  flex-shrink:0;
+}
+/* ---------- copy button inside code header ---------- */
+.copy-btn{
+  background:transparent;
+  border:1px solid var(--code-border);
+  color:var(--code-header-text);
+  border-radius:5px;
+  padding:2px 10px;
+  font-size:0.72rem;
+  font-weight:600;
+  cursor:pointer;
+  letter-spacing:0.04em;
+  font-family:inherit;
+  transition:background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  flex-shrink:0;
+}
+.copy-btn:hover{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  border-color:var(--accent);
+}
+.copy-btn.copied{
+  background:rgba(39,201,63,0.12);
+  border-color:#27c93f;
+  color:#27c93f;
 }
 .code-block pre{
   margin:0;
@@ -625,16 +654,8 @@ table code.inline-code{white-space:nowrap;}
 </style>
 </head>
 <body>
-<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="
-  (function(){
-    var html = document.documentElement;
-    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
-  })();
-">
-  <span class="icon-sun">&#9728;&#65039;</span>
-  <span class="icon-moon">&#127769;</span>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
 </button>
 <header class="top-banner">
   <h1>${escapeHtml(title)}</h1>
@@ -648,6 +669,57 @@ ${bodyHtml}
   <div class="scroll-progress-bar" id="scroll-bar"></div>
 </div>
 <script>
+  // ── Theme toggle (matches main site) ─────────────────────────
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    updateThemeIcon(next);
+  }
+  function updateThemeIcon(theme) {
+    var icon = document.getElementById('theme-icon');
+    if (!icon) return;
+    icon.className = (theme || document.documentElement.getAttribute('data-theme')) === 'dark'
+      ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  // Set initial icon state after page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    updateThemeIcon();
+  });
+
+  // ── Copy-to-clipboard for code blocks ────────────────────────
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '\u2713 Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() {
+        fallbackCopy(code, onCopied);
+      });
+    } else {
+      fallbackCopy(code, onCopied);
+    }
+  }
+  function fallbackCopy(text, onCopied) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); onCopied(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  // ── Scroll progress bar ───────────────────────────────────────
   (function() {
     var bar = null;
     var ticking = false;
@@ -655,9 +727,7 @@ ${bodyHtml}
       var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      if (bar) {
-        bar.style.width = scrollPercent + '%';
-      }
+      if (bar) { bar.style.width = scrollPercent + '%'; }
       ticking = false;
     }
     window.addEventListener('scroll', function() {
