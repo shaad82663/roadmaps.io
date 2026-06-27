@@ -592,6 +592,7 @@ table code.inline-code{white-space:nowrap;}
 [data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
 [data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
 
+
 /* ---------- footer ---------- */
 .doc-footer{
   text-align:center;
@@ -600,6 +601,26 @@ table code.inline-code{white-space:nowrap;}
   margin-top:48px;
   padding-top:18px;
   border-top:1px solid var(--border);
+}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
 }
 </style>
 </head>
@@ -623,6 +644,31 @@ table code.inline-code{white-space:nowrap;}
 ${bodyHtml}
 <div class="doc-footer">Converted from Markdown &middot; ${new Date().toISOString().slice(0, 10)}</div>
 </main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
 </body>
 </html>
 `;
