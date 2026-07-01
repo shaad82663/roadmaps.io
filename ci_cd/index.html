@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CI/CD Mastery Roadmap — GitHub Actions & Jenkins</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    :root {
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      /* Premium Dark Theme */
+      --color-bg-base: #0f1115;
+      --color-bg-gradient: radial-gradient(circle at top center, #1a1d24, #0f1115 80%);
+      --color-background-primary: rgba(30, 33, 40, 0.6);
+      --color-background-secondary: rgba(45, 49, 58, 0.7);
+      --color-border-primary: rgba(255, 255, 255, 0.15);
+      --color-border-secondary: rgba(255, 255, 255, 0.08);
+      --color-border-tertiary: rgba(255, 255, 255, 0.04);
+
+      --color-text-primary: #f8f9fa;
+      --color-text-secondary: #adb5bd;
+      --color-text-tertiary: #6c757d;
+
+      --border-radius-md: 12px;
+      --border-radius-lg: 16px;
+
+      /* Rich phase colors */
+      --p-found-bg: rgba(99, 102, 241, 0.15);
+      --p-found-text: #a5b4fc;
+      --p-found-dot: #6366f1;
+      --p-found-border: rgba(99, 102, 241, 0.3);
+
+      --p-ctrl-bg: rgba(20, 184, 166, 0.15);
+      --p-ctrl-text: #5eead4;
+      --p-ctrl-dot: #14b8a6;
+      --p-ctrl-border: rgba(20, 184, 166, 0.3);
+
+      --p-pers-bg: rgba(56, 189, 248, 0.15);
+      --p-pers-text: #7dd3fc;
+      --p-pers-dot: #38bdf8;
+      --p-pers-border: rgba(56, 189, 248, 0.3);
+
+      --p-hitl-bg: rgba(245, 158, 11, 0.15);
+      --p-hitl-text: #fcd34d;
+      --p-hitl-dot: #f59e0b;
+      --p-hitl-border: rgba(245, 158, 11, 0.3);
+
+      --p-multi-bg: rgba(168, 85, 247, 0.15);
+      --p-multi-text: #d8b4fe;
+      --p-multi-dot: #a855f7;
+      --p-multi-border: rgba(168, 85, 247, 0.3);
+
+      --p-prod-bg: rgba(239, 68, 68, 0.15);
+      --p-prod-text: #fca5a5;
+      --p-prod-dot: #ef4444;
+      --p-prod-border: rgba(239, 68, 68, 0.3);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+      background: var(--color-bg-base);
+      background-image: var(--color-bg-gradient);
+      background-attachment: fixed;
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+
+    header {
+      margin-bottom: 3.5rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff, #adb5bd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--color-text-secondary);
+      font-size: 1.15rem;
+      font-weight: 300;
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-card {
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem 2rem;
+      min-width: 130px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--color-border-primary);
+    }
+
+    .stat-val {
+      font-size: 2.75rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+    }
+
+    .filters {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.5rem;
+      border-radius: 100px;
+      border: 1px solid var(--color-border-tertiary);
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .filter-btn {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.95rem;
+      border-radius: 100px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active {
+      border-color: var(--color-border-primary);
+      color: var(--color-text-primary);
+      background: var(--color-background-secondary);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .filter-btn:hover:not(.active) {
+      color: var(--color-text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .unit-row {
+      display: flex;
+      gap: 1.5rem;
+      align-items: stretch;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.5s forwards ease-out;
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 24px;
+      flex-shrink: 0;
+      padding-top: 2rem;
+    }
+
+    .spine-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px currentColor;
+      z-index: 2;
+      position: relative;
+      transition: transform 0.3s;
+    }
+
+    .unit-card:hover .spine-dot {
+      transform: scale(1.2);
+    }
+
+    .spine-dot::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      opacity: 0.3;
+    }
+
+    .spine-line {
+      flex: 1;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--color-border-secondary) 0%, transparent 100%);
+      margin-top: 1rem;
+    }
+
+    .unit-card {
+      flex: 1;
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.75rem;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .unit-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .unit-card:hover {
+      border-color: var(--color-border-primary);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .unit-card:hover::before {
+      opacity: 1;
+    }
+
+    .unit-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .unit-num {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--color-text-tertiary);
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .unit-title {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      flex: 1;
+      min-width: 200px;
+      letter-spacing: -0.3px;
+    }
+
+    .phase-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.35rem 0.85rem;
+      border-radius: 100px;
+      white-space: nowrap;
+      border: 1px solid;
+    }
+
+    .diff-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.35rem 0.85rem;
+      border-radius: 100px;
+      border: 1px solid var(--color-border-tertiary);
+      color: var(--color-text-secondary);
+      background: rgba(255, 255, 255, 0.02);
+      white-space: nowrap;
+    }
+
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1.2rem 0 0 0;
+    }
+
+    .tag {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--color-border-tertiary);
+      color: var(--color-text-secondary);
+      transition: all 0.2s;
+    }
+
+    .unit-card:hover .tag {
+      border-color: var(--color-border-secondary);
+      color: var(--color-text-primary);
+    }
+
+    .expand-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .expand-content.open {
+      max-height: 2000px;
+      opacity: 1;
+      margin-top: 1.5rem;
+    }
+
+    .expand-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-border-secondary), transparent);
+      margin-bottom: 1.5rem;
+    }
+
+    .expand-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media(max-width: 768px) {
+      .expand-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .unit-title {
+        font-size: 1.2rem;
+      }
+
+      .stat-card {
+        padding: 1.25rem;
+        min-width: 100px;
+      }
+
+      .stat-val {
+        font-size: 2.2rem;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+      }
+    }
+
+    .section-label {
+      font-size: 0.85rem;
+      color: var(--color-text-primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-label i {
+      color: var(--color-text-secondary);
+      font-size: 1.2rem;
+    }
+
+    .item-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .item-list li {
+      font-size: 1rem;
+      color: var(--color-text-secondary);
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      line-height: 1.5;
+      border-bottom: 1px solid var(--color-border-tertiary);
+    }
+
+    .item-list li:last-child {
+      border-bottom: none;
+    }
+
+    .item-list li::before {
+      content: '→';
+      color: var(--color-text-tertiary);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+
+    .study-btn {
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.85rem 1.5rem;
+      border-radius: var(--border-radius-md);
+      border: 1px solid var(--color-border-primary);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      margin-top: 2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .study-btn:hover {
+      background: var(--color-text-primary);
+      color: var(--color-bg-base);
+      border-color: var(--color-text-primary);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .chevron {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-block;
+      font-size: 1.25rem;
+      color: var(--color-text-tertiary);
+      margin-left: auto;
+    }
+
+    .unit-card:hover .chevron {
+      color: var(--color-text-primary);
+    }
+
+    .chevron.open {
+      transform: rotate(180deg);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg-base);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border-primary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-text-secondary);
+    }
+
+    /* Theme Toggle Button Styling */
+    .theme-toggle-btn {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    .theme-toggle-btn:hover {
+      transform: scale(1.1);
+      border-color: var(--color-border-primary);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Light Theme Styling Variable Overrides */
+    :root.light-theme,
+    .light-theme {
+      --color-bg-base: #f5f7fa;
+      --color-bg-gradient: radial-gradient(circle at top center, #ffffff, #edf0f5 80%);
+      --color-background-primary: rgba(255, 255, 255, 0.85);
+      --color-background-secondary: rgba(235, 238, 243, 0.95);
+      --color-border-primary: rgba(0, 0, 0, 0.12);
+      --color-border-secondary: rgba(0, 0, 0, 0.06);
+      --color-border-tertiary: rgba(0, 0, 0, 0.03);
+
+      --color-text-primary: #1a202c;
+      --color-text-secondary: #4a5568;
+      --color-text-tertiary: #718096;
+
+      /* Phase badge overrides for readable contrast in light mode */
+      --p-found-bg: rgba(79, 70, 229, 0.08);
+      --p-found-text: #4f46e5;
+      --p-found-dot: #4f46e5;
+      --p-found-border: rgba(79, 70, 229, 0.2);
+
+      --p-ctrl-bg: rgba(13, 148, 136, 0.08);
+      --p-ctrl-text: #0d9488;
+      --p-ctrl-dot: #0d9488;
+      --p-ctrl-border: rgba(13, 148, 136, 0.2);
+
+      --p-pers-bg: rgba(2, 132, 199, 0.08);
+      --p-pers-text: #0284c7;
+      --p-pers-dot: #0284c7;
+      --p-pers-border: rgba(2, 132, 199, 0.2);
+
+      --p-hitl-bg: rgba(217, 119, 6, 0.08);
+      --p-hitl-text: #b45309;
+      --p-hitl-dot: #d97706;
+      --p-hitl-border: rgba(217, 119, 6, 0.2);
+
+      --p-multi-bg: rgba(147, 51, 234, 0.08);
+      --p-multi-text: #9333ea;
+      --p-multi-dot: #9333ea;
+      --p-multi-border: rgba(147, 51, 234, 0.2);
+
+      --p-prod-bg: rgba(220, 38, 38, 0.08);
+      --p-prod-text: #dc2626;
+      --p-prod-dot: #dc2626;
+      --p-prod-border: rgba(220, 38, 38, 0.2);
+    }
+
+    /* Light Theme adjustments for specific elements */
+    .light-theme h1 {
+      background: linear-gradient(135deg, #1a202c, #4a5568);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .light-theme .theme-toggle-btn {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+    .light-theme .unit-card:hover {
+      box-shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
+    }
+    .light-theme .tag {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--color-text-secondary);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .light-theme .unit-card:hover .tag {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--color-text-primary);
+    }
+    .light-theme .study-btn {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.1);
+      color: var(--color-text-primary);
+    }
+    .light-theme .study-btn:hover {
+      background: #1a202c;
+      color: #ffffff;
+      border-color: #1a202c;
+      box-shadow: 0 4px 12px rgba(26, 32, 44, 0.25);
+    }
+    .light-theme .filters {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.05);
+    }
+    .light-theme .filter-btn.active {
+      background: #1a202c;
+      color: #ffffff;
+      border-color: #1a202c;
+    }
+    .light-theme ::-webkit-scrollbar-track {
+      background: #f5f7fa;
+    }
+    .light-theme ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+    }
+    .light-theme ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+    <i class="ti ti-moon"></i>
+  </button>
+
+  <div class="container">
+    <header>
+      <h1>CI/CD Mastery Roadmap</h1>
+      <p class="subtitle">18 units across Foundation, GitHub Actions, Jenkins, Deployment & Pipeline-as-Code,
+        Security & Governance, and Industry & Interview Mastery — everything from your first pipeline to
+        production-grade, interview-ready CI/CD expertise on both GitHub Actions and Jenkins.</p>
+    </header>
+
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-val">18</div>
+        <div class="stat-label">Units</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">90</div>
+        <div class="stat-label">Topics</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">72</div>
+        <div class="stat-label">Labs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">6</div>
+        <div class="stat-label">Phases</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all', this)">All Phases</button>
+      <button class="filter-btn" onclick="setFilter('Foundation', this)">Foundation</button>
+      <button class="filter-btn" onclick="setFilter('GitHub Actions', this)">GitHub Actions</button>
+      <button class="filter-btn" onclick="setFilter('Jenkins', this)">Jenkins</button>
+      <button class="filter-btn" onclick="setFilter('Deployment & Pipeline-as-Code', this)">Deployment & PaC</button>
+      <button class="filter-btn" onclick="setFilter('Security & Governance', this)">Security & Governance</button>
+      <button class="filter-btn" onclick="setFilter('Industry & Interview', this)">Industry & Interview</button>
+    </div>
+
+    <div id="units-list"></div>
+  </div>
+
+  <script>
+    const phases = {
+      Foundation: { bg: 'var(--p-found-bg)', text: 'var(--p-found-text)', dot: 'var(--p-found-dot)', border: 'var(--p-found-border)' },
+      'GitHub Actions': { bg: 'var(--p-ctrl-bg)', text: 'var(--p-ctrl-text)', dot: 'var(--p-ctrl-dot)', border: 'var(--p-ctrl-border)' },
+      'Jenkins': { bg: 'var(--p-pers-bg)', text: 'var(--p-pers-text)', dot: 'var(--p-pers-dot)', border: 'var(--p-pers-border)' },
+      'Deployment & Pipeline-as-Code': { bg: 'var(--p-hitl-bg)', text: 'var(--p-hitl-text)', dot: 'var(--p-hitl-dot)', border: 'var(--p-hitl-border)' },
+      'Security & Governance': { bg: 'var(--p-multi-bg)', text: 'var(--p-multi-text)', dot: 'var(--p-multi-dot)', border: 'var(--p-multi-border)' },
+      'Industry & Interview': { bg: 'var(--p-prod-bg)', text: 'var(--p-prod-text)', dot: 'var(--p-prod-dot)', border: 'var(--p-prod-border)' }
+    };
+
+    const units = [
+      {
+        order: 0, title: 'CI/CD Fundamentals & DevOps Culture', phase: 'Foundation', difficulty: 'Beginner',
+        tags: ['CI vs CD', 'DORA metrics', 'pipeline stages', 'shift-left testing', 'deployment frequency'],
+        theory: ['What Continuous Integration, Continuous Delivery and Continuous Deployment actually mean — and how they differ', 'DevOps culture and DORA metrics: deployment frequency, lead time, MTTR, change failure rate', 'Anatomy of a CI/CD pipeline: source → build → test → package → deploy → monitor', 'Shift-left testing and the "fail fast" philosophy', 'Interview trap: precisely explaining CI vs CD vs Continuous Deployment on the spot'],
+        labs: ["Map an existing manual release process onto CI/CD pipeline stages", "Calculate DORA metrics for a sample team's release history", 'Diagram a pipeline for a sample app from commit to production', "Compare CI/CD maturity across two hypothetical teams"]
+      },
+      {
+        order: 1, title: 'Git Branching Strategies for CI/CD', phase: 'Foundation', difficulty: 'Beginner',
+        tags: ['trunk-based dev', 'GitFlow', 'feature flags', 'PR triggers', 'merge strategies'],
+        theory: ['Trunk-based development vs GitFlow vs GitHub Flow', 'How branching strategy drives pipeline trigger design', 'Feature flags/toggles as an alternative to long-lived branches', 'Pull request workflows and required status checks', 'Interview angle: "Which branching strategy would you pick, and why?"'],
+        labs: ['Set up branch protection rules requiring passing CI before merge', 'Simulate a trunk-based workflow with short-lived feature branches', 'Configure a pipeline that triggers only on PRs targeting main', 'Implement a feature flag to decouple deploy from release']
+      },
+      {
+        order: 2, title: 'Build Systems, Artifacts & Dependency Management', phase: 'Foundation', difficulty: 'Beginner',
+        tags: ['build tools', 'artifact repos', 'semantic versioning', 'caching', 'Docker images'],
+        theory: ['Build tools overview: npm/yarn, Maven/Gradle, MSBuild', 'Artifact repositories: Nexus, Artifactory, GitHub Packages, container registries', 'Semantic versioning and immutable build artifacts', 'Dependency caching to speed up builds', 'Interview favorite: the "build once, deploy many" principle and why it matters'],
+        labs: ['Publish a build artifact to GitHub Packages', 'Configure dependency caching in a sample pipeline', 'Tag a Docker image with a semantic version and commit SHA', 'Demo "build once, promote everywhere" across three environments']
+      },
+      {
+        order: 3, title: 'GitHub Actions Fundamentals', phase: 'GitHub Actions', difficulty: 'Beginner',
+        tags: ['workflow YAML', 'events', 'jobs & steps', 'runners', 'marketplace actions'],
+        theory: ['Anatomy of a workflow file: name, on, jobs, steps', 'Event triggers: push, pull_request, workflow_dispatch, schedule', 'Jobs, steps, and the default GitHub-hosted runner environment', 'Using marketplace actions (checkout, setup-node, setup-java)', 'Reading logs and run history in the Actions tab'],
+        labs: ['Write a workflow that runs tests on every push to main', 'Trigger a workflow manually with workflow_dispatch and inputs', 'Add a scheduled (cron) workflow for nightly builds', "Debug a failing workflow using the Actions log viewer"]
+      },
+      {
+        order: 4, title: 'GitHub Actions Workflow Syntax Deep Dive', phase: 'GitHub Actions', difficulty: 'Intermediate',
+        tags: ['contexts & expressions', 'needs', 'conditionals', 'artifacts', 'job outputs'],
+        theory: ['Contexts and expressions (github, env, secrets, needs, matrix)', 'The needs: keyword and building multi-job dependency graphs', 'if: conditionals for steps and jobs', 'Uploading/downloading artifacts between jobs', 'Job outputs and passing data between jobs'],
+        labs: ['Build a 3-job pipeline: build → test → deploy using needs', 'Use an if: condition to skip a job on non-main branches', 'Pass a build artifact from a build job into a deploy job', 'Use job outputs to pass a version string across jobs']
+      },
+      {
+        order: 5, title: 'GitHub Actions Secrets, Environments & Deployments', phase: 'GitHub Actions', difficulty: 'Intermediate',
+        tags: ['encrypted secrets', 'environments', 'protection rules', 'OIDC', 'approval gates'],
+        theory: ['Repository, organization and environment-level secrets', 'GitHub Environments — protection rules and required reviewers', 'OIDC — keyless cloud authentication (AWS/Azure/GCP) without long-lived secrets', 'Deployment approval gates for production environments', 'Interview favorite: "How do you avoid storing cloud credentials in CI?"'],
+        labs: ['Configure an environment with a required-reviewer approval gate', 'Set up OIDC federation to deploy to a cloud provider without static keys', 'Store and reference an encrypted secret in a deploy step', 'Build a workflow that auto-deploys to staging, but needs approval for prod']
+      },
+      {
+        order: 6, title: 'GitHub Actions Advanced Patterns', phase: 'GitHub Actions', difficulty: 'Advanced',
+        tags: ['matrix builds', 'caching', 'reusable workflows', 'composite actions', 'self-hosted runners'],
+        theory: ['Matrix builds for testing across OS/language versions', 'actions/cache for dependency and build caching', 'Reusable workflows (workflow_call) vs composite actions', 'Self-hosted runners — when and why to use them', 'Concurrency groups to cancel superseded runs'],
+        labs: ['Build a matrix workflow testing across 3 language versions and 2 OSes', 'Extract shared steps into a reusable workflow called from two repos', 'Write a composite action that bundles lint + test + build', 'Configure concurrency to cancel in-progress runs on new pushes']
+      },
+      {
+        order: 7, title: 'Jenkins Fundamentals & Architecture', phase: 'Jenkins', difficulty: 'Beginner',
+        tags: ['controller/agent', 'installation', 'plugins', 'job types', 'Blue Ocean'],
+        theory: ['Jenkins architecture: controller, agents/nodes, executors', 'Installing and configuring Jenkins (WAR / Docker / Helm)', 'Freestyle jobs vs Pipeline jobs vs Multibranch Pipeline jobs', 'The Jenkins plugin ecosystem and plugin management', 'Blue Ocean UI vs the classic Jenkins UI'],
+        labs: ['Install Jenkins via Docker and complete the initial setup wizard', 'Create a Freestyle job that builds a sample repo on push', 'Add and configure an agent node over SSH', 'Install and configure the Git and Pipeline plugins']
+      },
+      {
+        order: 8, title: 'Jenkins Pipelines — Declarative vs Scripted', phase: 'Jenkins', difficulty: 'Intermediate',
+        tags: ['Jenkinsfile', 'declarative pipeline', 'scripted pipeline', 'post actions', 'parameters'],
+        theory: ['Declarative Pipeline syntax: pipeline, agent, stages, steps', 'Scripted Pipeline (Groovy-based) and when it is still needed', 'post {} blocks — always, success, failure, cleanup', 'Parameters, environment variables, and when {} conditions', 'Interview classic: "Declarative vs Scripted — which would you use, and why?"'],
+        labs: ['Write a declarative Jenkinsfile with build/test/deploy stages', 'Add a post block that sends a notification on failure', 'Parameterize a pipeline with a choice and a string parameter', 'Convert a scripted pipeline snippet into declarative syntax']
+      },
+      {
+        order: 9, title: 'Jenkins Shared Libraries, Plugins & Multibranch Pipelines', phase: 'Jenkins', difficulty: 'Advanced',
+        tags: ['shared libraries', 'vars/src structure', 'multibranch pipeline', 'webhooks', 'key plugins'],
+        theory: ['Shared Libraries — reusing pipeline code across many Jenkinsfiles', 'The vars/ and src/ directory structure of a shared library', 'Multibranch Pipeline — auto-discovering branches and pull requests', 'Webhooks — triggering Jenkins instantly from GitHub/GitLab pushes', 'Key plugins: Pipeline, Credentials, Blue Ocean, Docker Pipeline'],
+        labs: ['Build a shared library with a reusable "deploy" step', 'Set up a Multibranch Pipeline job scanning a GitHub org', 'Configure a GitHub webhook to trigger Jenkins builds instantly', 'Reuse one shared-library function inside three different Jenkinsfiles']
+      },
+      {
+        order: 10, title: 'Jenkins Distributed Builds & Scaling', phase: 'Jenkins', difficulty: 'Advanced',
+        tags: ['agents & labels', 'Kubernetes plugin', 'dynamic agents', 'build queues', 'scaling'],
+        theory: ['Static agents vs dynamic/ephemeral agents', 'Labels — routing jobs to specific agent types', 'The Kubernetes plugin — spinning up pod-based agents on demand', 'Managing build queues and executor capacity', 'Scaling Jenkins for large orgs: controller sizing, agent pools'],
+        labs: ['Label two agents and route jobs using the agent { label } directive', 'Configure the Kubernetes plugin to run builds in ephemeral pods', 'Simulate a build-queue bottleneck and resolve it with more executors', 'Benchmark build time: static agent vs dynamic Kubernetes agent']
+      },
+      {
+        order: 11, title: 'Containerized CI/CD — Docker & Kubernetes Integration', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
+        tags: ['Docker builds', 'image scanning', 'Helm', 'kubectl deploy', 'GitOps basics'],
+        theory: ['Building and pushing Docker images from both GitHub Actions and Jenkins', 'Multi-stage Docker builds for smaller, faster CI images', 'Deploying to Kubernetes via kubectl/Helm from a pipeline', 'Image vulnerability scanning (Trivy, Snyk) as a pipeline gate', 'GitOps basics — ArgoCD/Flux vs push-based deployment'],
+        labs: ['Build and push a Docker image to a registry from GitHub Actions and Jenkins', 'Add a Trivy scan step that fails the pipeline on critical CVEs', 'Deploy a Helm chart to a Kubernetes cluster from a pipeline', 'Compare a push-based deploy step against a GitOps ArgoCD sync']
+      },
+      {
+        order: 12, title: 'Deployment Strategies — Blue-Green, Canary, Rolling', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
+        tags: ['blue-green', 'canary releases', 'rolling updates', 'feature flags', 'rollback'],
+        theory: ['Rolling deployments — the default Kubernetes strategy and its trade-offs', 'Blue-Green deployments — the zero-downtime cutover pattern', 'Canary releases — gradual traffic shifting with automated rollback triggers', 'Feature flags as a deployment-decoupling technique', 'Interview scenario: "Production just broke after a deploy — walk me through your rollback"'],
+        labs: ['Implement a blue-green deploy switch using two Kubernetes services', 'Configure a canary rollout with progressive traffic weighting', 'Trigger an automated rollback on failed health checks', 'Design a rollback runbook for a failed production deployment']
+      },
+      {
+        order: 13, title: 'Pipeline as Code Best Practices & GitOps', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
+        tags: ['pipeline as code', 'DRY pipelines', 'GitOps', 'promotion pattern', 'IaC integration'],
+        theory: ['Why pipeline configuration belongs in version control', 'DRY pipeline design at scale: reusable workflows and shared libraries revisited', 'Environment promotion pattern: dev → staging → prod with the same artifact', 'Integrating Infrastructure as Code (Terraform) into CI/CD', 'GitOps principles: declarative, versioned, pulled not pushed'],
+        labs: ['Design a promotion pipeline that moves one artifact through 3 environments', 'Add a Terraform plan/apply stage with a manual approval gate', 'Refactor a duplicated pipeline into a single reusable template', 'Compare a traditional push-deploy pipeline against a GitOps pull model']
+      },
+      {
+        order: 14, title: 'CI/CD Security — Secrets, SAST/DAST, Supply Chain', phase: 'Security & Governance', difficulty: 'Advanced',
+        tags: ['secrets scanning', 'SAST/DAST', 'SBOM', 'supply chain security', 'artifact signing'],
+        theory: ['Secrets management: vaults, encrypted secrets, secret-scanning tools', 'SAST (static analysis) and DAST (dynamic analysis) as pipeline gates', 'Software Bill of Materials (SBOM) and dependency vulnerability scanning', 'Supply chain attacks — lessons from real-world incidents', 'Signing artifacts and verifying provenance (Sigstore/cosign)'],
+        labs: ['Add a secret-scanning step (gitleaks) that blocks a pull request', 'Integrate a SAST tool (CodeQL/SonarQube) into a pipeline', 'Generate an SBOM for a build artifact', 'Sign a container image with cosign and verify it in a deploy step']
+      },
+      {
+        order: 15, title: 'RBAC, Compliance & Governance in CI/CD', phase: 'Security & Governance', difficulty: 'Advanced',
+        tags: ['RBAC', 'audit logs', 'compliance', 'CODEOWNERS', 'policy as code'],
+        theory: ['Role-based access control in GitHub Actions and Jenkins (org/folder-level)', 'Audit logging and traceability requirements (SOC2/ISO 27001 context)', 'Policy as code — enforcing pipeline rules with OPA/Conftest', 'Required reviewers, CODEOWNERS, and protected branches at scale', 'Interview angle: "How do you enforce compliance across 200 pipelines?"'],
+        labs: ['Configure RBAC roles in a Jenkins folder using the Role Strategy plugin', 'Set up CODEOWNERS to require specific team review on sensitive paths', 'Write an OPA policy that blocks pipelines missing a security-scan stage', 'Audit a sample pipeline for compliance gaps and document the fixes']
+      },
+      {
+        order: 16, title: 'Monitoring, Observability & Incident Response', phase: 'Industry & Interview', difficulty: 'Advanced',
+        tags: ['pipeline metrics', 'alerting', 'MTTR', 'post-mortems', 'flaky tests'],
+        theory: ['Monitoring pipeline health: success rate, duration, flaky-test detection', 'Alerting on failed deployments (Slack/PagerDuty integration)', 'Tracking DORA metrics on a production dashboard', 'Incident response workflow when a bad deploy hits production', 'Writing blameless post-mortems for pipeline/deployment failures'],
+        labs: ['Add a Slack notification step for pipeline failures', 'Build a simple dashboard tracking build success rate over time', 'Identify and quarantine a flaky test in a real pipeline', 'Write a post-mortem for a simulated failed production deployment']
+      },
+      {
+        order: 17, title: 'CI/CD Interview Mastery — Scenario-Based Q&A', phase: 'Industry & Interview', difficulty: 'Advanced',
+        tags: ['system design Qs', 'troubleshooting scenarios', 'behavioral Qs', 'GitHub Actions vs Jenkins', 'rapid-fire concepts'],
+        theory: ['"Design a CI/CD pipeline for a microservices app" — structuring your answer', '"GitHub Actions vs Jenkins — when would you choose one over the other?"', 'Troubleshooting: "Pipeline passes locally but fails in CI — how do you debug it?"', 'Behavioral: "Tell me about a time you fixed a slow or broken pipeline"', 'Rapid-fire concept checks: idempotency, artifact immutability, secrets handling, rollback strategy'],
+        labs: ['Mock interview: design a full pipeline for a 3-service app on a whiteboard', 'Debug a deliberately broken sample GitHub Actions workflow under time pressure', 'Debug a deliberately broken sample Jenkinsfile under time pressure', 'Prepare and rehearse STAR-format answers for 3 CI/CD behavioral questions']
+      },
+    ];
+
+    let current = 'all';
+
+    function render() {
+      const el = document.getElementById('units-list');
+      const vis = current === 'all' ? units : units.filter(u => u.phase === current);
+
+      if (vis.length === 0) {
+        el.innerHTML = '<div style="text-align:center; padding: 3rem; color: var(--color-text-tertiary);">No units found for this phase.</div>';
+        return;
+      }
+
+      el.innerHTML = vis.map((u, i) => {
+        const p = phases[u.phase];
+        const last = i === vis.length - 1;
+        // Animation delay for cascading effect
+        const delay = i * 0.05;
+
+        return `
+<div class="unit-row" id="row-${u.order}" style="animation-delay: ${delay}s">
+  <div class="spine">
+    <div class="spine-dot" style="background:${p.dot}; color:${p.dot}"></div>
+    ${!last ? `<div class="spine-line"></div>` : ''}
+  </div>
+  <div class="unit-card" onclick="toggle(${u.order})">
+    <div class="unit-header">
+      <span class="unit-num">U${String(u.order).padStart(2, '0')}</span>
+      <span class="unit-title">${u.title}</span>
+      <span class="phase-badge" style="background:${p.bg}; color:${p.text}; border-color:${p.border}">${u.phase}</span>
+      <span class="diff-badge">${u.difficulty}</span>
+      <i class="ti ti-chevron-down chevron" id="chev-${u.order}" aria-hidden="true"></i>
+    </div>
+    <div class="tags-row">${u.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    <div class="expand-content" id="exp-${u.order}" onclick="event.stopPropagation()">
+      <div class="expand-divider"></div>
+      <div class="expand-grid">
+        <div>
+          <div class="section-label"><i class="ti ti-book" aria-hidden="true"></i> Theory topics</div>
+          <ul class="item-list">${u.theory.map(t => `<li>${t}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <div class="section-label"><i class="ti ti-terminal-2" aria-hidden="true"></i> Labs & Practical Exercises</div>
+          <ul class="item-list">${u.labs.map(l => `<li>${l}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <button class="study-btn" onclick="startLearning(${u.order})">
+        <i class="ti ti-player-play-filled" style="font-size: 1rem;"></i> Start Learning this Unit
+      </button>
+    </div>
+  </div>
+</div>`;
+      }).join('');
+    }
+
+    function toggle(id) {
+      const e = document.getElementById('exp-' + id);
+      const c = document.getElementById('chev-' + id);
+      const o = e.classList.contains('open');
+
+      // Close all others (accordion style)
+      document.querySelectorAll('.expand-content').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.chevron').forEach(el => el.classList.remove('open'));
+
+      // Toggle current
+      if (!o) {
+        e.classList.add('open');
+        c.classList.add('open');
+      }
+    }
+
+    function setFilter(phase, btn) {
+      current = phase;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    }
+
+    function startLearning(order) {
+      const unit = units.find(u => u.order === order);
+      if (!unit) return;
+
+      const phaseMap = {
+        'Foundation': 1,
+        'GitHub Actions': 2,
+        'Jenkins': 3,
+        'Deployment & Pipeline-as-Code': 4,
+        'Security & Governance': 5,
+        'Industry & Interview': 6
+      };
+
+      const phaseNum = phaseMap[unit.phase];
+      if (phaseNum) {
+        const htmlPath = `phases/phase_${phaseNum}.html`;
+        const pdfPath = `phases/phase_${phaseNum}.pdf`;
+
+        // Check if the HTML file exists
+        fetch(htmlPath)
+          .then(res => {
+            if (res.ok) {
+              window.open(htmlPath, '_blank');
+            } else {
+              window.open(pdfPath, '_blank');
+            }
+          })
+          .catch(() => {
+            // Fallback for local files / CORS issues on file:// protocol
+            if (window.location.protocol === 'file:') {
+              window.open(htmlPath, '_blank');
+            } else {
+              window.open(pdfPath, '_blank');
+            }
+          });
+      } else {
+        console.error('Unknown phase:', unit.phase);
+      }
+    }
+
+    // Smooth counting animation for stat cards
+    function animateCount(element, target, duration = 1200) {
+      if (!element) return;
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const easeProgress = progress * (2 - progress); // Ease out quad
+        const currentValue = Math.floor(easeProgress * target);
+        element.textContent = currentValue;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          element.textContent = target;
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      updateThemeToggleIcon();
+    }
+
+    function updateThemeToggleIcon() {
+      const icon = document.querySelector('.theme-toggle-btn i');
+      if (!icon) return;
+      if (document.documentElement.classList.contains('light-theme')) {
+        icon.className = 'ti ti-sun';
+      } else {
+        icon.className = 'ti ti-moon';
+      }
+    }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', () => {
+      updateThemeToggleIcon();
+      render(); // draw unit cards
+      const durations = [1000, 1200, 1200, 800];
+      document.querySelectorAll('.stat-val').forEach((el, i) => {
+        const target = parseInt(el.textContent, 10);
+        if (!isNaN(target)) animateCount(el, target, durations[i] || 1200);
+      });
+    });
+
+  </script>
+</body>
+
+</html>
