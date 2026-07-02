@@ -3,7 +3,7 @@
 
 <head>
   <script>
-    (function() {
+    (function () {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       if (savedTheme === 'light') {
         document.documentElement.classList.add('light-theme');
@@ -535,6 +535,7 @@
       z-index: 1000;
       transition: all 0.3s ease;
     }
+
     .theme-toggle-btn:hover {
       transform: scale(1.1);
       border-color: var(--color-border-primary);
@@ -591,47 +592,58 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     .light-theme .theme-toggle-btn {
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     }
+
     .light-theme .unit-card:hover {
       box-shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
     }
+
     .light-theme .tag {
       background: rgba(0, 0, 0, 0.04);
       color: var(--color-text-secondary);
       border: 1px solid rgba(0, 0, 0, 0.06);
     }
+
     .light-theme .unit-card:hover .tag {
       background: rgba(0, 0, 0, 0.06);
       color: var(--color-text-primary);
     }
+
     .light-theme .study-btn {
       background: rgba(0, 0, 0, 0.02);
       border-color: rgba(0, 0, 0, 0.1);
       color: var(--color-text-primary);
     }
+
     .light-theme .study-btn:hover {
       background: #1a202c;
       color: #ffffff;
       border-color: #1a202c;
       box-shadow: 0 4px 12px rgba(26, 32, 44, 0.25);
     }
+
     .light-theme .filters {
       background: rgba(0, 0, 0, 0.03);
       border-color: rgba(0, 0, 0, 0.05);
     }
+
     .light-theme .filter-btn.active {
       background: #1a202c;
       color: #ffffff;
       border-color: #1a202c;
     }
+
     .light-theme ::-webkit-scrollbar-track {
       background: #f5f7fa;
     }
+
     .light-theme ::-webkit-scrollbar-thumb {
       background: rgba(0, 0, 0, 0.15);
     }
+
     .light-theme ::-webkit-scrollbar-thumb:hover {
       background: rgba(0, 0, 0, 0.3);
     }
@@ -695,148 +707,214 @@
 
     const units = [
       // ---------- JS - FOUNDATIONS ----------
-      { order: 0, title: 'Execution Context, Hoisting & Scope', phase: 'JS - Foundations', difficulty: 'Beginner',
+      {
+        order: 0, title: 'Execution Context, Hoisting & Scope', phase: 'JS - Foundations', difficulty: 'Beginner',
         tags: ['execution context', 'hoisting', 'TDZ', 'var/let/const', 'scope chain'],
         theory: ['Global vs function execution context, call stack', 'Hoisting of var/let/const/functions + Temporal Dead Zone', 'Lexical vs dynamic scope, scope chain resolution'],
-        labs: ['Predict-the-output hoisting traps (classic interview snippets)', 'Trace variable resolution across nested scopes'] },
-      { order: 1, title: 'Type Coercion, Equality & Truthy/Falsy', phase: 'JS - Foundations', difficulty: 'Beginner',
+        labs: ['Predict-the-output hoisting traps (classic interview snippets)', 'Trace variable resolution across nested scopes']
+      },
+      {
+        order: 1, title: 'Type Coercion, Equality & Truthy/Falsy', phase: 'JS - Foundations', difficulty: 'Beginner',
         tags: ['type coercion', '== vs ===', 'truthy/falsy', 'NaN handling'],
         theory: ['Implicit coercion rules: + does concatenation, -/*// force numeric coercion', 'The falsy value list and why `if(count)` silently breaks when count is 0', '== vs === edge cases: null == undefined, NaN comparisons, Number.isNaN'],
-        labs: ['Predict output of 5-6 classic coercion snippets (interview staple)', 'Refactor a buggy conditional that silently skips valid 0/empty-string input'] },
-      { order: 2, title: 'Closures & Currying', phase: 'JS - Foundations', difficulty: 'Beginner',
+        labs: ['Predict output of 5-6 classic coercion snippets (interview staple)', 'Refactor a buggy conditional that silently skips valid 0/empty-string input']
+      },
+      {
+        order: 2, title: 'Closures & Currying', phase: 'JS - Foundations', difficulty: 'Beginner',
         tags: ['closures', 'IIFE', 'currying', 'memoization', 'private state'],
         theory: ['How closures capture variables (by reference, not value)', 'Classic loop-variable closure bug and fixes', 'Practical uses: memoization, private state, currying'],
-        labs: ['Implement memoize()', 'Fix the var-in-loop setTimeout interview question'] },
-      { order: 3, title: 'this, call/apply/bind & Arrow Functions', phase: 'JS - Foundations', difficulty: 'Beginner',
+        labs: ['Implement memoize()', 'Fix the var-in-loop setTimeout interview question']
+      },
+      {
+        order: 3, title: 'this, call/apply/bind & Arrow Functions', phase: 'JS - Foundations', difficulty: 'Beginner',
         tags: ['this binding', 'call/apply/bind', 'arrow functions', 'implicit vs explicit binding'],
         theory: ['4 rules of this binding (default, implicit, explicit, new)', 'Arrow functions and lexical this, why they have no own this/arguments', 'call/apply/bind differences and use cases'],
-        labs: ['Fix a broken this inside a callback (classic interview bug)', 'Implement a custom bind() polyfill'] },
-      { order: 4, title: 'Values vs References: Copying & Mutation', phase: 'JS - Foundations', difficulty: 'Beginner',
+        labs: ['Fix a broken this inside a callback (classic interview bug)', 'Implement a custom bind() polyfill']
+      },
+      {
+        order: 4, title: 'Values vs References: Copying & Mutation', phase: 'JS - Foundations', difficulty: 'Beginner',
         tags: ['pass by value', 'pass by reference', 'shallow copy', 'deep copy', 'structuredClone'],
         theory: ['Primitives copied by value; objects/arrays copied by reference (the reference itself is passed by value)', 'Why reassigning a function parameter never mutates the caller\'s object, but mutating a property does', 'Shallow copy (spread/Object.assign) vs deep copy (structuredClone) and where shallow copy silently breaks'],
-        labs: ['Predict output of a mutate-vs-reassign snippet (interview staple)', 'Fix a shared-nested-array bug caused by a shallow copy'] },
-      { order: 5, title: 'Prototypes, Classes, Getters/Setters & Object.create', phase: 'JS - Foundations', difficulty: 'Beginner',
+        labs: ['Predict output of a mutate-vs-reassign snippet (interview staple)', 'Fix a shared-nested-array bug caused by a shallow copy']
+      },
+      {
+        order: 5, title: 'Prototypes, Classes, Getters/Setters & Object.create', phase: 'JS - Foundations', difficulty: 'Beginner',
         tags: ['prototype chain', '__proto__ vs prototype', 'ES6 classes', 'Object.create', 'getters/setters'],
         theory: ['Prototype chain and property lookup, __proto__ vs .prototype', 'ES6 class syntax as sugar over prototypes; constructor-fn vs class-based inheritance', 'Object.create for prototype-only objects; getter/setter pattern with a backing _field'],
-        labs: ['Implement classic inheritance without class syntax (Student extends Person)', 'Add a validated getter/setter (e.g. fullName) and explain/reproduce prototype pollution risk'] },
-      { order: 6, title: 'Arrays, Destructuring & Core Methods', phase: 'JS - Foundations', difficulty: 'Beginner',
+        labs: ['Implement classic inheritance without class syntax (Student extends Person)', 'Add a validated getter/setter (e.g. fullName) and explain/reproduce prototype pollution risk']
+      },
+      {
+        order: 6, title: 'Arrays, Destructuring & Core Methods', phase: 'JS - Foundations', difficulty: 'Beginner',
         tags: ['map/filter/reduce', 'spread/rest', 'destructuring', 'iterables'],
         theory: ['map/filter/reduce internals and chaining', 'Spread/rest and shallow vs deep copy', 'Iterable protocol basics'],
-        labs: ['Implement your own reduce()', 'Solve 2-3 array manipulation interview problems'] },
+        labs: ['Implement your own reduce()', 'Solve 2-3 array manipulation interview problems']
+      },
 
       // ---------- JS - INTERMEDIATE ----------
-      { order: 7, title: 'Promises & Async/Await', phase: 'JS - Intermediate', difficulty: 'Intermediate',
+      {
+        order: 7, title: 'Promises & Async/Await', phase: 'JS - Intermediate', difficulty: 'Intermediate',
         tags: ['promises', 'async/await', 'Promise.all/race/allSettled/any', 'error handling'],
         theory: ['Promise states and chaining semantics', 'async/await sugar over promises, error propagation', 'Promise combinators and when to use each'],
-        labs: ['Implement a simplified Promise from scratch', 'Parallelize API calls correctly with Promise.allSettled'] },
-      { order: 8, title: 'Event Loop & Concurrency Model', phase: 'JS - Intermediate', difficulty: 'Intermediate',
+        labs: ['Implement a simplified Promise from scratch', 'Parallelize API calls correctly with Promise.allSettled']
+      },
+      {
+        order: 8, title: 'Event Loop & Concurrency Model', phase: 'JS - Intermediate', difficulty: 'Intermediate',
         tags: ['call stack', 'microtask queue', 'macrotask queue', 'setTimeout vs Promise'],
         theory: ['Call stack, task queue, microtask queue ordering', 'Why Promise.then runs before setTimeout(0)', 'Browser event loop vs Node event loop at a glance'],
-        labs: ['Predict execution order of mixed sync/async/microtask code (interview staple)'] },
-      { order: 9, title: 'Modules: CommonJS vs ESM', phase: 'JS - Intermediate', difficulty: 'Intermediate',
+        labs: ['Predict execution order of mixed sync/async/microtask code (interview staple)']
+      },
+      {
+        order: 9, title: 'Modules: CommonJS vs ESM', phase: 'JS - Intermediate', difficulty: 'Intermediate',
         tags: ['require', 'import/export', 'module resolution', 'CJS/ESM interop'],
         theory: ['CommonJS require caching and resolution algorithm', 'ESM static imports, tree-shaking implications', 'Interop pitfalls between CJS and ESM'],
-        labs: ['Debug a real CJS/ESM interop failure', 'Convert a small CJS module to ESM'] },
-      { order: 10, title: 'Error Handling Patterns', phase: 'JS - Intermediate', difficulty: 'Intermediate',
+        labs: ['Debug a real CJS/ESM interop failure', 'Convert a small CJS module to ESM']
+      },
+      {
+        order: 10, title: 'Error Handling Patterns', phase: 'JS - Intermediate', difficulty: 'Intermediate',
         tags: ['try/catch', 'custom errors', 'async error propagation', 'error-first callbacks'],
         theory: ['Custom Error subclasses and error codes', 'Error propagation across async boundaries', 'Error-first callback convention (legacy Node style)'],
-        labs: ['Build a custom AppError hierarchy', 'Fix a swallowed-promise-rejection bug'] },
-      { order: 11, title: 'Functional Programming Patterns', phase: 'JS - Intermediate', difficulty: 'Intermediate',
+        labs: ['Build a custom AppError hierarchy', 'Fix a swallowed-promise-rejection bug']
+      },
+      {
+        order: 11, title: 'Functional Programming Patterns', phase: 'JS - Intermediate', difficulty: 'Intermediate',
         tags: ['pure functions', 'immutability', 'composition', 'first-class functions', 'higher-order functions'],
         theory: ['First-class functions (functions as values) as the foundation for HOFs and callbacks', 'Pure functions and referential transparency', 'Function composition/pipelines and immutability strategies in JS (no built-in enforcement)'],
-        labs: ['Build a compose()/pipe() utility', 'Refactor an imperative function into a functional pipeline'] },
+        labs: ['Build a compose()/pipe() utility', 'Refactor an imperative function into a functional pipeline']
+      },
 
       // ---------- JS - ADVANCED ----------
-      { order: 12, title: 'Design Patterns for JS', phase: 'JS - Advanced', difficulty: 'Advanced',
+      {
+        order: 12, title: 'Design Patterns for JS', phase: 'JS - Advanced', difficulty: 'Advanced',
         tags: ['singleton', 'factory', 'observer', 'pub-sub', 'module pattern'],
         theory: ['Singleton, Factory, Observer/Pub-Sub in idiomatic JS', 'When these patterns show up in real backend code'],
-        labs: ['Implement a pub-sub event bus from scratch', 'Identify the pattern used in a given code snippet (interview style)'] },
-      { order: 13, title: 'Memory Management & Performance', phase: 'JS - Advanced', difficulty: 'Advanced',
+        labs: ['Implement a pub-sub event bus from scratch', 'Identify the pattern used in a given code snippet (interview style)']
+      },
+      {
+        order: 13, title: 'Memory Management & Performance', phase: 'JS - Advanced', difficulty: 'Advanced',
         tags: ['garbage collection', 'memory leaks', 'debounce/throttle', 'Big O'],
         theory: ['Mark-and-sweep GC basics, generational GC', 'Common memory leak sources (closures, detached listeners, timers)', 'Time/space complexity of common operations'],
-        labs: ['Find and fix a memory leak in a given snippet', 'Implement debounce and throttle from scratch'] },
-      { order: 14, title: 'Generators, Iterators & Proxy/Reflect', phase: 'JS - Advanced', difficulty: 'Advanced',
+        labs: ['Find and fix a memory leak in a given snippet', 'Implement debounce and throttle from scratch']
+      },
+      {
+        order: 14, title: 'Generators, Iterators & Proxy/Reflect', phase: 'JS - Advanced', difficulty: 'Advanced',
         tags: ['generators', 'iterator protocol', 'async generators', 'Proxy', 'Reflect'],
         theory: ['Iterator/iterable protocol and custom iterables', 'Generators for lazy evaluation, async generators', 'Proxy/Reflect for interception (validation, logging)'],
-        labs: ['Build a lazy paginated data fetcher with async generators', 'Implement a validation Proxy on an object'] },
-      { order: 15, title: 'V8 Internals & JS Engine Basics', phase: 'JS - Advanced', difficulty: 'Advanced',
+        labs: ['Build a lazy paginated data fetcher with async generators', 'Implement a validation Proxy on an object']
+      },
+      {
+        order: 15, title: 'V8 Internals & JS Engine Basics', phase: 'JS - Advanced', difficulty: 'Advanced',
         tags: ['JIT compilation', 'hidden classes', 'inline caching', 'engine optimization'],
         theory: ['JIT compilation pipeline (interpreter → optimizing compiler)', 'Hidden classes and inline caching, why object shape matters', 'Deoptimization triggers to avoid in hot code paths'],
-        labs: ['Explain a V8 deoptimization scenario (common senior-interview question)'] },
-      { order: 16, title: 'JS Coding Round Prep', phase: 'JS - Advanced', difficulty: 'Advanced',
+        labs: ['Explain a V8 deoptimization scenario (common senior-interview question)']
+      },
+      {
+        order: 16, title: 'JS Coding Round Prep', phase: 'JS - Advanced', difficulty: 'Advanced',
         tags: ['polyfills', 'DSA in JS', 'array/string problems', 'whiteboard patterns'],
         theory: ['Common polyfills asked in interviews: bind, map, Promise, debounce', 'Pattern recognition for array/string/hashmap problems'],
-        labs: ['Implement 3 common polyfills from memory', 'Solve 2-3 timed DSA problems in JS'] },
+        labs: ['Implement 3 common polyfills from memory', 'Solve 2-3 timed DSA problems in JS']
+      },
 
       // ---------- NODE - CORE & RUNTIME ----------
-      { order: 17, title: 'Node Architecture & Event Loop Phases', phase: 'Node - Core & Runtime', difficulty: 'Beginner',
+      {
+        order: 17, title: 'Node Architecture & Event Loop Phases', phase: 'Node - Core & Runtime', difficulty: 'Beginner',
         tags: ['libuv', 'event loop phases', 'timers/poll/check', 'thread pool'],
         theory: ['libuv architecture, single-threaded JS + thread pool for I/O', 'Event loop phases: timers, pending, poll, check, close', 'process.nextTick vs setImmediate ordering'],
-        labs: ['Predict output ordering across nextTick/setImmediate/setTimeout (interview staple)'] },
-      { order: 18, title: 'Module System & Package Management', phase: 'Node - Core & Runtime', difficulty: 'Beginner',
+        labs: ['Predict output ordering across nextTick/setImmediate/setTimeout (interview staple)']
+      },
+      {
+        order: 18, title: 'Module System & Package Management', phase: 'Node - Core & Runtime', difficulty: 'Beginner',
         tags: ['require internals', 'module caching', 'package.json', 'semver', 'npm/pnpm/yarn'],
         theory: ['Module resolution algorithm and require caching', 'semver ranges and lockfile purpose', 'npm vs pnpm vs yarn tradeoffs'],
-        labs: ['Trace a module resolution failure in a monorepo-style layout'] },
-      { order: 19, title: 'File System & Streams', phase: 'Node - Core & Runtime', difficulty: 'Intermediate',
+        labs: ['Trace a module resolution failure in a monorepo-style layout']
+      },
+      {
+        order: 19, title: 'File System & Streams', phase: 'Node - Core & Runtime', difficulty: 'Intermediate',
         tags: ['fs module', 'readable/writable streams', 'piping', 'backpressure', 'buffers'],
         theory: ['Buffers vs strings, encoding basics', 'Readable/Writable/Duplex/Transform streams', 'Backpressure and why streaming matters for large payloads'],
-        labs: ['Stream-process a large CSV/log file without loading it fully in memory', 'Build a Transform stream'] },
-      { order: 20, title: 'Process, Child Processes & EventEmitter', phase: 'Node - Core & Runtime', difficulty: 'Intermediate',
+        labs: ['Stream-process a large CSV/log file without loading it fully in memory', 'Build a Transform stream']
+      },
+      {
+        order: 20, title: 'Process, Child Processes & EventEmitter', phase: 'Node - Core & Runtime', difficulty: 'Intermediate',
         tags: ['process object', 'env config', 'EventEmitter', 'spawn/exec/fork', 'cluster basics'],
         theory: ['process object, env vars, exit codes, signals', 'EventEmitter pattern used across Node core', 'spawn vs exec vs fork differences'],
-        labs: ['Build a custom EventEmitter-based module', 'Run a child process and stream its output'] },
-      { order: 21, title: 'Debugging & Diagnostics in Node', phase: 'Node - Core & Runtime', difficulty: 'Intermediate',
+        labs: ['Build a custom EventEmitter-based module', 'Run a child process and stream its output']
+      },
+      {
+        order: 21, title: 'Debugging & Diagnostics in Node', phase: 'Node - Core & Runtime', difficulty: 'Intermediate',
         tags: ['uncaughtException', 'unhandledRejection', 'node --inspect', 'process exit codes'],
         theory: ['Global error handlers: uncaughtException, unhandledRejection', 'node --inspect and Chrome DevTools debugging', 'Graceful shutdown patterns (SIGTERM/SIGINT)'],
-        labs: ['Diagnose a hung process with --inspect', 'Implement graceful shutdown for an HTTP server'] },
+        labs: ['Diagnose a hung process with --inspect', 'Implement graceful shutdown for an HTTP server']
+      },
 
       // ---------- NODE - BACKEND ENGINEERING ----------
-      { order: 22, title: 'Building REST APIs with Express', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
+      {
+        order: 22, title: 'Building REST APIs with Express', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
         tags: ['routing', 'middleware', 'request/response lifecycle', 'error middleware'],
         theory: ['Middleware chain and request/response lifecycle', 'Centralized error-handling middleware', 'Router-level vs app-level middleware'],
-        labs: ['Build a REST API with layered routing + centralized error handler'] },
-      { order: 23, title: 'Authentication & Authorization', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
+        labs: ['Build a REST API with layered routing + centralized error handler']
+      },
+      {
+        order: 23, title: 'Authentication & Authorization', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
         tags: ['JWT', 'sessions/cookies', 'OAuth2', 'refresh tokens', 'RBAC'],
         theory: ['JWT structure, signing, expiry, refresh token flow', 'Session/cookie-based auth vs token-based auth', 'Role-based access control (RBAC) middleware'],
-        labs: ['Implement JWT access + refresh token flow', 'Build RBAC middleware for protected routes'] },
-      { order: 24, title: 'Database Integration', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
+        labs: ['Implement JWT access + refresh token flow', 'Build RBAC middleware for protected routes']
+      },
+      {
+        order: 24, title: 'Database Integration', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
         tags: ['SQL vs NoSQL', 'ORMs (Prisma/Sequelize/TypeORM)', 'connection pooling', 'transactions'],
         theory: ['SQL vs NoSQL tradeoffs for backend use cases', 'Connection pooling and why it matters at scale', 'Transactions, ACID basics, N+1 query problem'],
-        labs: ['Write a multi-step DB transaction correctly', 'Identify and fix an N+1 query in ORM code'] },
-      { order: 25, title: 'Validation, Logging & Middleware Patterns', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
+        labs: ['Write a multi-step DB transaction correctly', 'Identify and fix an N+1 query in ORM code']
+      },
+      {
+        order: 25, title: 'Validation, Logging & Middleware Patterns', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
         tags: ['input validation (Zod/Joi)', 'structured logging', 'rate limiting', 'CORS'],
         theory: ['Schema validation at API boundaries (Zod/Joi)', 'Structured logging vs console.log for production', 'CORS mechanics, rate limiting strategies'],
-        labs: ['Add schema validation + structured logging to an existing API', 'Implement basic rate limiting middleware'] },
-      { order: 26, title: 'WebSockets & Real-Time Systems', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
+        labs: ['Add schema validation + structured logging to an existing API', 'Implement basic rate limiting middleware']
+      },
+      {
+        order: 26, title: 'WebSockets & Real-Time Systems', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
         tags: ['WebSocket protocol', 'Socket.io', 'real-time events', 'scaling real-time connections'],
         theory: ['WebSocket handshake vs HTTP polling/SSE, and when to reach for each', 'Socket.io rooms/namespaces for targeted broadcast', 'Scaling real-time connections across multiple instances (Redis adapter, sticky sessions)'],
-        labs: ['Build a real-time notification channel with Socket.io rooms', 'Wire a Redis adapter so events broadcast correctly across 2 clustered instances'] },
-      { order: 27, title: 'Testing Node Applications', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
+        labs: ['Build a real-time notification channel with Socket.io rooms', 'Wire a Redis adapter so events broadcast correctly across 2 clustered instances']
+      },
+      {
+        order: 27, title: 'Testing Node Applications', phase: 'Node - Backend Engineering', difficulty: 'Intermediate',
         tags: ['unit testing (Jest)', 'mocking', 'integration tests', 'supertest'],
         theory: ['Unit vs integration testing for APIs', 'Mocking DB/external calls', 'supertest for HTTP-level integration tests'],
-        labs: ['Write unit + integration tests for one API route with mocked DB'] },
+        labs: ['Write unit + integration tests for one API route with mocked DB']
+      },
 
       // ---------- NODE - ADVANCED & SYSTEM DESIGN ----------
-      { order: 28, title: 'Scaling Node.js', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
+      {
+        order: 28, title: 'Scaling Node.js', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
         tags: ['cluster module', 'worker threads', 'PM2', 'horizontal scaling', 'load balancing'],
         theory: ['cluster module vs worker_threads: when to use which', 'PM2 for process management in production', 'Horizontal scaling and stateless service design'],
-        labs: ['Run an app in cluster mode and benchmark throughput', 'Offload a CPU-heavy task to a worker thread'] },
-      { order: 29, title: 'Caching & Message Queues', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
+        labs: ['Run an app in cluster mode and benchmark throughput', 'Offload a CPU-heavy task to a worker thread']
+      },
+      {
+        order: 29, title: 'Caching & Message Queues', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
         tags: ['Redis caching', 'pub/sub', 'Kafka/RabbitMQ', 'job queues (BullMQ)'],
         theory: ['Cache-aside, write-through, TTL/invalidation strategies', 'Message queues for decoupling and async processing', 'Job queues (BullMQ) for background work'],
-        labs: ['Add Redis caching with proper invalidation to an endpoint', 'Set up a background job queue for a slow task'] },
-      { order: 30, title: 'Microservices Architecture', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
+        labs: ['Add Redis caching with proper invalidation to an endpoint', 'Set up a background job queue for a slow task']
+      },
+      {
+        order: 30, title: 'Microservices Architecture', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
         tags: ['service boundaries', 'API gateway', 'gRPC', 'inter-service communication'],
         theory: ['Defining service boundaries, shared vs per-service data', 'API gateway pattern, sync (REST/gRPC) vs async (queue) communication', 'Distributed tracing basics'],
-        labs: ['Design service boundaries for a given monolith (whiteboard exercise)'] },
-      { order: 31, title: 'Security Hardening', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
+        labs: ['Design service boundaries for a given monolith (whiteboard exercise)']
+      },
+      {
+        order: 31, title: 'Security Hardening', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
         tags: ['OWASP top 10', 'helmet', 'sanitization', 'secrets management'],
         theory: ['OWASP top 10 as it applies to Node APIs', 'helmet, input sanitization, dependency vulnerability scanning', 'Secrets management (env vars vs vaults)'],
-        labs: ['Harden an existing API against 2-3 OWASP risks (injection, XSS, broken auth)'] },
-      { order: 32, title: 'System Design Interview Prep', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
+        labs: ['Harden an existing API against 2-3 OWASP risks (injection, XSS, broken auth)']
+      },
+      {
+        order: 32, title: 'System Design Interview Prep', phase: 'Node - Advanced & System Design', difficulty: 'Advanced',
         tags: ['URL shortener', 'rate limiter', 'chat app', 'scalability tradeoffs'],
         theory: ['Framework for approaching a system design interview (requirements → API → data model → scale)', 'Common designs: URL shortener, rate limiter, chat app, notification system'],
-        labs: ['Whiteboard-design a rate limiter with a Node implementation sketch', 'Whiteboard-design a URL shortener end-to-end'] },
+        labs: ['Whiteboard-design a rate limiter with a Node implementation sketch', 'Whiteboard-design a URL shortener end-to-end']
+      },
     ];
 
     let current = 'all';
@@ -882,6 +960,9 @@
           <ul class="item-list">${u.labs.map(l => `<li>${l}</li>`).join('')}</ul>
         </div>
       </div>
+      <button class="study-btn" onclick="startLearning(${u.order})">
+        <i class="ti ti-player-play-filled" style="font-size: 1rem;"></i> Start Learning this Unit
+      </button>
     </div>
   </div>
 </div>`;
@@ -907,6 +988,46 @@
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       render();
+    }
+
+    function startLearning(order) {
+      const unit = units.find(u => u.order === order);
+      if (!unit) return;
+
+      const phaseMap = {
+        'JS - Foundations': 1,
+        'JS - Intermediate': 2,
+        'JS - Advanced': 3,
+        'Node - Core & Runtime': 4,
+        'Node - Backend Engineering': 5,
+        'Node - Advanced & System Design': 6
+      };
+
+      const phaseNum = phaseMap[unit.phase];
+      if (phaseNum) {
+        const htmlPath = `phases/phase_${phaseNum}.html`;
+        const pdfPath = `phases/phase_${phaseNum}.pdf`;
+
+        // Check if the HTML file exists
+        fetch(htmlPath)
+          .then(res => {
+            if (res.ok) {
+              window.open(htmlPath, '_blank');
+            } else {
+              window.open(pdfPath, '_blank');
+            }
+          })
+          .catch(() => {
+            // Fallback for local files / CORS issues on file:// protocol
+            if (window.location.protocol === 'file:') {
+              window.open(htmlPath, '_blank');
+            } else {
+              window.open(pdfPath, '_blank');
+            }
+          });
+      } else {
+        console.error('Unknown phase:', unit.phase);
+      }
     }
 
     function animateCount(element, target, duration = 1200) {
