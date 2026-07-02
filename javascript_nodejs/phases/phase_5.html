@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 5: Node.js — Backend Engineering</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 5: Node.js — Backend Engineering</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-5-nodejs--backend-engineering"><a class="heading-anchor" href="#phase-5-nodejs--backend-engineering" aria-hidden="true">#</a>Phase 5: Node.js — Backend Engineering</h1>
+<h3 id="deep-dive--interview-prep-for-a-3-yoe-nodejs-backend-dev"><a class="heading-anchor" href="#deep-dive--interview-prep-for-a-3-yoe-nodejs-backend-dev" aria-hidden="true">#</a>Deep-Dive + Interview Prep (for a 3 YOE Node.js Backend Dev)</h3>
+<p>Covers Units 22–27: Express REST APIs, Auth, Database Integration, Validation/Logging/Middleware, WebSockets, Testing.</p>
+<hr>
+<h2 id="unit-22--building-rest-apis-with-express"><a class="heading-anchor" href="#unit-22--building-rest-apis-with-express" aria-hidden="true">#</a>Unit 22 — Building REST APIs with Express</h2>
+<h3 id="221-the-middleware-chain-mental-model"><a class="heading-anchor" href="#221-the-middleware-chain-mental-model" aria-hidden="true">#</a>22.1 The Middleware Chain (mental model)</h3>
+<p>Express is fundamentally a <strong>chain of functions</strong> with signature <code class="inline-code">(req, res, next)</code>. Every request flows through this chain top to bottom, in the order middleware/routes were registered. <code class="inline-code">next()</code> hands control to the next function; not calling it hangs the request; calling it with an argument (<code class="inline-code">next(err)</code>) skips straight to error-handling middleware.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">morgan</span>(<span class="hljs-string">&#x27;combined&#x27;</span>));      <span class="hljs-comment">// 1. logging</span>
+app.<span class="hljs-title function_">use</span>(express.<span class="hljs-title function_">json</span>());          <span class="hljs-comment">// 2. body parsing</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;/api/users&#x27;</span>, userRouter);<span class="hljs-comment">// 3. routing</span>
+app.<span class="hljs-title function_">use</span>(notFoundHandler);         <span class="hljs-comment">// 4. 404</span>
+app.<span class="hljs-title function_">use</span>(errorHandler);            <span class="hljs-comment">// 5. centralized errors (4-arg fn)</span></code></pre></div>
+<p>Key rule: <strong>error-handling middleware must have exactly 4 params</strong> <code class="inline-code">(err, req, res, next)</code> — Express detects this by arity, not by name.</p>
+<h3 id="222-router-level-vs-app-level-middleware"><a class="heading-anchor" href="#222-router-level-vs-app-level-middleware" aria-hidden="true">#</a>22.2 Router-level vs App-level Middleware</h3>
+<ul>
+<li><code class="inline-code">app.use(mw)</code> → runs for every request.</li>
+<li><code class="inline-code">router.use(mw)</code> → scoped to that router&#39;s mount path.</li>
+<li><code class="inline-code">app.use(&#39;/admin&#39;, authMw, adminRouter)</code> → path-scoped, only hits <code class="inline-code">/admin/*</code>.</li>
+</ul>
+<p>Use <code class="inline-code">express.Router()</code> to modularize by resource (<code class="inline-code">userRouter</code>, <code class="inline-code">orderRouter</code>) and mount them with a versioned prefix (<code class="inline-code">/api/v1/users</code>). This is what interviewers expect when they ask &quot;how do you structure a large Express app.&quot;</p>
+<h3 id="223-layered-architecture-what-senior-interviews-actually-probe"><a class="heading-anchor" href="#223-layered-architecture-what-senior-interviews-actually-probe" aria-hidden="true">#</a>22.3 Layered Architecture (what senior interviews actually probe)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">routes/        → HTTP concerns only (params, status codes)
+controllers/   → orchestrates request → calls service → shapes response
+services/      → business logic, framework-agnostic
+repositories/  → DB access (Prisma/Sequelize/raw queries)
+middlewares/   → auth, validation, error handling</code></pre></div>
+<p>Why this matters: it keeps controllers thin, makes services unit-testable without spinning up Express, and isolates DB swaps to the repository layer. <strong>This is the #1 thing interviewers check for &quot;have you worked on production code.&quot;</strong></p>
+<h3 id="224-requestresponse-lifecycle-details"><a class="heading-anchor" href="#224-requestresponse-lifecycle-details" aria-hidden="true">#</a>22.4 Request/Response Lifecycle Details</h3>
+<ul>
+<li><code class="inline-code">req.params</code>, <code class="inline-code">req.query</code>, <code class="inline-code">req.body</code> — know exactly what each contains and when <code class="inline-code">req.body</code> is <code class="inline-code">undefined</code> (no body-parser middleware, or wrong <code class="inline-code">Content-Type</code>).</li>
+<li>Response is a <strong>stream</strong>; <code class="inline-code">res.send()</code>/<code class="inline-code">res.json()</code> implicitly call <code class="inline-code">res.end()</code>. Calling <code class="inline-code">res.json()</code> twice throws <code class="inline-code">ERR_HTTP_HEADERS_SENT</code> — a very common junior bug and a favorite debugging question.</li>
+<li><code class="inline-code">res.status(201).json(...)</code> — chainable because most <code class="inline-code">res</code> methods return <code class="inline-code">res</code>.</li>
+</ul>
+<h3 id="225-centralized-error-handling-pattern"><a class="heading-anchor" href="#225-centralized-error-handling-pattern" aria-hidden="true">#</a>22.5 Centralized Error Handling Pattern</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">AppError</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">Error</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">message, statusCode</span>) {
+    <span class="hljs-variable language_">super</span>(message);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">statusCode</span> = statusCode;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">isOperational</span> = <span class="hljs-literal">true</span>; <span class="hljs-comment">// distinguishes expected vs programmer errors</span>
+  }
+}
+
+<span class="hljs-comment">// controller</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">getUser</span> = <span class="hljs-keyword">async</span> (<span class="hljs-params">req, res, next</span>) =&gt; {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> userService.<span class="hljs-title function_">findById</span>(req.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>);
+    <span class="hljs-keyword">if</span> (!user) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AppError</span>(<span class="hljs-string">&#x27;User not found&#x27;</span>, <span class="hljs-number">404</span>);
+    res.<span class="hljs-title function_">json</span>(user);
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-title function_">next</span>(err); <span class="hljs-comment">// always forward to centralized handler</span>
+  }
+};
+
+<span class="hljs-comment">// centralized handler (must be LAST app.use)</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">err, req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> status = err.<span class="hljs-property">statusCode</span> || <span class="hljs-number">500</span>;
+  res.<span class="hljs-title function_">status</span>(status).<span class="hljs-title function_">json</span>({
+    <span class="hljs-attr">success</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">message</span>: err.<span class="hljs-property">isOperational</span> ? err.<span class="hljs-property">message</span> : <span class="hljs-string">&#x27;Internal Server Error&#x27;</span>,
+  });
+  <span class="hljs-keyword">if</span> (!err.<span class="hljs-property">isOperational</span>) logger.<span class="hljs-title function_">error</span>(err); <span class="hljs-comment">// unexpected → log for investigation</span>
+});</code></pre></div>
+<p>Async route handlers don&#39;t auto-forward rejected promises to <code class="inline-code">next()</code> in Express 4 — you must wrap them (<code class="inline-code">express-async-errors</code> package, or a manual <code class="inline-code">asyncHandler</code> wrapper). Express 5 (still stabilizing in the ecosystem) fixes this natively. <strong>Know this distinction — it&#39;s a recurring gotcha question.</strong></p>
+<h3 id="226-rest-conventions-interviewers-check"><a class="heading-anchor" href="#226-rest-conventions-interviewers-check" aria-hidden="true">#</a>22.6 REST Conventions Interviewers Check</h3>
+<ul>
+<li>Correct verb usage: GET (safe, idempotent), POST (create, not idempotent), PUT (full replace, idempotent), PATCH (partial update), DELETE (idempotent).</li>
+<li>Correct status codes: 200 (ok), 201 (created, with <code class="inline-code">Location</code> header ideally), 204 (no content), 400 (bad request/validation), 401 (unauthenticated), 403 (unauthorized/forbidden), 404, 409 (conflict), 422 (semantic validation failure), 429 (rate limited), 500.</li>
+<li>Pagination (<code class="inline-code">?page=&amp;limit=</code> or cursor-based), filtering, sorting via query params.</li>
+<li>Versioning: URI (<code class="inline-code">/v1/</code>) vs header-based — know tradeoffs (URI is simpler/cacheable, header is &quot;cleaner REST&quot; but harder to test manually).</li>
+</ul>
+<h3 id="227-interview-qampa"><a class="heading-anchor" href="#227-interview-qampa" aria-hidden="true">#</a>22.7 Interview Q&amp;A</h3>
+<p><strong>Q: Difference between <code class="inline-code">app.use()</code> and <code class="inline-code">app.get()</code>/<code class="inline-code">app.post()</code>?</strong>
+<code class="inline-code">use</code> matches all HTTP methods and matches path as a prefix; <code class="inline-code">get</code>/<code class="inline-code">post</code> match exact method + exact path pattern.</p>
+<p><strong>Q: How does Express match routes internally?</strong>
+It compiles route paths into regex via <code class="inline-code">path-to-regexp</code>, then iterates the middleware stack in registration order until a match calls <code class="inline-code">next()</code> all the way through or a response is sent.</p>
+<p><strong>Q: How do you handle async errors in Express 4 without crashing the process?</strong>
+Wrap handlers: <code class="inline-code">const asyncHandler = fn =&gt; (req, res, next) =&gt; Promise.resolve(fn(req, res, next)).catch(next);</code> — never let an unhandled rejection escape, since Node will otherwise crash on <code class="inline-code">unhandledRejection</code> in strict configurations.</p>
+<p><strong>Q: How would you version an API without breaking existing clients?</strong>
+URI versioning + deprecation headers + maintaining old controllers behind a compatibility shim until sunset date; discuss tradeoffs vs GraphQL-style non-versioned evolution.</p>
+<h3 id="228-practical-task"><a class="heading-anchor" href="#228-practical-task" aria-hidden="true">#</a>22.8 Practical Task</h3>
+<p>Build a REST API for a resource (e.g., <code class="inline-code">products</code>) with: layered structure (route → controller → service → repo), centralized error handler, <code class="inline-code">asyncHandler</code> wrapper, proper status codes, and a 404 fallback middleware.</p>
+<hr>
+<h2 id="unit-23--authentication-amp-authorization"><a class="heading-anchor" href="#unit-23--authentication-amp-authorization" aria-hidden="true">#</a>Unit 23 — Authentication &amp; Authorization</h2>
+<h3 id="231-authentication-vs-authorization-say-this-correctly-in-interviews"><a class="heading-anchor" href="#231-authentication-vs-authorization-say-this-correctly-in-interviews" aria-hidden="true">#</a>23.1 Authentication vs Authorization (say this correctly in interviews)</h3>
+<ul>
+<li><strong>AuthN</strong> = who are you (login, verifying identity).</li>
+<li><strong>AuthZ</strong> = what are you allowed to do (roles/permissions).</li>
+</ul>
+<h3 id="232-sessioncookie-based-auth"><a class="heading-anchor" href="#232-sessioncookie-based-auth" aria-hidden="true">#</a>23.2 Session/Cookie-based Auth</h3>
+<ul>
+<li>Server creates a session (stored in memory/Redis/DB), sends client a <code class="inline-code">Set-Cookie</code> with a session ID.</li>
+<li>Cookie flags matter: <code class="inline-code">HttpOnly</code> (JS can&#39;t read it → mitigates XSS token theft), <code class="inline-code">Secure</code> (HTTPS only), <code class="inline-code">SameSite=Strict/Lax</code> (CSRF mitigation).</li>
+<li>Stateful: server must look up session on every request → doesn&#39;t scale horizontally without a shared store (Redis).</li>
+</ul>
+<h3 id="233-token-based-auth-jwt"><a class="heading-anchor" href="#233-token-based-auth-jwt" aria-hidden="true">#</a>23.3 Token-based Auth (JWT)</h3>
+<p><strong>Structure:</strong> <code class="inline-code">header.payload.signature</code>, base64url-encoded, <strong>not encrypted</strong> — never put secrets in the payload (interviewers love catching this misconception).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> accessToken = jwt.<span class="hljs-title function_">sign</span>(
+  { <span class="hljs-attr">sub</span>: user.<span class="hljs-property">id</span>, <span class="hljs-attr">role</span>: user.<span class="hljs-property">role</span> },
+  process.<span class="hljs-property">env</span>.<span class="hljs-property">ACCESS_SECRET</span>,
+  { <span class="hljs-attr">expiresIn</span>: <span class="hljs-string">&#x27;15m&#x27;</span> }
+);
+<span class="hljs-keyword">const</span> refreshToken = jwt.<span class="hljs-title function_">sign</span>(
+  { <span class="hljs-attr">sub</span>: user.<span class="hljs-property">id</span>, <span class="hljs-attr">tokenVersion</span>: user.<span class="hljs-property">tokenVersion</span> },
+  process.<span class="hljs-property">env</span>.<span class="hljs-property">REFRESH_SECRET</span>,
+  { <span class="hljs-attr">expiresIn</span>: <span class="hljs-string">&#x27;7d&#x27;</span> }
+);</code></pre></div>
+<ul>
+<li><strong>Access token</strong>: short-lived (minutes), sent in <code class="inline-code">Authorization: Bearer &lt;token&gt;</code> header, used to authorize API calls, never persisted server-side (stateless — that&#39;s the whole point of JWT).</li>
+<li><strong>Refresh token</strong>: long-lived, stored <code class="inline-code">HttpOnly</code> cookie or secure storage, used only to mint new access tokens, <strong>should</strong> be persisted/trackable server-side (e.g., a <code class="inline-code">tokenVersion</code> or a stored hash) so it can be revoked on logout/compromise — pure stateless refresh tokens can&#39;t be revoked, which is a common design flaw interviewers probe.</li>
+</ul>
+<p><strong>Refresh flow:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Client access token expires → 401
+Client calls /auth/refresh with refresh token (cookie)
+Server verifies refresh token, checks tokenVersion/DB record
+Server issues new access token (+ optionally rotates refresh token)</code></pre></div>
+<p><strong>Rotation + reuse detection</strong>: on every refresh, invalidate the old refresh token and issue a new one; if an old (already-used) refresh token is presented again, it signals theft — revoke the entire token family.</p>
+<h3 id="234-jwt-vs-session--interview-comparison-table-know-both-sides"><a class="heading-anchor" href="#234-jwt-vs-session--interview-comparison-table-know-both-sides" aria-hidden="true">#</a>23.4 JWT vs Session — Interview Comparison Table (know both sides)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Session/Cookie</th>
+<th>JWT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>State</td>
+<td>Stateful (server store)</td>
+<td>Stateless (self-contained)</td>
+</tr>
+<tr>
+<td>Revocation</td>
+<td>Easy (delete from store)</td>
+<td>Hard (needs blocklist/versioning)</td>
+</tr>
+<tr>
+<td>Scaling</td>
+<td>Needs shared store (Redis)</td>
+<td>Scales naturally (no lookup)</td>
+</tr>
+<tr>
+<td>Payload size</td>
+<td>Small (just an ID)</td>
+<td>Larger (base64 claims)</td>
+</tr>
+<tr>
+<td>Common use</td>
+<td>Traditional web apps</td>
+<td>APIs, SPAs, mobile, microservices</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="235-oauth2-conceptual-commonly-asked-at-3-yoe-level"><a class="heading-anchor" href="#235-oauth2-conceptual-commonly-asked-at-3-yoe-level" aria-hidden="true">#</a>23.5 OAuth2 (conceptual, commonly asked at 3 YOE level)</h3>
+<ul>
+<li><strong>Authorization Code flow</strong> (most common, used by &quot;Login with Google&quot;): client redirects to provider → user consents → provider redirects back with a <code class="inline-code">code</code> → server exchanges <code class="inline-code">code</code> + <code class="inline-code">client_secret</code> for tokens (server-to-server, so the secret never touches the browser).</li>
+<li>Roles: Resource Owner (user), Client (your app), Authorization Server (Google/GitHub), Resource Server (API holding the data).</li>
+<li><strong>PKCE</strong> extension: required for public clients (SPAs, mobile) that can&#39;t safely hold a <code class="inline-code">client_secret</code> — prevents authorization code interception attacks.</li>
+</ul>
+<h3 id="236-rbac-middleware"><a class="heading-anchor" href="#236-rbac-middleware" aria-hidden="true">#</a>23.6 RBAC Middleware</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> <span class="hljs-title function_">authenticate</span> = <span class="hljs-keyword">async</span> (<span class="hljs-params">req, res, next</span>) =&gt; {
+  <span class="hljs-keyword">const</span> token = req.<span class="hljs-property">headers</span>.<span class="hljs-property">authorization</span>?.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27; &#x27;</span>)[<span class="hljs-number">1</span>];
+  <span class="hljs-keyword">if</span> (!token) <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">AppError</span>(<span class="hljs-string">&#x27;No token provided&#x27;</span>, <span class="hljs-number">401</span>));
+  <span class="hljs-keyword">try</span> {
+    req.<span class="hljs-property">user</span> = jwt.<span class="hljs-title function_">verify</span>(token, process.<span class="hljs-property">env</span>.<span class="hljs-property">ACCESS_SECRET</span>);
+    <span class="hljs-title function_">next</span>();
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">AppError</span>(<span class="hljs-string">&#x27;Invalid or expired token&#x27;</span>, <span class="hljs-number">401</span>));
+  }
+};
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">authorize</span> = (<span class="hljs-params">...allowedRoles</span>) =&gt; <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!allowedRoles.<span class="hljs-title function_">includes</span>(req.<span class="hljs-property">user</span>.<span class="hljs-property">role</span>)) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">AppError</span>(<span class="hljs-string">&#x27;Forbidden&#x27;</span>, <span class="hljs-number">403</span>));
+  }
+  <span class="hljs-title function_">next</span>();
+};
+
+<span class="hljs-comment">// usage</span>
+router.<span class="hljs-title function_">delete</span>(<span class="hljs-string">&#x27;/users/:id&#x27;</span>, authenticate, <span class="hljs-title function_">authorize</span>(<span class="hljs-string">&#x27;admin&#x27;</span>), deleteUser);</code></pre></div>
+<p>For finer-grained control than roles, use <strong>permission-based</strong> checks (<code class="inline-code">user.can(&#39;delete:orders&#39;)</code>) — mention this as an evolution when roles get too coarse (e.g., &quot;manager&quot; needing partial admin rights).</p>
+<h3 id="237-password-storage"><a class="heading-anchor" href="#237-password-storage" aria-hidden="true">#</a>23.7 Password Storage</h3>
+<ul>
+<li>Never store plaintext. Use <code class="inline-code">bcrypt</code>/<code class="inline-code">argon2</code> (salted, slow hash by design to resist brute force).</li>
+<li><code class="inline-code">bcrypt.hash(password, 12)</code> — the cost factor (rounds) trades off security vs latency; know that increasing it exponentially increases hashing time.</li>
+<li>Never compare passwords with <code class="inline-code">===</code>; always use the library&#39;s <code class="inline-code">compare()</code> (constant-time comparison, mitigates timing attacks).</li>
+</ul>
+<h3 id="238-interview-qampa"><a class="heading-anchor" href="#238-interview-qampa" aria-hidden="true">#</a>23.8 Interview Q&amp;A</h3>
+<p><strong>Q: Where should you store a JWT on the client and why?</strong>
+<code class="inline-code">HttpOnly</code> cookie over <code class="inline-code">localStorage</code> — <code class="inline-code">localStorage</code> is readable by any injected JS (XSS risk); cookies with <code class="inline-code">HttpOnly</code> aren&#39;t accessible to JS at all. Tradeoff: cookies need CSRF protection (<code class="inline-code">SameSite</code>, CSRF tokens).</p>
+<p><strong>Q: Can you truly &quot;log out&quot; a JWT?</strong>
+Not by itself — it&#39;s valid until expiry. Real logout requires either short expiry + refresh-token revocation, or maintaining a server-side blocklist (defeats some statelessness benefits but is often necessary).</p>
+<p><strong>Q: How do you handle a compromised refresh token?</strong>
+Token rotation with reuse detection (see 23.3) — revoke the whole family and force re-login.</p>
+<h3 id="239-practical-task"><a class="heading-anchor" href="#239-practical-task" aria-hidden="true">#</a>23.9 Practical Task</h3>
+<p>Implement access + refresh JWT flow with rotation, and RBAC middleware protecting at least one admin-only route.</p>
+<hr>
+<h2 id="unit-24--database-integration"><a class="heading-anchor" href="#unit-24--database-integration" aria-hidden="true">#</a>Unit 24 — Database Integration</h2>
+<h3 id="241-sql-vs-nosql--decision-framework-not-just-definitions"><a class="heading-anchor" href="#241-sql-vs-nosql--decision-framework-not-just-definitions" aria-hidden="true">#</a>24.1 SQL vs NoSQL — Decision Framework (not just definitions)</h3>
+<ul>
+<li><strong>SQL</strong> (Postgres/MySQL): strong schema, relational integrity, ACID transactions, joins — pick when data has clear relationships and consistency matters (finance, orders, inventory).</li>
+<li><strong>NoSQL</strong> (MongoDB, DynamoDB): flexible schema, horizontal scale, denormalized documents — pick for high write throughput, evolving schemas, or when data is naturally document-shaped (logs, catalogs, activity feeds).</li>
+<li>Real interviews want you to justify a choice for a <em>given scenario</em>, not recite definitions.</li>
+</ul>
+<h3 id="242-orms--prisma--sequelize--typeorm"><a class="heading-anchor" href="#242-orms--prisma--sequelize--typeorm" aria-hidden="true">#</a>24.2 ORMs — Prisma / Sequelize / TypeORM</h3>
+<ul>
+<li><strong>Prisma</strong>: schema-first (<code class="inline-code">schema.prisma</code>), generates a fully-typed client, migrations via <code class="inline-code">prisma migrate</code>. Great DX, strong TypeScript story.</li>
+<li><strong>Sequelize</strong>: model-first, mature, more &quot;magic,&quot; good raw-query escape hatches.</li>
+<li><strong>TypeORM</strong>: decorator-based (works well with NestJS), Active Record or Data Mapper pattern.</li>
+<li>Know when to <strong>drop to raw SQL</strong>: complex aggregations, performance-critical queries, or DB features the ORM doesn&#39;t expose well.</li>
+</ul>
+<h3 id="243-connection-pooling"><a class="heading-anchor" href="#243-connection-pooling" aria-hidden="true">#</a>24.3 Connection Pooling</h3>
+<ul>
+<li>Opening a new TCP+auth connection per request is expensive; a <strong>pool</strong> maintains a set of reusable connections.</li>
+<li>Key config knobs: <code class="inline-code">max</code> connections (bounded by DB&#39;s max_connections and your app&#39;s concurrency), <code class="inline-code">idleTimeoutMillis</code>, <code class="inline-code">connectionTimeoutMillis</code>.</li>
+<li><strong>Common production bug</strong>: pool exhaustion from not releasing connections (forgotten <code class="inline-code">.release()</code> in raw <code class="inline-code">pg</code> usage, or long-held transactions) → new requests hang until timeout. Interviewers ask about this as a &quot;debug this outage&quot; scenario.</li>
+<li>In serverless (Lambda), pooling is trickier — each cold start can open a new connection; solutions: connection poolers like PgBouncer, or serverless-specific drivers.</li>
+</ul>
+<h3 id="244-transactions-amp-acid"><a class="heading-anchor" href="#244-transactions-amp-acid" aria-hidden="true">#</a>24.4 Transactions &amp; ACID</h3>
+<ul>
+<li><strong>Atomicity</strong> (all-or-nothing), <strong>Consistency</strong> (valid state transitions), <strong>Isolation</strong> (concurrent txns don&#39;t interfere), <strong>Durability</strong> (committed = permanent).</li>
+<li>Multi-step operation example (money transfer) <strong>must</strong> be wrapped in a transaction:</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Prisma example</span>
+<span class="hljs-keyword">await</span> prisma.$transaction(<span class="hljs-title function_">async</span> (tx) =&gt; {
+  <span class="hljs-keyword">await</span> tx.<span class="hljs-property">account</span>.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">where</span>: { <span class="hljs-attr">id</span>: fromId }, <span class="hljs-attr">data</span>: { <span class="hljs-attr">balance</span>: { <span class="hljs-attr">decrement</span>: amount } } });
+  <span class="hljs-keyword">await</span> tx.<span class="hljs-property">account</span>.<span class="hljs-title function_">update</span>({ <span class="hljs-attr">where</span>: { <span class="hljs-attr">id</span>: toId }, <span class="hljs-attr">data</span>: { <span class="hljs-attr">balance</span>: { <span class="hljs-attr">increment</span>: amount } } });
+});</code></pre></div>
+<ul>
+<li><strong>Isolation levels</strong> (Read Uncommitted → Read Committed → Repeatable Read → Serializable): know the tradeoff — stricter isolation prevents anomalies (dirty reads, non-repeatable reads, phantom reads) but reduces concurrency. Postgres defaults to Read Committed.</li>
+<li><strong>Deadlocks</strong>: two transactions waiting on each other&#39;s locks — mitigate with consistent lock ordering, shorter transactions, and retry logic.</li>
+</ul>
+<h3 id="245-the-n1-query-problem"><a class="heading-anchor" href="#245-the-n1-query-problem" aria-hidden="true">#</a>24.5 The N+1 Query Problem</h3>
+<p>Classic ORM trap:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> users = <span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">findAll</span>();
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> user <span class="hljs-keyword">of</span> users) {
+  user.<span class="hljs-property">posts</span> = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Post</span>.<span class="hljs-title function_">findAll</span>({ <span class="hljs-attr">where</span>: { <span class="hljs-attr">userId</span>: user.<span class="hljs-property">id</span> } }); <span class="hljs-comment">// 1 query per user!</span>
+}</code></pre></div>
+<p>Fix with eager loading:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Sequelize</span>
+<span class="hljs-keyword">const</span> users = <span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">findAll</span>({ <span class="hljs-attr">include</span>: <span class="hljs-title class_">Post</span> });
+<span class="hljs-comment">// Prisma</span>
+<span class="hljs-keyword">const</span> users = <span class="hljs-keyword">await</span> prisma.<span class="hljs-property">user</span>.<span class="hljs-title function_">findMany</span>({ <span class="hljs-attr">include</span>: { <span class="hljs-attr">posts</span>: <span class="hljs-literal">true</span> } });</code></pre></div>
+<p>This is one of the <strong>most-asked</strong> backend interview questions — be ready to spot it in a code snippet and fix it, and explain why it degrades badly (100 users → 101 queries instead of 2).</p>
+<h3 id="246-indexing-commonly-probed-even-though-quotdatabasequot-isn39t-its-own-unit"><a class="heading-anchor" href="#246-indexing-commonly-probed-even-though-quotdatabasequot-isn39t-its-own-unit" aria-hidden="true">#</a>24.6 Indexing (commonly probed even though &quot;Database&quot; isn&#39;t its own unit)</h3>
+<ul>
+<li>Index columns used in <code class="inline-code">WHERE</code>, <code class="inline-code">JOIN</code>, <code class="inline-code">ORDER BY</code> frequently.</li>
+<li>Tradeoff: faster reads, slower writes (index must be updated), more storage.</li>
+<li>Composite indexes: column order matters (leftmost-prefix rule).</li>
+</ul>
+<h3 id="247-interview-qampa"><a class="heading-anchor" href="#247-interview-qampa" aria-hidden="true">#</a>24.7 Interview Q&amp;A</h3>
+<p><strong>Q: How do you prevent SQL injection in Node?</strong>
+Always use parameterized queries/prepared statements (<code class="inline-code">?</code>/<code class="inline-code">$1</code> placeholders) or an ORM&#39;s query builder — never string-concatenate user input into SQL.</p>
+<p><strong>Q: What&#39;s the difference between optimistic and pessimistic locking?</strong>
+Pessimistic: lock the row on read (<code class="inline-code">SELECT ... FOR UPDATE</code>), blocking others until you finish. Optimistic: no lock; check a <code class="inline-code">version</code>/<code class="inline-code">updatedAt</code> field on write, reject if it changed since read (retry). Optimistic scales better under low contention.</p>
+<p><strong>Q: How would you paginate a large dataset efficiently?</strong>
+Prefer <strong>cursor-based</strong> pagination (<code class="inline-code">WHERE id &gt; lastSeenId LIMIT n</code>) over <code class="inline-code">OFFSET/LIMIT</code> for large tables — offset pagination degrades linearly since the DB still scans and discards skipped rows.</p>
+<h3 id="248-practical-task"><a class="heading-anchor" href="#248-practical-task" aria-hidden="true">#</a>24.8 Practical Task</h3>
+<p>Write a transaction that must roll back correctly on partial failure, and find/fix an N+1 query in a given ORM code sample.</p>
+<hr>
+<h2 id="unit-25--validation-logging-amp-middleware-patterns"><a class="heading-anchor" href="#unit-25--validation-logging-amp-middleware-patterns" aria-hidden="true">#</a>Unit 25 — Validation, Logging &amp; Middleware Patterns</h2>
+<h3 id="251-schema-validation-at-the-boundary"><a class="heading-anchor" href="#251-schema-validation-at-the-boundary" aria-hidden="true">#</a>25.1 Schema Validation at the Boundary</h3>
+<p>Validate <strong>at the edge</strong> (before touching business logic) — never trust <code class="inline-code">req.body</code>/<code class="inline-code">req.query</code>/<code class="inline-code">req.params</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Zod example</span>
+<span class="hljs-keyword">const</span> createUserSchema = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">email</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">email</span>(),
+  <span class="hljs-attr">password</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">min</span>(<span class="hljs-number">8</span>),
+  <span class="hljs-attr">age</span>: z.<span class="hljs-title function_">number</span>().<span class="hljs-title function_">int</span>().<span class="hljs-title function_">positive</span>().<span class="hljs-title function_">optional</span>(),
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">validate</span> = (<span class="hljs-params">schema</span>) =&gt; <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> result = schema.<span class="hljs-title function_">safeParse</span>(req.<span class="hljs-property">body</span>);
+  <span class="hljs-keyword">if</span> (!result.<span class="hljs-property">success</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">AppError</span>(result.<span class="hljs-property">error</span>.<span class="hljs-property">errors</span>[<span class="hljs-number">0</span>].<span class="hljs-property">message</span>, <span class="hljs-number">400</span>));
+  }
+  req.<span class="hljs-property">body</span> = result.<span class="hljs-property">data</span>; <span class="hljs-comment">// sanitized/typed</span>
+  <span class="hljs-title function_">next</span>();
+};
+
+router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/users&#x27;</span>, <span class="hljs-title function_">validate</span>(createUserSchema), createUser);</code></pre></div>
+<ul>
+<li><strong>Zod</strong>: TypeScript-first, schema = type inference, great DX.</li>
+<li><strong>Joi</strong>: mature, framework-agnostic, widely used in older codebases.</li>
+<li>Validate query params and route params too (<code class="inline-code">z.coerce.number()</code> for numeric query strings, since query params always arrive as strings).</li>
+</ul>
+<h3 id="252-structured-logging"><a class="heading-anchor" href="#252-structured-logging" aria-hidden="true">#</a>25.2 Structured Logging</h3>
+<p><code class="inline-code">console.log</code> is unacceptable in production: no log levels, no structure for aggregation, blocks the event loop on large synchronous writes in some setups.</p>
+<p>Use <strong>Winston</strong> or <strong>Pino</strong> (Pino is faster, JSON-first, popular in high-throughput services):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> logger = <span class="hljs-title function_">pino</span>({ <span class="hljs-attr">level</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">LOG_LEVEL</span> || <span class="hljs-string">&#x27;info&#x27;</span> });
+logger.<span class="hljs-title function_">info</span>({ userId, <span class="hljs-attr">action</span>: <span class="hljs-string">&#x27;login&#x27;</span> }, <span class="hljs-string">&#x27;user logged in&#x27;</span>);
+logger.<span class="hljs-title function_">error</span>({ err }, <span class="hljs-string">&#x27;failed to process payment&#x27;</span>);</code></pre></div>
+<ul>
+<li>Log <strong>levels</strong>: trace/debug/info/warn/error/fatal — set via env var per environment.</li>
+<li>Log <strong>structured JSON</strong>, not strings — enables querying in tools like ELK/Datadog/CloudWatch Insights.</li>
+<li>Never log secrets/PII (passwords, full card numbers, tokens) — redact.</li>
+<li>Correlate requests with a <strong>request ID</strong> (generate/propagate via header like <code class="inline-code">X-Request-Id</code>) so you can trace one request across services/logs.</li>
+</ul>
+<h3 id="253-cors"><a class="heading-anchor" href="#253-cors" aria-hidden="true">#</a>25.3 CORS</h3>
+<ul>
+<li>Browser-enforced same-origin policy; CORS headers tell the browser which cross-origin requests are allowed.</li>
+<li><code class="inline-code">Access-Control-Allow-Origin</code>, <code class="inline-code">-Methods</code>, <code class="inline-code">-Headers</code>, <code class="inline-code">-Credentials</code>.</li>
+<li><strong>Preflight</strong>: browser sends an <code class="inline-code">OPTIONS</code> request first for &quot;non-simple&quot; requests (custom headers, non-GET/POST, <code class="inline-code">Content-Type: application/json</code> in some cases) — server must respond correctly or the actual request never fires.</li>
+<li><code class="inline-code">cors</code> npm package handles this; know that <code class="inline-code">credentials: true</code> requires an explicit origin (can&#39;t use <code class="inline-code">*</code> with credentials).</li>
+</ul>
+<h3 id="254-rate-limiting"><a class="heading-anchor" href="#254-rate-limiting" aria-hidden="true">#</a>25.4 Rate Limiting</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> limiter = <span class="hljs-title function_">rateLimit</span>({
+  <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>,
+  <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>,
+  <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Too many requests, please try again later.&#x27;</span>,
+});
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;/api/&#x27;</span>, limiter);</code></pre></div>
+<ul>
+<li>Algorithms: <strong>fixed window</strong> (simple, but bursts at window edges), <strong>sliding window</strong> (smoother), <strong>token bucket</strong> (allows bursts up to a cap, refills over time — good general default), <strong>leaky bucket</strong> (smooths output rate).</li>
+<li>For distributed systems, rate-limit state must live in Redis (in-memory counters don&#39;t work across multiple instances) — this is a favorite &quot;how would you scale this&quot; follow-up.</li>
+</ul>
+<h3 id="255-middleware-ordering-gotchas"><a class="heading-anchor" href="#255-middleware-ordering-gotchas" aria-hidden="true">#</a>25.5 Middleware Ordering Gotchas</h3>
+<ul>
+<li>Body parser <strong>before</strong> any middleware that reads <code class="inline-code">req.body</code>.</li>
+<li>CORS <strong>before</strong> routes.</li>
+<li>Auth middleware <strong>before</strong> the routes it protects, but validation typically <strong>after</strong> auth (so you don&#39;t waste validation work on unauthenticated junk) — though some prefer validate-first; be ready to justify either.</li>
+<li>Error handler <strong>always last</strong>.</li>
+</ul>
+<h3 id="256-interview-qampa"><a class="heading-anchor" href="#256-interview-qampa" aria-hidden="true">#</a>25.6 Interview Q&amp;A</h3>
+<p><strong>Q: Why validate on the server if the client already validates?</strong>
+Client-side validation is a UX nicety, not a security boundary — anyone can bypass it (Postman, curl, modified JS). Server-side validation is the actual trust boundary.</p>
+<p><strong>Q: How do you avoid leaking stack traces to clients in production?</strong>
+Centralized error handler checks <code class="inline-code">NODE_ENV</code>/<code class="inline-code">err.isOperational</code> and only returns a generic message + logs full detail server-side.</p>
+<p><strong>Q: What&#39;s the difference between authentication middleware order and validation middleware order, and why does it matter?</strong>
+Running auth first avoids doing expensive validation/DB work for unauthenticated requests (fail fast, cheaper).</p>
+<h3 id="257-practical-task"><a class="heading-anchor" href="#257-practical-task" aria-hidden="true">#</a>25.7 Practical Task</h3>
+<p>Add Zod/Joi validation + Pino structured logging with a request-ID correlation header to an existing API, and implement token-bucket-style rate limiting.</p>
+<hr>
+<h2 id="unit-26--websockets-amp-real-time-systems"><a class="heading-anchor" href="#unit-26--websockets-amp-real-time-systems" aria-hidden="true">#</a>Unit 26 — WebSockets &amp; Real-Time Systems</h2>
+<h3 id="261-websocket-vs-polling-vs-sse-know-when-to-use-each"><a class="heading-anchor" href="#261-websocket-vs-polling-vs-sse-know-when-to-use-each" aria-hidden="true">#</a>26.1 WebSocket vs Polling vs SSE (know when to use each)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Polling</th>
+<th>SSE</th>
+<th>WebSocket</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Direction</td>
+<td>Client → Server (repeated)</td>
+<td>Server → Client only</td>
+<td>Bidirectional</td>
+</tr>
+<tr>
+<td>Protocol</td>
+<td>Plain HTTP</td>
+<td>HTTP (long-lived)</td>
+<td>Own protocol (upgrade from HTTP)</td>
+</tr>
+<tr>
+<td>Use case</td>
+<td>Simple, infrequent updates</td>
+<td>Live feeds, notifications (one-way)</td>
+<td>Chat, games, collaborative editing</td>
+</tr>
+<tr>
+<td>Overhead</td>
+<td>High (repeated headers)</td>
+<td>Low</td>
+<td>Lowest (persistent connection)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="262-the-websocket-handshake"><a class="heading-anchor" href="#262-the-websocket-handshake" aria-hidden="true">#</a>26.2 The WebSocket Handshake</h3>
+<p>Client sends an HTTP request with <code class="inline-code">Upgrade: websocket</code> and <code class="inline-code">Connection: Upgrade</code> headers plus a <code class="inline-code">Sec-WebSocket-Key</code>; server responds <code class="inline-code">101 Switching Protocols</code> with a computed <code class="inline-code">Sec-WebSocket-Accept</code>. After that, it&#39;s a persistent full-duplex TCP connection — no more HTTP request/response cycle, just framed messages both ways.</p>
+<h3 id="263-socketio-essentials"><a class="heading-anchor" href="#263-socketio-essentials" aria-hidden="true">#</a>26.3 Socket.io Essentials</h3>
+<p>Socket.io is a WebSocket <strong>abstraction</strong> — it falls back to long-polling if WS is unavailable, and adds rooms, namespaces, auto-reconnect, and acknowledgements on top of raw <code class="inline-code">ws</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">io.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connection&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">socket</span>) =&gt;</span> {
+  socket.<span class="hljs-title function_">join</span>(<span class="hljs-string">`user:<span class="hljs-subst">${socket.userId}</span>`</span>); <span class="hljs-comment">// room per user</span>
+  socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;message:send&#x27;</span>, <span class="hljs-title function_">async</span> (data) =&gt; {
+    <span class="hljs-keyword">const</span> msg = <span class="hljs-keyword">await</span> <span class="hljs-title function_">saveMessage</span>(data);
+    io.<span class="hljs-title function_">to</span>(<span class="hljs-string">`room:<span class="hljs-subst">${data.roomId}</span>`</span>).<span class="hljs-title function_">emit</span>(<span class="hljs-string">&#x27;message:new&#x27;</span>, msg);
+  });
+  socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;disconnect&#x27;</span>, <span class="hljs-function">() =&gt;</span> { <span class="hljs-comment">/* cleanup */</span> });
+});</code></pre></div>
+<ul>
+<li><strong>Namespaces</strong> (<code class="inline-code">/chat</code>, <code class="inline-code">/admin</code>): separate communication channels over one connection, each with its own event handlers/middleware.</li>
+<li><strong>Rooms</strong>: arbitrary grouping within a namespace for targeted broadcast (<code class="inline-code">io.to(room).emit(...)</code>); rooms aren&#39;t a Socket.io &quot;connection&quot; concept, just a server-side tagging mechanism.</li>
+<li><strong>Auth for sockets</strong>: verify the JWT during the handshake (<code class="inline-code">io.use((socket, next) =&gt; {...})</code> middleware), not after connection.</li>
+</ul>
+<h3 id="264-scaling-websockets-across-instances"><a class="heading-anchor" href="#264-scaling-websockets-across-instances" aria-hidden="true">#</a>26.4 Scaling WebSockets Across Instances</h3>
+<p>Problem: WebSocket connections are <strong>stateful and sticky</strong> to one server process — if User A is connected to instance 1 and User B to instance 2, instance 1 can&#39;t natively <code class="inline-code">emit</code> to User B.</p>
+<p>Solution: <strong>Redis adapter</strong> — every instance subscribes to a Redis pub/sub channel; <code class="inline-code">io.to(room).emit()</code> publishes to Redis, and all instances (including the originating one) receive it and deliver to their locally-connected sockets.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> { createAdapter } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@socket.io/redis-adapter&#x27;</span>);
+io.<span class="hljs-title function_">adapter</span>(<span class="hljs-title function_">createAdapter</span>(pubClient, subClient));</code></pre></div>
+<p>Also requires <strong>sticky sessions</strong> at the load balancer (so a client&#39;s HTTP polling fallback/reconnects land back on the same instance during the handshake phase) — <code class="inline-code">ip-hash</code> or cookie-based stickiness on the LB.</p>
+<h3 id="265-reliability-considerations"><a class="heading-anchor" href="#265-reliability-considerations" aria-hidden="true">#</a>26.5 Reliability Considerations</h3>
+<ul>
+<li><strong>Reconnection</strong>: Socket.io auto-reconnects by default; design your app state to be resync-able (client requests missed events since <code class="inline-code">lastEventId</code> on reconnect rather than assuming a continuous stream).</li>
+<li><strong>Heartbeats/ping-pong</strong>: detect dead connections (network drop without a clean close) — Socket.io handles this internally via <code class="inline-code">pingInterval</code>/<code class="inline-code">pingTimeout</code>.</li>
+<li><strong>Backpressure</strong>: a slow client can cause the server&#39;s send buffer to grow unbounded — Socket.io emits are fire-and-forget by default; for critical messages use acknowledgements (<code class="inline-code">socket.emit(&#39;event&#39;, data, callback)</code>) with timeouts.</li>
+</ul>
+<h3 id="266-interview-qampa"><a class="heading-anchor" href="#266-interview-qampa" aria-hidden="true">#</a>26.6 Interview Q&amp;A</h3>
+<p><strong>Q: How would you build a &quot;user is typing&quot; indicator that scales to millions of users?</strong>
+Ephemeral event (not persisted), scoped to a room, broadcast via Redis adapter across instances, with a short client-side debounce/timeout to auto-clear the indicator if no follow-up event arrives.</p>
+<p><strong>Q: What happens if a message needs guaranteed delivery (e.g., a chat message) but the WebSocket disconnects mid-send?</strong>
+Persist to DB first (or a queue), then push over WebSocket for real-time delivery; on reconnect, client fetches messages since its last known message ID/timestamp as a fallback — WebSocket delivery is &quot;best effort,&quot; DB/queue is the source of truth.</p>
+<p><strong>Q: Why can&#39;t you just use <code class="inline-code">io.emit()</code> from any instance in a multi-instance deployment without the Redis adapter?</strong>
+Each Node process only &quot;knows about&quot; sockets connected directly to it; without a shared pub/sub layer, <code class="inline-code">emit</code> only reaches locally connected clients.</p>
+<h3 id="267-practical-task"><a class="heading-anchor" href="#267-practical-task" aria-hidden="true">#</a>26.7 Practical Task</h3>
+<p>Build a real-time notification/chat channel with Socket.io rooms and JWT-authenticated handshake, then wire the Redis adapter and verify a message sent via instance A is received by a client connected to instance B.</p>
+<hr>
+<h2 id="unit-27--testing-node-applications"><a class="heading-anchor" href="#unit-27--testing-node-applications" aria-hidden="true">#</a>Unit 27 — Testing Node Applications</h2>
+<h3 id="271-the-testing-pyramid-backend-flavor"><a class="heading-anchor" href="#271-the-testing-pyramid-backend-flavor" aria-hidden="true">#</a>27.1 The Testing Pyramid (backend flavor)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">        /\        E2E (few) — full stack, slow, brittle
+       /  \       Integration (some) — API + real/test DB
+      /----\      Unit (many) — pure functions, mocked deps</code></pre></div>
+<p>Interviewers want you to justify the <em>ratio</em>, not just define the layers: heavy unit coverage for business logic, targeted integration tests for critical API flows, minimal E2E.</p>
+<h3 id="272-unit-testing-with-jest"><a class="heading-anchor" href="#272-unit-testing-with-jest" aria-hidden="true">#</a>27.2 Unit Testing with Jest</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// userService.test.js</span>
+jest.<span class="hljs-title function_">mock</span>(<span class="hljs-string">&#x27;../repositories/userRepository&#x27;</span>);
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;userService.createUser&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;throws if email already exists&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    userRepository.<span class="hljs-property">findByEmail</span>.<span class="hljs-title function_">mockResolvedValue</span>({ <span class="hljs-attr">id</span>: <span class="hljs-number">1</span> });
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">expect</span>(userService.<span class="hljs-title function_">createUser</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;a@b.com&#x27;</span> }))
+      .<span class="hljs-property">rejects</span>.<span class="hljs-title function_">toThrow</span>(<span class="hljs-string">&#x27;Email already in use&#x27;</span>);
+  });
+
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;hashes the password before saving&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    userRepository.<span class="hljs-property">findByEmail</span>.<span class="hljs-title function_">mockResolvedValue</span>(<span class="hljs-literal">null</span>);
+    userRepository.<span class="hljs-property">create</span>.<span class="hljs-title function_">mockResolvedValue</span>({ <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;a@b.com&#x27;</span> });
+    <span class="hljs-keyword">await</span> userService.<span class="hljs-title function_">createUser</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;a@b.com&#x27;</span>, <span class="hljs-attr">password</span>: <span class="hljs-string">&#x27;plain&#x27;</span> });
+    <span class="hljs-keyword">const</span> savedArg = userRepository.<span class="hljs-property">create</span>.<span class="hljs-property">mock</span>.<span class="hljs-property">calls</span>[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>];
+    <span class="hljs-title function_">expect</span>(savedArg.<span class="hljs-property">password</span>).<span class="hljs-property">not</span>.<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#x27;plain&#x27;</span>); <span class="hljs-comment">// was hashed</span>
+  });
+});</code></pre></div>
+<ul>
+<li><code class="inline-code">jest.mock()</code> for module-level mocking; <code class="inline-code">jest.fn()</code> for individual mock functions; <code class="inline-code">mockResolvedValue</code>/<code class="inline-code">mockRejectedValue</code> for async.</li>
+<li><strong>Test the service layer, not Express</strong> — this is exactly why the layered architecture from Unit 22 matters: services are plain functions, trivially testable without spinning up HTTP.</li>
+<li>Use <strong>dependency injection</strong> (pass the repository in, or use a container) rather than hard <code class="inline-code">require</code>s where feasible — makes mocking cleaner and avoids <code class="inline-code">jest.mock</code> path fragility.</li>
+</ul>
+<h3 id="273-integration-testing-with-supertest"><a class="heading-anchor" href="#273-integration-testing-with-supertest" aria-hidden="true">#</a>27.3 Integration Testing with Supertest</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> request = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;supertest&#x27;</span>);
+<span class="hljs-keyword">const</span> app = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../app&#x27;</span>); <span class="hljs-comment">// exported Express app, not app.listen()</span>
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#x27;POST /api/users&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-title function_">beforeEach</span>(<span class="hljs-title function_">async</span> () =&gt; { <span class="hljs-keyword">await</span> <span class="hljs-title function_">resetTestDb</span>(); });
+
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;creates a user and returns 201&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">request</span>(app)
+      .<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/api/users&#x27;</span>)
+      .<span class="hljs-title function_">send</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;test@x.com&#x27;</span>, <span class="hljs-attr">password</span>: <span class="hljs-string">&#x27;password123&#x27;</span> });
+    <span class="hljs-title function_">expect</span>(res.<span class="hljs-property">status</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-number">201</span>);
+    <span class="hljs-title function_">expect</span>(res.<span class="hljs-property">body</span>.<span class="hljs-property">email</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#x27;test@x.com&#x27;</span>);
+    <span class="hljs-title function_">expect</span>(res.<span class="hljs-property">body</span>.<span class="hljs-property">password</span>).<span class="hljs-title function_">toBeUndefined</span>(); <span class="hljs-comment">// never leak hash</span>
+  });
+
+  <span class="hljs-title function_">it</span>(<span class="hljs-string">&#x27;returns 400 on invalid payload&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">request</span>(app).<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/api/users&#x27;</span>).<span class="hljs-title function_">send</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;bad&#x27;</span> });
+    <span class="hljs-title function_">expect</span>(res.<span class="hljs-property">status</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-number">400</span>);
+  });
+});</code></pre></div>
+<ul>
+<li>Export the Express <code class="inline-code">app</code> <strong>without</strong> calling <code class="inline-code">.listen()</code> in the testable module — Supertest binds it to an ephemeral port internally.</li>
+<li>Use a <strong>real test database</strong> (Dockerized Postgres/Mongo, reset between tests) for integration tests — mocking the DB at this layer defeats the purpose of an integration test (you want to catch real query/schema issues).</li>
+<li>Seed/reset strategy: transaction rollback per test (fast) or full reset (<code class="inline-code">beforeEach</code>) — know the tradeoff (rollback is faster but doesn&#39;t work well with code that itself opens transactions).</li>
+</ul>
+<h3 id="274-mocking-external-services"><a class="heading-anchor" href="#274-mocking-external-services" aria-hidden="true">#</a>27.4 Mocking External Services</h3>
+<ul>
+<li>Mock third-party HTTP calls (payment gateways, email providers) with tools like <code class="inline-code">nock</code> or MSW — never hit real external APIs in CI.</li>
+<li>Distinguish: <strong>stub</strong> (canned response), <strong>mock</strong> (also asserts it was called correctly), <strong>spy</strong> (wraps a real implementation, observes calls).</li>
+</ul>
+<h3 id="275-what-interviewers-actually-ask"><a class="heading-anchor" href="#275-what-interviewers-actually-ask" aria-hidden="true">#</a>27.5 What Interviewers Actually Ask</h3>
+<p><strong>Q: How do you test code that depends on <code class="inline-code">Date.now()</code> or randomness?</strong>
+Inject the dependency (pass a <code class="inline-code">clock</code>/<code class="inline-code">idGenerator</code>) or use Jest&#39;s fake timers (<code class="inline-code">jest.useFakeTimers()</code>, <code class="inline-code">jest.setSystemTime()</code>).</p>
+<p><strong>Q: How would you test a rate limiter or a queue consumer?</strong>
+Rate limiter: fire N+1 requests in a test and assert the last one gets a 429; for time-window behavior, use fake timers to fast-forward. Queue consumer: test the handler function directly with a crafted job payload, independent of the actual queue infra (mock the queue library, unit-test the processing logic).</p>
+<p><strong>Q: What&#39;s your strategy for flaky tests?</strong>
+Eliminate shared mutable state between tests, avoid real timers/network, ensure DB resets are deterministic, and never rely on execution order.</p>
+<p><strong>Q: Unit vs integration — where do you draw the line for a new PR?</strong>
+Business logic and edge cases → unit tests (fast feedback, exhaustive). At least one integration test per new endpoint verifying the full request→response contract including status codes and auth. E2E reserved for critical user journeys only (login, checkout), run less frequently (e.g., not on every commit).</p>
+<h3 id="276-practical-task"><a class="heading-anchor" href="#276-practical-task" aria-hidden="true">#</a>27.6 Practical Task</h3>
+<p>For one API route, write unit tests for its service (all branches: success, validation failure, not-found) with mocked repository, plus a Supertest integration test hitting the real route with a test DB, asserting status code and response shape.</p>
+<hr>
+<h2 id="quick-reference-phase-5-rapid-fire-interview-list"><a class="heading-anchor" href="#quick-reference-phase-5-rapid-fire-interview-list" aria-hidden="true">#</a>Quick-Reference: Phase 5 Rapid-Fire Interview List</h2>
+<ol>
+<li>Explain the Express middleware chain and how <code class="inline-code">next()</code>/<code class="inline-code">next(err)</code> control flow.</li>
+<li>Why must error-handling middleware have 4 arguments?</li>
+<li>Design a layered folder structure for a mid-size Express service.</li>
+<li>JWT vs session-based auth — full tradeoff comparison.</li>
+<li>How do you implement refresh token rotation with reuse detection?</li>
+<li>Explain OAuth2 Authorization Code flow and why PKCE exists.</li>
+<li>SQL vs NoSQL — pick one for a given scenario and justify it.</li>
+<li>What is the N+1 query problem and how do you fix it in your ORM of choice?</li>
+<li>Explain transaction isolation levels and a deadlock scenario.</li>
+<li>Why validate server-side even if the client validates?</li>
+<li>Structured logging vs <code class="inline-code">console.log</code> — why does it matter at scale?</li>
+<li>How do you rate-limit across multiple server instances?</li>
+<li>WebSocket handshake — what happens under the hood?</li>
+<li>How do you scale Socket.io across multiple instances (Redis adapter + sticky sessions)?</li>
+<li>Testing pyramid — what ratio of unit/integration/E2E do you aim for, and why?</li>
+<li>How do you keep integration tests deterministic against a real database?</li>
+</ol>
+<hr>
+<p><em>This file maps to Units 22–27 of your JS + Node.js Backend Roadmap (Phase: Node - Backend Engineering). Each section is meant to be read top to bottom for theory, then re-used as flashcard-style Q&amp;A the night before an interview.</em></p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

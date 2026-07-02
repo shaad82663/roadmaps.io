@@ -1,649 +1,649 @@
-<!DOCTYPE html>
-<html lang="en">
+  <!DOCTYPE html>
+  <html lang="en">
 
-<head>
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      if (savedTheme === 'light') {
-        document.documentElement.classList.add('light-theme');
-      }
-    })();
-  </script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Learning Roadmaps</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-  <style>
-    :root {
-      --font-sans: 'Outfit', sans-serif;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-      /* Premium Dark Theme */
-      --color-bg-base: #0f1115;
-      --color-bg-gradient: radial-gradient(circle at top center, #1a1d24, #0f1115 80%);
-      --color-background-primary: rgba(30, 33, 40, 0.6);
-      --color-background-secondary: rgba(45, 49, 58, 0.7);
-      --color-border-primary: rgba(255, 255, 255, 0.15);
-      --color-border-secondary: rgba(255, 255, 255, 0.08);
-      --color-border-tertiary: rgba(255, 255, 255, 0.04);
-
-      --color-text-primary: #f8f9fa;
-      --color-text-secondary: #adb5bd;
-      --color-text-tertiary: #6c757d;
-
-      --border-radius-md: 12px;
-      --border-radius-lg: 16px;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: var(--font-sans);
-      background: var(--color-bg-base);
-      background-image: var(--color-bg-gradient);
-      background-attachment: fixed;
-      color: var(--color-text-primary);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 4rem 1.5rem;
-    }
-
-    header {
-      margin-bottom: 3.5rem;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 3.25rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #ffffff, #adb5bd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -1px;
-    }
-
-    .subtitle {
-      color: var(--color-text-secondary);
-      font-size: 1.2rem;
-      font-weight: 300;
-      max-width: 600px;
-      margin: 0 auto;
-      line-height: 1.6;
-    }
-
-    .stats-container {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 4rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .stat-card {
-      background: var(--color-background-primary);
-      border: 1px solid var(--color-border-secondary);
-      border-radius: var(--border-radius-lg);
-      padding: 1.25rem 2rem;
-      min-width: 130px;
-      text-align: center;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease, border-color 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      border-color: var(--color-border-primary);
-    }
-
-    .stat-val {
-      font-size: 2.5rem;
-      font-weight: 600;
-      color: var(--color-text-primary);
-      margin-bottom: 0.25rem;
-      line-height: 1.1;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--color-text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 500;
-    }
-
-    .grid-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      letter-spacing: -0.5px;
-      border-bottom: 1px solid var(--color-border-secondary);
-      padding-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .roadmaps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 4rem;
-    }
-
-    .roadmap-card {
-      background: var(--color-background-primary);
-      border: 1px solid var(--color-border-secondary);
-      border-radius: var(--border-radius-lg);
-      padding: 2rem;
-      cursor: pointer;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      height: calc(100% - 4rem);
-    }
-
-    .roadmap-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 100%;
-      background: linear-gradient(120deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-    }
-
-    .roadmap-card:hover {
-      border-color: var(--color-border-primary);
-      transform: translateY(-5px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .roadmap-card:hover::before {
-      opacity: 1;
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .subject-logo {
-      width: 48px;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--color-border-secondary);
-      border-radius: var(--border-radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: #7fc8ff;
-      flex-shrink: 0;
-    }
-
-    .subject-logo img,
-    .subject-logo svg {
-      width: 28px;
-      height: 28px;
-    }
-
-    .subject-title {
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: var(--color-text-primary);
-      letter-spacing: -0.3px;
-    }
-
-    .subject-desc {
-      font-size: 0.95rem;
-      color: var(--color-text-secondary);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-      flex-grow: 1;
-    }
-
-    .card-stats {
-      display: flex;
-      gap: 1.25rem;
-      margin-bottom: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--color-border-tertiary);
-    }
-
-    .card-stat-item {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card-stat-val {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--color-text-primary);
-    }
-
-    .card-stat-label {
-      font-size: 0.75rem;
-      color: var(--color-text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .tags-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.75rem;
-    }
-
-    .tag {
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
-      padding: 0.25rem 0.6rem;
-      border-radius: 6px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--color-border-tertiary);
-      color: var(--color-text-secondary);
-      transition: all 0.2s;
-    }
-
-    .roadmap-card:hover .tag {
-      border-color: var(--color-border-secondary);
-      color: var(--color-text-primary);
-    }
-
-    .enter-btn {
-      font-size: 0.95rem;
-      font-weight: 500;
-      padding: 0.75rem 1.25rem;
-      border-radius: var(--border-radius-md);
-      border: 1px solid var(--color-border-primary);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--color-text-primary);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
-      font-family: var(--font-sans);
-      justify-content: center;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .roadmap-card:hover .enter-btn {
-      background: var(--color-text-primary);
-      color: var(--color-bg-base);
-      border-color: var(--color-text-primary);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-    }
-
-    footer {
-      text-align: center;
-      color: var(--color-text-tertiary);
-      font-size: 0.85rem;
-      border-top: 1px solid var(--color-border-tertiary);
-      padding-top: 2rem;
-      margin-top: auto;
-    }
-
-    footer a {
-      color: var(--color-text-secondary);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    footer a:hover {
-      color: var(--color-text-primary);
-    }
-
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--color-bg-base);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--color-border-primary);
-      border-radius: 4px;
-    }
-
-     ::-webkit-scrollbar-thumb:hover {
-      background: var(--color-text-secondary);
-    }
-
-    /* Theme Toggle Button Styling */
-    .theme-toggle-btn {
-      position: fixed;
-      top: 1.5rem;
-      right: 1.5rem;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--color-background-primary);
-      border: 1px solid var(--color-border-secondary);
-      color: var(--color-text-primary);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      z-index: 1000;
-      transition: all 0.3s ease;
-    }
-    .theme-toggle-btn:hover {
-      transform: scale(1.1);
-      border-color: var(--color-border-primary);
-      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
-    }
-
-    /* Light Theme Styling Variable Overrides */
-    :root.light-theme,
-    .light-theme {
-      --color-bg-base: #f5f7fa;
-      --color-bg-gradient: radial-gradient(circle at top center, #ffffff, #edf0f5 80%);
-      --color-background-primary: rgba(255, 255, 255, 0.85);
-      --color-background-secondary: rgba(235, 238, 243, 0.95);
-      --color-border-primary: rgba(0, 0, 0, 0.12);
-      --color-border-secondary: rgba(0, 0, 0, 0.06);
-      --color-border-tertiary: rgba(0, 0, 0, 0.03);
-
-      --color-text-primary: #1a202c;
-      --color-text-secondary: #4a5568;
-      --color-text-tertiary: #718096;
-    }
-
-    /* Light Theme adjustments for specific elements */
-    .light-theme h1 {
-      background: linear-gradient(135deg, #1a202c, #4a5568);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .light-theme .theme-toggle-btn {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    }
-    .light-theme .roadmap-card:hover {
-      box-shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
-    }
-    .light-theme .tag {
-      background: rgba(0, 0, 0, 0.04);
-      color: var(--color-text-secondary);
-      border: 1px solid rgba(0, 0, 0, 0.06);
-    }
-    .light-theme .roadmap-card:hover .tag {
-      background: rgba(0, 0, 0, 0.06);
-      color: var(--color-text-primary);
-    }
-    .light-theme .enter-btn {
-      background: rgba(0, 0, 0, 0.02);
-      border-color: rgba(0, 0, 0, 0.1);
-      color: var(--color-text-primary);
-    }
-    .light-theme .roadmap-card:hover .enter-btn {
-      background: #1a202c;
-      color: #ffffff;
-      border-color: #1a202c;
-      box-shadow: 0 4px 12px rgba(26, 32, 44, 0.25);
-    }
-    .light-theme .subject-logo {
-      background: rgba(0, 0, 0, 0.02);
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #1a202c;
-    }
-    .light-theme ::-webkit-scrollbar-track {
-      background: #f5f7fa;
-    }
-    .light-theme ::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.15);
-    }
-    .light-theme ::-webkit-scrollbar-thumb:hover {
-      background: rgba(0, 0, 0, 0.3);
-    }
-  </style>
-</head>
-
-<body>
-  <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
-    <i class="ti ti-moon"></i>
-  </button>
-
-  <div class="container">
-    <header>
-      <h1>Learning Roadmaps</h1>
-      <p class="subtitle">A structured, phase-wise guide to mastering engineering subjects and frameworks.</p>
-    </header>
-
-    <!-- Portal Summary Stats -->
-    <div class="stats-container" id="global-stats">
-      <!-- Dynamically filled -->
-    </div>
-
-    <div class="grid-title">
-      <i class="ti ti-map" aria-hidden="true"></i> Available Roadmaps
-    </div>
-
-    <!-- Roadmaps Grid -->
-    <div class="roadmaps-grid" id="roadmaps-list">
-      <!-- Dynamically filled -->
-    </div>
-
-    <footer>
-      <p>Created by <strong>Mohd Shadab</strong> &nbsp;·&nbsp; 
-         <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;·&nbsp;
-         <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
-      <p style="margin-top: 0.5rem; font-size: 0.82rem; opacity: 0.75;">© 2026 Interactive Roadmaps.</p>
-    </footer>
-  </div>
-
-  <script>
-    // Config: Add new roadmaps here. They will automatically render on the dashboard
-    const roadmaps = [
-      {
-        id: 'langchain',
-        title: 'LangChain Mastery',
-        description: '15 units across Foundation, Core, RAG Pipeline, Agents, and Production phases to elevate your AI engineering skills.',
-        logo: 'langchain/logo.svg',
-        path: 'langchain/index.html',
-        stats: {
-          units: 15,
-          topics: 84,
-          labs: 61
-        },
-        tags: ['AI Engineering', 'LLMs', 'RAG', 'Agents']
-      },
-      {
-        id: 'langgraph',
-        title: 'LangGraph Mastery',
-        description: '15 units across Foundation, Control Flow, Persistence & Memory, Human-in-the-Loop, Multi-Agent & Tools, and Production phases — every core LangGraph concept from your first node to a deployed multi-agent system.',
-        logo: 'langgraph/logo.svg',
-        path: 'langgraph/index.html',
-        stats: {
-          units: 15,
-          topics: 75,
-          labs: 60
-        },
-        tags: ['Stateful Agents', 'Graphs', 'Multi-Agent', 'LLMs']
-      },
-      {
-        id: 'aws',
-        title: 'AWS Solutions Architect',
-        description: '46 units across 7 phases — from Cloud Foundations to Architecture Mastery and Exam Readiness. 100% SAA-C03 syllabus coverage.',
-        logo: 'AWS/logo.svg',
-        path: 'AWS/index.html',
-        stats: {
-          units: 46,
-          topics: 338,
-          labs: 184
-        },
-        tags: ['Cloud', 'AWS', 'Infrastructure', 'Solutions Architect']
-      },
-      {
-        id: 'ci_cd',
-        title: 'CI/CD Mastery',
-        description: '18 units across Foundation, GitHub Actions, Jenkins, Deployment & Pipeline-as-Code, Security & Governance, and Industry & Interview Mastery — production-grade CI/CD expertise on both GitHub Actions and Jenkins.',
-        logo: 'ci_cd/logo.svg',
-        path: 'ci_cd/index.html',
-        stats: {
-          units: 18,
-          topics: 90,
-          labs: 72
-        },
-        tags: ['DevOps', 'GitHub Actions', 'Jenkins', 'Pipelines']
-      },
-      {
-        id: 'javascript_nodejs',
-        title: 'JS + Node.js Backend Mastery',
-        description: '33 units across JS Foundations, Intermediate, Advanced, and Node.js Core, Backend Engineering & Advanced System Design — interview-focused, practical-only, no fluff.',
-        logo: 'javascript_nodejs/logo.svg',
-        path: 'javascript_nodejs/index.html',
-        stats: {
-          units: 33,
-          topics: 0,
-          labs: 0
-        },
-        tags: ['JavaScript', 'Node.js', 'Backend', 'System Design']
-      }
-    ];
-
-    function animateCount(element, target, duration = 1200) {
-      if (!element) return;
-      let startTimestamp = null;
-      const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const easeProgress = progress * (2 - progress); // Ease out quad
-        const currentValue = Math.floor(easeProgress * target);
-        element.textContent = currentValue;
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
-        } else {
-          element.textContent = target;
+  <head>
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+          document.documentElement.classList.add('light-theme');
         }
-      };
-      window.requestAnimationFrame(step);
-    }
+      })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Learning Roadmaps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+    <style>
+      :root {
+        --font-sans: 'Outfit', sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-    function renderDashboard() {
-      // 1. Render Stats
-      const totalRoadmaps = roadmaps.length;
-      const totalUnits = roadmaps.reduce((acc, r) => acc + (r.stats.units || 0), 0);
-      const totalTopics = roadmaps.reduce((acc, r) => acc + (r.stats.topics || 0), 0);
-      const totalLabs = roadmaps.reduce((acc, r) => acc + (r.stats.labs || 0), 0);
+        /* Premium Dark Theme */
+        --color-bg-base: #0f1115;
+        --color-bg-gradient: radial-gradient(circle at top center, #1a1d24, #0f1115 80%);
+        --color-background-primary: rgba(30, 33, 40, 0.6);
+        --color-background-secondary: rgba(45, 49, 58, 0.7);
+        --color-border-primary: rgba(255, 255, 255, 0.15);
+        --color-border-secondary: rgba(255, 255, 255, 0.08);
+        --color-border-tertiary: rgba(255, 255, 255, 0.04);
 
-      const statsEl = document.getElementById('global-stats');
-      statsEl.innerHTML = `
-        <div class="stat-card">
-          <div class="stat-val" id="stat-roadmaps">0</div>
-          <div class="stat-label">Roadmaps</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-units">0</div>
-          <div class="stat-label">Total Units</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-topics">0</div>
-          <div class="stat-label">Total Topics</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-labs">0</div>
-          <div class="stat-label">Total Labs</div>
-        </div>
-      `;
+        --color-text-primary: #f8f9fa;
+        --color-text-secondary: #adb5bd;
+        --color-text-tertiary: #6c757d;
 
-      // Smooth counting animation
-      animateCount(document.getElementById('stat-roadmaps'), totalRoadmaps, 800);
-      animateCount(document.getElementById('stat-units'), totalUnits, 1000);
-      animateCount(document.getElementById('stat-topics'), totalTopics, 1200);
-      animateCount(document.getElementById('stat-labs'), totalLabs, 1200);
+        --border-radius-md: 12px;
+        --border-radius-lg: 16px;
+      }
 
-      // 2. Render Cards
-      const gridEl = document.getElementById('roadmaps-list');
-      gridEl.innerHTML = roadmaps.map((r) => {
-        return `
-          <div class="roadmap-card" onclick="window.location.href='${r.path}'">
-            <div class="card-header">
-              <div class="subject-logo">
-                ${r.logo
-            ? `<object type="image/svg+xml" data="${r.logo}" style="pointer-events: none; width: 28px; height: 28px;"></object>`
-            : `<i class="ti ${r.icon || 'ti-map'}" style="font-size: 1.6rem;"></i>`
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: var(--font-sans);
+        background: var(--color-bg-base);
+        background-image: var(--color-bg-gradient);
+        background-attachment: fixed;
+        color: var(--color-text-primary);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+      }
+
+      header {
+        margin-bottom: 3.5rem;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 3.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #ffffff, #adb5bd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -1px;
+      }
+
+      .subtitle {
+        color: var(--color-text-secondary);
+        font-size: 1.2rem;
+        font-weight: 300;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      .stats-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 4rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .stat-card {
+        background: var(--color-background-primary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        padding: 1.25rem 2rem;
+        min-width: 130px;
+        text-align: center;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, border-color 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--color-border-primary);
+      }
+
+      .stat-val {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: var(--color-text-primary);
+        margin-bottom: 0.25rem;
+        line-height: 1.1;
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 500;
+      }
+
+      .grid-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.5px;
+        border-bottom: 1px solid var(--color-border-secondary);
+        padding-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .roadmaps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 4rem;
+      }
+
+      .roadmap-card {
+        background: var(--color-background-primary);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-lg);
+        padding: 2rem;
+        cursor: pointer;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 4rem);
+      }
+
+      .roadmap-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+
+      .roadmap-card:hover {
+        border-color: var(--color-border-primary);
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .roadmap-card:hover::before {
+        opacity: 1;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .subject-logo {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--color-border-secondary);
+        border-radius: var(--border-radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #7fc8ff;
+        flex-shrink: 0;
+      }
+
+      .subject-logo img,
+      .subject-logo svg {
+        width: 28px;
+        height: 28px;
+      }
+
+      .subject-title {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--color-text-primary);
+        letter-spacing: -0.3px;
+      }
+
+      .subject-desc {
+        font-size: 0.95rem;
+        color: var(--color-text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+      }
+
+      .card-stats {
+        display: flex;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-border-tertiary);
+      }
+
+      .card-stat-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-stat-val {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--color-text-primary);
+      }
+
+      .card-stat-label {
+        font-size: 0.75rem;
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .tags-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.75rem;
+      }
+
+      .tag {
+        font-size: 0.75rem;
+        font-family: var(--font-mono);
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--color-border-tertiary);
+        color: var(--color-text-secondary);
+        transition: all 0.2s;
+      }
+
+      .roadmap-card:hover .tag {
+        border-color: var(--color-border-secondary);
+        color: var(--color-text-primary);
+      }
+
+      .enter-btn {
+        font-size: 0.95rem;
+        font-weight: 500;
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--color-border-primary);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--color-text-primary);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        font-family: var(--font-sans);
+        justify-content: center;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .roadmap-card:hover .enter-btn {
+        background: var(--color-text-primary);
+        color: var(--color-bg-base);
+        border-color: var(--color-text-primary);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+
+      footer {
+        text-align: center;
+        color: var(--color-text-tertiary);
+        font-size: 0.85rem;
+        border-top: 1px solid var(--color-border-tertiary);
+        padding-top: 2rem;
+        margin-top: auto;
+      }
+
+      footer a {
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      footer a:hover {
+        color: var(--color-text-primary);
+      }
+
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--color-bg-base);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--color-border-primary);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-text-secondary);
+      }
+
+      /* Theme Toggle Button Styling */
+      .theme-toggle-btn {
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--color-background-primary);
+        border: 1px solid var(--color-border-secondary);
+        color: var(--color-text-primary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        transition: all 0.3s ease;
+      }
+      .theme-toggle-btn:hover {
+        transform: scale(1.1);
+        border-color: var(--color-border-primary);
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+      }
+
+      /* Light Theme Styling Variable Overrides */
+      :root.light-theme,
+      .light-theme {
+        --color-bg-base: #f5f7fa;
+        --color-bg-gradient: radial-gradient(circle at top center, #ffffff, #edf0f5 80%);
+        --color-background-primary: rgba(255, 255, 255, 0.85);
+        --color-background-secondary: rgba(235, 238, 243, 0.95);
+        --color-border-primary: rgba(0, 0, 0, 0.12);
+        --color-border-secondary: rgba(0, 0, 0, 0.06);
+        --color-border-tertiary: rgba(0, 0, 0, 0.03);
+
+        --color-text-primary: #1a202c;
+        --color-text-secondary: #4a5568;
+        --color-text-tertiary: #718096;
+      }
+
+      /* Light Theme adjustments for specific elements */
+      .light-theme h1 {
+        background: linear-gradient(135deg, #1a202c, #4a5568);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .light-theme .theme-toggle-btn {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      }
+      .light-theme .roadmap-card:hover {
+        box-shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
+      }
+      .light-theme .tag {
+        background: rgba(0, 0, 0, 0.04);
+        color: var(--color-text-secondary);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+      .light-theme .roadmap-card:hover .tag {
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--color-text-primary);
+      }
+      .light-theme .enter-btn {
+        background: rgba(0, 0, 0, 0.02);
+        border-color: rgba(0, 0, 0, 0.1);
+        color: var(--color-text-primary);
+      }
+      .light-theme .roadmap-card:hover .enter-btn {
+        background: #1a202c;
+        color: #ffffff;
+        border-color: #1a202c;
+        box-shadow: 0 4px 12px rgba(26, 32, 44, 0.25);
+      }
+      .light-theme .subject-logo {
+        background: rgba(0, 0, 0, 0.02);
+        border-color: rgba(0, 0, 0, 0.08);
+        color: #1a202c;
+      }
+      .light-theme ::-webkit-scrollbar-track {
+        background: #f5f7fa;
+      }
+      .light-theme ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.15);
+      }
+      .light-theme ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+
+  <body>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+      <i class="ti ti-moon"></i>
+    </button>
+
+    <div class="container">
+      <header>
+        <h1>Learning Roadmaps</h1>
+        <p class="subtitle">A structured, phase-wise guide to mastering engineering subjects and frameworks.</p>
+      </header>
+
+      <!-- Portal Summary Stats -->
+      <div class="stats-container" id="global-stats">
+        <!-- Dynamically filled -->
+      </div>
+
+      <div class="grid-title">
+        <i class="ti ti-map" aria-hidden="true"></i> Available Roadmaps
+      </div>
+
+      <!-- Roadmaps Grid -->
+      <div class="roadmaps-grid" id="roadmaps-list">
+        <!-- Dynamically filled -->
+      </div>
+
+      <footer>
+        <p>Created by <strong>Mohd Shadab</strong> &nbsp;·&nbsp; 
+          <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;·&nbsp;
+          <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+        <p style="margin-top: 0.5rem; font-size: 0.82rem; opacity: 0.75;">© 2026 Interactive Roadmaps.</p>
+      </footer>
+    </div>
+
+    <script>
+      // Config: Add new roadmaps here. They will automatically render on the dashboard
+      const roadmaps = [
+        {
+          id: 'langchain',
+          title: 'LangChain Mastery',
+          description: '15 units across Foundation, Core, RAG Pipeline, Agents, and Production phases to elevate your AI engineering skills.',
+          logo: 'langchain/logo.svg',
+          path: 'langchain/index.html',
+          stats: {
+            units: 15,
+            topics: 84,
+            labs: 61
+          },
+          tags: ['AI Engineering', 'LLMs', 'RAG', 'Agents']
+        },
+        {
+          id: 'langgraph',
+          title: 'LangGraph Mastery',
+          description: '15 units across Foundation, Control Flow, Persistence & Memory, Human-in-the-Loop, Multi-Agent & Tools, and Production phases — every core LangGraph concept from your first node to a deployed multi-agent system.',
+          logo: 'langgraph/logo.svg',
+          path: 'langgraph/index.html',
+          stats: {
+            units: 15,
+            topics: 75,
+            labs: 60
+          },
+          tags: ['Stateful Agents', 'Graphs', 'Multi-Agent', 'LLMs']
+        },
+        {
+          id: 'aws',
+          title: 'AWS Solutions Architect',
+          description: '46 units across 7 phases — from Cloud Foundations to Architecture Mastery and Exam Readiness. 100% SAA-C03 syllabus coverage.',
+          logo: 'AWS/logo.svg',
+          path: 'AWS/index.html',
+          stats: {
+            units: 46,
+            topics: 338,
+            labs: 184
+          },
+          tags: ['Cloud', 'AWS', 'Infrastructure', 'Solutions Architect']
+        },
+        {
+          id: 'ci_cd',
+          title: 'Docker + CI/CD Mastery',
+          description: '18 units across Foundation, GitHub Actions, Jenkins, Deployment & Pipeline-as-Code, Security & Governance, and Industry & Interview Mastery — production-grade CI/CD expertise on both GitHub Actions and Jenkins.',
+          logo: 'ci_cd/logo.svg',
+          path: 'ci_cd/index.html',
+          stats: {
+            units: 18,
+            topics: 90,
+            labs: 72
+          },
+          tags: ['DevOps', 'GitHub Actions', 'Jenkins', 'Pipelines']
+        },
+        {
+          id: 'javascript_nodejs',
+          title: 'JS + Node.js Backend Mastery',
+          description: '33 units across JS Foundations, Intermediate, Advanced, and Node.js Core, Backend Engineering & Advanced System Design — interview-focused, practical-only, no fluff.',
+          logo: 'javascript_nodejs/logo.svg',
+          path: 'javascript_nodejs/index.html',
+          stats: {
+            units: 33,
+            topics: 0,
+            labs: 0
+          },
+          tags: ['JavaScript', 'Node.js', 'Backend', 'System Design']
+        }
+      ];
+
+      function animateCount(element, target, duration = 1200) {
+        if (!element) return;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          const easeProgress = progress * (2 - progress); // Ease out quad
+          const currentValue = Math.floor(easeProgress * target);
+          element.textContent = currentValue;
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            element.textContent = target;
           }
-              </div>
-              <div class="subject-title">${r.title}</div>
-            </div>
-            <div class="subject-desc">${r.description}</div>
-            <div class="card-stats">
-              <div class="card-stat-item">
-                <span class="card-stat-val">${r.stats.units}</span>
-                <span class="card-stat-label">Units</span>
-              </div>
-              <div class="card-stat-item">
-                <span class="card-stat-val">${r.stats.topics}</span>
-                <span class="card-stat-label">Topics</span>
-              </div>
-              <div class="card-stat-item">
-                <span class="card-stat-val">${r.stats.labs}</span>
-                <span class="card-stat-label">Labs</span>
-              </div>
-            </div>
-            <div class="tags-row">
-              ${r.tags.map(t => `<span class="tag">${t}</span>`).join('')}
-            </div>
-            <button class="enter-btn">
-              <i class="ti ti-arrow-right"></i> Enter Roadmap
-            </button>
+        };
+        window.requestAnimationFrame(step);
+      }
+
+      function renderDashboard() {
+        // 1. Render Stats
+        const totalRoadmaps = roadmaps.length;
+        const totalUnits = roadmaps.reduce((acc, r) => acc + (r.stats.units || 0), 0);
+        const totalTopics = roadmaps.reduce((acc, r) => acc + (r.stats.topics || 0), 0);
+        const totalLabs = roadmaps.reduce((acc, r) => acc + (r.stats.labs || 0), 0);
+
+        const statsEl = document.getElementById('global-stats');
+        statsEl.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-val" id="stat-roadmaps">0</div>
+            <div class="stat-label">Roadmaps</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="stat-units">0</div>
+            <div class="stat-label">Total Units</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="stat-topics">0</div>
+            <div class="stat-label">Total Topics</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="stat-labs">0</div>
+            <div class="stat-label">Total Labs</div>
           </div>
         `;
-      }).join('');
-    }
 
-    function toggleTheme() {
-      const isLight = document.documentElement.classList.toggle('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      updateThemeToggleIcon();
-    }
+        // Smooth counting animation
+        animateCount(document.getElementById('stat-roadmaps'), totalRoadmaps, 800);
+        animateCount(document.getElementById('stat-units'), totalUnits, 1000);
+        animateCount(document.getElementById('stat-topics'), totalTopics, 1200);
+        animateCount(document.getElementById('stat-labs'), totalLabs, 1200);
 
-    function updateThemeToggleIcon() {
-      const icon = document.querySelector('.theme-toggle-btn i');
-      if (!icon) return;
-      if (document.documentElement.classList.contains('light-theme')) {
-        icon.className = 'ti ti-sun';
-      } else {
-        icon.className = 'ti ti-moon';
+        // 2. Render Cards
+        const gridEl = document.getElementById('roadmaps-list');
+        gridEl.innerHTML = roadmaps.map((r) => {
+          return `
+            <div class="roadmap-card" onclick="window.location.href='${r.path}'">
+              <div class="card-header">
+                <div class="subject-logo">
+                  ${r.logo
+              ? `<object type="image/svg+xml" data="${r.logo}" style="pointer-events: none; width: 28px; height: 28px;"></object>`
+              : `<i class="ti ${r.icon || 'ti-map'}" style="font-size: 1.6rem;"></i>`
+            }
+                </div>
+                <div class="subject-title">${r.title}</div>
+              </div>
+              <div class="subject-desc">${r.description}</div>
+              <div class="card-stats">
+                <div class="card-stat-item">
+                  <span class="card-stat-val">${r.stats.units}</span>
+                  <span class="card-stat-label">Units</span>
+                </div>
+                <div class="card-stat-item">
+                  <span class="card-stat-val">${r.stats.topics}</span>
+                  <span class="card-stat-label">Topics</span>
+                </div>
+                <div class="card-stat-item">
+                  <span class="card-stat-val">${r.stats.labs}</span>
+                  <span class="card-stat-label">Labs</span>
+                </div>
+              </div>
+              <div class="tags-row">
+                ${r.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+              </div>
+              <button class="enter-btn">
+                <i class="ti ti-arrow-right"></i> Enter Roadmap
+              </button>
+            </div>
+          `;
+        }).join('');
       }
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      updateThemeToggleIcon();
-      renderDashboard();
-    });
-  </script>
-</body>
+      function toggleTheme() {
+        const isLight = document.documentElement.classList.toggle('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        updateThemeToggleIcon();
+      }
 
-</html>
+      function updateThemeToggleIcon() {
+        const icon = document.querySelector('.theme-toggle-btn i');
+        if (!icon) return;
+        if (document.documentElement.classList.contains('light-theme')) {
+          icon.className = 'ti ti-sun';
+        } else {
+          icon.className = 'ti ti-moon';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        updateThemeToggleIcon();
+        renderDashboard();
+      });
+    </script>
+  </body>
+
+  </html>

@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 1: JS Foundations — Deep Dive &amp; Interview Guide</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 1: JS Foundations — Deep Dive &amp; Interview Guide</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-1-js-foundations--deep-dive-amp-interview-guide"><a class="heading-anchor" href="#phase-1-js-foundations--deep-dive-amp-interview-guide" aria-hidden="true">#</a>Phase 1: JS Foundations — Deep Dive &amp; Interview Guide</h1>
+<p><strong>Audience:</strong> 3 YOE Node.js backend developer
+<strong>Scope:</strong> U00–U06 (7 units)
+<strong>Goal:</strong> A-Z conceptual mastery + interview-ready recall</p>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ul>
+<li>U00: Execution Context, Hoisting &amp; Scope</li>
+<li>U01: Type Coercion, Equality &amp; Truthy/Falsy</li>
+<li>U02: Closures &amp; Currying</li>
+<li>U03: <code class="inline-code">this</code>, call/apply/bind &amp; Arrow Functions</li>
+<li>U04: Values vs References: Copying &amp; Mutation</li>
+<li>U05: Prototypes, Classes, Getters/Setters &amp; Object.create</li>
+<li>U06: Arrays, Destructuring &amp; Core Methods</li>
+</ul>
+<hr>
+<h2 id="u00-execution-context-hoisting-amp-scope"><a class="heading-anchor" href="#u00-execution-context-hoisting-amp-scope" aria-hidden="true">#</a>U00: Execution Context, Hoisting &amp; Scope</h2>
+<h3 id="1-execution-context-ec"><a class="heading-anchor" href="#1-execution-context-ec" aria-hidden="true">#</a>1. Execution Context (EC)</h3>
+<p>An Execution Context is the environment in which JS code is evaluated and executed. Every time a function is invoked, a new EC is created and pushed onto the <strong>call stack</strong>.</p>
+<p>Two phases of every EC:</p>
+<ol>
+<li><strong>Creation phase</strong> — memory is allocated for variables/functions (hoisting happens here), <code class="inline-code">this</code> binding is set up, scope chain is established.</li>
+<li><strong>Execution phase</strong> — code runs top to bottom, values are assigned.</li>
+</ol>
+<p>Types of EC:</p>
+<ul>
+<li><strong>Global Execution Context (GEC)</strong> — created once, wraps top-level code. Creates the global object (<code class="inline-code">globalThis</code>/<code class="inline-code">window</code>/<code class="inline-code">global</code>) and binds <code class="inline-code">this</code>.</li>
+<li><strong>Function Execution Context (FEC)</strong> — created per function call.</li>
+<li><strong>Eval Execution Context</strong> — rare, from <code class="inline-code">eval()</code>.</li>
+</ul>
+<p><strong>Call stack</strong>: LIFO structure tracking active ECs. When a function returns, its EC pops off. A <code class="inline-code">RangeError: Maximum call stack size exceeded</code> means the stack overflowed (usually infinite/deep recursion).</p>
+<h3 id="2-hoisting"><a class="heading-anchor" href="#2-hoisting" aria-hidden="true">#</a>2. Hoisting</h3>
+<p>Hoisting is a <em>result</em> of the creation phase — declarations are processed before execution, so it looks like they&#39;re &quot;moved to the top.&quot;</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Declaration</th>
+<th>Hoisted?</th>
+<th>Initialized to</th>
+<th>Accessible before line?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">var</code></td>
+<td>Yes</td>
+<td><code class="inline-code">undefined</code></td>
+<td>Yes (value is <code class="inline-code">undefined</code>)</td>
+</tr>
+<tr>
+<td><code class="inline-code">function</code> decl</td>
+<td>Yes</td>
+<td>Fully hoisted (whole function)</td>
+<td>Yes, callable</td>
+</tr>
+<tr>
+<td><code class="inline-code">let</code> / <code class="inline-code">const</code></td>
+<td>Yes (binding created)</td>
+<td><strong>Uninitialized</strong> (TDZ)</td>
+<td>No — <code class="inline-code">ReferenceError</code></td>
+</tr>
+<tr>
+<td><code class="inline-code">class</code></td>
+<td>Yes (binding created)</td>
+<td><strong>Uninitialized</strong> (TDZ)</td>
+<td>No — <code class="inline-code">ReferenceError</code></td>
+</tr>
+<tr>
+<td>function expression / arrow assigned to <code class="inline-code">var</code></td>
+<td>Only the <code class="inline-code">var</code> part</td>
+<td><code class="inline-code">undefined</code></td>
+<td>Yes, but calling throws <code class="inline-code">TypeError: not a function</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="3-temporal-dead-zone-tdz"><a class="heading-anchor" href="#3-temporal-dead-zone-tdz" aria-hidden="true">#</a>3. Temporal Dead Zone (TDZ)</h3>
+<p>The TDZ is the span from the start of a scope until the <code class="inline-code">let</code>/<code class="inline-code">const</code>/<code class="inline-code">class</code> declaration is actually executed. The binding exists (hoisted) but is uninitialized — accessing it throws <code class="inline-code">ReferenceError</code>, not <code class="inline-code">undefined</code>. This is <em>why</em> <code class="inline-code">let</code>/<code class="inline-code">const</code> feel &quot;not hoisted&quot; even though technically they are.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(a); <span class="hljs-comment">// undefined (var hoisted + initialized)</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(b); <span class="hljs-comment">// ReferenceError: Cannot access &#x27;b&#x27; before initialization</span>
+<span class="hljs-keyword">var</span> a = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">let</span> b = <span class="hljs-number">2</span>;</code></pre></div>
+<h3 id="4-scope-amp-scope-chain"><a class="heading-anchor" href="#4-scope-amp-scope-chain" aria-hidden="true">#</a>4. Scope &amp; Scope Chain</h3>
+<ul>
+<li><strong>Global scope</strong> — top level.</li>
+<li><strong>Function scope</strong> — <code class="inline-code">var</code> is function-scoped, not block-scoped.</li>
+<li><strong>Block scope</strong> — <code class="inline-code">let</code>/<code class="inline-code">const</code> are block-scoped (<code class="inline-code">{}</code> creates a new scope for them).</li>
+<li><strong>Lexical scoping</strong>: scope is determined by <em>where</em> code is physically written, not by call-time. A nested function has access to variables in its enclosing lexical scopes — this is the <strong>scope chain</strong>, resolved at parse time (not runtime).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">outer</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">let</span> x = <span class="hljs-number">10</span>;
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">inner</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x); <span class="hljs-comment">// resolves via scope chain -&gt; outer&#x27;s x</span>
+  }
+  <span class="hljs-title function_">inner</span>();
+}</code></pre></div>
+<p>Dynamic scope (not used in JS, but interviewers may ask to contrast) would resolve <code class="inline-code">x</code> based on the <em>caller&#39;s</em> context instead of where the function was defined. JS never does this for variable scope (only <code class="inline-code">this</code> behaves somewhat &quot;dynamically&quot;).</p>
+<h3 id="interview-qampa"><a class="heading-anchor" href="#interview-qampa" aria-hidden="true">#</a>Interview Q&amp;A</h3>
+<p><strong>Q: Why does <code class="inline-code">var</code> inside a <code class="inline-code">for</code> loop cause the classic <code class="inline-code">setTimeout</code> closure bug, but <code class="inline-code">let</code> fixes it?</strong>
+A: <code class="inline-code">var</code> is function-scoped — there&#39;s only <em>one</em> binding shared across all iterations, so by the time the callbacks fire, the loop has finished and the variable holds its final value. <code class="inline-code">let</code> creates a <strong>new binding per iteration</strong> (per the spec), so each closure captures its own snapshot.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++) <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(i), <span class="hljs-number">0</span>); <span class="hljs-comment">// 3 3 3</span>
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> j = <span class="hljs-number">0</span>; j &lt; <span class="hljs-number">3</span>; j++) <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(j), <span class="hljs-number">0</span>); <span class="hljs-comment">// 0 1 2</span></code></pre></div>
+<p><strong>Q: Is a <code class="inline-code">function</code> declaration inside a block (<code class="inline-code">if {}</code>) hoisted to the block or the function scope?</strong>
+A: Historically inconsistent across engines; in strict mode/ES6, function declarations in blocks are block-scoped, but legacy &quot;Annex B&quot; behavior in non-strict sloppy mode also leaks a <code class="inline-code">var</code>-like binding to the enclosing function scope. Safe interview answer: <em>&quot;Behavior is spec-defined but inconsistent across environments — always use function expressions assigned to <code class="inline-code">let/const</code> inside blocks to avoid ambiguity.&quot;</em></p>
+<p><strong>Q: What&#39;s the output?</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-keyword">typeof</span> foo); <span class="hljs-comment">// &quot;function&quot;</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">foo</span>(<span class="hljs-params"></span>) {}
+<span class="hljs-keyword">var</span> foo = <span class="hljs-number">5</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-keyword">typeof</span> foo); <span class="hljs-comment">// &quot;number&quot;</span></code></pre></div>
+<p>A: Function declarations hoist fully (including their body) and take priority over <code class="inline-code">var</code> declarations of the same name during the creation phase; the <code class="inline-code">var foo = 5</code> assignment only happens at its line during execution, overwriting <code class="inline-code">foo</code>.</p>
+<h3 id="common-traps"><a class="heading-anchor" href="#common-traps" aria-hidden="true">#</a>Common Traps</h3>
+<ul>
+<li>Assuming <code class="inline-code">let</code>/<code class="inline-code">const</code> are &quot;not hoisted&quot; — they are hoisted, just uninitialized (TDZ).</li>
+<li>Redeclaring <code class="inline-code">var</code> in the same scope silently overwrites; redeclaring <code class="inline-code">let</code>/<code class="inline-code">const</code> throws <code class="inline-code">SyntaxError</code>.</li>
+<li><code class="inline-code">typeof</code> on a TDZ variable still throws <code class="inline-code">ReferenceError</code> (the one case where <code class="inline-code">typeof</code> on an undeclared-looking identifier isn&#39;t safe).</li>
+</ul>
+<hr>
+<h2 id="u01-type-coercion-equality-amp-truthyfalsy"><a class="heading-anchor" href="#u01-type-coercion-equality-amp-truthyfalsy" aria-hidden="true">#</a>U01: Type Coercion, Equality &amp; Truthy/Falsy</h2>
+<h3 id="1-implicit-coercion-rules"><a class="heading-anchor" href="#1-implicit-coercion-rules" aria-hidden="true">#</a>1. Implicit Coercion Rules</h3>
+<p>JS coerces types automatically in certain operator contexts.</p>
+<ul>
+<li><strong><code class="inline-code">+</code> operator</strong>: if either operand is a string, does <strong>string concatenation</strong> (after calling <code class="inline-code">ToPrimitive</code> on objects). Otherwise numeric addition.<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-number">1</span> + <span class="hljs-string">&#x27;1&#x27;</span>      <span class="hljs-comment">// &#x27;11&#x27;</span>
+<span class="hljs-number">1</span> + {}       <span class="hljs-comment">// &#x27;1[object Object]&#x27;</span>
+<span class="hljs-number">1</span> + []       <span class="hljs-comment">// &#x27;1&#x27;  (array -&gt; &#x27;&#x27; via ToPrimitive)</span>
+[] + []      <span class="hljs-comment">// &#x27;&#x27;</span>
+[] + {}      <span class="hljs-comment">// &#x27;[object Object]&#x27;</span></code></pre></div>
+</li>
+<li><strong><code class="inline-code">- * / %</code></strong>: always coerce both operands to <code class="inline-code">Number</code> via <code class="inline-code">ToNumber</code>.<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-string">&#x27;5&#x27;</span> - <span class="hljs-number">2</span>   <span class="hljs-comment">// 3</span>
+<span class="hljs-string">&#x27;5&#x27;</span> * <span class="hljs-string">&#x27;2&#x27;</span> <span class="hljs-comment">// 10</span></code></pre></div>
+</li>
+<li><strong><code class="inline-code">ToPrimitive</code> algorithm</strong> (for objects): tries <code class="inline-code">valueOf()</code> then <code class="inline-code">toString()</code> (for default/number hint), or <code class="inline-code">toString()</code> then <code class="inline-code">valueOf()</code> (for string hint).</li>
+</ul>
+<h3 id="2-truthy--falsy"><a class="heading-anchor" href="#2-truthy--falsy" aria-hidden="true">#</a>2. Truthy / Falsy</h3>
+<p><strong>Only 8 falsy values</strong> in JS — memorize this list:
+<code class="inline-code">false</code>, <code class="inline-code">0</code>, <code class="inline-code">-0</code>, <code class="inline-code">0n</code> (BigInt zero), <code class="inline-code">&#39;&#39;</code>, <code class="inline-code">null</code>, <code class="inline-code">undefined</code>, <code class="inline-code">NaN</code></p>
+<p>Everything else is truthy — including <code class="inline-code">&#39;0&#39;</code>, <code class="inline-code">&#39;false&#39;</code>, <code class="inline-code">[]</code>, <code class="inline-code">{}</code> (empty array/object are truthy!).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">if</span> ([]) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;runs&#x27;</span>);   <span class="hljs-comment">// runs - [] is truthy</span>
+<span class="hljs-keyword">if</span> ({}) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;runs&#x27;</span>);   <span class="hljs-comment">// runs - {} is truthy</span>
+<span class="hljs-keyword">if</span> (<span class="hljs-number">0</span>) {} <span class="hljs-keyword">else</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;falsy&#x27;</span>); <span class="hljs-comment">// falsy</span></code></pre></div>
+<p><strong>Real-world bug this causes</strong>: <code class="inline-code">if (count)</code> silently treats <code class="inline-code">count = 0</code> as &quot;no value,&quot; which is wrong when 0 is a legitimate value (e.g., inventory count, page index). Fix: explicit checks — <code class="inline-code">if (count !== undefined)</code> or <code class="inline-code">if (Number.isFinite(count))</code>.</p>
+<h3 id="3--vs-"><a class="heading-anchor" href="#3--vs-" aria-hidden="true">#</a>3. <code class="inline-code">==</code> vs <code class="inline-code">===</code></h3>
+<ul>
+<li><code class="inline-code">===</code> (strict equality): no coercion, compares type + value.</li>
+<li><code class="inline-code">==</code> (loose equality): coerces operands to a common type before comparing, following the <strong>Abstract Equality Comparison Algorithm</strong>.</li>
+</ul>
+<p>Key gotchas:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-literal">null</span> == <span class="hljs-literal">undefined</span>     <span class="hljs-comment">// true  (special-cased — only equal to each other)</span>
+<span class="hljs-literal">null</span> === <span class="hljs-literal">undefined</span>    <span class="hljs-comment">// false</span>
+<span class="hljs-title class_">NaN</span> == <span class="hljs-title class_">NaN</span>             <span class="hljs-comment">// false (NaN is never equal to anything, incl. itself)</span>
+<span class="hljs-title class_">Number</span>.<span class="hljs-built_in">isNaN</span>(<span class="hljs-title class_">NaN</span>)      <span class="hljs-comment">// true - the only reliable NaN check</span>
+[] == <span class="hljs-literal">false</span>            <span class="hljs-comment">// true  ([] -&gt; &#x27;&#x27; -&gt; 0, false -&gt; 0)</span>
+<span class="hljs-string">&#x27;&#x27;</span> == <span class="hljs-number">0</span>                <span class="hljs-comment">// true</span>
+<span class="hljs-string">&#x27;0&#x27;</span> == <span class="hljs-literal">false</span>           <span class="hljs-comment">// true</span>
+[] == ![]              <span class="hljs-comment">// true (![] is false, [] coerces to 0, false -&gt; 0)</span></code></pre></div>
+<p>Interview-safe rule: <strong>always use <code class="inline-code">===</code>/<code class="inline-code">!==</code></strong> except the idiomatic <code class="inline-code">x == null</code> (which checks for both <code class="inline-code">null</code> and <code class="inline-code">undefined</code> in one shot — commonly used and accepted).</p>
+<h3 id="4-nan-handling"><a class="heading-anchor" href="#4-nan-handling" aria-hidden="true">#</a>4. <code class="inline-code">NaN</code> Handling</h3>
+<ul>
+<li><code class="inline-code">NaN</code> is the only value in JS not equal to itself.</li>
+<li><code class="inline-code">typeof NaN === &#39;number&#39;</code> (it IS a number type, just &quot;not a number&quot; semantically).</li>
+<li>Reliable check: <code class="inline-code">Number.isNaN(value)</code> (does NOT coerce). Avoid global <code class="inline-code">isNaN()</code> — it coerces first (<code class="inline-code">isNaN(&#39;foo&#39;)</code> is <code class="inline-code">true</code> because <code class="inline-code">&#39;foo&#39;</code> coerces to <code class="inline-code">NaN</code>).</li>
+</ul>
+<h3 id="interview-qampa-1"><a class="heading-anchor" href="#interview-qampa-1" aria-hidden="true">#</a>Interview Q&amp;A</h3>
+<p><strong>Q: <code class="inline-code">console.log(0.1 + 0.2 === 0.3)</code> — what and why?</strong>
+A: <code class="inline-code">false</code>. Floating point numbers use IEEE-754 double precision, which can&#39;t represent 0.1/0.2 exactly, causing rounding errors (<code class="inline-code">0.1+0.2 === 0.30000000000000004</code>). Fix: compare with an epsilon (<code class="inline-code">Math.abs(a-b) &lt; Number.EPSILON</code>) or use integer-based math (cents instead of dollars).</p>
+<p><strong>Q: Predict output:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>] + [<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>]); <span class="hljs-comment">// &quot;1,2,34,5,6&quot;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;5&#x27;</span> + <span class="hljs-number">3</span>);           <span class="hljs-comment">// &quot;53&quot;</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;5&#x27;</span> - <span class="hljs-number">3</span>);           <span class="hljs-comment">// 2</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;5&#x27;</span> + +<span class="hljs-string">&#x27;3&#x27;</span>);        <span class="hljs-comment">// &quot;53&quot;  (unary + coerces &#x27;3&#x27; to number first, then string concat)</span></code></pre></div>
+<h3 id="common-traps-1"><a class="heading-anchor" href="#common-traps-1" aria-hidden="true">#</a>Common Traps</h3>
+<ul>
+<li>Using <code class="inline-code">==</code> for array/object comparisons — always compares by reference regardless of coercion (<code class="inline-code">[] == []</code> is <code class="inline-code">false</code>).</li>
+<li>Forgetting <code class="inline-code">0</code> and <code class="inline-code">&#39;&#39;</code> are falsy when validating required form/API fields.</li>
+<li>Global <code class="inline-code">isNaN()</code> vs <code class="inline-code">Number.isNaN()</code> mixup.</li>
+</ul>
+<hr>
+<h2 id="u02-closures-amp-currying"><a class="heading-anchor" href="#u02-closures-amp-currying" aria-hidden="true">#</a>U02: Closures &amp; Currying</h2>
+<h3 id="1-what-is-a-closure"><a class="heading-anchor" href="#1-what-is-a-closure" aria-hidden="true">#</a>1. What Is a Closure?</h3>
+<p>A closure is formed when a function &quot;remembers&quot; the lexical scope it was created in, even after the outer function has returned. Technically: every function in JS carries a reference to its <code class="inline-code">[[Environment]]</code> — the scope in which it was defined — not a copy of the variables, a <strong>live reference</strong>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">makeCounter</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">let</span> count = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">return</span> ++count; <span class="hljs-comment">// closes over &#x27;count&#x27;</span>
+  };
+}
+<span class="hljs-keyword">const</span> counter = <span class="hljs-title function_">makeCounter</span>();
+<span class="hljs-title function_">counter</span>(); <span class="hljs-comment">// 1</span>
+<span class="hljs-title function_">counter</span>(); <span class="hljs-comment">// 2 (same &#x27;count&#x27; persists across calls)</span></code></pre></div>
+<p>Key point: closures capture variables <strong>by reference</strong>, not by value snapshot. This is why the classic <code class="inline-code">var</code> loop bug happens (see U00) — all closures share the same <code class="inline-code">i</code>.</p>
+<h3 id="2-practical-uses"><a class="heading-anchor" href="#2-practical-uses" aria-hidden="true">#</a>2. Practical Uses</h3>
+<ul>
+<li><p><strong>Data privacy / private state</strong>: pre-class-fields way to hide internal state (module pattern, IIFE).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> bankAccount = (<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">let</span> balance = <span class="hljs-number">0</span>; <span class="hljs-comment">// private, inaccessible from outside</span>
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">deposit</span>: <span class="hljs-function">(<span class="hljs-params">amt</span>) =&gt;</span> (balance += amt),
+    <span class="hljs-attr">getBalance</span>: <span class="hljs-function">() =&gt;</span> balance
+  };
+})();</code></pre></div>
+</li>
+<li><p><strong>Memoization</strong>: cache expensive computation results in a closed-over object.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">memoize</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">const</span> cache = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params">...args</span>) {
+    <span class="hljs-keyword">const</span> key = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(args);
+    <span class="hljs-keyword">if</span> (cache.<span class="hljs-title function_">has</span>(key)) <span class="hljs-keyword">return</span> cache.<span class="hljs-title function_">get</span>(key);
+    <span class="hljs-keyword">const</span> result = <span class="hljs-title function_">fn</span>(...args);
+    cache.<span class="hljs-title function_">set</span>(key, result);
+    <span class="hljs-keyword">return</span> result;
+  };
+}</code></pre></div>
+</li>
+<li><p><strong>Currying</strong>: transforming a function of N args into a chain of functions each taking one arg (or fewer).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> <span class="hljs-title function_">curry</span> = (<span class="hljs-params">fn</span>) =&gt; {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">curried</span>(<span class="hljs-params">...args</span>) {
+    <span class="hljs-keyword">if</span> (args.<span class="hljs-property">length</span> &gt;= fn.<span class="hljs-property">length</span>) <span class="hljs-keyword">return</span> <span class="hljs-title function_">fn</span>(...args);
+    <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">...more</span>) =&gt;</span> <span class="hljs-title function_">curried</span>(...args, ...more);
+  };
+};
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">add3</span> = (<span class="hljs-params">a, b, c</span>) =&gt; a + b + c;
+<span class="hljs-keyword">const</span> curriedAdd = <span class="hljs-title function_">curry</span>(add3);
+<span class="hljs-title function_">curriedAdd</span>(<span class="hljs-number">1</span>)(<span class="hljs-number">2</span>)(<span class="hljs-number">3</span>);   <span class="hljs-comment">// 6</span>
+<span class="hljs-title function_">curriedAdd</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)(<span class="hljs-number">3</span>);   <span class="hljs-comment">// 6</span>
+<span class="hljs-title function_">curriedAdd</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>);   <span class="hljs-comment">// 6</span></code></pre></div>
+<p>Currying is common in functional pipelines and configuration-style APIs (e.g., partially applying a logger with a fixed prefix).</p>
+</li>
+<li><p><strong>Event handler factories, debounce/throttle</strong> (both rely on closures to persist a timer ID across calls — covered in depth in Phase 3).</p>
+</li>
+</ul>
+<h3 id="3-iife-immediately-invoked-function-expression"><a class="heading-anchor" href="#3-iife-immediately-invoked-function-expression" aria-hidden="true">#</a>3. IIFE (Immediately Invoked Function Expression)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// runs immediately, creates an isolated scope</span>
+})();</code></pre></div>
+<p>Historically used to avoid polluting global scope before ES6 modules/block scope existed. Still used for one-off initialization or the module pattern above.</p>
+<h3 id="interview-qampa-2"><a class="heading-anchor" href="#interview-qampa-2" aria-hidden="true">#</a>Interview Q&amp;A</h3>
+<p><strong>Q: Fix this classic bug:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">3</span>; i++) {
+  <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(i), i * <span class="hljs-number">1000</span>);
+}
+<span class="hljs-comment">// prints 4, 4, 4 instead of 1, 2, 3</span></code></pre></div>
+<p>A: Two fixes —</p>
+<ol>
+<li>Swap <code class="inline-code">var</code> → <code class="inline-code">let</code> (per-iteration binding).</li>
+<li>Wrap in an IIFE to force a new closure per iteration: <code class="inline-code">setTimeout((function(i){ return () =&gt; console.log(i); })(i), i*1000)</code>.</li>
+</ol>
+<p><strong>Q: Implement <code class="inline-code">once(fn)</code> — a function that can only run once.</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">once</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">let</span> called = <span class="hljs-literal">false</span>, result;
+  <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">...args</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (!called) { result = <span class="hljs-title function_">fn</span>(...args); called = <span class="hljs-literal">true</span>; }
+    <span class="hljs-keyword">return</span> result;
+  };
+}</code></pre></div>
+<p>This is a closure over <code class="inline-code">called</code>/<code class="inline-code">result</code> — commonly asked because it demonstrates persisted private state.</p>
+<h3 id="common-traps-2"><a class="heading-anchor" href="#common-traps-2" aria-hidden="true">#</a>Common Traps</h3>
+<ul>
+<li>Believing closures copy variable <em>values</em> — they close over the <em>variable binding</em> itself.</li>
+<li>Memory leaks: closures keep referenced variables alive as long as the closure itself is reachable (e.g., a forgotten event listener holding a large object in scope).</li>
+</ul>
+<hr>
+<h2 id="u03-this-callapplybind-amp-arrow-functions"><a class="heading-anchor" href="#u03-this-callapplybind-amp-arrow-functions" aria-hidden="true">#</a>U03: <code class="inline-code">this</code>, call/apply/bind &amp; Arrow Functions</h2>
+<h3 id="1-the-4-1-rules-of-this-binding"><a class="heading-anchor" href="#1-the-4-1-rules-of-this-binding" aria-hidden="true">#</a>1. The 4 (+1) Rules of <code class="inline-code">this</code> Binding</h3>
+<p><code class="inline-code">this</code> is determined by <strong>how a function is called</strong>, not where it&#39;s defined (except arrow functions — see below). Priority order (highest wins):</p>
+<ol>
+<li><strong><code class="inline-code">new</code> binding</strong> — <code class="inline-code">new Foo()</code> → <code class="inline-code">this</code> is the newly created object.</li>
+<li><strong>Explicit binding</strong> — <code class="inline-code">.call()</code>, <code class="inline-code">.apply()</code>, <code class="inline-code">.bind()</code> → <code class="inline-code">this</code> is whatever is passed.</li>
+<li><strong>Implicit binding</strong> — called as a method (<code class="inline-code">obj.method()</code>) → <code class="inline-code">this</code> is <code class="inline-code">obj</code>.</li>
+<li><strong>Default binding</strong> — plain function call (<code class="inline-code">foo()</code>) → <code class="inline-code">this</code> is <code class="inline-code">undefined</code> in strict mode, or the global object in sloppy mode.</li>
+</ol>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">show</span>(<span class="hljs-params"></span>) { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>); }
+<span class="hljs-keyword">const</span> obj = { show };
+
+<span class="hljs-title function_">show</span>();               <span class="hljs-comment">// default: undefined (strict) / global (sloppy)</span>
+obj.<span class="hljs-title function_">show</span>();            <span class="hljs-comment">// implicit: obj</span>
+obj.<span class="hljs-property">show</span>.<span class="hljs-title function_">call</span>({<span class="hljs-attr">x</span>:<span class="hljs-number">1</span>});  <span class="hljs-comment">// explicit: {x:1}</span>
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">show</span>();            <span class="hljs-comment">// new binding: newly created object</span></code></pre></div>
+<p><strong>Classic bug — losing <code class="inline-code">this</code> in a callback:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> obj = {
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;A&#x27;</span>,
+  <span class="hljs-title function_">greet</span>(<span class="hljs-params"></span>) { <span class="hljs-built_in">setTimeout</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span>); }, <span class="hljs-number">0</span>); } <span class="hljs-comment">// undefined</span>
+};</code></pre></div>
+<p>Fix options: arrow function (<code class="inline-code">setTimeout(() =&gt; console.log(this.name), 0)</code>), <code class="inline-code">.bind(this)</code>, or store <code class="inline-code">const self = this</code>.</p>
+<h3 id="2-call--apply--bind"><a class="heading-anchor" href="#2-call--apply--bind" aria-hidden="true">#</a>2. <code class="inline-code">call</code> / <code class="inline-code">apply</code> / <code class="inline-code">bind</code></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Invokes immediately?</th>
+<th>Args format</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">.call(thisArg, a, b, c)</code></td>
+<td>Yes</td>
+<td>comma-separated</td>
+<td>function&#39;s return value</td>
+</tr>
+<tr>
+<td><code class="inline-code">.apply(thisArg, [a,b,c])</code></td>
+<td>Yes</td>
+<td>array</td>
+<td>function&#39;s return value</td>
+</tr>
+<tr>
+<td><code class="inline-code">.bind(thisArg, a, b)</code></td>
+<td>No</td>
+<td>comma-separated (partial application)</td>
+<td>new function with <code class="inline-code">this</code>/args pre-set</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">greet</span>(<span class="hljs-params">greeting</span>) { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${greeting}</span>, <span class="hljs-subst">${<span class="hljs-variable language_">this</span>.name}</span>`</span>; }
+greet.<span class="hljs-title function_">call</span>({<span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Sam&#x27;</span>}, <span class="hljs-string">&#x27;Hi&#x27;</span>);      <span class="hljs-comment">// &quot;Hi, Sam&quot;</span>
+greet.<span class="hljs-title function_">apply</span>({<span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Sam&#x27;</span>}, [<span class="hljs-string">&#x27;Hi&#x27;</span>]);   <span class="hljs-comment">// &quot;Hi, Sam&quot;</span>
+<span class="hljs-keyword">const</span> boundGreet = greet.<span class="hljs-title function_">bind</span>({<span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Sam&#x27;</span>});
+<span class="hljs-title function_">boundGreet</span>(<span class="hljs-string">&#x27;Hi&#x27;</span>);                      <span class="hljs-comment">// &quot;Hi, Sam&quot;</span></code></pre></div>
+<p><strong><code class="inline-code">bind</code> polyfill (frequently asked):</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-title class_">Function</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myBind</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">context, ...boundArgs</span>) {
+  <span class="hljs-keyword">const</span> fn = <span class="hljs-variable language_">this</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params">...args</span>) {
+    <span class="hljs-keyword">return</span> fn.<span class="hljs-title function_">apply</span>(context, [...boundArgs, ...args]);
+  };
+};</code></pre></div>
+<h3 id="3-arrow-functions-amp-lexical-this"><a class="heading-anchor" href="#3-arrow-functions-amp-lexical-this" aria-hidden="true">#</a>3. Arrow Functions &amp; Lexical <code class="inline-code">this</code></h3>
+<p>Arrow functions <strong>do not have their own <code class="inline-code">this</code>, <code class="inline-code">arguments</code>, or <code class="inline-code">super</code></strong> — they capture these lexically from the enclosing scope at definition time, exactly like a closure captures a variable. This means:</p>
+<ul>
+<li><code class="inline-code">.call()</code>/<code class="inline-code">.apply()</code>/<code class="inline-code">.bind()</code> cannot rebind <code class="inline-code">this</code> on an arrow function — the <code class="inline-code">thisArg</code> is silently ignored.</li>
+<li>Arrow functions should <strong>not</strong> be used as object methods when you need dynamic <code class="inline-code">this</code> (e.g., <code class="inline-code">obj = { name: &#39;A&#39;, greet: () =&gt; console.log(this.name) }</code> — <code class="inline-code">this</code> here is NOT <code class="inline-code">obj</code>, it&#39;s whatever enclosing scope the object literal was created in, usually module/global scope).</li>
+<li>Arrow functions <strong>cannot</strong> be used as constructors (<code class="inline-code">new arrowFn()</code> throws <code class="inline-code">TypeError</code>).</li>
+</ul>
+<h3 id="interview-qampa-3"><a class="heading-anchor" href="#interview-qampa-3" aria-hidden="true">#</a>Interview Q&amp;A</h3>
+<p><strong>Q: Why do class methods often need <code class="inline-code">.bind(this)</code> in the constructor, or arrow-function class fields?</strong>
+A: When a method is passed as a callback (e.g., <code class="inline-code">onClick={this.handleClick}</code> in React, or <code class="inline-code">arr.forEach(this.process)</code>), it&#39;s invoked as a plain function, losing implicit binding to the instance. Binding in the constructor (<code class="inline-code">this.handleClick = this.handleClick.bind(this)</code>) or using an arrow-function class field (<code class="inline-code">handleClick = () =&gt; {...}</code>) locks <code class="inline-code">this</code> to the instance regardless of call-site.</p>
+<p><strong>Q: What does this print?</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> obj = {
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Obj&#x27;</span>,
+  <span class="hljs-attr">regular</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span>); },
+  <span class="hljs-attr">arrow</span>: <span class="hljs-function">() =&gt;</span> { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span>); }
+};
+obj.<span class="hljs-title function_">regular</span>(); <span class="hljs-comment">// &quot;Obj&quot;</span>
+obj.<span class="hljs-title function_">arrow</span>();   <span class="hljs-comment">// undefined (this is lexical, refers to outer/module scope)</span></code></pre></div>
+<h3 id="common-traps-3"><a class="heading-anchor" href="#common-traps-3" aria-hidden="true">#</a>Common Traps</h3>
+<ul>
+<li>Using arrow functions for object methods that need <code class="inline-code">this</code>.</li>
+<li>Forgetting <code class="inline-code">bind</code>/arrow in <code class="inline-code">setTimeout</code>, event listeners, array callbacks passed as references.</li>
+<li>Assuming <code class="inline-code">apply</code>/<code class="inline-code">call</code> change <code class="inline-code">this</code> on arrow functions (they don&#39;t).</li>
+</ul>
+<hr>
+<h2 id="u04-values-vs-references-copying-amp-mutation"><a class="heading-anchor" href="#u04-values-vs-references-copying-amp-mutation" aria-hidden="true">#</a>U04: Values vs References: Copying &amp; Mutation</h2>
+<h3 id="1-primitives-vs-objects"><a class="heading-anchor" href="#1-primitives-vs-objects" aria-hidden="true">#</a>1. Primitives vs Objects</h3>
+<ul>
+<li><strong>Primitives</strong> (<code class="inline-code">string</code>, <code class="inline-code">number</code>, <code class="inline-code">boolean</code>, <code class="inline-code">null</code>, <code class="inline-code">undefined</code>, <code class="inline-code">symbol</code>, <code class="inline-code">bigint</code>) are <strong>copied by value</strong>. Assigning or passing them creates an independent copy.</li>
+<li><strong>Objects/arrays/functions</strong> are <strong>copied by reference</strong> — but critically, <strong>the reference itself is passed by value</strong>. This nuance is the #1 source of confusion.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">reassign</span>(<span class="hljs-params">obj</span>) { obj = { <span class="hljs-attr">changed</span>: <span class="hljs-literal">true</span> }; } <span class="hljs-comment">// reassigning the local reference</span>
+<span class="hljs-keyword">const</span> original = { <span class="hljs-attr">changed</span>: <span class="hljs-literal">false</span> };
+<span class="hljs-title function_">reassign</span>(original);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(original.<span class="hljs-property">changed</span>); <span class="hljs-comment">// false — original untouched</span>
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">mutate</span>(<span class="hljs-params">obj</span>) { obj.<span class="hljs-property">changed</span> = <span class="hljs-literal">true</span>; } <span class="hljs-comment">// mutating via the shared reference</span>
+<span class="hljs-title function_">mutate</span>(original);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(original.<span class="hljs-property">changed</span>); <span class="hljs-comment">// true — mutation IS visible outside</span></code></pre></div>
+<p>So: <strong>JS is always pass-by-value</strong> — for objects, the &quot;value&quot; being passed is the reference (memory address), not the object itself. Reassigning the parameter inside the function only rebinds the local copy of that reference; mutating properties through it affects the shared object.</p>
+<h3 id="2-shallow-copy-vs-deep-copy"><a class="heading-anchor" href="#2-shallow-copy-vs-deep-copy" aria-hidden="true">#</a>2. Shallow Copy vs Deep Copy</h3>
+<p><strong>Shallow copy</strong> — copies top-level properties only; nested objects/arrays are still shared references.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> a = { <span class="hljs-attr">x</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">nested</span>: { <span class="hljs-attr">y</span>: <span class="hljs-number">2</span> } };
+<span class="hljs-keyword">const</span> b = { ...a };           <span class="hljs-comment">// spread — shallow</span>
+<span class="hljs-keyword">const</span> c = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">assign</span>({}, a); <span class="hljs-comment">// also shallow</span>
+b.<span class="hljs-property">nested</span>.<span class="hljs-property">y</span> = <span class="hljs-number">99</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(a.<span class="hljs-property">nested</span>.<span class="hljs-property">y</span>); <span class="hljs-comment">// 99 — nested object shared! bug source.</span></code></pre></div>
+<p><strong>Deep copy</strong> — recursively copies all levels, no shared references.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> deep = <span class="hljs-title function_">structuredClone</span>(a); <span class="hljs-comment">// native, handles Dates/Maps/Sets/circular refs (Node 17+)</span>
+<span class="hljs-comment">// legacy fallback: JSON.parse(JSON.stringify(a)) — loses functions, undefined, Dates become strings, breaks on circular refs</span></code></pre></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Depth</th>
+<th>Handles functions?</th>
+<th>Handles circular refs?</th>
+<th>Handles Date/Map/Set?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">{...obj}</code> / <code class="inline-code">Object.assign</code></td>
+<td>Shallow</td>
+<td>N/A (copies ref)</td>
+<td>N/A</td>
+<td>N/A (copies ref)</td>
+</tr>
+<tr>
+<td><code class="inline-code">JSON.parse(JSON.stringify())</code></td>
+<td>Deep</td>
+<td>No (dropped)</td>
+<td>No (throws)</td>
+<td>No (Date→string, Map/Set lost)</td>
+</tr>
+<tr>
+<td><code class="inline-code">structuredClone()</code></td>
+<td>Deep</td>
+<td>No (throws)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Lodash <code class="inline-code">_.cloneDeep()</code></td>
+<td>Deep</td>
+<td>Copies ref</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="interview-qampa-4"><a class="heading-anchor" href="#interview-qampa-4" aria-hidden="true">#</a>Interview Q&amp;A</h3>
+<p><strong>Q: Predict the output:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">updateArray</span>(<span class="hljs-params">arr</span>) {
+  arr.<span class="hljs-title function_">push</span>(<span class="hljs-number">4</span>);       <span class="hljs-comment">// mutation - visible outside</span>
+  arr = [<span class="hljs-number">9</span>, <span class="hljs-number">9</span>, <span class="hljs-number">9</span>];    <span class="hljs-comment">// reassignment - local only</span>
+}
+<span class="hljs-keyword">const</span> nums = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>];
+<span class="hljs-title function_">updateArray</span>(nums);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(nums); <span class="hljs-comment">// [1, 2, 3, 4]</span></code></pre></div>
+<p><strong>Q: You have <code class="inline-code">const state = { user: { settings: { theme: &#39;dark&#39; } } }</code> and do <code class="inline-code">const copy = {...state}</code>. You then set <code class="inline-code">copy.user.settings.theme = &#39;light&#39;</code>. Does <code class="inline-code">state.user.settings.theme</code> change? Why, and how do you avoid it?</strong>
+A: Yes, it changes to <code class="inline-code">&#39;light&#39;</code> too — spread is shallow, so <code class="inline-code">copy.user</code> is the <em>same object reference</em> as <code class="inline-code">state.user</code>. Avoid via <code class="inline-code">structuredClone(state)</code> or manually deep-cloning/using an immutable-update library (Immer) for nested state — this is a very common Redux/React-state interview question, equally relevant to backend config-object mutation bugs.</p>
+<h3 id="common-traps-4"><a class="heading-anchor" href="#common-traps-4" aria-hidden="true">#</a>Common Traps</h3>
+<ul>
+<li>Assuming spread/<code class="inline-code">Object.assign</code> performs a deep copy.</li>
+<li>Mutating a function parameter (object/array) thinking it&#39;s &quot;safe&quot; because &quot;JS passes by value&quot; — true for the reference, false for the pointed-to data.</li>
+<li>Using <code class="inline-code">JSON.parse(JSON.stringify())</code> on objects containing <code class="inline-code">Date</code>, <code class="inline-code">undefined</code>, functions, or circular references and getting silently wrong/broken results.</li>
+</ul>
+<hr>
+<h2 id="u05-prototypes-classes-getterssetters-amp-objectcreate"><a class="heading-anchor" href="#u05-prototypes-classes-getterssetters-amp-objectcreate" aria-hidden="true">#</a>U05: Prototypes, Classes, Getters/Setters &amp; Object.create</h2>
+<h3 id="1-the-prototype-chain"><a class="heading-anchor" href="#1-the-prototype-chain" aria-hidden="true">#</a>1. The Prototype Chain</h3>
+<p>Every JS object has an internal <code class="inline-code">[[Prototype]]</code> link (exposed via <code class="inline-code">__proto__</code>, or properly via <code class="inline-code">Object.getPrototypeOf()</code>) to another object. When you access a property, the engine walks up this chain until it finds the property or reaches <code class="inline-code">null</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> animal = { <span class="hljs-attr">eats</span>: <span class="hljs-literal">true</span> };
+<span class="hljs-keyword">const</span> dog = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">create</span>(animal); <span class="hljs-comment">// dog.[[Prototype]] = animal</span>
+dog.<span class="hljs-property">barks</span> = <span class="hljs-literal">true</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(dog.<span class="hljs-property">eats</span>);  <span class="hljs-comment">// true — found via prototype chain</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Object</span>.<span class="hljs-title function_">getPrototypeOf</span>(dog) === animal); <span class="hljs-comment">// true</span></code></pre></div>
+<p><strong><code class="inline-code">__proto__</code> vs <code class="inline-code">.prototype</code></strong> — the #1 source of confusion:</p>
+<ul>
+<li><code class="inline-code">obj.__proto__</code> — the actual link to the object&#39;s prototype (legacy accessor; prefer <code class="inline-code">Object.getPrototypeOf</code>).</li>
+<li><code class="inline-code">Fn.prototype</code> — a property that exists <strong>only on functions</strong>, used as the <code class="inline-code">[[Prototype]]</code> for objects created via <code class="inline-code">new Fn()</code>. It is NOT the function&#39;s own prototype.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Dog</span>(<span class="hljs-params">name</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name; }
+<span class="hljs-title class_">Dog</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">bark</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-variable language_">this</span>.name}</span> says woof`</span>; };
+<span class="hljs-keyword">const</span> d = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Dog</span>(<span class="hljs-string">&#x27;Rex&#x27;</span>);
+d.<span class="hljs-title function_">bark</span>();                              <span class="hljs-comment">// &quot;Rex says woof&quot; — found on Dog.prototype</span>
+d.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Dog</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>;         <span class="hljs-comment">// true</span></code></pre></div>
+<h3 id="2-constructor-functions-vs-es6-classes"><a class="heading-anchor" href="#2-constructor-functions-vs-es6-classes" aria-hidden="true">#</a>2. Constructor Functions vs ES6 Classes</h3>
+<p>Classes are (mostly) <strong>syntactic sugar</strong> over prototype-based inheritance — under the hood, methods still live on <code class="inline-code">.prototype</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Constructor-function style</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Person</span>(<span class="hljs-params">name</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name; }
+<span class="hljs-title class_">Person</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">greet</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-string">`Hi, I&#x27;m <span class="hljs-subst">${<span class="hljs-variable language_">this</span>.name}</span>`</span>; };
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Student</span>(<span class="hljs-params">name, school</span>) {
+  <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">call</span>(<span class="hljs-variable language_">this</span>, name);       <span class="hljs-comment">// manual &quot;super&quot; call</span>
+  <span class="hljs-variable language_">this</span>.<span class="hljs-property">school</span> = school;
+}
+<span class="hljs-title class_">Student</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span> = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">create</span>(<span class="hljs-title class_">Person</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// set up inheritance</span>
+<span class="hljs-title class_">Student</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">constructor</span> = <span class="hljs-title class_">Student</span>;
+
+<span class="hljs-comment">// Class style — equivalent, cleaner</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonC</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">name</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name; }
+  <span class="hljs-title function_">greet</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-string">`Hi, I&#x27;m <span class="hljs-subst">${<span class="hljs-variable language_">this</span>.name}</span>`</span>; }
+}
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">StudentC</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">PersonC</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">name, school</span>) {
+    <span class="hljs-variable language_">super</span>(name);                 <span class="hljs-comment">// calls PersonC constructor</span>
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">school</span> = school;
+  }
+}</code></pre></div>
+<p>Real differences (not just sugar):</p>
+<ul>
+<li>Class declarations are <strong>not hoisted</strong> the way function declarations are (they&#39;re in TDZ).</li>
+<li>Class bodies run in <strong>strict mode</strong> implicitly.</li>
+<li>Class methods are <strong>non-enumerable</strong> by default (constructor-function-assigned prototype methods are enumerable unless configured otherwise).</li>
+<li>Calling a class <strong>without <code class="inline-code">new</code></strong> throws <code class="inline-code">TypeError</code>; calling a constructor function without <code class="inline-code">new</code> silently runs with wrong <code class="inline-code">this</code> (global/undefined) — a common source of production bugs pre-ES6.</li>
+</ul>
+<h3 id="3-objectcreate"><a class="heading-anchor" href="#3-objectcreate" aria-hidden="true">#</a>3. <code class="inline-code">Object.create()</code></h3>
+<p>Creates a new object with a specified prototype directly, without invoking a constructor — useful for prototype-only inheritance or building objects with <code class="inline-code">null</code> prototype (<code class="inline-code">Object.create(null)</code>) to avoid inherited pollution (e.g., safe dictionary/map objects with no <code class="inline-code">toString</code>/<code class="inline-code">hasOwnProperty</code> collisions).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> safeDict = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">create</span>(<span class="hljs-literal">null</span>); <span class="hljs-comment">// no prototype chain at all</span>
+safeDict.<span class="hljs-property">hasOwnProperty</span>; <span class="hljs-comment">// undefined — no inherited methods, good for pure key-value maps</span></code></pre></div>
+<h3 id="4-getters-amp-setters"><a class="heading-anchor" href="#4-getters-amp-setters" aria-hidden="true">#</a>4. Getters &amp; Setters</h3>
+<p>Allow computed/validated property access with normal property syntax (no explicit method call needed).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Circle</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">radius</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">_radius</span> = radius; } <span class="hljs-comment">// backing field convention (_prefix)</span>
+  <span class="hljs-keyword">get</span> <span class="hljs-title function_">area</span>() { <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-property">PI</span> * <span class="hljs-variable language_">this</span>.<span class="hljs-property">_radius</span> ** <span class="hljs-number">2</span>; }
+  <span class="hljs-keyword">set</span> <span class="hljs-title function_">radius</span>(<span class="hljs-params">value</span>) {
+    <span class="hljs-keyword">if</span> (value &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RangeError</span>(<span class="hljs-string">&#x27;Radius must be positive&#x27;</span>);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">_radius</span> = value;
+  }
+  <span class="hljs-keyword">get</span> <span class="hljs-title function_">radius</span>() { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">_radius</span>; }
+}
+<span class="hljs-keyword">const</span> c = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Circle</span>(<span class="hljs-number">5</span>);
+c.<span class="hljs-property">area</span>;        <span class="hljs-comment">// computed on access, no ()</span>
+c.<span class="hljs-property">radius</span> = <span class="hljs-number">10</span>; <span class="hljs-comment">// runs validation via setter</span></code></pre></div>
+<p><strong>Prototype pollution risk</strong>: if you dynamically merge user-controlled keys into an object (e.g., a naive deep-merge for config), an attacker can inject a <code class="inline-code">__proto__</code> key to pollute <code class="inline-code">Object.prototype</code> for <em>every</em> object in the app — a well-known Node.js security vulnerability class. Mitigation: use <code class="inline-code">Object.create(null)</code> for untrusted key-value data, or explicitly block <code class="inline-code">__proto__</code>/<code class="inline-code">constructor</code>/<code class="inline-code">prototype</code> keys during merge, or use <code class="inline-code">Object.freeze(Object.prototype)</code>.</p>
+<h3 id="interview-qampa-5"><a class="heading-anchor" href="#interview-qampa-5" aria-hidden="true">#</a>Interview Q&amp;A</h3>
+<p><strong>Q: What&#39;s the output?</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Foo</span>(<span class="hljs-params"></span>) {}
+<span class="hljs-title class_">Foo</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">bar</span> = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Foo</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.<span class="hljs-property">bar</span>);                 <span class="hljs-comment">// 1 (inherited)</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(f.<span class="hljs-title function_">hasOwnProperty</span>(<span class="hljs-string">&#x27;bar&#x27;</span>)); <span class="hljs-comment">// false (bar is on the prototype, not own)</span></code></pre></div>
+<p><strong>Q: Implement classic inheritance without <code class="inline-code">class</code> syntax</strong> — see the <code class="inline-code">Student</code>/<code class="inline-code">Person</code> example above; commonly asked to test whether you actually understand what <code class="inline-code">class</code>/<code class="inline-code">extends</code> compile down to.</p>
+<p><strong>Q: What is prototype pollution and how would you defend against it in an Express API accepting arbitrary JSON bodies?</strong>
+A: See explanation above — validate/whitelist keys via a schema validator (Zod/Joi, covered in Node Backend Engineering phase), avoid naive recursive merge of untrusted input into objects with a prototype chain, or use <code class="inline-code">Object.create(null)</code> / <code class="inline-code">Map</code> for storing arbitrary user-supplied keys.</p>
+<h3 id="common-traps-5"><a class="heading-anchor" href="#common-traps-5" aria-hidden="true">#</a>Common Traps</h3>
+<ul>
+<li>Confusing <code class="inline-code">__proto__</code> (instance-level link) with <code class="inline-code">.prototype</code> (function-level blueprint property).</li>
+<li>Assuming class methods are enumerable like constructor-function prototype methods.</li>
+<li>Forgetting <code class="inline-code">super()</code> must be called before using <code class="inline-code">this</code> in a subclass constructor (throws <code class="inline-code">ReferenceError</code> otherwise).</li>
+</ul>
+<hr>
+<h2 id="u06-arrays-destructuring-amp-core-methods"><a class="heading-anchor" href="#u06-arrays-destructuring-amp-core-methods" aria-hidden="true">#</a>U06: Arrays, Destructuring &amp; Core Methods</h2>
+<h3 id="1-map--filter--reduce-internals"><a class="heading-anchor" href="#1-map--filter--reduce-internals" aria-hidden="true">#</a>1. <code class="inline-code">map</code> / <code class="inline-code">filter</code> / <code class="inline-code">reduce</code> Internals</h3>
+<ul>
+<li><strong><code class="inline-code">map</code></strong>: transforms each element 1:1, returns a <strong>new array</strong> of the same length. Never mutates.</li>
+<li><strong><code class="inline-code">filter</code></strong>: returns a new array containing only elements where the predicate returns truthy.</li>
+<li><strong><code class="inline-code">reduce</code></strong>: the most general — folds the array into a single accumulated value (which can itself be an array/object). <code class="inline-code">map</code> and <code class="inline-code">filter</code> can both be implemented in terms of <code class="inline-code">reduce</code>.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// reduce implementing map</span>
+<span class="hljs-keyword">const</span> doubled = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>].<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">acc, x</span>) =&gt;</span> { acc.<span class="hljs-title function_">push</span>(x*<span class="hljs-number">2</span>); <span class="hljs-keyword">return</span> acc; }, []);
+<span class="hljs-comment">// reduce implementing filter</span>
+<span class="hljs-keyword">const</span> evens = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>].<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">acc, x</span>) =&gt;</span> x % <span class="hljs-number">2</span> === <span class="hljs-number">0</span> ? [...acc, x] : acc, []);</code></pre></div>
+<p><strong>Custom <code class="inline-code">reduce</code> implementation (frequently asked):</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-title class_">Array</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">myReduce</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">callback, initialValue</span>) {
+  <span class="hljs-keyword">let</span> acc = initialValue;
+  <span class="hljs-keyword">let</span> startIdx = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">if</span> (acc === <span class="hljs-literal">undefined</span>) { acc = <span class="hljs-variable language_">this</span>[<span class="hljs-number">0</span>]; startIdx = <span class="hljs-number">1</span>; } <span class="hljs-comment">// no initial value -&gt; use first element</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = startIdx; i &lt; <span class="hljs-variable language_">this</span>.<span class="hljs-property">length</span>; i++) {
+    acc = <span class="hljs-title function_">callback</span>(acc, <span class="hljs-variable language_">this</span>[i], i, <span class="hljs-variable language_">this</span>);
+  }
+  <span class="hljs-keyword">return</span> acc;
+};</code></pre></div>
+<p><strong>Chaining</strong>: each of <code class="inline-code">map</code>/<code class="inline-code">filter</code> creates a new intermediate array — chaining several is readable but does multiple passes over the data. For very large arrays / hot paths, a single <code class="inline-code">reduce</code> (or a manual <code class="inline-code">for</code> loop) avoids the intermediate allocations — a legitimate performance talking point in senior interviews.</p>
+<h3 id="2-spread-amp-rest"><a class="heading-anchor" href="#2-spread-amp-rest" aria-hidden="true">#</a>2. Spread &amp; Rest</h3>
+<p>Same <code class="inline-code">...</code> syntax, opposite direction:</p>
+<ul>
+<li><strong>Spread</strong> — expands an iterable into individual elements (in array literals, function calls, object literals).</li>
+<li><strong>Rest</strong> — collects remaining elements into an array/object (in destructuring or function parameters).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Spread</span>
+<span class="hljs-keyword">const</span> merged = [...arr1, ...arr2];
+<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(...numbers);
+<span class="hljs-keyword">const</span> objCopy = { ...original, <span class="hljs-attr">updatedField</span>: <span class="hljs-number">1</span> };
+
+<span class="hljs-comment">// Rest</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">sum</span>(<span class="hljs-params">...nums</span>) { <span class="hljs-keyword">return</span> nums.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">a,b</span>) =&gt;</span> a+b, <span class="hljs-number">0</span>); }
+<span class="hljs-keyword">const</span> [first, ...rest] = [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>]; <span class="hljs-comment">// first=1, rest=[2,3,4]</span>
+<span class="hljs-keyword">const</span> { id, ...otherFields } = user;</code></pre></div>
+<p>Both spread on objects/arrays are <strong>shallow</strong> — same caveat as U04.</p>
+<h3 id="3-destructuring"><a class="heading-anchor" href="#3-destructuring" aria-hidden="true">#</a>3. Destructuring</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Array destructuring - position-based, supports skipping &amp; defaults</span>
+<span class="hljs-keyword">const</span> [, second, third = <span class="hljs-string">&#x27;default&#x27;</span>] = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>];
+
+<span class="hljs-comment">// Object destructuring - key-based, supports renaming &amp; defaults &amp; nesting</span>
+<span class="hljs-keyword">const</span> { <span class="hljs-attr">name</span>: userName, age = <span class="hljs-number">18</span>, <span class="hljs-attr">address</span>: { city } = {} } = user;
+
+<span class="hljs-comment">// Function parameter destructuring (very common in Express handlers)</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">createUser</span>(<span class="hljs-params">{ name, email, role = <span class="hljs-string">&#x27;user&#x27;</span> }</span>) { <span class="hljs-comment">/* ... */</span> }
+
+<span class="hljs-comment">// Swapping without a temp variable</span>
+[a, b] = [b, a];</code></pre></div>
+<h3 id="4-iterable-protocol-basics"><a class="heading-anchor" href="#4-iterable-protocol-basics" aria-hidden="true">#</a>4. Iterable Protocol (Basics)</h3>
+<p>An object is <strong>iterable</strong> if it implements <code class="inline-code">Symbol.iterator</code> — a method returning an iterator (<code class="inline-code">{ next(): {value, done} }</code>). This is what powers <code class="inline-code">for...of</code>, spread, and destructuring on non-array types.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> range = {
+  <span class="hljs-attr">from</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">to</span>: <span class="hljs-number">3</span>,
+  [<span class="hljs-title class_">Symbol</span>.<span class="hljs-property">iterator</span>]() {
+    <span class="hljs-keyword">let</span> current = <span class="hljs-variable language_">this</span>.<span class="hljs-property">from</span>, last = <span class="hljs-variable language_">this</span>.<span class="hljs-property">to</span>;
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-title function_">next</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">return</span> current &lt;= last ? { <span class="hljs-attr">value</span>: current++, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> } : { <span class="hljs-attr">value</span>: <span class="hljs-literal">undefined</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> };
+      }
+    };
+  }
+};
+[...range]; <span class="hljs-comment">// [1, 2, 3] - custom iterable works with spread</span></code></pre></div>
+<p>(Full depth on generators/custom iterators is covered in Phase 3 — JS Advanced.)</p>
+<h3 id="interview-qampa-6"><a class="heading-anchor" href="#interview-qampa-6" aria-hidden="true">#</a>Interview Q&amp;A</h3>
+<p><strong>Q: Difference between <code class="inline-code">map</code> and <code class="inline-code">forEach</code>?</strong>
+A: <code class="inline-code">map</code> returns a new array (pure, chainable); <code class="inline-code">forEach</code> returns <code class="inline-code">undefined</code> and is used purely for side effects. Using <code class="inline-code">map</code> when you don&#39;t use its return value is a common code-smell flagged in reviews.</p>
+<p><strong>Q: What does this print, and why?</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>].<span class="hljs-title function_">map</span>(<span class="hljs-built_in">parseInt</span>)); <span class="hljs-comment">// [1, NaN, NaN]</span></code></pre></div>
+<p>A: Classic gotcha — <code class="inline-code">map</code> calls the callback with <code class="inline-code">(element, index, array)</code>. <code class="inline-code">parseInt</code> accepts <code class="inline-code">(string, radix)</code>. So it&#39;s really <code class="inline-code">parseInt(1,0)</code>, <code class="inline-code">parseInt(2,1)</code>, <code class="inline-code">parseInt(3,2)</code> — index 1 becomes an invalid radix, hence <code class="inline-code">NaN</code>. Fix: <code class="inline-code">[1,2,3].map(n =&gt; parseInt(n))</code> or <code class="inline-code">.map(Number)</code>.</p>
+<p><strong>Q: Solve — flatten a nested array one level deep, without <code class="inline-code">Array.flat()</code>.</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> <span class="hljs-title function_">flatten</span> = (<span class="hljs-params">arr</span>) =&gt; arr.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">acc, val</span>) =&gt;</span> acc.<span class="hljs-title function_">concat</span>(val), []);</code></pre></div>
+<h3 id="common-traps-6"><a class="heading-anchor" href="#common-traps-6" aria-hidden="true">#</a>Common Traps</h3>
+<ul>
+<li>Passing a multi-arg native function (<code class="inline-code">parseInt</code>, sometimes <code class="inline-code">isNaN</code>) directly as a <code class="inline-code">map</code> callback — extra args from <code class="inline-code">map</code> collide with the function&#39;s signature.</li>
+<li>Mutating the array inside <code class="inline-code">map</code>/<code class="inline-code">filter</code> callbacks (side effects break the &quot;pure transform&quot; contract and can cause subtle bugs with array methods that rely on stable length, like <code class="inline-code">forEach</code>/<code class="inline-code">map</code> skipping re-indexed elements).</li>
+<li>Forgetting destructuring defaults only apply when the value is <code class="inline-code">undefined</code> — NOT <code class="inline-code">null</code>. <code class="inline-code">const { x = 5 } = { x: null }</code> → <code class="inline-code">x</code> is <code class="inline-code">null</code>, not <code class="inline-code">5</code>.</li>
+</ul>
+<hr>
+<h2 id="quick-fire-recap-table-for-last-minute-revision"><a class="heading-anchor" href="#quick-fire-recap-table-for-last-minute-revision" aria-hidden="true">#</a>Quick-Fire Recap Table (For Last-Minute Revision)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>One-line takeaway</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hoisting</td>
+<td><code class="inline-code">var</code>/functions hoisted+initialized; <code class="inline-code">let</code>/<code class="inline-code">const</code>/<code class="inline-code">class</code> hoisted but in TDZ</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td>Lexical, resolved at definition time via scope chain</td>
+</tr>
+<tr>
+<td>Coercion</td>
+<td><code class="inline-code">+</code> may concat; <code class="inline-code">- * / %</code> always numeric; only 8 falsy values</td>
+</tr>
+<tr>
+<td><code class="inline-code">==</code> vs <code class="inline-code">===</code></td>
+<td>Always prefer <code class="inline-code">===</code>; exception: <code class="inline-code">x == null</code></td>
+</tr>
+<tr>
+<td>Closures</td>
+<td>Function + its lexical scope reference, captured by reference not value</td>
+</tr>
+<tr>
+<td><code class="inline-code">this</code></td>
+<td>Determined by call-site: new &gt; explicit &gt; implicit &gt; default; arrows are lexical</td>
+</tr>
+<tr>
+<td>Values vs refs</td>
+<td>Primitives copied by value; object refs copied by value (mutation visible, reassignment not)</td>
+</tr>
+<tr>
+<td>Shallow vs deep copy</td>
+<td>Spread/<code class="inline-code">Object.assign</code> = shallow; <code class="inline-code">structuredClone</code> = deep</td>
+</tr>
+<tr>
+<td>Prototype chain</td>
+<td><code class="inline-code">__proto__</code> = instance link; <code class="inline-code">.prototype</code> = blueprint on constructor functions</td>
+</tr>
+<tr>
+<td>Classes</td>
+<td>Sugar over prototypes + TDZ + strict mode + non-enumerable methods</td>
+</tr>
+<tr>
+<td>map/filter/reduce</td>
+<td>All can be derived from <code class="inline-code">reduce</code>; none mutate the original array</td>
+</tr>
+<tr>
+<td>Spread/rest</td>
+<td>Same syntax, opposite direction; both shallow</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<p><em>Next up: Phase 2 — JS Intermediate (Promises/Async, Event Loop, Modules, Error Handling, Functional Patterns). Just say &quot;phase 2&quot; whenever you&#39;re ready.</em></p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

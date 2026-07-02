@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 6 — Node: Advanced &amp; System Design</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 6 — Node: Advanced &amp; System Design</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-6--node-advanced-amp-system-design"><a class="heading-anchor" href="#phase-6--node-advanced-amp-system-design" aria-hidden="true">#</a>Phase 6 — Node: Advanced &amp; System Design</h1>
+<h3 id="for-a-3-yoe-nodejs-backend-developer--interview--production-depth"><a class="heading-anchor" href="#for-a-3-yoe-nodejs-backend-developer--interview--production-depth" aria-hidden="true">#</a>For a 3 YOE Node.js Backend Developer — Interview + Production Depth</h3>
+<p>This covers Units 28–32: <strong>Scaling Node.js</strong>, <strong>Caching &amp; Message Queues</strong>, <strong>Microservices Architecture</strong>, <strong>Security Hardening</strong>, <strong>System Design Interview Prep</strong>.</p>
+<p>Each unit has: Core Theory (A-Z) → Code/Patterns → Common Mistakes → Interview Q&amp;A.</p>
+<hr>
+<h2 id="unit-28-scaling-nodejs"><a class="heading-anchor" href="#unit-28-scaling-nodejs" aria-hidden="true">#</a>Unit 28: Scaling Node.js</h2>
+<h3 id="281-why-scaling-matters"><a class="heading-anchor" href="#281-why-scaling-matters" aria-hidden="true">#</a>28.1 Why scaling matters</h3>
+<p>Node runs your JS on a <strong>single thread</strong>. One process = one core used for JS execution (libuv&#39;s thread pool handles some I/O off-thread, but your event loop itself is single-threaded). To use multi-core machines, you need to run multiple Node processes.</p>
+<h3 id="282-cluster-module"><a class="heading-anchor" href="#282-cluster-module" aria-hidden="true">#</a>28.2 <code class="inline-code">cluster</code> module</h3>
+<ul>
+<li>Spawns multiple <strong>worker processes</strong>, each with its own event loop, memory, and V8 instance.</li>
+<li>Master process listens on a port and uses OS-level load balancing (round-robin on Linux, or the OS scheduler) to distribute incoming connections to workers.</li>
+<li>Workers <strong>do not share memory</strong> — no shared variables, no shared in-memory cache. If you need shared state, put it in Redis or a DB.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;cluster&#x27;</span>);
+<span class="hljs-keyword">const</span> os = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;os&#x27;</span>);
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-keyword">const</span> cpuCount = os.<span class="hljs-title function_">cpus</span>().<span class="hljs-property">length</span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; cpuCount; i++) cluster.<span class="hljs-title function_">fork</span>();
+
+  cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">worker, code</span>) =&gt;</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Worker <span class="hljs-subst">${worker.process.pid}</span> died. Restarting...`</span>);
+    cluster.<span class="hljs-title function_">fork</span>(); <span class="hljs-comment">// self-healing</span>
+  });
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./server&#x27;</span>); <span class="hljs-comment">// each worker runs the actual app</span>
+}</code></pre></div>
+<p><strong>Interview trap:</strong> Cluster mode gives you <em>process</em>-level parallelism for handling more concurrent connections — it does <strong>not</strong> speed up a single CPU-bound request. Two clients hitting the API at the same time can now be served on different cores, but one heavy synchronous computation still blocks that one worker&#39;s event loop.</p>
+<h3 id="283-worker_threads"><a class="heading-anchor" href="#283-worker_threads" aria-hidden="true">#</a>28.3 <code class="inline-code">worker_threads</code></h3>
+<ul>
+<li>For <strong>CPU-bound work inside a single request</strong> (image processing, heavy computation, parsing large JSON, crypto hashing).</li>
+<li>Unlike <code class="inline-code">cluster</code>, worker_threads <em>can</em> share memory via <code class="inline-code">SharedArrayBuffer</code>.</li>
+<li>Communication is via <code class="inline-code">postMessage</code> (structured clone by default, unless using <code class="inline-code">SharedArrayBuffer</code>/<code class="inline-code">Atomics</code>).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// main.js</span>
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;worker_threads&#x27;</span>);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">runHeavyTask</span>(<span class="hljs-params">data</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">&#x27;./heavy-task.js&#x27;</span>, { <span class="hljs-attr">workerData</span>: data });
+    worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;message&#x27;</span>, resolve);
+    worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, reject);
+    worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+      <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) <span class="hljs-title function_">reject</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Worker stopped with code <span class="hljs-subst">${code}</span>`</span>));
+    });
+  });
+}
+
+<span class="hljs-comment">// heavy-task.js</span>
+<span class="hljs-keyword">const</span> { parentPort, workerData } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;worker_threads&#x27;</span>);
+<span class="hljs-keyword">const</span> result = <span class="hljs-title function_">expensiveComputation</span>(workerData);
+parentPort.<span class="hljs-title function_">postMessage</span>(result);</code></pre></div>
+<p><strong>cluster vs worker_threads — the interview answer:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>cluster</th>
+<th>worker_threads</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use case</td>
+<td>More concurrent requests</td>
+<td>Offload CPU-heavy work within a request</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>Isolated processes</td>
+<td>Can share memory (SharedArrayBuffer)</td>
+</tr>
+<tr>
+<td>Overhead</td>
+<td>Heavier (full process)</td>
+<td>Lighter (thread)</td>
+</tr>
+<tr>
+<td>Crash isolation</td>
+<td>A worker crash doesn&#39;t affect others</td>
+<td>Same, but easier to leak into main thread if mismanaged</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="284-pm2"><a class="heading-anchor" href="#284-pm2" aria-hidden="true">#</a>28.4 PM2</h3>
+<p>Production process manager built on top of <code class="inline-code">cluster</code>.</p>
+<ul>
+<li><code class="inline-code">pm2 start app.js -i max</code> — runs in cluster mode across all cores.</li>
+<li>Handles auto-restart on crash, zero-downtime reloads (<code class="inline-code">pm2 reload</code>), log aggregation, and monitoring.</li>
+<li><code class="inline-code">pm2 reload</code> does rolling restarts (old process keeps serving until new one is ready) vs <code class="inline-code">pm2 restart</code> which kills and starts (brief downtime).</li>
+</ul>
+<h3 id="285-horizontal-scaling-amp-stateless-design"><a class="heading-anchor" href="#285-horizontal-scaling-amp-stateless-design" aria-hidden="true">#</a>28.5 Horizontal scaling &amp; stateless design</h3>
+<ul>
+<li><strong>Vertical scaling</strong>: bigger machine (more CPU/RAM). Has a ceiling, and single point of failure.</li>
+<li><strong>Horizontal scaling</strong>: more machines/instances behind a load balancer. This is the standard for Node backends.</li>
+<li>For horizontal scaling to work, your app <strong>must be stateless</strong>:<ul>
+<li>No in-memory sessions (use Redis-backed sessions or JWTs).</li>
+<li>No in-memory rate-limit counters (use Redis).</li>
+<li>No local file writes that later requests depend on (use S3/shared storage).</li>
+<li>WebSocket connections need sticky sessions or a shared pub/sub layer (Redis adapter) since a client&#39;s socket is pinned to one instance.</li>
+</ul>
+</li>
+</ul>
+<h3 id="286-load-balancing"><a class="heading-anchor" href="#286-load-balancing" aria-hidden="true">#</a>28.6 Load balancing</h3>
+<ul>
+<li><strong>Layer 4 (transport)</strong>: routes based on IP/port, fast, doesn&#39;t inspect HTTP content.</li>
+<li><strong>Layer 7 (application)</strong>: routes based on HTTP headers/paths, enables smarter routing (path-based, canary deploys), slightly more overhead. (Nginx, ALB, Envoy.)</li>
+<li>Common algorithms: round robin, least connections, IP hash (useful for sticky sessions).</li>
+</ul>
+<h3 id="interview-qampa--unit-28"><a class="heading-anchor" href="#interview-qampa--unit-28" aria-hidden="true">#</a>Interview Q&amp;A — Unit 28</h3>
+<p><strong>Q: Your Node API is slow under load on a 8-core machine but CPU usage per core looks low. What&#39;s wrong?</strong>
+A: Likely running a single Node process — only using 1 core. Fix: run in <code class="inline-code">cluster</code> mode or with PM2 <code class="inline-code">-i max</code>, or deploy multiple containers behind a load balancer.</p>
+<p><strong>Q: When would worker_threads NOT help?</strong>
+A: For I/O-bound work (DB calls, HTTP calls) — those are already async and non-blocking; threads add overhead without benefit. Worker threads only help genuinely CPU-bound synchronous work.</p>
+<p><strong>Q: How do you handle WebSocket connections when scaling horizontally?</strong>
+A: Use sticky sessions at the load balancer (so a client always hits the same instance) OR use a shared pub/sub backend (Redis adapter for Socket.io) so any instance can broadcast to any connected client regardless of which instance holds the socket.</p>
+<p><strong>Q: What happens to in-flight requests during <code class="inline-code">pm2 reload</code>?</strong>
+A: PM2 does a rolling restart — starts new workers, waits for them to be ready, then gradually shifts traffic away from old workers and kills them only after they&#39;ve drained existing connections. Zero downtime, unlike a hard restart.</p>
+<hr>
+<h2 id="unit-29-caching-amp-message-queues"><a class="heading-anchor" href="#unit-29-caching-amp-message-queues" aria-hidden="true">#</a>Unit 29: Caching &amp; Message Queues</h2>
+<h3 id="291-why-cache"><a class="heading-anchor" href="#291-why-cache" aria-hidden="true">#</a>29.1 Why cache</h3>
+<p>Reduces DB load and latency for frequently-read, infrequently-changed data. The core tradeoff is always <strong>staleness vs load</strong>.</p>
+<h3 id="292-caching-strategies"><a class="heading-anchor" href="#292-caching-strategies" aria-hidden="true">#</a>29.2 Caching strategies</h3>
+<ul>
+<li><strong>Cache-aside (lazy loading)</strong> — most common pattern:<ol>
+<li>App checks cache first.</li>
+<li>On miss, reads from DB, writes result to cache, returns it.</li>
+<li>On next read, cache hits.</li>
+</ol>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getUser</span>(<span class="hljs-params">id</span>) {
+  <span class="hljs-keyword">const</span> cached = <span class="hljs-keyword">await</span> redis.<span class="hljs-title function_">get</span>(<span class="hljs-string">`user:<span class="hljs-subst">${id}</span>`</span>);
+  <span class="hljs-keyword">if</span> (cached) <span class="hljs-keyword">return</span> <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(cached);
+
+  <span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> db.<span class="hljs-property">users</span>.<span class="hljs-title function_">findById</span>(id);
+  <span class="hljs-keyword">await</span> redis.<span class="hljs-title function_">set</span>(<span class="hljs-string">`user:<span class="hljs-subst">${id}</span>`</span>, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(user), <span class="hljs-string">&#x27;EX&#x27;</span>, <span class="hljs-number">3600</span>); <span class="hljs-comment">// TTL 1hr</span>
+  <span class="hljs-keyword">return</span> user;
+}</code></pre></div>
+</li>
+<li><strong>Write-through</strong> — every write goes to cache and DB simultaneously (keeps cache always fresh, slightly slower writes).</li>
+<li><strong>Write-behind (write-back)</strong> — write to cache immediately, flush to DB asynchronously in batches (fast writes, risk of data loss if cache crashes before flush).</li>
+<li><strong>TTL / invalidation</strong> — the classic hard problem (&quot;there are only two hard things in CS: cache invalidation and naming things&quot;). Options:<ul>
+<li>Time-based expiry (simplest, some staleness window accepted).</li>
+<li>Explicit invalidation on write (<code class="inline-code">redis.del(&#39;user:123&#39;)</code> after an update).</li>
+<li>Versioned/namespaced keys (<code class="inline-code">user:v2:123</code>) so you can invalidate a whole generation at once.</li>
+</ul>
+</li>
+</ul>
+<h3 id="293-common-redis-caching-pitfalls-interview-favorites"><a class="heading-anchor" href="#293-common-redis-caching-pitfalls-interview-favorites" aria-hidden="true">#</a>29.3 Common Redis caching pitfalls (interview favorites)</h3>
+<ul>
+<li><strong>Cache stampede / thundering herd</strong>: many requests miss cache simultaneously (e.g., a hot key just expired) and all hammer the DB at once. Fix: request coalescing (only one request repopulates, others wait), or add jitter to TTLs so keys don&#39;t all expire at the same moment.</li>
+<li><strong>Stale cache after failed DB write</strong>: always update DB first, then invalidate/update cache — never the other way around, or a race can leave stale cache data even after a DB write succeeds and a concurrent read repopulates cache first.</li>
+</ul>
+<h3 id="294-message-queues"><a class="heading-anchor" href="#294-message-queues" aria-hidden="true">#</a>29.4 Message queues</h3>
+<p>Decouple producers from consumers; enable async processing, retries, and load leveling (absorbing traffic bursts).</p>
+<p><strong>Kafka</strong></p>
+<ul>
+<li>Distributed log, partitioned topics, consumers track their own offset.</li>
+<li>Great for high-throughput event streaming, replay-ability, multiple independent consumer groups reading the same stream.</li>
+<li>Messages are retained for a configured period regardless of consumption (unlike traditional queues).</li>
+</ul>
+<p><strong>RabbitMQ</strong></p>
+<ul>
+<li>Traditional broker with exchanges/queues/bindings (AMQP protocol).</li>
+<li>Good for task distribution, routing logic (direct/topic/fanout exchanges), when you need per-message ack/nack and don&#39;t need Kafka&#39;s replay semantics.</li>
+</ul>
+<p><strong>When to use which (interview answer):</strong></p>
+<ul>
+<li>Need event streaming, multiple consumers replaying history, huge throughput → Kafka.</li>
+<li>Need flexible routing, simpler ops, classic task queue semantics → RabbitMQ.</li>
+</ul>
+<h3 id="295-job-queues--bullmq"><a class="heading-anchor" href="#295-job-queues--bullmq" aria-hidden="true">#</a>29.5 Job queues — BullMQ</h3>
+<p>Built on Redis; the practical choice for background jobs in a Node app (emails, PDF generation, image processing, scheduled tasks).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Queue</span>, <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;bullmq&#x27;</span>);
+
+<span class="hljs-keyword">const</span> emailQueue = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Queue</span>(<span class="hljs-string">&#x27;emails&#x27;</span>, { <span class="hljs-attr">connection</span>: redisConnection });
+
+<span class="hljs-comment">// Producer</span>
+<span class="hljs-keyword">await</span> emailQueue.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;welcome-email&#x27;</span>, { <span class="hljs-attr">userId</span>: <span class="hljs-number">123</span> }, {
+  <span class="hljs-attr">attempts</span>: <span class="hljs-number">3</span>,
+  <span class="hljs-attr">backoff</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;exponential&#x27;</span>, <span class="hljs-attr">delay</span>: <span class="hljs-number">5000</span> },
+});
+
+<span class="hljs-comment">// Consumer</span>
+<span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">&#x27;emails&#x27;</span>, <span class="hljs-title function_">async</span> (job) =&gt; {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">sendEmail</span>(job.<span class="hljs-property">data</span>.<span class="hljs-property">userId</span>);
+}, { <span class="hljs-attr">connection</span>: redisConnection, <span class="hljs-attr">concurrency</span>: <span class="hljs-number">5</span> });
+
+worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;failed&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">job, err</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`Job <span class="hljs-subst">${job.id}</span> failed:`</span>, err));</code></pre></div>
+<p>Key features to know for interviews: retries with backoff, concurrency control, delayed jobs, rate limiting per queue, dead-letter handling (failed jobs after max attempts), job priority.</p>
+<h3 id="interview-qampa--unit-29"><a class="heading-anchor" href="#interview-qampa--unit-29" aria-hidden="true">#</a>Interview Q&amp;A — Unit 29</h3>
+<p><strong>Q: How do you prevent a cache stampede on a very hot key?</strong>
+A: Use a lock/mutex so only one process repopulates the cache while others wait or serve stale data briefly (&quot;stale-while-revalidate&quot;), and/or add random jitter to TTLs to avoid synchronized expiry.</p>
+<p><strong>Q: Cache-aside vs write-through — tradeoffs?</strong>
+A: Cache-aside is simpler and only caches what&#39;s actually read (efficient), but the first read after expiry is always slow (&quot;cold miss&quot;) and there&#39;s a brief window of staleness. Write-through keeps cache always warm and consistent but adds write latency and can cache data that&#39;s never read.</p>
+<p><strong>Q: Why use a message queue instead of calling a service directly?</strong>
+A: Decoupling (producer doesn&#39;t need consumer to be up), load leveling (buffer traffic spikes instead of overwhelming downstream), retries/durability (message isn&#39;t lost if consumer briefly fails), and independent scaling of producer/consumer.</p>
+<p><strong>Q: Kafka vs RabbitMQ — when would you pick each?</strong>
+A: Kafka for high-throughput event streams with multiple independent consumers and replay needs (analytics pipelines, event sourcing). RabbitMQ for simpler task/work queues with flexible routing and lower operational complexity.</p>
+<hr>
+<h2 id="unit-30-microservices-architecture"><a class="heading-anchor" href="#unit-30-microservices-architecture" aria-hidden="true">#</a>Unit 30: Microservices Architecture</h2>
+<h3 id="301-defining-service-boundaries"><a class="heading-anchor" href="#301-defining-service-boundaries" aria-hidden="true">#</a>30.1 Defining service boundaries</h3>
+<p>The hardest part of microservices isn&#39;t the tech — it&#39;s drawing boundaries correctly.</p>
+<ul>
+<li>Use <strong>Domain-Driven Design (DDD)</strong> bounded contexts: each service owns one business capability (Orders, Payments, Inventory), not a technical layer (don&#39;t split into &quot;DB service&quot; / &quot;API service&quot;).</li>
+<li>Rule of thumb: a service should be independently deployable and own its own data. If two &quot;services&quot; always deploy together and share a DB, they&#39;re really one service.</li>
+</ul>
+<h3 id="302-data-ownership"><a class="heading-anchor" href="#302-data-ownership" aria-hidden="true">#</a>30.2 Data ownership</h3>
+<ul>
+<li>Each microservice owns its own database — no other service reads/writes it directly.</li>
+<li>Cross-service data needs come through APIs or async events, not shared DB tables (a shared DB re-couples services you just split apart).</li>
+<li>This introduces <strong>eventual consistency</strong> — accept that data across services may briefly disagree; design UX/business logic around it (e.g., an order shows &quot;processing&quot; until payment confirmation event arrives).</li>
+</ul>
+<h3 id="303-api-gateway-pattern"><a class="heading-anchor" href="#303-api-gateway-pattern" aria-hidden="true">#</a>30.3 API Gateway pattern</h3>
+<p>Single entry point that routes requests to the right service, handles cross-cutting concerns (auth, rate limiting, request logging, response aggregation) so individual services don&#39;t duplicate that logic.</p>
+<ul>
+<li>Also solves the &quot;chatty client&quot; problem — client makes one call to the gateway, gateway may fan out to multiple services (Backend-for-Frontend pattern).</li>
+</ul>
+<h3 id="304-sync-vs-async-communication"><a class="heading-anchor" href="#304-sync-vs-async-communication" aria-hidden="true">#</a>30.4 Sync vs async communication</h3>
+<ul>
+<li><strong>Sync (REST/gRPC)</strong>: caller waits for response. Simple mental model, but creates tight coupling — if the downstream service is slow/down, the caller is blocked (unless you add timeouts/circuit breakers).</li>
+<li><strong>Async (message queue/event bus)</strong>: caller fires an event and moves on; consumer processes independently. Better resilience and decoupling, but harder to reason about (eventual consistency, debugging distributed flows).</li>
+</ul>
+<h3 id="305-grpc"><a class="heading-anchor" href="#305-grpc" aria-hidden="true">#</a>30.5 gRPC</h3>
+<ul>
+<li>Uses Protocol Buffers (binary, strongly typed) over HTTP/2 — faster serialization than JSON, supports streaming (unlike typical REST).</li>
+<li>Good for internal service-to-service calls where you control both ends (client and server share a <code class="inline-code">.proto</code> contract).</li>
+<li>Not ideal for public-facing browser APIs (less tooling/debuggability than REST/JSON, browsers need gRPC-Web).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">protobuf</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-protobuf"><span class="hljs-comment">// order.proto</span>
+<span class="hljs-keyword">service </span><span class="hljs-title class_">OrderService</span> {
+  <span class="hljs-function"><span class="hljs-keyword">rpc</span> GetOrder (OrderRequest) <span class="hljs-keyword">returns</span> (OrderResponse)</span>;
+  <span class="hljs-function"><span class="hljs-keyword">rpc</span> StreamOrderUpdates (OrderRequest) <span class="hljs-keyword">returns</span> (stream OrderUpdate)</span>;
+}
+<span class="hljs-keyword">message </span><span class="hljs-title class_">OrderRequest</span> { <span class="hljs-type">string</span> order_id = <span class="hljs-number">1</span>; }
+<span class="hljs-keyword">message </span><span class="hljs-title class_">OrderResponse</span> { <span class="hljs-type">string</span> id = <span class="hljs-number">1</span>; <span class="hljs-type">string</span> status = <span class="hljs-number">2</span>; }</code></pre></div>
+<h3 id="306-distributed-tracing"><a class="heading-anchor" href="#306-distributed-tracing" aria-hidden="true">#</a>30.6 Distributed tracing</h3>
+<p>When one user request fans out across 5 services, you need to follow it end-to-end.</p>
+<ul>
+<li>Each request gets a <strong>trace ID</strong> propagated through headers (<code class="inline-code">traceparent</code> in W3C Trace Context, or custom <code class="inline-code">x-request-id</code>).</li>
+<li>Each service call within that trace is a <strong>span</strong>; spans nest to show the call tree and timing.</li>
+<li>Tools: OpenTelemetry (vendor-neutral SDK), Jaeger/Zipkin (visualization backends).</li>
+<li>Without this, debugging &quot;why was this request slow&quot; across microservices is nearly impossible — you&#39;d be grepping logs across N services manually.</li>
+</ul>
+<h3 id="307-resilience-patterns-commonly-asked-alongside-microservices"><a class="heading-anchor" href="#307-resilience-patterns-commonly-asked-alongside-microservices" aria-hidden="true">#</a>30.7 Resilience patterns (commonly asked alongside microservices)</h3>
+<ul>
+<li><strong>Circuit breaker</strong>: after N consecutive failures calling a downstream service, &quot;open&quot; the circuit and fail fast (skip the call) for a cooldown period instead of piling up slow/failing calls. Prevents cascading failure.</li>
+<li><strong>Retry with backoff</strong>: retry transient failures, but with exponential backoff + jitter to avoid hammering a struggling service.</li>
+<li><strong>Timeouts</strong>: every network call needs one — an unbounded call can hang a request (and eventually exhaust connections/threads) waiting on a dead dependency.</li>
+<li><strong>Bulkhead</strong>: isolate resource pools per dependency (e.g., separate connection pools) so one slow dependency can&#39;t starve resources needed by calls to a healthy one.</li>
+</ul>
+<h3 id="interview-qampa--unit-30"><a class="heading-anchor" href="#interview-qampa--unit-30" aria-hidden="true">#</a>Interview Q&amp;A — Unit 30</h3>
+<p><strong>Q: How do you keep data consistent across microservices without a shared DB?</strong>
+A: Eventual consistency via async events (e.g., an Order service publishes <code class="inline-code">OrderCreated</code>, Inventory service consumes it and reserves stock). For strict consistency across services, patterns like Saga (choreography or orchestration) coordinate multi-step transactions with compensating actions on failure, since distributed 2PC transactions are generally avoided at scale.</p>
+<p><strong>Q: What&#39;s a circuit breaker and why do you need one?</strong>
+A: A safeguard that stops calling a failing downstream service after repeated failures, failing fast instead of queuing up requests that will likely fail anyway or hang — this prevents one struggling service from cascading failure across the whole system by exhausting caller resources (threads/connections) waiting on it.</p>
+<p><strong>Q: REST vs gRPC for internal service communication?</strong>
+A: gRPC: faster (binary protobuf + HTTP/2 multiplexing), strongly typed contracts, supports streaming — best when you control both client and server. REST/JSON: simpler to debug, universally supported, better for public APIs or when consumers are diverse/external.</p>
+<p><strong>Q: How would you debug a slow request that touches 4 microservices?</strong>
+A: Distributed tracing — follow the trace ID across all 4 services&#39; spans to see exactly where time is spent, rather than manually correlating logs by timestamp across services.</p>
+<hr>
+<h2 id="unit-31-security-hardening"><a class="heading-anchor" href="#unit-31-security-hardening" aria-hidden="true">#</a>Unit 31: Security Hardening</h2>
+<h3 id="311-owasp-top-10--as-it-applies-to-node-apis"><a class="heading-anchor" href="#311-owasp-top-10--as-it-applies-to-node-apis" aria-hidden="true">#</a>31.1 OWASP Top 10 — as it applies to Node APIs</h3>
+<ol>
+<li><strong>Injection</strong> (SQL/NoSQL/command injection) — always use parameterized queries/ORMs, never string-concatenate user input into queries.</li>
+<li><strong>Broken authentication</strong> — weak session handling, missing rate limits on login, predictable tokens.</li>
+<li><strong>Sensitive data exposure</strong> — logging secrets/PII, not encrypting data in transit (TLS) or at rest.</li>
+<li><strong>XML External Entities (XXE)</strong> — less common in Node but relevant if parsing XML from untrusted sources.</li>
+<li><strong>Broken access control</strong> — missing authorization checks (e.g., checking auth but not ownership: user A can fetch user B&#39;s resource by changing an ID in the URL — classic IDOR, Insecure Direct Object Reference).</li>
+<li><strong>Security misconfiguration</strong> — default credentials, verbose error messages leaking stack traces, unnecessary open ports/headers.</li>
+<li><strong>XSS</strong> — reflecting unsanitized user input into HTML responses (mainly a frontend concern but APIs serving HTML/templates must sanitize).</li>
+<li><strong>Insecure deserialization</strong> — trusting <code class="inline-code">JSON.parse</code>/deserialized objects from untrusted sources without validation.</li>
+<li><strong>Using components with known vulnerabilities</strong> — outdated npm packages with CVEs.</li>
+<li><strong>Insufficient logging &amp; monitoring</strong> — can&#39;t detect or investigate a breach without adequate audit logs.</li>
+</ol>
+<h3 id="312-helmet"><a class="heading-anchor" href="#312-helmet" aria-hidden="true">#</a>31.2 helmet</h3>
+<p>Sets security-related HTTP headers automatically:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> helmet = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;helmet&#x27;</span>);
+app.<span class="hljs-title function_">use</span>(<span class="hljs-title function_">helmet</span>());</code></pre></div>
+<p>Sets things like <code class="inline-code">X-Content-Type-Options: nosniff</code> (prevents MIME sniffing), <code class="inline-code">Strict-Transport-Security</code> (forces HTTPS), removes <code class="inline-code">X-Powered-By</code> (don&#39;t leak &quot;Express&quot; to attackers), sets a baseline Content-Security-Policy.</p>
+<h3 id="313-input-sanitization-amp-validation"><a class="heading-anchor" href="#313-input-sanitization-amp-validation" aria-hidden="true">#</a>31.3 Input sanitization &amp; validation</h3>
+<ul>
+<li><strong>Validate at the API boundary</strong> (Zod/Joi) — reject malformed input before it touches business logic.</li>
+<li>Sanitize before rendering (if serving any HTML) to prevent stored/reflected XSS.</li>
+<li>Never trust client-supplied IDs for authorization — always re-check ownership server-side (<code class="inline-code">if (resource.userId !== req.user.id) throw new ForbiddenError()</code>).</li>
+</ul>
+<h3 id="314-sqlnosql-injection-prevention"><a class="heading-anchor" href="#314-sqlnosql-injection-prevention" aria-hidden="true">#</a>31.4 SQL/NoSQL injection prevention</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// BAD — string concatenation</span>
+db.<span class="hljs-title function_">query</span>(<span class="hljs-string">`SELECT * FROM users WHERE email = &#x27;<span class="hljs-subst">${email}</span>&#x27;`</span>);
+
+<span class="hljs-comment">// GOOD — parameterized</span>
+db.<span class="hljs-title function_">query</span>(<span class="hljs-string">&#x27;SELECT * FROM users WHERE email = $1&#x27;</span>, [email]);
+
+<span class="hljs-comment">// MongoDB — also vulnerable to operator injection if you don&#x27;t validate input shape</span>
+<span class="hljs-comment">// { email: { $ne: null } } as a request body would bypass an emailmatch if not validated</span>
+<span class="hljs-title class_">UserSchema</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">email</span>: <span class="hljs-title class_">String</span>(req.<span class="hljs-property">body</span>.<span class="hljs-property">email</span>) }); <span class="hljs-comment">// coerce type explicitly</span></code></pre></div>
+<h3 id="315-dependency-vulnerability-scanning"><a class="heading-anchor" href="#315-dependency-vulnerability-scanning" aria-hidden="true">#</a>31.5 Dependency vulnerability scanning</h3>
+<ul>
+<li><code class="inline-code">npm audit</code> (built-in), Snyk, or Dependabot for automated PRs on vulnerable dependencies.</li>
+<li>Pin versions via lockfile; review before bumping major versions of security-sensitive packages (auth libs, crypto libs).</li>
+</ul>
+<h3 id="316-secrets-management"><a class="heading-anchor" href="#316-secrets-management" aria-hidden="true">#</a>31.6 Secrets management</h3>
+<ul>
+<li><strong>Never</strong> commit secrets to source control (<code class="inline-code">.env</code> in <code class="inline-code">.gitignore</code>).</li>
+<li>Env vars are fine for simple deployments, but for production at scale prefer a secrets manager (AWS Secrets Manager, HashiCorp Vault, GCP Secret Manager) — supports rotation, access auditing, and avoids secrets sitting in plaintext env files on disk.</li>
+<li>Rotate secrets periodically; never log secrets (redact in logging middleware).</li>
+</ul>
+<h3 id="317-rate-limiting-amp-brute-force-protection"><a class="heading-anchor" href="#317-rate-limiting-amp-brute-force-protection" aria-hidden="true">#</a>31.7 Rate limiting &amp; brute force protection</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> rateLimit = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express-rate-limit&#x27;</span>);
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&#x27;/api/login&#x27;</span>, <span class="hljs-title function_">rateLimit</span>({ <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-attr">max</span>: <span class="hljs-number">5</span> })); <span class="hljs-comment">// 5 attempts / 15 min</span></code></pre></div>
+<p>Also: account lockout after N failed attempts, CAPTCHA on repeated failures, and always compare passwords with a constant-time hash comparison (bcrypt/argon2 handle this internally).</p>
+<h3 id="interview-qampa--unit-31"><a class="heading-anchor" href="#interview-qampa--unit-31" aria-hidden="true">#</a>Interview Q&amp;A — Unit 31</h3>
+<p><strong>Q: What&#39;s an IDOR vulnerability and how do you prevent it?</strong>
+A: Insecure Direct Object Reference — when an API checks that a user is <em>authenticated</em> but not that they&#39;re <em>authorized</em> to access the specific resource (e.g., <code class="inline-code">GET /orders/456</code> returns another user&#39;s order just because the requester is logged in). Fix: always verify resource ownership/permissions server-side against the authenticated user, never trust the client-supplied ID alone.</p>
+<p><strong>Q: How do you securely store passwords?</strong>
+A: Never store plaintext or reversibly-encrypted passwords. Hash with a slow, salted algorithm designed for passwords — bcrypt or argon2 (not fast general-purpose hashes like MD5/SHA256 alone, which are crackable via brute force/rainbow tables at scale).</p>
+<p><strong>Q: What does helmet actually protect against?</strong>
+A: It&#39;s not a single protection — it sets multiple HTTP response headers that mitigate specific attack classes: clickjacking (<code class="inline-code">X-Frame-Options</code>), MIME sniffing attacks, forces HTTPS (HSTS), and reduces information leakage (hides the tech stack fingerprint).</p>
+<p><strong>Q: How would you securely manage secrets in a Node app deployed on Kubernetes?</strong>
+A: Avoid baking secrets into images or plain env vars in manifests; use a secrets manager (Vault, AWS Secrets Manager) or Kubernetes Secrets with encryption at rest, inject via env vars or mounted volumes at runtime, and rotate regularly with access scoped per service (least privilege).</p>
+<hr>
+<h2 id="unit-32-system-design-interview-prep"><a class="heading-anchor" href="#unit-32-system-design-interview-prep" aria-hidden="true">#</a>Unit 32: System Design Interview Prep</h2>
+<h3 id="321-general-framework-use-this-structure-every-time"><a class="heading-anchor" href="#321-general-framework-use-this-structure-every-time" aria-hidden="true">#</a>32.1 General framework (use this structure every time)</h3>
+<ol>
+<li><strong>Clarify requirements</strong> — functional (what must it do) and non-functional (scale, latency, consistency needs). Ask about read/write ratio, expected QPS, data size.</li>
+<li><strong>Back-of-envelope estimation</strong> — rough numbers for storage, bandwidth, QPS. Interviewers care that you <em>can</em> estimate, not that you&#39;re exact.</li>
+<li><strong>High-level API design</strong> — the core endpoints/contracts.</li>
+<li><strong>Data model</strong> — what gets stored, in what kind of store (SQL vs NoSQL and why).</li>
+<li><strong>High-level architecture</strong> — draw boxes: client → LB → API → cache → DB → queue → workers.</li>
+<li><strong>Deep dive on 1–2 hard parts</strong> — the interviewer usually steers here (e.g., &quot;how do you handle the hot-key problem&quot;).</li>
+<li><strong>Scale it</strong> — talk about bottlenecks, how you&#39;d scale each component, tradeoffs.</li>
+</ol>
+<p>Interviewers are grading your <strong>process and tradeoff reasoning</strong>, not a single &quot;correct&quot; answer.</p>
+<h3 id="322-design-url-shortener"><a class="heading-anchor" href="#322-design-url-shortener" aria-hidden="true">#</a>32.2 Design: URL Shortener</h3>
+<ul>
+<li><strong>Core requirement</strong>: given a long URL, return a short one; given a short URL, redirect to the long one.</li>
+<li><strong>API</strong>: <code class="inline-code">POST /shorten { longUrl }</code> → <code class="inline-code">{ shortUrl }</code>; <code class="inline-code">GET /:code</code> → 302 redirect.</li>
+<li><strong>ID generation</strong>: base62 encode an auto-incrementing counter (simple, no collisions) OR hash the URL (MD5/SHA) and take first 7 chars (risk of collision — need collision check), OR use a distributed ID generator (Snowflake-style) if running multiple write nodes.</li>
+<li><strong>Data model</strong>: <code class="inline-code">{ code (PK), longUrl, createdAt, expiresAt, ownerId }</code> in a key-value or SQL store — reads massively outnumber writes here.</li>
+<li><strong>Caching</strong>: cache hot short codes in Redis (cache-aside) since redirects are read-heavy and latency-sensitive.</li>
+<li><strong>Scale</strong>: shard by code prefix if the dataset outgrows a single DB; put a CDN/edge cache in front for extremely hot links.</li>
+<li><strong>Analytics</strong> (common follow-up): don&#39;t do click tracking synchronously in the redirect path — fire-and-forget an event to a queue, process click counts asynchronously so redirect latency stays low.</li>
+</ul>
+<h3 id="323-design-rate-limiter"><a class="heading-anchor" href="#323-design-rate-limiter" aria-hidden="true">#</a>32.3 Design: Rate Limiter</h3>
+<ul>
+<li><strong>Core requirement</strong>: limit each client to N requests per time window.</li>
+<li><strong>Algorithms</strong> (know all four — commonly asked to compare):<ul>
+<li><strong>Fixed window counter</strong>: simple, but bursts at window boundaries (client can do 2x limit right at the edge of two windows).</li>
+<li><strong>Sliding window log</strong>: store timestamp of every request, count requests in the last N seconds. Accurate but memory-heavy at scale.</li>
+<li><strong>Sliding window counter</strong>: approximates sliding log using weighted counts of current + previous fixed window — good accuracy/memory tradeoff, most commonly used in practice.</li>
+<li><strong>Token bucket</strong>: bucket refills at a fixed rate, each request consumes a token; allows controlled bursts up to bucket size. Very common in production (also used by AWS/Stripe-style APIs).</li>
+</ul>
+</li>
+<li><strong>Implementation</strong>: Redis-backed (since rate limiting must be consistent across horizontally-scaled instances — in-memory counters per instance don&#39;t work). Use Redis <code class="inline-code">INCR</code> + <code class="inline-code">EXPIRE</code>, or a Lua script for atomicity (avoid race conditions between check-and-increment).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// token bucket sketch using Redis + Lua for atomicity</span>
+<span class="hljs-keyword">const</span> script = <span class="hljs-string">`
+  local tokens = tonumber(redis.call(&#x27;GET&#x27;, KEYS[1]) or ARGV[1])
+  if tokens &gt; 0 then
+    redis.call(&#x27;DECR&#x27;, KEYS[1])
+    return 1
+  else
+    return 0
+  end
+`</span>;</code></pre></div>
+<ul>
+<li><strong>Where to apply it</strong>: at the API gateway/edge (cheaper, protects all downstream services) vs per-service (more granular, more overhead).</li>
+</ul>
+<h3 id="324-design-chat-application"><a class="heading-anchor" href="#324-design-chat-application" aria-hidden="true">#</a>32.4 Design: Chat Application</h3>
+<ul>
+<li><strong>Core requirement</strong>: real-time 1:1 and group messaging, delivery/read receipts, online presence.</li>
+<li><strong>Transport</strong>: WebSockets for real-time delivery (fallback to long-polling for constrained clients).</li>
+<li><strong>Scaling WebSockets</strong>: each server holds a subset of open connections; use a pub/sub layer (Redis pub/sub, or Kafka) so a message sent to a user connected on Server B, but published from Server A, gets routed correctly — this is the &quot;fan-out&quot; problem in multi-instance real-time systems.</li>
+<li><strong>Data model</strong>: messages stored per conversation, typically a NoSQL store (Cassandra/DynamoDB) partitioned by conversation ID for fast, high-throughput appends and range reads (e.g., latest 50 messages).</li>
+<li><strong>Delivery guarantees</strong>: at-least-once delivery + client-side dedup (message IDs) is usually the practical choice over exactly-once (which is expensive to guarantee in a distributed system).</li>
+<li><strong>Presence</strong>: heartbeat/ping from client, TTL-based online status in Redis (<code class="inline-code">SETEX user:123:online 30 1</code>), so a dead connection auto-expires to &quot;offline&quot; without needing an explicit disconnect event.</li>
+</ul>
+<h3 id="325-design-notification-system"><a class="heading-anchor" href="#325-design-notification-system" aria-hidden="true">#</a>32.5 Design: Notification System</h3>
+<ul>
+<li><strong>Core requirement</strong>: send notifications (push/email/SMS) triggered by events, at scale, without blocking the triggering request.</li>
+<li><strong>Architecture</strong>: triggering service publishes an event to a queue → notification service consumes → fans out to the right channel (push/email/SMS) via provider APIs (FCM/APNs, SendGrid, Twilio).</li>
+<li><strong>Why async</strong>: sending an email inline in the request path adds latency and a new failure mode to unrelated user actions (e.g., &quot;place order&quot; shouldn&#39;t fail because the email provider timed out) — always decouple via a queue.</li>
+<li><strong>Retry/dead-letter</strong>: failed sends retry with backoff; after max attempts, move to a dead-letter queue for investigation rather than dropping silently.</li>
+<li><strong>User preferences &amp; rate limiting</strong>: check notification preferences (opted out?) and per-user throttling (don&#39;t spam) before sending — usually a lookup against a preferences table/cache before the fan-out step.</li>
+</ul>
+<h3 id="326-cross-cutting-concepts-interviewers-probe-memorize-these-tradeoffs"><a class="heading-anchor" href="#326-cross-cutting-concepts-interviewers-probe-memorize-these-tradeoffs" aria-hidden="true">#</a>32.6 Cross-cutting concepts interviewers probe (memorize these tradeoffs)</h3>
+<ul>
+<li><strong>CAP theorem</strong>: in a network partition, choose Consistency or Availability — you can&#39;t have both. Most Node backends lean AP (available, eventually consistent) for user-facing features, CP for things like payments/inventory counts.</li>
+<li><strong>SQL vs NoSQL for a given design</strong>: SQL when you need strong consistency, joins, and transactions (orders, payments, users). NoSQL (key-value/wide-column) when you need massive write throughput, simple access patterns, and horizontal scale (chat messages, activity feeds, click events).</li>
+<li><strong>Read-heavy vs write-heavy systems</strong>: read-heavy → cache aggressively, read replicas. Write-heavy → queue writes, batch/async processing, consider write-optimized stores (LSM-tree based like Cassandra).</li>
+</ul>
+<h3 id="interview-qampa--unit-32"><a class="heading-anchor" href="#interview-qampa--unit-32" aria-hidden="true">#</a>Interview Q&amp;A — Unit 32</h3>
+<p><strong>Q: How would you generate unique short codes at scale across multiple servers without collisions?</strong>
+A: Avoid pure randomness with no coordination. Use a centralized (or partitioned) counter with base62 encoding, or a Snowflake-style distributed ID generator (timestamp + machine ID + sequence) so multiple nodes can generate unique IDs independently without coordination overhead per request.</p>
+<p><strong>Q: Token bucket vs sliding window — when would you pick each?</strong>
+A: Token bucket allows controlled burstiness (good for APIs where occasional spikes are fine, like user-facing apps), while sliding window counter gives smoother, more precise enforcement of a strict rate over time (good for protecting a fragile downstream dependency). Fixed window is simplest but allows boundary bursts, so it&#39;s rarely the final answer in an interview — mention it, then explain why you&#39;d upgrade to sliding window or token bucket.</p>
+<p><strong>Q: In a chat app, how do you deliver a message to a user connected to a different server instance?</strong>
+A: Use a pub/sub backbone (Redis pub/sub or a Kafka topic) that every server instance subscribes to. When Server A receives a message for a user connected to Server B, it publishes the message; Server B, subscribed to the relevant channel, receives it and pushes it down that user&#39;s WebSocket connection.</p>
+<p><strong>Q: Why keep notification sending out of the main request path?</strong>
+A: Coupling it synchronously means the core user action (e.g., checkout) inherits the latency and failure modes of a third-party notification provider. Decoupling via a queue keeps the critical path fast and resilient, and lets notification delivery retry independently without affecting the triggering transaction.</p>
+<hr>
+<h2 id="phase-6-quick-reference-cheat-sheet"><a class="heading-anchor" href="#phase-6-quick-reference-cheat-sheet" aria-hidden="true">#</a>Phase 6 Quick-Reference Cheat Sheet</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>One-line answer to remember</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cluster vs worker_threads</td>
+<td>cluster = more processes for more connections; worker_threads = offload CPU work within one process</td>
+</tr>
+<tr>
+<td>Horizontal scaling requirement</td>
+<td>App must be stateless — no local session/cache/file dependency</td>
+</tr>
+<tr>
+<td>Cache-aside</td>
+<td>Read cache → miss → read DB → populate cache → return</td>
+</tr>
+<tr>
+<td>Cache stampede fix</td>
+<td>Locking/coalescing + TTL jitter</td>
+</tr>
+<tr>
+<td>Kafka vs RabbitMQ</td>
+<td>Kafka = streaming/replay/high throughput; RabbitMQ = flexible routed task queues</td>
+</tr>
+<tr>
+<td>Microservices data rule</td>
+<td>Each service owns its DB; no shared DB across services</td>
+</tr>
+<tr>
+<td>Circuit breaker</td>
+<td>Fail fast after repeated downstream failures, avoid cascading failure</td>
+</tr>
+<tr>
+<td>gRPC vs REST</td>
+<td>gRPC = fast, typed, internal service-to-service; REST = simple, public-facing</td>
+</tr>
+<tr>
+<td>OWASP #1 risk</td>
+<td>Injection — always parameterize queries</td>
+</tr>
+<tr>
+<td>IDOR</td>
+<td>Auth ≠ Authorization — always check resource ownership server-side</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>Never commit; use env vars minimum, secrets manager for production scale</td>
+</tr>
+<tr>
+<td>Rate limiter (production default)</td>
+<td>Token bucket, backed by Redis for cross-instance consistency</td>
+</tr>
+<tr>
+<td>System design framework</td>
+<td>Requirements → estimates → API → data model → architecture → deep dive → scale</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<p><em>Study tip: For each unit, close this file and try to redraw the architecture / rewrite the code pattern from memory. If you can explain the &quot;why&quot; behind each tradeoff out loud in under 60 seconds, you&#39;re interview-ready on that topic.</em></p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

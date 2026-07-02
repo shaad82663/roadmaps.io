@@ -12,7 +12,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CI/CD Mastery Roadmap — GitHub Actions & Jenkins</title>
+  <title>Docker + CI/CD Mastery Roadmap — Docker, GitHub Actions & Jenkins</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -39,6 +39,16 @@
       --border-radius-lg: 16px;
 
       /* Rich phase colors */
+      --p-dkf-bg: rgba(16, 185, 129, 0.15);
+      --p-dkf-text: #6ee7b7;
+      --p-dkf-dot: #10b981;
+      --p-dkf-border: rgba(16, 185, 129, 0.3);
+
+      --p-dka-bg: rgba(249, 115, 22, 0.15);
+      --p-dka-text: #fdba74;
+      --p-dka-dot: #f97316;
+      --p-dka-border: rgba(249, 115, 22, 0.3);
+
       --p-found-bg: rgba(99, 102, 241, 0.15);
       --p-found-text: #a5b4fc;
       --p-found-dot: #6366f1;
@@ -107,7 +117,7 @@
       color: var(--color-text-secondary);
       font-size: 1.15rem;
       font-weight: 300;
-      max-width: 640px;
+      max-width: 660px;
       margin: 0 auto;
       line-height: 1.6;
     }
@@ -561,6 +571,16 @@
       --color-text-tertiary: #718096;
 
       /* Phase badge overrides for readable contrast in light mode */
+      --p-dkf-bg: rgba(5, 150, 105, 0.08);
+      --p-dkf-text: #047857;
+      --p-dkf-dot: #059669;
+      --p-dkf-border: rgba(5, 150, 105, 0.2);
+
+      --p-dka-bg: rgba(234, 88, 12, 0.08);
+      --p-dka-text: #c2410c;
+      --p-dka-dot: #ea580c;
+      --p-dka-border: rgba(234, 88, 12, 0.2);
+
       --p-found-bg: rgba(79, 70, 229, 0.08);
       --p-found-text: #4f46e5;
       --p-found-dot: #4f46e5;
@@ -652,34 +672,37 @@
 
   <div class="container">
     <header>
-      <h1>CI/CD Mastery Roadmap</h1>
-      <p class="subtitle">18 units across Foundation, GitHub Actions, Jenkins, Deployment & Pipeline-as-Code,
-        Security & Governance, and Industry & Interview Mastery — everything from your first pipeline to
-        production-grade, interview-ready CI/CD expertise on both GitHub Actions and Jenkins.</p>
+      <h1>Docker + CI/CD Mastery Roadmap</h1>
+      <p class="subtitle">27 units across Docker Foundations, Docker Advanced & Production, CI/CD Foundation, GitHub
+        Actions, Jenkins, Deployment & Pipeline-as-Code, Security & Governance, and Industry & Interview Mastery —
+        Docker A-Z first, then everything from your first pipeline to production-grade, interview-ready CI/CD
+        expertise on both GitHub Actions and Jenkins.</p>
     </header>
 
     <div class="stats-container">
       <div class="stat-card">
-        <div class="stat-val">18</div>
+        <div class="stat-val">27</div>
         <div class="stat-label">Units</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">90</div>
+        <div class="stat-val">135</div>
         <div class="stat-label">Topics</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">72</div>
+        <div class="stat-val">108</div>
         <div class="stat-label">Labs</div>
       </div>
       <div class="stat-card">
-        <div class="stat-val">6</div>
+        <div class="stat-val">8</div>
         <div class="stat-label">Phases</div>
       </div>
     </div>
 
     <div class="filters">
       <button class="filter-btn active" onclick="setFilter('all', this)">All Phases</button>
-      <button class="filter-btn" onclick="setFilter('Foundation', this)">Foundation</button>
+      <button class="filter-btn" onclick="setFilter('Docker Foundations', this)">Docker Foundations</button>
+      <button class="filter-btn" onclick="setFilter('Docker Advanced & Production', this)">Docker Advanced</button>
+      <button class="filter-btn" onclick="setFilter('CI/CD Foundation', this)">CI/CD Foundation</button>
       <button class="filter-btn" onclick="setFilter('GitHub Actions', this)">GitHub Actions</button>
       <button class="filter-btn" onclick="setFilter('Jenkins', this)">Jenkins</button>
       <button class="filter-btn" onclick="setFilter('Deployment & Pipeline-as-Code', this)">Deployment & PaC</button>
@@ -692,7 +715,9 @@
 
   <script>
     const phases = {
-      Foundation: { bg: 'var(--p-found-bg)', text: 'var(--p-found-text)', dot: 'var(--p-found-dot)', border: 'var(--p-found-border)' },
+      'Docker Foundations': { bg: 'var(--p-dkf-bg)', text: 'var(--p-dkf-text)', dot: 'var(--p-dkf-dot)', border: 'var(--p-dkf-border)' },
+      'Docker Advanced & Production': { bg: 'var(--p-dka-bg)', text: 'var(--p-dka-text)', dot: 'var(--p-dka-dot)', border: 'var(--p-dka-border)' },
+      'CI/CD Foundation': { bg: 'var(--p-found-bg)', text: 'var(--p-found-text)', dot: 'var(--p-found-dot)', border: 'var(--p-found-border)' },
       'GitHub Actions': { bg: 'var(--p-ctrl-bg)', text: 'var(--p-ctrl-text)', dot: 'var(--p-ctrl-dot)', border: 'var(--p-ctrl-border)' },
       'Jenkins': { bg: 'var(--p-pers-bg)', text: 'var(--p-pers-text)', dot: 'var(--p-pers-dot)', border: 'var(--p-pers-border)' },
       'Deployment & Pipeline-as-Code': { bg: 'var(--p-hitl-bg)', text: 'var(--p-hitl-text)', dot: 'var(--p-hitl-dot)', border: 'var(--p-hitl-border)' },
@@ -701,113 +726,182 @@
     };
 
     const units = [
+      // ---------- DOCKER FOUNDATIONS ----------
       {
-        order: 0, title: 'CI/CD Fundamentals & DevOps Culture', phase: 'Foundation', difficulty: 'Beginner',
+        order: 0, title: 'Docker Fundamentals & Architecture', phase: 'Docker Foundations', difficulty: 'Beginner',
+        tags: ['containers vs VMs', 'Docker Engine', 'daemon/client', 'images vs containers', 'Docker Desktop'],
+        theory: ['Containers vs Virtual Machines: kernel sharing, isolation, overhead differences', 'Docker Engine architecture: daemon (dockerd), REST API, Docker CLI, containerd, runc', 'Images vs containers: read-only layers vs the writable container layer', 'Installing Docker Desktop/Engine and verifying with docker version, docker info', "Interview trap: precisely explaining what happens when you run `docker run`"],
+        labs: ['Install Docker and run your first container (hello-world, nginx)', 'Inspect container vs image internals with docker inspect', 'Walk through the full lifecycle of `docker run` step by step', 'Compare a VM boot time vs a container start time on the same host']
+      },
+      {
+        order: 1, title: 'Dockerfile, Images & Layer Caching', phase: 'Docker Foundations', difficulty: 'Beginner',
+        tags: ['Dockerfile instructions', 'build context', 'layer caching', 'multi-stage builds', '.dockerignore'],
+        theory: ['Core Dockerfile instructions: FROM, RUN, COPY, ADD, WORKDIR, ENV, EXPOSE, CMD vs ENTRYPOINT', 'Build context and .dockerignore to keep images lean', 'Layer caching mechanics and ordering instructions for maximum cache hits', 'Multi-stage builds to separate build-time and runtime dependencies', 'Interview classic: "CMD vs ENTRYPOINT" and "ADD vs COPY"'],
+        labs: ['Write a Dockerfile for a Node.js app with proper layer ordering', 'Reduce image size using a multi-stage build (builder + slim runtime)', 'Add a .dockerignore and measure build context size before/after', 'Break and fix layer caching by reordering COPY/RUN instructions']
+      },
+      {
+        order: 2, title: 'Docker Networking', phase: 'Docker Foundations', difficulty: 'Beginner',
+        tags: ['bridge network', 'host network', 'port mapping', 'custom networks', 'container DNS'],
+        theory: ['Default network drivers: bridge, host, none, and when each applies', 'Port publishing (-p) vs exposing (EXPOSE) and the difference in effect', 'User-defined bridge networks and automatic container DNS resolution', 'Connecting multiple containers on the same network for service discovery', 'Interview angle: "How do two containers talk to each other by name?"'],
+        labs: ['Run two containers on a custom bridge network and ping by container name', 'Publish a container port and verify access from the host', 'Compare host network mode vs bridge mode for a web server', "Debug a container that can't reach another container's port"]
+      },
+      {
+        order: 3, title: 'Docker Storage & Volumes', phase: 'Docker Foundations', difficulty: 'Beginner',
+        tags: ['named volumes', 'bind mounts', 'tmpfs', 'data persistence', 'volume backup'],
+        theory: ['Named volumes vs bind mounts vs tmpfs — use cases and trade-offs', 'Volume lifecycle: create, inspect, prune, and data persistence across container restarts', 'Sharing data between containers via volumes', 'Backup and restore strategies for volume data', "Interview trap: \"Why did my data disappear when the container was removed?\""],
+        labs: ["Persist a database's data using a named volume across container recreation", 'Mount a local directory as a bind mount for live code reload', "Back up a volume's contents to a tarball and restore it", 'Diagnose and fix a data-loss bug caused by missing volume config']
+      },
+      {
+        order: 4, title: 'Docker Compose for Multi-Container Apps', phase: 'Docker Foundations', difficulty: 'Intermediate',
+        tags: ['docker-compose.yml', 'services', 'depends_on', 'healthchecks', 'env files'],
+        theory: ['Compose file structure: services, networks, volumes, and environment blocks', 'depends_on, healthchecks, and startup ordering pitfalls', 'Environment variables and .env file usage in Compose', 'Scaling services locally with docker compose up --scale', 'Interview favorite: "How would you spin up an app + DB + cache locally?"'],
+        labs: ['Write a docker-compose.yml for an app + database + Redis cache', 'Add a healthcheck so the app waits for the DB to be ready', 'Override Compose config for local dev vs a second environment file', 'Scale a stateless service to 3 replicas locally with Compose']
+      },
+
+      // ---------- DOCKER ADVANCED & PRODUCTION ----------
+      {
+        order: 5, title: 'Docker Image Optimization & Security', phase: 'Docker Advanced & Production', difficulty: 'Intermediate',
+        tags: ['distroless images', 'non-root user', 'image scanning', 'least privilege', 'build secrets'],
+        theory: ['Choosing minimal base images (alpine, distroless) and the size/security trade-offs', 'Running containers as a non-root user and dropping capabilities', 'Image vulnerability scanning (Trivy, Docker Scout) and interpreting results', 'Avoiding secrets baked into image layers; build-time secrets handling', 'Interview angle: "How do you harden a Docker image for production?"'],
+        labs: ['Convert a root-running Dockerfile to run as a non-root user', 'Scan an image with Trivy and fix at least one high-severity finding', 'Rebuild an image on a distroless base and compare size/attack surface', 'Use BuildKit secret mounts to avoid leaking credentials into layers']
+      },
+      {
+        order: 6, title: 'Docker Registries & Image Management', phase: 'Docker Advanced & Production', difficulty: 'Intermediate',
+        tags: ['Docker Hub', 'private registries', 'tagging strategy', 'image promotion', 'retention policies'],
+        theory: ['Docker Hub vs private registries (ECR, GCR, Harbor, GitHub Container Registry)', 'Tagging strategy: semantic versions, commit SHA tags, avoiding "latest" in production', 'Pushing, pulling, and authenticating against a private registry', 'Image retention and cleanup policies to control registry storage costs', 'Interview trap: "Why is tagging images \'latest\' risky in production pipelines?"'],
+        labs: ['Push a tagged image to a private registry and pull it on another host', 'Set up authentication for a private registry using docker login', 'Design a tagging convention combining semver and commit SHA', 'Write a cleanup script/policy to prune old untagged images']
+      },
+      {
+        order: 7, title: 'Docker Logging, Resource Limits & Health in Production', phase: 'Docker Advanced & Production', difficulty: 'Advanced',
+        tags: ['logging drivers', 'restart policies', 'resource limits', 'HEALTHCHECK', 'Swarm basics'],
+        theory: ['Logging drivers (json-file, journald, syslog) and log rotation', 'Restart policies (no, on-failure, always, unless-stopped) and their production implications', 'CPU/memory limits and requests, and what happens on an OOM kill', 'HEALTHCHECK instruction and how orchestrators use it', 'Brief intro to Docker Swarm as a native orchestration option vs Kubernetes'],
+        labs: ['Configure a restart policy and simulate a crash to observe recovery', 'Set memory/CPU limits on a container and trigger an OOM kill intentionally', 'Add a HEALTHCHECK to a Dockerfile and observe unhealthy status handling', 'Configure log rotation for a noisy container']
+      },
+      {
+        order: 8, title: 'Docker Troubleshooting & Interview Mastery', phase: 'Docker Advanced & Production', difficulty: 'Advanced',
+        tags: ['debugging containers', 'exec/logs/inspect', 'exit codes', 'scenario Q&A', 'rapid-fire concepts'],
+        theory: ['Systematic debugging workflow: logs, inspect, exec, stats, events', 'Common failure scenarios: exit code 137, port conflicts, permission denied, DNS failures', 'Diagnosing "works on my machine" discrepancies between environments', 'Rapid-fire interview concepts: image vs container, layers, union filesystem, PID 1 in containers', 'Scenario-based Q&A: "A container keeps restarting in prod — walk me through your debugging steps"'],
+        labs: ['Debug a container stuck in a restart loop using logs and inspect', 'Diagnose an exit code 137 (OOM) vs exit code 1 (app crash) scenario', "Use docker exec to troubleshoot a live container's file system and processes", 'Mock interview: explain the full docker build → run → network → volume flow end-to-end']
+      },
+
+      // ---------- CI/CD FOUNDATION ----------
+      {
+        order: 9, title: 'CI/CD Fundamentals & DevOps Culture', phase: 'CI/CD Foundation', difficulty: 'Beginner',
         tags: ['CI vs CD', 'DORA metrics', 'pipeline stages', 'shift-left testing', 'deployment frequency'],
         theory: ['What Continuous Integration, Continuous Delivery and Continuous Deployment actually mean — and how they differ', 'DevOps culture and DORA metrics: deployment frequency, lead time, MTTR, change failure rate', 'Anatomy of a CI/CD pipeline: source → build → test → package → deploy → monitor', 'Shift-left testing and the "fail fast" philosophy', 'Interview trap: precisely explaining CI vs CD vs Continuous Deployment on the spot'],
         labs: ["Map an existing manual release process onto CI/CD pipeline stages", "Calculate DORA metrics for a sample team's release history", 'Diagram a pipeline for a sample app from commit to production', "Compare CI/CD maturity across two hypothetical teams"]
       },
       {
-        order: 1, title: 'Git Branching Strategies for CI/CD', phase: 'Foundation', difficulty: 'Beginner',
+        order: 10, title: 'Git Branching Strategies for CI/CD', phase: 'CI/CD Foundation', difficulty: 'Beginner',
         tags: ['trunk-based dev', 'GitFlow', 'feature flags', 'PR triggers', 'merge strategies'],
         theory: ['Trunk-based development vs GitFlow vs GitHub Flow', 'How branching strategy drives pipeline trigger design', 'Feature flags/toggles as an alternative to long-lived branches', 'Pull request workflows and required status checks', 'Interview angle: "Which branching strategy would you pick, and why?"'],
         labs: ['Set up branch protection rules requiring passing CI before merge', 'Simulate a trunk-based workflow with short-lived feature branches', 'Configure a pipeline that triggers only on PRs targeting main', 'Implement a feature flag to decouple deploy from release']
       },
       {
-        order: 2, title: 'Build Systems, Artifacts & Dependency Management', phase: 'Foundation', difficulty: 'Beginner',
+        order: 11, title: 'Build Systems, Artifacts & Dependency Management', phase: 'CI/CD Foundation', difficulty: 'Beginner',
         tags: ['build tools', 'artifact repos', 'semantic versioning', 'caching', 'Docker images'],
         theory: ['Build tools overview: npm/yarn, Maven/Gradle, MSBuild', 'Artifact repositories: Nexus, Artifactory, GitHub Packages, container registries', 'Semantic versioning and immutable build artifacts', 'Dependency caching to speed up builds', 'Interview favorite: the "build once, deploy many" principle and why it matters'],
         labs: ['Publish a build artifact to GitHub Packages', 'Configure dependency caching in a sample pipeline', 'Tag a Docker image with a semantic version and commit SHA', 'Demo "build once, promote everywhere" across three environments']
       },
+
+      // ---------- GITHUB ACTIONS ----------
       {
-        order: 3, title: 'GitHub Actions Fundamentals', phase: 'GitHub Actions', difficulty: 'Beginner',
+        order: 12, title: 'GitHub Actions Fundamentals', phase: 'GitHub Actions', difficulty: 'Beginner',
         tags: ['workflow YAML', 'events', 'jobs & steps', 'runners', 'marketplace actions'],
         theory: ['Anatomy of a workflow file: name, on, jobs, steps', 'Event triggers: push, pull_request, workflow_dispatch, schedule', 'Jobs, steps, and the default GitHub-hosted runner environment', 'Using marketplace actions (checkout, setup-node, setup-java)', 'Reading logs and run history in the Actions tab'],
         labs: ['Write a workflow that runs tests on every push to main', 'Trigger a workflow manually with workflow_dispatch and inputs', 'Add a scheduled (cron) workflow for nightly builds', "Debug a failing workflow using the Actions log viewer"]
       },
       {
-        order: 4, title: 'GitHub Actions Workflow Syntax Deep Dive', phase: 'GitHub Actions', difficulty: 'Intermediate',
+        order: 13, title: 'GitHub Actions Workflow Syntax Deep Dive', phase: 'GitHub Actions', difficulty: 'Intermediate',
         tags: ['contexts & expressions', 'needs', 'conditionals', 'artifacts', 'job outputs'],
         theory: ['Contexts and expressions (github, env, secrets, needs, matrix)', 'The needs: keyword and building multi-job dependency graphs', 'if: conditionals for steps and jobs', 'Uploading/downloading artifacts between jobs', 'Job outputs and passing data between jobs'],
         labs: ['Build a 3-job pipeline: build → test → deploy using needs', 'Use an if: condition to skip a job on non-main branches', 'Pass a build artifact from a build job into a deploy job', 'Use job outputs to pass a version string across jobs']
       },
       {
-        order: 5, title: 'GitHub Actions Secrets, Environments & Deployments', phase: 'GitHub Actions', difficulty: 'Intermediate',
+        order: 14, title: 'GitHub Actions Secrets, Environments & Deployments', phase: 'GitHub Actions', difficulty: 'Intermediate',
         tags: ['encrypted secrets', 'environments', 'protection rules', 'OIDC', 'approval gates'],
         theory: ['Repository, organization and environment-level secrets', 'GitHub Environments — protection rules and required reviewers', 'OIDC — keyless cloud authentication (AWS/Azure/GCP) without long-lived secrets', 'Deployment approval gates for production environments', 'Interview favorite: "How do you avoid storing cloud credentials in CI?"'],
         labs: ['Configure an environment with a required-reviewer approval gate', 'Set up OIDC federation to deploy to a cloud provider without static keys', 'Store and reference an encrypted secret in a deploy step', 'Build a workflow that auto-deploys to staging, but needs approval for prod']
       },
       {
-        order: 6, title: 'GitHub Actions Advanced Patterns', phase: 'GitHub Actions', difficulty: 'Advanced',
+        order: 15, title: 'GitHub Actions Advanced Patterns', phase: 'GitHub Actions', difficulty: 'Advanced',
         tags: ['matrix builds', 'caching', 'reusable workflows', 'composite actions', 'self-hosted runners'],
         theory: ['Matrix builds for testing across OS/language versions', 'actions/cache for dependency and build caching', 'Reusable workflows (workflow_call) vs composite actions', 'Self-hosted runners — when and why to use them', 'Concurrency groups to cancel superseded runs'],
         labs: ['Build a matrix workflow testing across 3 language versions and 2 OSes', 'Extract shared steps into a reusable workflow called from two repos', 'Write a composite action that bundles lint + test + build', 'Configure concurrency to cancel in-progress runs on new pushes']
       },
+
+      // ---------- JENKINS ----------
       {
-        order: 7, title: 'Jenkins Fundamentals & Architecture', phase: 'Jenkins', difficulty: 'Beginner',
+        order: 16, title: 'Jenkins Fundamentals & Architecture', phase: 'Jenkins', difficulty: 'Beginner',
         tags: ['controller/agent', 'installation', 'plugins', 'job types', 'Blue Ocean'],
         theory: ['Jenkins architecture: controller, agents/nodes, executors', 'Installing and configuring Jenkins (WAR / Docker / Helm)', 'Freestyle jobs vs Pipeline jobs vs Multibranch Pipeline jobs', 'The Jenkins plugin ecosystem and plugin management', 'Blue Ocean UI vs the classic Jenkins UI'],
         labs: ['Install Jenkins via Docker and complete the initial setup wizard', 'Create a Freestyle job that builds a sample repo on push', 'Add and configure an agent node over SSH', 'Install and configure the Git and Pipeline plugins']
       },
       {
-        order: 8, title: 'Jenkins Pipelines — Declarative vs Scripted', phase: 'Jenkins', difficulty: 'Intermediate',
+        order: 17, title: 'Jenkins Pipelines — Declarative vs Scripted', phase: 'Jenkins', difficulty: 'Intermediate',
         tags: ['Jenkinsfile', 'declarative pipeline', 'scripted pipeline', 'post actions', 'parameters'],
         theory: ['Declarative Pipeline syntax: pipeline, agent, stages, steps', 'Scripted Pipeline (Groovy-based) and when it is still needed', 'post {} blocks — always, success, failure, cleanup', 'Parameters, environment variables, and when {} conditions', 'Interview classic: "Declarative vs Scripted — which would you use, and why?"'],
         labs: ['Write a declarative Jenkinsfile with build/test/deploy stages', 'Add a post block that sends a notification on failure', 'Parameterize a pipeline with a choice and a string parameter', 'Convert a scripted pipeline snippet into declarative syntax']
       },
       {
-        order: 9, title: 'Jenkins Shared Libraries, Plugins & Multibranch Pipelines', phase: 'Jenkins', difficulty: 'Advanced',
+        order: 18, title: 'Jenkins Shared Libraries, Plugins & Multibranch Pipelines', phase: 'Jenkins', difficulty: 'Advanced',
         tags: ['shared libraries', 'vars/src structure', 'multibranch pipeline', 'webhooks', 'key plugins'],
         theory: ['Shared Libraries — reusing pipeline code across many Jenkinsfiles', 'The vars/ and src/ directory structure of a shared library', 'Multibranch Pipeline — auto-discovering branches and pull requests', 'Webhooks — triggering Jenkins instantly from GitHub/GitLab pushes', 'Key plugins: Pipeline, Credentials, Blue Ocean, Docker Pipeline'],
         labs: ['Build a shared library with a reusable "deploy" step', 'Set up a Multibranch Pipeline job scanning a GitHub org', 'Configure a GitHub webhook to trigger Jenkins builds instantly', 'Reuse one shared-library function inside three different Jenkinsfiles']
       },
       {
-        order: 10, title: 'Jenkins Distributed Builds & Scaling', phase: 'Jenkins', difficulty: 'Advanced',
+        order: 19, title: 'Jenkins Distributed Builds & Scaling', phase: 'Jenkins', difficulty: 'Advanced',
         tags: ['agents & labels', 'Kubernetes plugin', 'dynamic agents', 'build queues', 'scaling'],
         theory: ['Static agents vs dynamic/ephemeral agents', 'Labels — routing jobs to specific agent types', 'The Kubernetes plugin — spinning up pod-based agents on demand', 'Managing build queues and executor capacity', 'Scaling Jenkins for large orgs: controller sizing, agent pools'],
         labs: ['Label two agents and route jobs using the agent { label } directive', 'Configure the Kubernetes plugin to run builds in ephemeral pods', 'Simulate a build-queue bottleneck and resolve it with more executors', 'Benchmark build time: static agent vs dynamic Kubernetes agent']
       },
+
+      // ---------- DEPLOYMENT & PIPELINE-AS-CODE ----------
       {
-        order: 11, title: 'Containerized CI/CD — Docker & Kubernetes Integration', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
-        tags: ['Docker builds', 'image scanning', 'Helm', 'kubectl deploy', 'GitOps basics'],
-        theory: ['Building and pushing Docker images from both GitHub Actions and Jenkins', 'Multi-stage Docker builds for smaller, faster CI images', 'Deploying to Kubernetes via kubectl/Helm from a pipeline', 'Image vulnerability scanning (Trivy, Snyk) as a pipeline gate', 'GitOps basics — ArgoCD/Flux vs push-based deployment'],
+        order: 20, title: 'Containerized CI/CD — Docker & Kubernetes Integration', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
+        tags: ['Docker builds in CI', 'image scanning gate', 'Helm', 'kubectl deploy', 'GitOps basics'],
+        theory: ['Building and pushing Docker images from both GitHub Actions and Jenkins (applying your Docker Foundations/Advanced skills in a pipeline)', 'Reusing multi-stage builds inside CI for smaller, faster CI images', 'Deploying to Kubernetes via kubectl/Helm from a pipeline', 'Wiring the Trivy/image-scanning step from Docker Advanced into a pipeline as a hard gate', 'GitOps basics — ArgoCD/Flux vs push-based deployment'],
         labs: ['Build and push a Docker image to a registry from GitHub Actions and Jenkins', 'Add a Trivy scan step that fails the pipeline on critical CVEs', 'Deploy a Helm chart to a Kubernetes cluster from a pipeline', 'Compare a push-based deploy step against a GitOps ArgoCD sync']
       },
       {
-        order: 12, title: 'Deployment Strategies — Blue-Green, Canary, Rolling', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
+        order: 21, title: 'Deployment Strategies — Blue-Green, Canary, Rolling', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
         tags: ['blue-green', 'canary releases', 'rolling updates', 'feature flags', 'rollback'],
         theory: ['Rolling deployments — the default Kubernetes strategy and its trade-offs', 'Blue-Green deployments — the zero-downtime cutover pattern', 'Canary releases — gradual traffic shifting with automated rollback triggers', 'Feature flags as a deployment-decoupling technique', 'Interview scenario: "Production just broke after a deploy — walk me through your rollback"'],
         labs: ['Implement a blue-green deploy switch using two Kubernetes services', 'Configure a canary rollout with progressive traffic weighting', 'Trigger an automated rollback on failed health checks', 'Design a rollback runbook for a failed production deployment']
       },
       {
-        order: 13, title: 'Pipeline as Code Best Practices & GitOps', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
+        order: 22, title: 'Pipeline as Code Best Practices & GitOps', phase: 'Deployment & Pipeline-as-Code', difficulty: 'Advanced',
         tags: ['pipeline as code', 'DRY pipelines', 'GitOps', 'promotion pattern', 'IaC integration'],
         theory: ['Why pipeline configuration belongs in version control', 'DRY pipeline design at scale: reusable workflows and shared libraries revisited', 'Environment promotion pattern: dev → staging → prod with the same artifact', 'Integrating Infrastructure as Code (Terraform) into CI/CD', 'GitOps principles: declarative, versioned, pulled not pushed'],
         labs: ['Design a promotion pipeline that moves one artifact through 3 environments', 'Add a Terraform plan/apply stage with a manual approval gate', 'Refactor a duplicated pipeline into a single reusable template', 'Compare a traditional push-deploy pipeline against a GitOps pull model']
       },
+
+      // ---------- SECURITY & GOVERNANCE ----------
       {
-        order: 14, title: 'CI/CD Security — Secrets, SAST/DAST, Supply Chain', phase: 'Security & Governance', difficulty: 'Advanced',
+        order: 23, title: 'CI/CD Security — Secrets, SAST/DAST, Supply Chain', phase: 'Security & Governance', difficulty: 'Advanced',
         tags: ['secrets scanning', 'SAST/DAST', 'SBOM', 'supply chain security', 'artifact signing'],
         theory: ['Secrets management: vaults, encrypted secrets, secret-scanning tools', 'SAST (static analysis) and DAST (dynamic analysis) as pipeline gates', 'Software Bill of Materials (SBOM) and dependency vulnerability scanning', 'Supply chain attacks — lessons from real-world incidents', 'Signing artifacts and verifying provenance (Sigstore/cosign)'],
         labs: ['Add a secret-scanning step (gitleaks) that blocks a pull request', 'Integrate a SAST tool (CodeQL/SonarQube) into a pipeline', 'Generate an SBOM for a build artifact', 'Sign a container image with cosign and verify it in a deploy step']
       },
       {
-        order: 15, title: 'RBAC, Compliance & Governance in CI/CD', phase: 'Security & Governance', difficulty: 'Advanced',
+        order: 24, title: 'RBAC, Compliance & Governance in CI/CD', phase: 'Security & Governance', difficulty: 'Advanced',
         tags: ['RBAC', 'audit logs', 'compliance', 'CODEOWNERS', 'policy as code'],
         theory: ['Role-based access control in GitHub Actions and Jenkins (org/folder-level)', 'Audit logging and traceability requirements (SOC2/ISO 27001 context)', 'Policy as code — enforcing pipeline rules with OPA/Conftest', 'Required reviewers, CODEOWNERS, and protected branches at scale', 'Interview angle: "How do you enforce compliance across 200 pipelines?"'],
         labs: ['Configure RBAC roles in a Jenkins folder using the Role Strategy plugin', 'Set up CODEOWNERS to require specific team review on sensitive paths', 'Write an OPA policy that blocks pipelines missing a security-scan stage', 'Audit a sample pipeline for compliance gaps and document the fixes']
       },
+
+      // ---------- INDUSTRY & INTERVIEW ----------
       {
-        order: 16, title: 'Monitoring, Observability & Incident Response', phase: 'Industry & Interview', difficulty: 'Advanced',
+        order: 25, title: 'Monitoring, Observability & Incident Response', phase: 'Industry & Interview', difficulty: 'Advanced',
         tags: ['pipeline metrics', 'alerting', 'MTTR', 'post-mortems', 'flaky tests'],
         theory: ['Monitoring pipeline health: success rate, duration, flaky-test detection', 'Alerting on failed deployments (Slack/PagerDuty integration)', 'Tracking DORA metrics on a production dashboard', 'Incident response workflow when a bad deploy hits production', 'Writing blameless post-mortems for pipeline/deployment failures'],
         labs: ['Add a Slack notification step for pipeline failures', 'Build a simple dashboard tracking build success rate over time', 'Identify and quarantine a flaky test in a real pipeline', 'Write a post-mortem for a simulated failed production deployment']
       },
       {
-        order: 17, title: 'CI/CD Interview Mastery — Scenario-Based Q&A', phase: 'Industry & Interview', difficulty: 'Advanced',
+        order: 26, title: 'CI/CD & Docker Interview Mastery — Scenario-Based Q&A', phase: 'Industry & Interview', difficulty: 'Advanced',
         tags: ['system design Qs', 'troubleshooting scenarios', 'behavioral Qs', 'GitHub Actions vs Jenkins', 'rapid-fire concepts'],
-        theory: ['"Design a CI/CD pipeline for a microservices app" — structuring your answer', '"GitHub Actions vs Jenkins — when would you choose one over the other?"', 'Troubleshooting: "Pipeline passes locally but fails in CI — how do you debug it?"', 'Behavioral: "Tell me about a time you fixed a slow or broken pipeline"', 'Rapid-fire concept checks: idempotency, artifact immutability, secrets handling, rollback strategy'],
-        labs: ['Mock interview: design a full pipeline for a 3-service app on a whiteboard', 'Debug a deliberately broken sample GitHub Actions workflow under time pressure', 'Debug a deliberately broken sample Jenkinsfile under time pressure', 'Prepare and rehearse STAR-format answers for 3 CI/CD behavioral questions']
+        theory: ['"Design a CI/CD pipeline for a containerized microservices app" — structuring your answer end-to-end from Dockerfile to deploy', '"GitHub Actions vs Jenkins — when would you choose one over the other?"', 'Troubleshooting: "Pipeline builds the image fine but the container crashes in prod — how do you debug it?"', 'Behavioral: "Tell me about a time you fixed a slow or broken pipeline"', 'Rapid-fire concept checks spanning Docker + CI/CD: image layers, idempotency, artifact immutability, secrets handling, rollback strategy'],
+        labs: ['Mock interview: design a full Docker-to-Kubernetes pipeline for a 3-service app on a whiteboard', 'Debug a deliberately broken sample GitHub Actions workflow under time pressure', 'Debug a deliberately broken sample Jenkinsfile under time pressure', 'Prepare and rehearse STAR-format answers for 3 Docker/CI-CD behavioral questions']
       },
     ];
 
@@ -892,12 +986,14 @@
       if (!unit) return;
 
       const phaseMap = {
-        'Foundation': 1,
-        'GitHub Actions': 2,
-        'Jenkins': 3,
-        'Deployment & Pipeline-as-Code': 4,
-        'Security & Governance': 5,
-        'Industry & Interview': 6
+        'Docker Foundations': 1,
+        'Docker Advanced & Production': 2,
+        'CI/CD Foundation': 3,
+        'GitHub Actions': 4,
+        'Jenkins': 5,
+        'Deployment & Pipeline-as-Code': 6,
+        'Security & Governance': 7,
+        'Industry & Interview': 8
       };
 
       const phaseNum = phaseMap[unit.phase];

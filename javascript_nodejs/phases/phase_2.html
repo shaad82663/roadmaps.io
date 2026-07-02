@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 2 — JS Intermediate</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 2 — JS Intermediate</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-2--js-intermediate"><a class="heading-anchor" href="#phase-2--js-intermediate" aria-hidden="true">#</a>Phase 2 — JS Intermediate</h1>
+<h3 id="promises-event-loop-modules-error-handling-functional-patterns"><a class="heading-anchor" href="#promises-event-loop-modules-error-handling-functional-patterns" aria-hidden="true">#</a>Promises, Event Loop, Modules, Error Handling, Functional Patterns</h3>
+<p><em>Target: 3 YOE Node.js backend dev — interview-ready, no 101 fluff</em></p>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ol>
+<li><a href="#unit-07">Unit 07 — Promises &amp; Async/Await</a></li>
+<li><a href="#unit-08">Unit 08 — Event Loop &amp; Concurrency Model</a></li>
+<li><a href="#unit-09">Unit 09 — Modules: CommonJS vs ESM</a></li>
+<li><a href="#unit-10">Unit 10 — Error Handling Patterns</a></li>
+<li><a href="#unit-11">Unit 11 — Functional Programming Patterns</a></li>
+<li><a href="#rapid-fire">Phase 2 Rapid-Fire Interview Round</a></li>
+</ol>
+<hr>
+<p><a name="unit-07"></a></p>
+<h2 id="unit-07--promises-amp-asyncawait"><a class="heading-anchor" href="#unit-07--promises-amp-asyncawait" aria-hidden="true">#</a>Unit 07 — Promises &amp; Async/Await</h2>
+<h3 id="1-why-promises-exist"><a class="heading-anchor" href="#1-why-promises-exist" aria-hidden="true">#</a>1. Why Promises exist</h3>
+<p>Before Promises, async work was handled with callbacks — leading to &quot;callback hell&quot; (deeply nested, hard to compose, hard to error-handle consistently because every callback needed its own <code class="inline-code">if (err)</code> check). Promises give you:</p>
+<ul>
+<li>A <strong>single, standard shape</strong> for &quot;a value that will exist later.&quot;</li>
+<li><strong>Composability</strong> (<code class="inline-code">.then</code> chains, <code class="inline-code">Promise.all</code>, etc.).</li>
+<li><strong>Guaranteed error propagation</strong> through the chain (no manual err-checking at every step).</li>
+</ul>
+<h3 id="2-the-three-states"><a class="heading-anchor" href="#2-the-three-states" aria-hidden="true">#</a>2. The three states</h3>
+<p>A Promise is a state machine with exactly one transition allowed:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">pending  --resolve(value)--&gt;  fulfilled   (settled, immutable)
+pending  --reject(reason)--&gt;  rejected    (settled, immutable)</code></pre></div>
+<p>Once <strong>settled</strong> (fulfilled or rejected), a Promise&#39;s outcome is locked forever — calling <code class="inline-code">resolve()</code> again does nothing. This immutability is why Promises are safe to pass around and hand to multiple consumers.</p>
+<h3 id="3-then-internals--what-interviewers-actually-probe"><a class="heading-anchor" href="#3-then-internals--what-interviewers-actually-probe" aria-hidden="true">#</a>3. <code class="inline-code">.then()</code> internals — what interviewers actually probe</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">promise.<span class="hljs-title function_">then</span>(onFulfilled, onRejected)</code></pre></div>
+<p>Key facts most 3-YOE devs get wrong:</p>
+<ul>
+<li><code class="inline-code">.then()</code> <strong>always returns a new Promise</strong> — this is what makes chaining work.</li>
+<li>If <code class="inline-code">onFulfilled</code> returns a plain value, the new promise resolves with that value.</li>
+<li>If <code class="inline-code">onFulfilled</code> returns a <strong>thenable/Promise</strong>, the new promise &quot;adopts&quot; its state (waits for it).</li>
+<li>If <code class="inline-code">onFulfilled</code> throws, the new promise <strong>rejects</strong> with that error — this is how <code class="inline-code">.catch()</code> at the end of a chain catches errors from any step above it.</li>
+<li><code class="inline-code">.catch(fn)</code> is literally sugar for <code class="inline-code">.then(undefined, fn)</code>.</li>
+<li><code class="inline-code">.finally(fn)</code> runs regardless of outcome, receives no arguments, and <strong>passes through</strong> the original value/error unless it itself throws.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-title function_">fetchUser</span>(id)
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">user</span> =&gt;</span> <span class="hljs-title function_">fetchOrders</span>(user.<span class="hljs-property">id</span>))   <span class="hljs-comment">// returns a promise -&gt; chain waits</span>
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">orders</span> =&gt;</span> <span class="hljs-title function_">processOrders</span>(orders)) <span class="hljs-comment">// returns a value -&gt; next .then gets it</span>
+  .<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> logger.<span class="hljs-title function_">error</span>(err))       <span class="hljs-comment">// catches ANY rejection above</span>
+  .<span class="hljs-title function_">finally</span>(<span class="hljs-function">() =&gt;</span> connection.<span class="hljs-title function_">release</span>());  <span class="hljs-comment">// always runs</span></code></pre></div>
+<h3 id="4-asyncawait--what-it-desugars-to"><a class="heading-anchor" href="#4-asyncawait--what-it-desugars-to" aria-hidden="true">#</a>4. async/await — what it desugars to</h3>
+<p><code class="inline-code">async function</code> always returns a Promise. <code class="inline-code">await</code> pauses execution of that function (not the whole thread) until the awaited promise settles, then either returns the value or throws the rejection reason as a normal JS exception.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// async/await</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getUser</span>(<span class="hljs-params">id</span>) {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`/users/<span class="hljs-subst">${id}</span>`</span>);
+    <span class="hljs-keyword">if</span> (!res.<span class="hljs-property">ok</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;not found&#x27;</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> res.<span class="hljs-title function_">json</span>();
+  } <span class="hljs-keyword">catch</span> (err) {
+    logger.<span class="hljs-title function_">error</span>(err);
+    <span class="hljs-keyword">throw</span> err; <span class="hljs-comment">// re-throw so caller&#x27;s promise rejects</span>
+  }
+}
+
+<span class="hljs-comment">// roughly equivalent .then() version</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getUser</span>(<span class="hljs-params">id</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`/users/<span class="hljs-subst">${id}</span>`</span>)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">res</span> =&gt;</span> {
+      <span class="hljs-keyword">if</span> (!res.<span class="hljs-property">ok</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;not found&#x27;</span>);
+      <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">json</span>();
+    })
+    .<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+      logger.<span class="hljs-title function_">error</span>(err);
+      <span class="hljs-keyword">throw</span> err;
+    });
+}</code></pre></div>
+<p><strong>Interview gotcha:</strong> <code class="inline-code">await</code> inside a <code class="inline-code">try/catch</code> catches rejections just like synchronous throws — this is the #1 reason teams migrate away from <code class="inline-code">.then()</code> chains for readability, not because <code class="inline-code">.then()</code> is &quot;wrong.&quot;</p>
+<h3 id="5-sequential-vs-parallel-await--the-1-real-world-bug"><a class="heading-anchor" href="#5-sequential-vs-parallel-await--the-1-real-world-bug" aria-hidden="true">#</a>5. Sequential vs Parallel await — the #1 real-world bug</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// BAD — sequential, 300ms + 300ms + 300ms = ~900ms</span>
+<span class="hljs-keyword">const</span> a = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchA</span>(); <span class="hljs-comment">// 300ms</span>
+<span class="hljs-keyword">const</span> b = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchB</span>(); <span class="hljs-comment">// 300ms</span>
+<span class="hljs-keyword">const</span> c = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchC</span>(); <span class="hljs-comment">// 300ms</span>
+
+<span class="hljs-comment">// GOOD — parallel, ~300ms total (if independent)</span>
+<span class="hljs-keyword">const</span> [a, b, c] = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>([<span class="hljs-title function_">fetchA</span>(), <span class="hljs-title function_">fetchB</span>(), <span class="hljs-title function_">fetchC</span>()]);</code></pre></div>
+<p>This is a <strong>very common senior-level review comment</strong>: &quot;these calls don&#39;t depend on each other, why are they sequential?&quot; Know how to spot it in a code review and fix it.</p>
+<h3 id="6-promise-combinators--know-the-exact-failure-semantics"><a class="heading-anchor" href="#6-promise-combinators--know-the-exact-failure-semantics" aria-hidden="true">#</a>6. Promise combinators — know the exact failure semantics</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Combinator</th>
+<th>Resolves when</th>
+<th>Rejects when</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">Promise.all</code></td>
+<td><strong>all</strong> settle fulfilled</td>
+<td><strong>any one</strong> rejects (fails fast)</td>
+<td>All results required, all-or-nothing</td>
+</tr>
+<tr>
+<td><code class="inline-code">Promise.allSettled</code></td>
+<td><strong>all</strong> settle (either state)</td>
+<td>never</td>
+<td>Want results even if some fail (e.g. batch email sends)</td>
+</tr>
+<tr>
+<td><code class="inline-code">Promise.race</code></td>
+<td>first to settle (fulfilled OR rejected)</td>
+<td>—</td>
+<td>Timeouts, &quot;whichever comes first&quot;</td>
+</tr>
+<tr>
+<td><code class="inline-code">Promise.any</code></td>
+<td>first to <strong>fulfill</strong></td>
+<td><strong>all</strong> reject (AggregateError)</td>
+<td>First success wins, ignore individual failures (e.g. multi-CDN fetch)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Timeout pattern using Promise.race — very common interview ask</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">withTimeout</span>(<span class="hljs-params">promise, ms</span>) {
+  <span class="hljs-keyword">const</span> timeout = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">_, reject</span>) =&gt;</span>
+    <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">reject</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;Timeout&#x27;</span>)), ms)
+  );
+  <span class="hljs-keyword">return</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">race</span>([promise, timeout]);
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// allSettled for &quot;best effort batch&quot; jobs</span>
+<span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">allSettled</span>(userIds.<span class="hljs-title function_">map</span>(sendWelcomeEmail));
+<span class="hljs-keyword">const</span> failed = results.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.<span class="hljs-property">status</span> === <span class="hljs-string">&#x27;rejected&#x27;</span>);</code></pre></div>
+<h3 id="7-implementing-a-mini-promise-from-scratch-common-interview-ask"><a class="heading-anchor" href="#7-implementing-a-mini-promise-from-scratch-common-interview-ask" aria-hidden="true">#</a>7. Implementing a mini Promise from scratch (common interview ask)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">MyPromise</span> {
+  #state = <span class="hljs-string">&#x27;pending&#x27;</span>;
+  #value;
+  #callbacks = [];
+
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">executor</span>) {
+    <span class="hljs-keyword">const</span> <span class="hljs-title function_">resolve</span> = (<span class="hljs-params">value</span>) =&gt; <span class="hljs-variable language_">this</span>.#<span class="hljs-title function_">settle</span>(<span class="hljs-string">&#x27;fulfilled&#x27;</span>, value);
+    <span class="hljs-keyword">const</span> <span class="hljs-title function_">reject</span> = (<span class="hljs-params">reason</span>) =&gt; <span class="hljs-variable language_">this</span>.#<span class="hljs-title function_">settle</span>(<span class="hljs-string">&#x27;rejected&#x27;</span>, reason);
+    <span class="hljs-keyword">try</span> { <span class="hljs-title function_">executor</span>(resolve, reject); } <span class="hljs-keyword">catch</span> (e) { <span class="hljs-title function_">reject</span>(e); }
+  }
+
+  #<span class="hljs-title function_">settle</span>(<span class="hljs-params">state, value</span>) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.#state !== <span class="hljs-string">&#x27;pending&#x27;</span>) <span class="hljs-keyword">return</span>; <span class="hljs-comment">// immutability</span>
+    <span class="hljs-variable language_">this</span>.#state = state;
+    <span class="hljs-variable language_">this</span>.#value = value;
+    <span class="hljs-title function_">queueMicrotask</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">this</span>.#callbacks.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">cb</span> =&gt;</span> <span class="hljs-title function_">cb</span>()));
+  }
+
+  <span class="hljs-title function_">then</span>(<span class="hljs-params">onFulfilled, onRejected</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyPromise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =&gt;</span> {
+      <span class="hljs-keyword">const</span> <span class="hljs-title function_">run</span> = (<span class="hljs-params"></span>) =&gt; {
+        <span class="hljs-keyword">try</span> {
+          <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.#state === <span class="hljs-string">&#x27;fulfilled&#x27;</span>) {
+            <span class="hljs-title function_">resolve</span>(onFulfilled ? <span class="hljs-title function_">onFulfilled</span>(<span class="hljs-variable language_">this</span>.#value) : <span class="hljs-variable language_">this</span>.#value);
+          } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">if</span> (onRejected) <span class="hljs-title function_">resolve</span>(<span class="hljs-title function_">onRejected</span>(<span class="hljs-variable language_">this</span>.#value));
+            <span class="hljs-keyword">else</span> <span class="hljs-title function_">reject</span>(<span class="hljs-variable language_">this</span>.#value);
+          }
+        } <span class="hljs-keyword">catch</span> (e) { <span class="hljs-title function_">reject</span>(e); }
+      };
+      <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.#state === <span class="hljs-string">&#x27;pending&#x27;</span>) <span class="hljs-variable language_">this</span>.#callbacks.<span class="hljs-title function_">push</span>(run);
+      <span class="hljs-keyword">else</span> <span class="hljs-title function_">queueMicrotask</span>(run);
+    });
+  }
+}</code></pre></div>
+<p>This demonstrates: pending/settled immutability, microtask scheduling, and chain adoption. You won&#39;t need to write this perfectly in an interview, but you should be able to explain each piece.</p>
+<h3 id="8-common-pitfalls-checklist"><a class="heading-anchor" href="#8-common-pitfalls-checklist" aria-hidden="true">#</a>8. Common pitfalls checklist</h3>
+<ul>
+<li><strong>Forgetting to <code class="inline-code">return</code></strong> a promise inside <code class="inline-code">.then()</code> — breaks chaining, causes &quot;silent&quot; out-of-order execution.</li>
+<li><strong>Unhandled rejections</strong> — a rejected promise with no <code class="inline-code">.catch</code> triggers <code class="inline-code">process.on(&#39;unhandledRejection&#39;)</code> in Node; in modern Node (&gt;=15) this <strong>crashes the process</strong> by default.</li>
+<li><strong>Mixing <code class="inline-code">await</code> with <code class="inline-code">.then()</code></strong> unnecessarily — pick one style per function.</li>
+<li><strong><code class="inline-code">forEach</code> with async callbacks does not await</strong> — <code class="inline-code">arr.forEach(async x =&gt; await doThing(x))</code> runs all iterations concurrently and <code class="inline-code">forEach</code> doesn&#39;t wait for any of them. Use <code class="inline-code">for...of</code> with <code class="inline-code">await</code>, or <code class="inline-code">Promise.all(arr.map(...))</code>.</li>
+</ul>
+<h3 id="9-interview-qampa"><a class="heading-anchor" href="#9-interview-qampa" aria-hidden="true">#</a>9. Interview Q&amp;A</h3>
+<p><strong>Q: What happens if you <code class="inline-code">await</code> a non-promise value?</strong>
+A: It&#39;s wrapped in <code class="inline-code">Promise.resolve(value)</code> and resolves immediately (on the next microtask tick) — no error.</p>
+<p><strong>Q: Does <code class="inline-code">await</code> block the Node.js thread?</strong>
+A: No. It pauses only the enclosing async function&#39;s execution; the event loop keeps processing other work (other requests, timers, I/O callbacks) while waiting.</p>
+<p><strong>Q: Why does <code class="inline-code">Promise.all</code> &quot;fail fast&quot;?</strong>
+A: It rejects as soon as the first passed promise rejects, without waiting for the others to settle — the other promises keep running in the background but their results are discarded by <code class="inline-code">Promise.all</code>.</p>
+<p><strong>Q: How do you catch errors from <code class="inline-code">Promise.all</code>?</strong>
+A: Wrap in <code class="inline-code">try/catch</code> with <code class="inline-code">await</code>, or attach <code class="inline-code">.catch()</code> — but you lose the individual per-item success/failure detail (use <code class="inline-code">allSettled</code> if you need that).</p>
+<hr>
+<p><a name="unit-08"></a></p>
+<h2 id="unit-08--event-loop-amp-concurrency-model"><a class="heading-anchor" href="#unit-08--event-loop-amp-concurrency-model" aria-hidden="true">#</a>Unit 08 — Event Loop &amp; Concurrency Model</h2>
+<h3 id="1-the-mental-model"><a class="heading-anchor" href="#1-the-mental-model" aria-hidden="true">#</a>1. The mental model</h3>
+<p>JavaScript is single-threaded for <strong>your code execution</strong>, but the <em>runtime</em> (browser or Node/libuv) is multi-threaded under the hood for I/O. The event loop is the mechanism that lets a single-threaded language handle concurrent I/O without blocking.</p>
+<p>Three key structures:</p>
+<ul>
+<li><strong>Call stack</strong> — synchronous execution, LIFO.</li>
+<li><strong>Microtask queue</strong> — Promise callbacks (<code class="inline-code">.then</code>, <code class="inline-code">catch</code>, <code class="inline-code">finally</code>), <code class="inline-code">queueMicrotask</code>, <code class="inline-code">async/await</code> continuations.</li>
+<li><strong>Macrotask queue(s)</strong> — <code class="inline-code">setTimeout</code>, <code class="inline-code">setInterval</code>, I/O callbacks, <code class="inline-code">setImmediate</code> (Node only).</li>
+</ul>
+<h3 id="2-the-golden-rule"><a class="heading-anchor" href="#2-the-golden-rule" aria-hidden="true">#</a>2. The golden rule</h3>
+<p><strong>After every single macrotask (or after each top-level script), the JS engine fully drains the microtask queue before doing anything else — including rendering (browser) or moving to the next macrotask (Node).</strong></p>
+<p>This is why:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;1&#x27;</span>);
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;2&#x27;</span>), <span class="hljs-number">0</span>);
+<span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;3&#x27;</span>));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;4&#x27;</span>);
+
+<span class="hljs-comment">// Output: 1, 4, 3, 2</span></code></pre></div>
+<p><code class="inline-code">1</code> and <code class="inline-code">4</code> run synchronously. <code class="inline-code">3</code> (microtask) always beats <code class="inline-code">2</code> (macrotask), even with <code class="inline-code">setTimeout(fn, 0)</code>.</p>
+<p><strong>Critical nuance:</strong> if a microtask queues another microtask, that new one is also drained <em>before</em> the next macrotask — microtasks can starve macrotasks if you keep chaining them. This is a real production bug pattern (infinite <code class="inline-code">.then()</code> recursion delaying I/O).</p>
+<h3 id="3-node39s-event-loop-phases-beyond-the-browser-model"><a class="heading-anchor" href="#3-node39s-event-loop-phases-beyond-the-browser-model" aria-hidden="true">#</a>3. Node&#39;s event loop phases (beyond the browser model)</h3>
+<p>Node (via libuv) breaks the loop into ordered phases per tick:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">┌───────────────────────────┐
+│           timers          │  &lt;- setTimeout / setInterval callbacks
+├───────────────────────────┤
+│     pending callbacks     │  &lt;- deferred I/O callbacks (some system errors)
+├───────────────────────────┤
+│       idle, prepare       │  &lt;- internal use
+├───────────────────────────┤
+│           poll            │  &lt;- retrieve new I/O events, execute I/O callbacks
+├───────────────────────────┤
+│           check           │  &lt;- setImmediate() callbacks
+├───────────────────────────┤
+│      close callbacks      │  &lt;- e.g. socket.on(&#x27;close&#x27;, ...)
+└───────────────────────────┘</code></pre></div>
+<p>Microtasks (Promise callbacks, <code class="inline-code">process.nextTick</code>) are drained <strong>between every phase transition</strong>, not just once per full loop.</p>
+<h3 id="4-processnexttick-vs-setimmediate-vs-settimeoutfn-0"><a class="heading-anchor" href="#4-processnexttick-vs-setimmediate-vs-settimeoutfn-0" aria-hidden="true">#</a>4. <code class="inline-code">process.nextTick</code> vs <code class="inline-code">setImmediate</code> vs <code class="inline-code">setTimeout(fn, 0)</code></h3>
+<p>This is the single most-asked Node interview question in this unit.</p>
+<ul>
+<li><strong><code class="inline-code">process.nextTick(fn)</code></strong> — Node-specific, higher priority than Promise microtasks. Runs <em>immediately</em> after the current operation completes, before the event loop continues to any phase. Overusing it can starve I/O entirely.</li>
+<li><strong><code class="inline-code">setImmediate(fn)</code></strong> — runs in the <strong>check</strong> phase, i.e. after the current poll phase completes. Good for &quot;run after I/O, in this loop iteration.&quot;</li>
+<li><strong><code class="inline-code">setTimeout(fn, 0)</code></strong> — runs in the <strong>timers</strong> phase; effectively <code class="inline-code">setTimeout(fn, 1)</code> due to minimum clamping. Ordering relative to <code class="inline-code">setImmediate</code> is <strong>not guaranteed</strong> in the main module (depends on process startup timing) but is guaranteed inside an I/O callback:</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
+
+fs.<span class="hljs-title function_">readFile</span>(__filename, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;timeout&#x27;</span>), <span class="hljs-number">0</span>);
+  <span class="hljs-title function_">setImmediate</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;immediate&#x27;</span>));
+});
+<span class="hljs-comment">// Inside an I/O callback, &#x27;immediate&#x27; ALWAYS logs before &#x27;timeout&#x27;</span>
+<span class="hljs-comment">// because we&#x27;re already past the timers phase and heading into poll-&gt;check</span></code></pre></div>
+<p>Priority order per tick (highest to lowest): <code class="inline-code">process.nextTick</code> queue → microtask (Promise) queue → the relevant macrotask phase.</p>
+<h3 id="5-blocking-the-event-loop--the-real-production-killer"><a class="heading-anchor" href="#5-blocking-the-event-loop--the-real-production-killer" aria-hidden="true">#</a>5. Blocking the event loop — the real production killer</h3>
+<p>Any synchronous, CPU-heavy operation blocks <strong>everything</strong> — all pending requests, all timers, all I/O callbacks — because there&#39;s only one thread running JS.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// This blocks the entire server for ~2s, killing throughput for ALL clients</span>
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/hash&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> hash = crypto.<span class="hljs-title function_">pbkdf2Sync</span>(req.<span class="hljs-property">query</span>.<span class="hljs-property">pw</span>, <span class="hljs-string">&#x27;salt&#x27;</span>, <span class="hljs-number">1_000_000</span>, <span class="hljs-number">64</span>, <span class="hljs-string">&#x27;sha512&#x27;</span>);
+  res.<span class="hljs-title function_">send</span>(hash.<span class="hljs-title function_">toString</span>(<span class="hljs-string">&#x27;hex&#x27;</span>));
+});</code></pre></div>
+<p>Fixes:</p>
+<ul>
+<li>Use async variants (<code class="inline-code">crypto.pbkdf2</code> instead of <code class="inline-code">Sync</code>).</li>
+<li>Offload to <code class="inline-code">worker_threads</code> for CPU-bound work.</li>
+<li>Chunk large synchronous loops using <code class="inline-code">setImmediate</code> to yield control back to the loop between chunks.</li>
+</ul>
+<h3 id="6-interview-qampa"><a class="heading-anchor" href="#6-interview-qampa" aria-hidden="true">#</a>6. Interview Q&amp;A</h3>
+<p><strong>Q: Is Node.js single-threaded?</strong>
+A: The JS execution thread is single-threaded, but Node itself uses a libuv thread pool (default size 4) for certain async operations (file system, DNS lookup, some crypto) and the OS kernel handles network I/O asynchronously via epoll/kqueue/IOCP — so Node as a whole is not single-threaded, only your JS callback execution is.</p>
+<p><strong>Q: Why is <code class="inline-code">Promise.then</code> faster than <code class="inline-code">setTimeout(fn, 0)</code>?</strong>
+A: Because microtasks are drained completely before the loop even considers moving to the next macrotask phase — they&#39;re always processed first, every tick.</p>
+<p><strong>Q: What&#39;s a real symptom of event-loop blocking in production?</strong>
+A: Rising p99 latency across <em>unrelated</em> endpoints, health-check timeouts, and increasing event loop lag metrics (measurable via <code class="inline-code">perf_hooks.monitorEventLoopDelay()</code>), even though CPU usage might look &quot;fine&quot; on average.</p>
+<hr>
+<p><a name="unit-09"></a></p>
+<h2 id="unit-09--modules-commonjs-vs-esm"><a class="heading-anchor" href="#unit-09--modules-commonjs-vs-esm" aria-hidden="true">#</a>Unit 09 — Modules: CommonJS vs ESM</h2>
+<h3 id="1-commonjs-cjs--how-require-actually-works"><a class="heading-anchor" href="#1-commonjs-cjs--how-require-actually-works" aria-hidden="true">#</a>1. CommonJS (CJS) — how <code class="inline-code">require()</code> actually works</h3>
+<ul>
+<li><strong>Synchronous</strong> loading — file is read and executed on <code class="inline-code">require()</code> call, blocking until done.</li>
+<li>Each module is wrapped in a function at load time:<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">(<span class="hljs-keyword">function</span>(<span class="hljs-params"><span class="hljs-built_in">exports</span>, <span class="hljs-built_in">require</span>, <span class="hljs-variable language_">module</span>, __filename, __dirname</span>) {
+  <span class="hljs-comment">// your module code</span>
+});</code></pre></div>
+This is why <code class="inline-code">module</code>, <code class="inline-code">exports</code>, <code class="inline-code">require</code>, <code class="inline-code">__filename</code>, <code class="inline-code">__dirname</code> are available without importing them.</li>
+<li><strong>Caching</strong>: <code class="inline-code">require()</code> caches by resolved absolute file path in <code class="inline-code">require.cache</code>. Second <code class="inline-code">require()</code> of the same file returns the <strong>same object reference</strong>, doesn&#39;t re-execute the file.</li>
+<li><strong>Circular require</strong>: returns whatever has been exported <em>so far</em> (a partial/incomplete <code class="inline-code">exports</code> object) — a classic bug source.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// a.js</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;a starting&#x27;</span>);
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">done</span> = <span class="hljs-literal">false</span>;
+<span class="hljs-keyword">const</span> b = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./b&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;in a, b.done =&#x27;</span>, b.<span class="hljs-property">done</span>);
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">done</span> = <span class="hljs-literal">true</span>;
+
+<span class="hljs-comment">// b.js</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;b starting&#x27;</span>);
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">done</span> = <span class="hljs-literal">false</span>;
+<span class="hljs-keyword">const</span> a = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./a&#x27;</span>); <span class="hljs-comment">// circular</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;in b, a.done =&#x27;</span>, a.<span class="hljs-property">done</span>); <span class="hljs-comment">// logs false — a hasn&#x27;t finished yet!</span>
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">done</span> = <span class="hljs-literal">true</span>;</code></pre></div>
+<h3 id="2-esm-importexport--how-it-differs-fundamentally"><a class="heading-anchor" href="#2-esm-importexport--how-it-differs-fundamentally" aria-hidden="true">#</a>2. ESM (<code class="inline-code">import</code>/<code class="inline-code">export</code>) — how it differs fundamentally</h3>
+<ul>
+<li><strong>Static structure</strong>: import/export declarations are parsed and resolved <strong>before</strong> any code executes (hoisted), enabling static analysis — this is what makes tree-shaking possible.</li>
+<li><strong>Live bindings</strong>, not copies: an imported value is a <strong>live reference</strong> to the exporting module&#39;s binding. If the exporter later reassigns the exported variable, importers see the updated value automatically (unlike CJS, which copies the <code class="inline-code">exports</code> object reference at require-time).</li>
+<li>Loading is asynchronous under the hood (even for local files) — this is why <strong>top-level <code class="inline-code">await</code></strong> is legal in ESM but not CJS.</li>
+<li><code class="inline-code">import.meta.url</code> replaces <code class="inline-code">__filename</code>/<code class="inline-code">__dirname</code> (which don&#39;t exist in ESM).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// counter.mjs</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">let</span> count = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">increment</span>(<span class="hljs-params"></span>) { count++; }
+
+<span class="hljs-comment">// main.mjs</span>
+<span class="hljs-keyword">import</span> { count, increment } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./counter.mjs&#x27;</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(count); <span class="hljs-comment">// 0</span>
+<span class="hljs-title function_">increment</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(count); <span class="hljs-comment">// 1 — live binding, reflects the update</span></code></pre></div>
+<h3 id="3-enabling-each-in-node"><a class="heading-anchor" href="#3-enabling-each-in-node" aria-hidden="true">#</a>3. Enabling each in Node</h3>
+<ul>
+<li>CJS is default for <code class="inline-code">.js</code> files unless <code class="inline-code">package.json</code> has <code class="inline-code">&quot;type&quot;: &quot;module&quot;</code>.</li>
+<li><code class="inline-code">.mjs</code> is always ESM; <code class="inline-code">.cjs</code> is always CJs, regardless of <code class="inline-code">package.json</code>.</li>
+<li><code class="inline-code">&quot;type&quot;: &quot;module&quot;</code> in <code class="inline-code">package.json</code> flips the default for <code class="inline-code">.js</code> files to ESM.</li>
+</ul>
+<h3 id="4-interop-pitfalls-real-world-pain-frequently-asked"><a class="heading-anchor" href="#4-interop-pitfalls-real-world-pain-frequently-asked" aria-hidden="true">#</a>4. Interop pitfalls (real-world pain, frequently asked)</h3>
+<ul>
+<li><strong>ESM can <code class="inline-code">import</code> a CJS module</strong> — Node wraps <code class="inline-code">module.exports</code> as the default export, and does static analysis via <code class="inline-code">cjs-module-lexer</code> to also expose <em>named</em> exports where possible (works for simple <code class="inline-code">exports.x = ...</code> patterns, fails for dynamically-computed exports).<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// CJS module: module.exports = { foo, bar }</span>
+<span class="hljs-keyword">import</span> pkg <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;cjs-package&#x27;</span>;       <span class="hljs-comment">// default import always works</span>
+<span class="hljs-keyword">import</span> { foo, bar } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;cjs-package&#x27;</span>; <span class="hljs-comment">// works only if statically analyzable</span></code></pre></div>
+</li>
+<li><strong>CJS cannot <code class="inline-code">require()</code> a pure ESM module synchronously</strong> — you must use dynamic <code class="inline-code">import()</code> (which returns a Promise) instead.<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// inside a CJS file</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> esmMod = <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">&#x27;./pureEsmModule.mjs&#x27;</span>);
+  esmMod.<span class="hljs-title function_">default</span>();
+}</code></pre></div>
+</li>
+<li><strong><code class="inline-code">__dirname</code> is undefined in ESM</strong> — the common fix:<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">import</span> { fileURLToPath } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;url&#x27;</span>;
+<span class="hljs-keyword">import</span> path <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;path&#x27;</span>;
+<span class="hljs-keyword">const</span> __filename = <span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+<span class="hljs-keyword">const</span> __dirname = path.<span class="hljs-title function_">dirname</span>(__filename);</code></pre></div>
+</li>
+<li><strong>package.json <code class="inline-code">&quot;exports&quot;</code> field</strong> can restrict/remap what&#39;s importable from a package, and can define <em>different</em> entry points for <code class="inline-code">require</code> vs <code class="inline-code">import</code> (conditional exports) — this is a frequent source of &quot;works with require but not import&quot; bugs when consuming third-party packages.</li>
+</ul>
+<h3 id="5-tree-shaking--why-it-needs-esm"><a class="heading-anchor" href="#5-tree-shaking--why-it-needs-esm" aria-hidden="true">#</a>5. Tree-shaking — why it needs ESM</h3>
+<p>Bundlers (webpack, esbuild, Rollup) can only safely eliminate unused exports when imports/exports are statically declared (ESM). CJS&#39;s dynamic, runtime nature (<code class="inline-code">require()</code> can be called conditionally, exports can be mutated at any time) makes static dead-code elimination unsafe in general.</p>
+<h3 id="6-interview-qampa-1"><a class="heading-anchor" href="#6-interview-qampa-1" aria-hidden="true">#</a>6. Interview Q&amp;A</h3>
+<p><strong>Q: Why does Node treat <code class="inline-code">.js</code> as CJS by default even in 2026?</strong>
+A: Backward compatibility — the vast npm ecosystem historically shipped CJS; changing the default would break millions of existing packages.</p>
+<p><strong>Q: What&#39;s the practical difference in how &quot;the same value&quot; behaves between CJS and ESM exports?</strong>
+A: CJS exports a copy of the reference to the <code class="inline-code">exports</code> object at require-time (mutating the module&#39;s internal variable <em>after</em> export doesn&#39;t reflect unless you&#39;re mutating properties of an already-shared object); ESM exports live bindings, so re-assignments in the source module are always visible to importers.</p>
+<p><strong>Q: You need to require() a package but get &quot;ERR_REQUIRE_ESM&quot; — what do you do?</strong>
+A: Either switch your file to ESM (<code class="inline-code">.mjs</code> or <code class="inline-code">&quot;type&quot;: &quot;module&quot;</code>) and use static/dynamic <code class="inline-code">import</code>, or use dynamic <code class="inline-code">import()</code> inside your CJS file (returns a Promise), since synchronous <code class="inline-code">require()</code> fundamentally cannot load an ESM-only module.</p>
+<hr>
+<p><a name="unit-10"></a></p>
+<h2 id="unit-10--error-handling-patterns"><a class="heading-anchor" href="#unit-10--error-handling-patterns" aria-hidden="true">#</a>Unit 10 — Error Handling Patterns</h2>
+<h3 id="1-baseline-error-and-subclassing"><a class="heading-anchor" href="#1-baseline-error-and-subclassing" aria-hidden="true">#</a>1. Baseline: <code class="inline-code">Error</code> and subclassing</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">AppError</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">Error</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">message, statusCode = <span class="hljs-number">500</span>, code = <span class="hljs-string">&#x27;INTERNAL_ERROR&#x27;</span>, isOperational = <span class="hljs-literal">true</span></span>) {
+    <span class="hljs-variable language_">super</span>(message);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = <span class="hljs-variable language_">this</span>.<span class="hljs-property">constructor</span>.<span class="hljs-property">name</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">statusCode</span> = statusCode;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">code</span> = code;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">isOperational</span> = isOperational; <span class="hljs-comment">// distinguishes &quot;expected&quot; vs &quot;bug&quot; errors</span>
+    <span class="hljs-title class_">Error</span>.<span class="hljs-title function_">captureStackTrace</span>(<span class="hljs-variable language_">this</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">constructor</span>);
+  }
+}
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">ValidationError</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">AppError</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">message, details</span>) {
+    <span class="hljs-variable language_">super</span>(message, <span class="hljs-number">400</span>, <span class="hljs-string">&#x27;VALIDATION_ERROR&#x27;</span>);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">details</span> = details;
+  }
+}
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">NotFoundError</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">AppError</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">resource</span>) {
+    <span class="hljs-variable language_">super</span>(<span class="hljs-string">`<span class="hljs-subst">${resource}</span> not found`</span>, <span class="hljs-number">404</span>, <span class="hljs-string">&#x27;NOT_FOUND&#x27;</span>);
+  }
+}</code></pre></div>
+<p><code class="inline-code">Error.captureStackTrace</code> excludes the constructor call itself from the stack trace, giving a cleaner trace pointing at the actual throw site.</p>
+<h3 id="2-operational-vs-programmer-errors--the-key-production-distinction"><a class="heading-anchor" href="#2-operational-vs-programmer-errors--the-key-production-distinction" aria-hidden="true">#</a>2. Operational vs Programmer errors — the key production distinction</h3>
+<ul>
+<li><strong>Operational errors</strong>: expected failure modes — invalid input, failed DB connection, 3rd-party API timeout, resource not found. Handle gracefully, respond to the client, keep the process alive.</li>
+<li><strong>Programmer errors</strong>: bugs — <code class="inline-code">undefined is not a function</code>, reading a property of <code class="inline-code">null</code>. These indicate the app is in an unknown state. The standard guidance (Node core team recommendation) is to <strong>let the process crash</strong> and restart it via a process manager (PM2, Kubernetes) rather than try to keep running in a corrupted state.</li>
+</ul>
+<p>The <code class="inline-code">isOperational</code> flag above lets a central handler decide: log-and-respond vs log-and-crash.</p>
+<h3 id="3-sync-vs-async-error-propagation"><a class="heading-anchor" href="#3-sync-vs-async-error-propagation" aria-hidden="true">#</a>3. Sync vs async error propagation</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Sync throw — caught by surrounding try/catch normally</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">parseConfig</span>(<span class="hljs-params">json</span>) {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(json);
+  } <span class="hljs-keyword">catch</span> (e) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AppError</span>(<span class="hljs-string">&#x27;Invalid config JSON&#x27;</span>, <span class="hljs-number">400</span>, <span class="hljs-string">&#x27;BAD_CONFIG&#x27;</span>);
+  }
+}
+
+<span class="hljs-comment">// Async — must await, or the rejection is &quot;swallowed&quot; silently</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadUser</span>(<span class="hljs-params">id</span>) {
+  <span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> db.<span class="hljs-property">users</span>.<span class="hljs-title function_">findById</span>(id); <span class="hljs-comment">// if this rejects, it propagates</span>
+  <span class="hljs-keyword">if</span> (!user) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotFoundError</span>(<span class="hljs-string">&#x27;User&#x27;</span>);
+  <span class="hljs-keyword">return</span> user;
+}</code></pre></div>
+<p><strong>Classic bug</strong>: forgetting <code class="inline-code">await</code> on an async call inside a try/catch — the promise rejection happens <em>after</em> the try/catch block has already exited, so it&#39;s never caught there, and (depending on Node version) may become an unhandled rejection.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// BUG — missing await</span>
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-title function_">doAsyncThing</span>(); <span class="hljs-comment">// fires and forgets, returns a promise immediately</span>
+} <span class="hljs-keyword">catch</span> (e) {
+  <span class="hljs-comment">// never runs for doAsyncThing&#x27;s rejection</span>
+}</code></pre></div>
+<h3 id="4-global-safety-nets-last-line-of-defense-not-primary-handling"><a class="heading-anchor" href="#4-global-safety-nets-last-line-of-defense-not-primary-handling" aria-hidden="true">#</a>4. Global safety nets (last line of defense, not primary handling)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;unhandledRejection&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">reason, promise</span>) =&gt;</span> {
+  logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Unhandled Rejection&#x27;</span>, reason);
+  <span class="hljs-comment">// In modern Node, unhandled rejections already terminate by default —</span>
+  <span class="hljs-comment">// this handler is for logging/alerting before the crash, or converting</span>
+  <span class="hljs-comment">// to a controlled shutdown.</span>
+  process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
+});
+
+process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;uncaughtException&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+  logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Uncaught Exception&#x27;</span>, err);
+  <span class="hljs-comment">// Never attempt to &quot;resume&quot; — the process state is unknown.</span>
+  process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
+});</code></pre></div>
+<p>These are <strong>safety nets</strong>, not a substitute for handling errors at the call site. Relying on them for normal control flow is an anti-pattern.</p>
+<h3 id="5-centralized-express-error-handling-middleware"><a class="heading-anchor" href="#5-centralized-express-error-handling-middleware" aria-hidden="true">#</a>5. Centralized Express error-handling middleware</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// error-handler.js — must have exactly 4 params for Express to recognize it</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">errorHandler</span>(<span class="hljs-params">err, req, res, next</span>) {
+  <span class="hljs-keyword">const</span> isOperational = err.<span class="hljs-property">isOperational</span> ?? <span class="hljs-literal">false</span>;
+  <span class="hljs-keyword">const</span> statusCode = err.<span class="hljs-property">statusCode</span> || <span class="hljs-number">500</span>;
+
+  logger.<span class="hljs-title function_">error</span>({
+    <span class="hljs-attr">message</span>: err.<span class="hljs-property">message</span>,
+    <span class="hljs-attr">stack</span>: err.<span class="hljs-property">stack</span>,
+    isOperational,
+    <span class="hljs-attr">path</span>: req.<span class="hljs-property">path</span>,
+  });
+
+  res.<span class="hljs-title function_">status</span>(statusCode).<span class="hljs-title function_">json</span>({
+    <span class="hljs-attr">error</span>: {
+      <span class="hljs-attr">code</span>: err.<span class="hljs-property">code</span> || <span class="hljs-string">&#x27;INTERNAL_ERROR&#x27;</span>,
+      <span class="hljs-attr">message</span>: isOperational ? err.<span class="hljs-property">message</span> : <span class="hljs-string">&#x27;Something went wrong&#x27;</span>,
+    },
+  });
+}
+
+<span class="hljs-comment">// wrapper to avoid try/catch boilerplate in every async route</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">asyncHandler</span> = (<span class="hljs-params">fn</span>) =&gt; <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-title function_">fn</span>(req, res, next)).<span class="hljs-title function_">catch</span>(next);
+};
+
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/users/:id&#x27;</span>, <span class="hljs-title function_">asyncHandler</span>(<span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> userService.<span class="hljs-title function_">findById</span>(req.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>);
+  <span class="hljs-keyword">if</span> (!user) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotFoundError</span>(<span class="hljs-string">&#x27;User&#x27;</span>);
+  res.<span class="hljs-title function_">json</span>(user);
+}));
+
+app.<span class="hljs-title function_">use</span>(errorHandler); <span class="hljs-comment">// registered LAST, after all routes</span></code></pre></div>
+<p><strong>Interview point:</strong> Express (pre-v5) does <strong>not</strong> automatically catch rejected promises from async route handlers — an unhandled rejection inside an async route handler will not reach your error middleware unless you either wrap it (<code class="inline-code">asyncHandler</code>) or explicitly <code class="inline-code">.catch(next)</code>. Express 5 fixes this by auto-forwarding rejected promises to <code class="inline-code">next()</code>.</p>
+<h3 id="6-error-first-callbacks-legacy-node-style--still-shows-up-in-interviews"><a class="heading-anchor" href="#6-error-first-callbacks-legacy-node-style--still-shows-up-in-interviews" aria-hidden="true">#</a>6. Error-first callbacks (legacy Node style — still shows up in interviews)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">&#x27;config.json&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">callback</span>(err); <span class="hljs-comment">// always check err FIRST</span>
+  <span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(data));
+});</code></pre></div>
+<p>Convention: first argument is always <code class="inline-code">null</code> on success, or an <code class="inline-code">Error</code> on failure. This predates Promises and is still the pattern for some core Node APIs and older libraries.</p>
+<h3 id="7-retry-amp-circuit-breaker-patterns-senior-level-expectation"><a class="heading-anchor" href="#7-retry-amp-circuit-breaker-patterns-senior-level-expectation" aria-hidden="true">#</a>7. Retry &amp; circuit breaker patterns (senior-level expectation)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">withRetry</span>(<span class="hljs-params">fn, { retries = <span class="hljs-number">3</span>, delayMs = <span class="hljs-number">200</span> } = {}</span>) {
+  <span class="hljs-keyword">let</span> lastErr;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> attempt = <span class="hljs-number">0</span>; attempt &lt;= retries; attempt++) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">fn</span>();
+    } <span class="hljs-keyword">catch</span> (err) {
+      lastErr = err;
+      <span class="hljs-keyword">if</span> (attempt &lt; retries) {
+        <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> <span class="hljs-built_in">setTimeout</span>(r, delayMs * <span class="hljs-number">2</span> ** attempt)); <span class="hljs-comment">// exponential backoff</span>
+      }
+    }
+  }
+  <span class="hljs-keyword">throw</span> lastErr;
+}</code></pre></div>
+<p>Know the concept of a <strong>circuit breaker</strong> (e.g. via the <code class="inline-code">opossum</code> library) even if you don&#39;t implement one from scratch: after N consecutive failures, stop calling a failing dependency for a cooldown period instead of hammering it — protects both the caller and the struggling downstream service.</p>
+<h3 id="8-interview-qampa"><a class="heading-anchor" href="#8-interview-qampa" aria-hidden="true">#</a>8. Interview Q&amp;A</h3>
+<p><strong>Q: Should you catch an error you can&#39;t meaningfully handle?</strong>
+A: No — let it propagate to a centralized handler. Catching-and-swallowing (or catching-and-logging without re-throwing) at a low level hides failures from callers and makes debugging much harder.</p>
+<p><strong>Q: What&#39;s the danger of <code class="inline-code">process.exit()</code> inside a request handler?</strong>
+A: It kills the entire server process — all other in-flight requests are dropped. It should only be used at the top level (e.g. in <code class="inline-code">uncaughtException</code>/<code class="inline-code">unhandledRejection</code> handlers), ideally after a graceful shutdown sequence closing DB connections, not from inside business logic.</p>
+<p><strong>Q: Difference between <code class="inline-code">isOperational</code> errors and letting the process crash?</strong>
+A: Operational errors (bad input, 404, timeout) are anticipated and safe to handle inline — respond and move on. Non-operational (programmer) errors mean the app&#39;s internal state is unknown, so the safer move is to crash and let an orchestrator (PM2/K8s) restart into a known-good state.</p>
+<hr>
+<p><a name="unit-11"></a></p>
+<h2 id="unit-11--functional-programming-patterns"><a class="heading-anchor" href="#unit-11--functional-programming-patterns" aria-hidden="true">#</a>Unit 11 — Functional Programming Patterns</h2>
+<h3 id="1-first-class-functions--the-foundation"><a class="heading-anchor" href="#1-first-class-functions--the-foundation" aria-hidden="true">#</a>1. First-class functions — the foundation</h3>
+<p>In JS, functions are values: they can be assigned to variables, stored in data structures, passed as arguments, and returned from other functions. This single property is what makes callbacks, <code class="inline-code">.then()</code>, middleware chains, and higher-order functions (HOFs) possible at all.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> handlers = { <span class="hljs-attr">onSuccess</span>: <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data), <span class="hljs-attr">onError</span>: <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err) };</code></pre></div>
+<h3 id="2-pure-functions-amp-referential-transparency"><a class="heading-anchor" href="#2-pure-functions-amp-referential-transparency" aria-hidden="true">#</a>2. Pure functions &amp; referential transparency</h3>
+<p>A function is <strong>pure</strong> if:</p>
+<ol>
+<li>Same input always produces same output.</li>
+<li>No observable side effects (no mutating external state, no I/O, no random/date dependence).</li>
+</ol>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Impure — depends on external state, has a side effect</span>
+<span class="hljs-keyword">let</span> taxRate = <span class="hljs-number">0.1</span>;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">addTax</span>(<span class="hljs-params">price</span>) { <span class="hljs-keyword">return</span> price + price * taxRate; }
+
+<span class="hljs-comment">// Pure — all inputs explicit, no external reads/writes</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">addTax</span>(<span class="hljs-params">price, rate</span>) { <span class="hljs-keyword">return</span> price + price * rate; }</code></pre></div>
+<p><strong>Why it matters in backend code</strong>: pure functions are trivially unit-testable (no mocking needed), safely parallelizable/memoizable, and easier to reason about in code review because their behavior is fully described by their signature.</p>
+<h3 id="3-immutability-in-js--no-built-in-enforcement-know-the-strategies"><a class="heading-anchor" href="#3-immutability-in-js--no-built-in-enforcement-know-the-strategies" aria-hidden="true">#</a>3. Immutability in JS — no built-in enforcement, know the strategies</h3>
+<p>JS has no true immutable data structures built in (aside from primitives, which are already immutable).</p>
+<ul>
+<li><code class="inline-code">Object.freeze(obj)</code> — shallow freeze only; nested objects remain mutable.</li>
+<li>Spread/<code class="inline-code">Object.assign</code> for shallow copies when &quot;updating&quot; — common in Redux-style reducers.</li>
+<li>Libraries like <code class="inline-code">immer</code> (structural sharing, &quot;draft&quot; mutation API) or <code class="inline-code">immutable.js</code> for deep, efficient immutability at scale.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Shallow-freeze gotcha</span>
+<span class="hljs-keyword">const</span> config = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">freeze</span>({ <span class="hljs-attr">db</span>: { <span class="hljs-attr">host</span>: <span class="hljs-string">&#x27;localhost&#x27;</span> } });
+config.<span class="hljs-property">db</span>.<span class="hljs-property">host</span> = <span class="hljs-string">&#x27;prod-db&#x27;</span>; <span class="hljs-comment">// succeeds! nested object isn&#x27;t frozen</span></code></pre></div>
+<h3 id="4-function-composition--building-pipelines"><a class="heading-anchor" href="#4-function-composition--building-pipelines" aria-hidden="true">#</a>4. Function composition — building pipelines</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> <span class="hljs-title function_">compose</span> = (<span class="hljs-params">...fns</span>) =&gt; <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> fns.<span class="hljs-title function_">reduceRight</span>(<span class="hljs-function">(<span class="hljs-params">acc, fn</span>) =&gt;</span> <span class="hljs-title function_">fn</span>(acc), x);
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">pipe</span> = (<span class="hljs-params">...fns</span>) =&gt; <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> fns.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">acc, fn</span>) =&gt;</span> <span class="hljs-title function_">fn</span>(acc), x);
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">trim</span> = (<span class="hljs-params">s</span>) =&gt; s.<span class="hljs-title function_">trim</span>();
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">toLower</span> = (<span class="hljs-params">s</span>) =&gt; s.<span class="hljs-title function_">toLowerCase</span>();
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">removeSpaces</span> = (<span class="hljs-params">s</span>) =&gt; s.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\s+/g</span>, <span class="hljs-string">&#x27;-&#x27;</span>);
+
+<span class="hljs-keyword">const</span> slugify = <span class="hljs-title function_">pipe</span>(trim, toLower, removeSpaces);
+<span class="hljs-title function_">slugify</span>(<span class="hljs-string">&#x27;  Hello World  &#x27;</span>); <span class="hljs-comment">// &#x27;hello-world&#x27;</span></code></pre></div>
+<p><code class="inline-code">compose</code> applies right-to-left (mathematical convention, like <code class="inline-code">f(g(x))</code>); <code class="inline-code">pipe</code> applies left-to-right (reads like a sequence of steps — generally preferred for readability in application code).</p>
+<h3 id="5-higher-order-functions-in-practice"><a class="heading-anchor" href="#5-higher-order-functions-in-practice" aria-hidden="true">#</a>5. Higher-order functions in practice</h3>
+<p>A HOF either takes a function as an argument, returns a function, or both.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Returns a function — classic middleware/decorator pattern</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">withLogging</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">...args</span>) =&gt;</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Calling <span class="hljs-subst">${fn.name}</span> with`</span>, args);
+    <span class="hljs-keyword">const</span> result = <span class="hljs-title function_">fn</span>(...args);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Result:`</span>, result);
+    <span class="hljs-keyword">return</span> result;
+  };
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">add</span> = (<span class="hljs-params">a, b</span>) =&gt; a + b;
+<span class="hljs-keyword">const</span> loggedAdd = <span class="hljs-title function_">withLogging</span>(add);
+<span class="hljs-title function_">loggedAdd</span>(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>); <span class="hljs-comment">// logs call + result, still returns 5</span></code></pre></div>
+<p>This is the exact shape of Express middleware, Redux middleware, and decorator-style utilities — recognizing this pattern is a strong signal in interviews.</p>
+<h3 id="6-currying--partial-application-for-reusable-specialized-functions"><a class="heading-anchor" href="#6-currying--partial-application-for-reusable-specialized-functions" aria-hidden="true">#</a>6. Currying — partial application for reusable, specialized functions</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> <span class="hljs-title function_">curry</span> = (<span class="hljs-params">fn</span>) =&gt; {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">curried</span>(<span class="hljs-params">...args</span>) {
+    <span class="hljs-keyword">if</span> (args.<span class="hljs-property">length</span> &gt;= fn.<span class="hljs-property">length</span>) <span class="hljs-keyword">return</span> <span class="hljs-title function_">fn</span>(...args);
+    <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">...more</span>) =&gt;</span> <span class="hljs-title function_">curried</span>(...args, ...more);
+  };
+};
+
+<span class="hljs-keyword">const</span> multiply = <span class="hljs-title function_">curry</span>(<span class="hljs-function">(<span class="hljs-params">a, b, c</span>) =&gt;</span> a * b * c);
+<span class="hljs-title function_">multiply</span>(<span class="hljs-number">2</span>)(<span class="hljs-number">3</span>)(<span class="hljs-number">4</span>);     <span class="hljs-comment">// 24</span>
+<span class="hljs-title function_">multiply</span>(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>)(<span class="hljs-number">4</span>);     <span class="hljs-comment">// 24</span>
+<span class="hljs-title function_">multiply</span>(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>);     <span class="hljs-comment">// 24</span>
+
+<span class="hljs-comment">// Practical use: specialized, reusable validators</span>
+<span class="hljs-keyword">const</span> validateRange = <span class="hljs-title function_">curry</span>(<span class="hljs-function">(<span class="hljs-params">min, max, value</span>) =&gt;</span> value &gt;= min &amp;&amp; value &lt;= max);
+<span class="hljs-keyword">const</span> isValidAge = <span class="hljs-title function_">validateRange</span>(<span class="hljs-number">0</span>, <span class="hljs-number">120</span>);
+<span class="hljs-title function_">isValidAge</span>(<span class="hljs-number">35</span>); <span class="hljs-comment">// true</span></code></pre></div>
+<h3 id="7-refactor-example-imperative--functional-pipeline--common-lab-exercise"><a class="heading-anchor" href="#7-refactor-example-imperative--functional-pipeline--common-lab-exercise" aria-hidden="true">#</a>7. Refactor example (imperative → functional pipeline — common lab exercise)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Imperative</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">processOrders</span>(<span class="hljs-params">orders</span>) {
+  <span class="hljs-keyword">const</span> result = [];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> order <span class="hljs-keyword">of</span> orders) {
+    <span class="hljs-keyword">if</span> (order.<span class="hljs-property">status</span> === <span class="hljs-string">&#x27;completed&#x27;</span>) {
+      <span class="hljs-keyword">const</span> withTax = order.<span class="hljs-property">total</span> * <span class="hljs-number">1.1</span>;
+      result.<span class="hljs-title function_">push</span>({ <span class="hljs-attr">id</span>: order.<span class="hljs-property">id</span>, <span class="hljs-attr">total</span>: withTax });
+    }
+  }
+  <span class="hljs-keyword">return</span> result;
+}
+
+<span class="hljs-comment">// Functional pipeline</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">isCompleted</span> = (<span class="hljs-params">order</span>) =&gt; order.<span class="hljs-property">status</span> === <span class="hljs-string">&#x27;completed&#x27;</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">addTax</span> = (<span class="hljs-params">order</span>) =&gt; ({ ...order, <span class="hljs-attr">total</span>: order.<span class="hljs-property">total</span> * <span class="hljs-number">1.1</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">toSummary</span> = (<span class="hljs-params">order</span>) =&gt; ({ <span class="hljs-attr">id</span>: order.<span class="hljs-property">id</span>, <span class="hljs-attr">total</span>: order.<span class="hljs-property">total</span> });
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">processOrders</span> = (<span class="hljs-params">orders</span>) =&gt;
+  orders.<span class="hljs-title function_">filter</span>(isCompleted).<span class="hljs-title function_">map</span>(addTax).<span class="hljs-title function_">map</span>(toSummary);</code></pre></div>
+<p>Each step is independently testable, and the intent reads top-to-bottom without tracking a mutable accumulator by hand.</p>
+<h3 id="8-where-quotpure-fpquot-meets-real-backend-code--practical-honesty"><a class="heading-anchor" href="#8-where-quotpure-fpquot-meets-real-backend-code--practical-honesty" aria-hidden="true">#</a>8. Where &quot;pure FP&quot; meets real backend code — practical honesty</h3>
+<p>Backend code is inherently side-effect-heavy (DB writes, HTTP calls, logging). The realistic goal isn&#39;t &quot;make everything pure&quot; — it&#39;s:</p>
+<ul>
+<li>Keep <strong>business logic / transformations</strong> pure and isolated (easy to unit test).</li>
+<li>Push side effects (I/O) to the <strong>edges</strong> of your functions/modules.</li>
+<li>Use composition to build readable pipelines out of small, named, single-purpose functions instead of one large imperative block.</li>
+</ul>
+<h3 id="9-interview-qampa-1"><a class="heading-anchor" href="#9-interview-qampa-1" aria-hidden="true">#</a>9. Interview Q&amp;A</h3>
+<p><strong>Q: Why are pure functions easier to test?</strong>
+A: No mocking of external state/dependencies is needed — you just assert output for given input, and the test can&#39;t be flaky due to shared/mutable state or execution order.</p>
+<p><strong>Q: What&#39;s the tradeoff of heavy immutability (e.g. via <code class="inline-code">immer</code> or spreading nested objects) in a hot path?</strong>
+A: Extra allocations/copies have a real performance and GC cost; for very large objects or hot loops this can matter, so it&#39;s a deliberate tradeoff (correctness/predictability vs raw throughput), not a free lunch.</p>
+<p><strong>Q: <code class="inline-code">compose</code> vs <code class="inline-code">pipe</code> — which do most codebases prefer and why?</strong>
+A: <code class="inline-code">pipe</code> (left-to-right) is generally preferred in application/backend code because it reads in the same order the operations execute, matching how most people reason about a sequence of steps; <code class="inline-code">compose</code> (right-to-left) mirrors mathematical function composition notation and shows up more in FP-library internals.</p>
+<hr>
+<p><a name="rapid-fire"></a></p>
+<h2 id="phase-2-rapid-fire-interview-round"><a class="heading-anchor" href="#phase-2-rapid-fire-interview-round" aria-hidden="true">#</a>Phase 2 Rapid-Fire Interview Round</h2>
+<p><em>Use these as a timed self-check before moving to Phase 3.</em></p>
+<ol>
+<li>Why does <code class="inline-code">.then()</code> always return a new Promise, and how does that enable chaining?</li>
+<li>What&#39;s the output order of: sync log → <code class="inline-code">setTimeout(fn, 0)</code> → <code class="inline-code">Promise.resolve().then(fn)</code> → sync log — and why?</li>
+<li>Explain the difference between <code class="inline-code">Promise.all</code>, <code class="inline-code">allSettled</code>, <code class="inline-code">race</code>, and <code class="inline-code">any</code> in one sentence each.</li>
+<li>Walk through Node&#39;s event loop phases and where <code class="inline-code">setImmediate</code> fits.</li>
+<li>Why is <code class="inline-code">process.nextTick</code> more dangerous to overuse than microtasks in general?</li>
+<li>What breaks in a circular <code class="inline-code">require()</code> in CommonJS, and why?</li>
+<li>Why can&#39;t you synchronously <code class="inline-code">require()</code> a pure ESM module from CJS?</li>
+<li>What is a &quot;live binding&quot; in ESM, and how does it differ from CJS export copying?</li>
+<li>What&#39;s the difference between an operational error and a programmer error, and why does that distinction change how you handle them?</li>
+<li>Why doesn&#39;t Express (pre-v5) automatically catch rejected promises from async route handlers?</li>
+<li>What makes a function &quot;pure,&quot; and why does that matter for testability?</li>
+<li>Implement <code class="inline-code">pipe</code> from scratch in under 2 minutes.</li>
+</ol>
+<hr>
+<p><strong>Next up: Phase 3 — JS Advanced</strong> (Design Patterns, Memory Management &amp; Performance, Generators/Iterators/Proxy, V8 Internals, JS Coding Round Prep). Say the word when you&#39;re ready.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

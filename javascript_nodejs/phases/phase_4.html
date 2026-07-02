@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 4: Node.js — Core &amp; Runtime</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 4: Node.js — Core &amp; Runtime</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-4-nodejs--core-amp-runtime"><a class="heading-anchor" href="#phase-4-nodejs--core-amp-runtime" aria-hidden="true">#</a>Phase 4: Node.js — Core &amp; Runtime</h1>
+<h3 id="deep-dive--interview-prep-for-a-3-yoe-nodejs-backend-dev"><a class="heading-anchor" href="#deep-dive--interview-prep-for-a-3-yoe-nodejs-backend-dev" aria-hidden="true">#</a>Deep-Dive + Interview Prep (for a 3 YOE Node.js Backend Dev)</h3>
+<p>Covers Units 17–21: Node Architecture &amp; Event Loop Phases · Module System &amp; Package Management · File System &amp; Streams · Process, Child Processes &amp; EventEmitter · Debugging &amp; Diagnostics.</p>
+<p>No &quot;what is a variable&quot; filler — this is written at the level you&#39;ll actually be grilled at in a senior/mid-senior Node interview, plus the internals that explain <em>why</em> things behave the way they do.</p>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ol>
+<li><a href="#unit-17">Unit 17 — Node Architecture &amp; Event Loop Phases</a></li>
+<li><a href="#unit-18">Unit 18 — Module System &amp; Package Management</a></li>
+<li><a href="#unit-19">Unit 19 — File System &amp; Streams</a></li>
+<li><a href="#unit-20">Unit 20 — Process, Child Processes &amp; EventEmitter</a></li>
+<li><a href="#unit-21">Unit 21 — Debugging &amp; Diagnostics in Node</a></li>
+<li><a href="#rapid-fire">Phase 4 Rapid-Fire Interview Round</a></li>
+</ol>
+<hr>
+<p><a name="unit-17"></a></p>
+<h2 id="unit-17--node-architecture-amp-event-loop-phases"><a class="heading-anchor" href="#unit-17--node-architecture-amp-event-loop-phases" aria-hidden="true">#</a>Unit 17 — Node Architecture &amp; Event Loop Phases</h2>
+<h3 id="171-the-big-picture"><a class="heading-anchor" href="#171-the-big-picture" aria-hidden="true">#</a>17.1 The Big Picture</h3>
+<p>Node.js is <strong>not</strong> single-threaded end to end. It&#39;s a hybrid:</p>
+<ul>
+<li><strong>Your JS code</strong> runs on a single thread (the &quot;main thread&quot;), driven by the <strong>V8</strong> engine.</li>
+<li><strong>I/O-bound work</strong> (file system, DNS lookups, some crypto, compression) is offloaded to <strong>libuv</strong>, which maintains a <strong>thread pool</strong> (default size 4, configurable via <code class="inline-code">UV_THREADPOOL_SIZE</code>).</li>
+<li><strong>Network I/O</strong> (sockets, HTTP) on most platforms doesn&#39;t even need the thread pool — libuv uses the OS&#39;s native async mechanisms (epoll on Linux, kqueue on macOS, IOCP on Windows).</li>
+</ul>
+<p>So the correct mental model is: <strong>&quot;Node is single-threaded for your JavaScript, but multi-threaded under the hood for I/O.&quot;</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text"> ┌───────────────────────────┐
+ │      Your JS Code          │  ← runs on the Main Thread (V8)
+ └──────────────┬─────────────┘
+                │
+        ┌───────▼────────┐
+        │     libuv        │  ← Event Loop lives here
+        └───────┬────────┘
+     ┌───────────┼────────────┐
+     │            │             │
+┌────▼───┐  ┌─────▼─────┐  ┌────▼─────┐
+│ Thread  │  │  OS Async  │  │ Timers/  │
+│  Pool   │  │  (epoll/   │  │ Signals  │
+│ (fs,    │  │  kqueue/   │  │          │
+│ crypto, │  │  IOCP)     │  │          │
+│ dns.lookup)│ (network) │  │          │
+└─────────┘  └───────────┘  └──────────┘</code></pre></div>
+<h3 id="172-the-event-loop--phases-in-order"><a class="heading-anchor" href="#172-the-event-loop--phases-in-order" aria-hidden="true">#</a>17.2 The Event Loop — Phases in Order</h3>
+<p>Each iteration of the event loop is called a <strong>tick</strong>, and it moves through six phases, in this fixed order:</p>
+<ol>
+<li><strong>Timers</strong> — executes callbacks scheduled by <code class="inline-code">setTimeout()</code> and <code class="inline-code">setInterval()</code> whose threshold has elapsed.</li>
+<li><strong>Pending callbacks</strong> — executes I/O callbacks deferred to the next loop iteration (e.g., some TCP error callbacks).</li>
+<li><strong>Idle, prepare</strong> — internal use only, not relevant to app code.</li>
+<li><strong>Poll</strong> — the workhorse phase:<ul>
+<li>Retrieves new I/O events and executes their callbacks (almost all I/O callbacks fire here).</li>
+<li>If the poll queue is empty and there are <code class="inline-code">setImmediate()</code> callbacks scheduled, it moves on.</li>
+<li>If there are timers due to expire, it wraps back to the timers phase.</li>
+<li>Otherwise, it <strong>waits</strong> (blocks) here for new events — this is how Node &quot;sleeps&quot; when idle instead of busy-looping.</li>
+</ul>
+</li>
+<li><strong>Check</strong> — executes <code class="inline-code">setImmediate()</code> callbacks specifically. This runs right after poll.</li>
+<li><strong>Close callbacks</strong> — e.g., <code class="inline-code">socket.on(&#39;close&#39;, ...)</code>.</li>
+</ol>
+<p>Between <strong>every phase transition, and after every individual callback</strong>, Node drains two special queues:</p>
+<ul>
+<li><strong><code class="inline-code">process.nextTick()</code> queue</strong> — highest priority, runs before microtasks.</li>
+<li><strong>Microtask queue</strong> (resolved Promises, <code class="inline-code">queueMicrotask()</code>) — runs right after <code class="inline-code">nextTick</code> queue.</li>
+</ul>
+<p>This means the real priority order at any checkpoint is:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">nextTick queue → microtask queue → next event loop phase&#x27;s callbacks</code></pre></div>
+<h3 id="173-processnexttick-vs-setimmediate-vs-settimeoutfn-0"><a class="heading-anchor" href="#173-processnexttick-vs-setimmediate-vs-settimeoutfn-0" aria-hidden="true">#</a>17.3 <code class="inline-code">process.nextTick()</code> vs <code class="inline-code">setImmediate()</code> vs <code class="inline-code">setTimeout(fn, 0)</code></h3>
+<p>This is <strong>the single most common Node interview trap.</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;start&#x27;</span>);
+
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;setTimeout&#x27;</span>), <span class="hljs-number">0</span>);
+<span class="hljs-title function_">setImmediate</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;setImmediate&#x27;</span>));
+process.<span class="hljs-title function_">nextTick</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;nextTick&#x27;</span>));
+<span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;promise&#x27;</span>));
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;end&#x27;</span>);</code></pre></div>
+<p><strong>Output:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">start
+end
+nextTick
+promise
+setTimeout   (or setImmediate — order can flip, see below)
+setImmediate</code></pre></div>
+<ul>
+<li><code class="inline-code">nextTick</code> and <code class="inline-code">promise</code> <strong>always</strong> run before any timer/immediate, because they&#39;re drained after the currently executing synchronous code finishes, before the loop even moves to its next phase.</li>
+<li><code class="inline-code">nextTick</code> always runs before microtasks (Promise callbacks) — it&#39;s Node&#39;s own queue, checked first.</li>
+<li><strong><code class="inline-code">setTimeout(fn, 0)</code> vs <code class="inline-code">setImmediate()</code> ordering is non-deterministic when called from the main module</strong> — it depends on process performance/timer precision (setTimeout&#39;s minimum is technically ~1ms, so which one &quot;wins&quot; depends on how much time has passed before the loop starts).</li>
+<li><strong>BUT</strong>, inside an I/O callback (e.g., inside <code class="inline-code">fs.readFile</code>&#39;s callback), <code class="inline-code">setImmediate()</code> is <strong>always guaranteed</strong> to run before <code class="inline-code">setTimeout()</code>, because you&#39;re already inside the poll phase, and <code class="inline-code">check</code> (setImmediate) comes immediately next, before looping back to timers.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
+
+fs.<span class="hljs-title function_">readFile</span>(__filename, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;timeout&#x27;</span>), <span class="hljs-number">0</span>);
+  <span class="hljs-title function_">setImmediate</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;immediate&#x27;</span>)); <span class="hljs-comment">// always wins here</span>
+});</code></pre></div>
+<p><strong>Why this matters practically:</strong> <code class="inline-code">process.nextTick()</code> can <strong>starve the event loop</strong> if used recursively (it keeps draining itself before I/O can proceed) — this is a real production bug pattern. <code class="inline-code">setImmediate()</code> doesn&#39;t have this problem because it&#39;s tied to a loop phase, not a queue drained before every phase.</p>
+<h3 id="174-why-libuv39s-thread-pool-exists"><a class="heading-anchor" href="#174-why-libuv39s-thread-pool-exists" aria-hidden="true">#</a>17.4 Why libuv&#39;s Thread Pool Exists</h3>
+<p>V8 itself has no concept of async I/O — it just runs JS. Node needs a way to do blocking OS calls (like reading a file) without blocking the main thread. libuv solves this with a thread pool:</p>
+<ul>
+<li>Default size: <strong>4 threads</strong> (<code class="inline-code">UV_THREADPOOL_SIZE</code>, max 128).</li>
+<li>Used by: <code class="inline-code">fs</code> module (most methods), <code class="inline-code">dns.lookup()</code> (not <code class="inline-code">dns.resolve*</code>, which use c-ares async), <code class="inline-code">crypto.pbkdf2</code>, <code class="inline-code">crypto.scrypt</code>, <code class="inline-code">zlib</code> operations, and some <code class="inline-code">os</code> calls.</li>
+<li><strong>Not used by:</strong> network sockets/HTTP — those use the OS&#39;s native async I/O notification system directly (epoll/kqueue/IOCP), which is why Node can handle tens of thousands of concurrent connections with just 4 threads in the pool — the pool isn&#39;t the bottleneck for network-heavy apps.</li>
+</ul>
+<p><strong>Common interview gotcha:</strong> &quot;If you increase <code class="inline-code">UV_THREADPOOL_SIZE</code>, does it improve HTTP request handling?&quot; — <strong>No</strong>, because HTTP/network I/O doesn&#39;t use the thread pool at all. It only helps if you&#39;re bottlenecked on <code class="inline-code">fs</code>, <code class="inline-code">crypto</code>, <code class="inline-code">dns.lookup</code>, or <code class="inline-code">zlib</code>.</p>
+<h3 id="175-practical-consequence-don39t-block-the-event-loop"><a class="heading-anchor" href="#175-practical-consequence-don39t-block-the-event-loop" aria-hidden="true">#</a>17.5 Practical Consequence: Don&#39;t Block the Event Loop</h3>
+<p>Because there&#39;s one thread running your JS, any CPU-bound synchronous work (a huge JSON.parse, a synchronous crypto hash, a tight loop) <strong>blocks everything</strong> — no other request can be served, no timer fires, nothing.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// BAD - blocks the entire server for all users</span>
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/hash&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> hash = crypto.<span class="hljs-title function_">createHash</span>(<span class="hljs-string">&#x27;sha256&#x27;</span>);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1e9</span>; i++) hash.<span class="hljs-title function_">update</span>(<span class="hljs-string">&#x27;x&#x27;</span>); <span class="hljs-comment">// blocking loop</span>
+  res.<span class="hljs-title function_">send</span>(hash.<span class="hljs-title function_">digest</span>(<span class="hljs-string">&#x27;hex&#x27;</span>));
+});</code></pre></div>
+<p>Fixes: offload to <code class="inline-code">worker_threads</code>, use the async variant of the API (<code class="inline-code">crypto.pbkdf2</code> instead of <code class="inline-code">pbkdf2Sync</code>), or move it to a separate microservice/queue.</p>
+<h3 id="interview-qampa--unit-17"><a class="heading-anchor" href="#interview-qampa--unit-17" aria-hidden="true">#</a>Interview Q&amp;A — Unit 17</h3>
+<p><strong>Q: Is Node.js single-threaded?</strong>
+A: The JavaScript execution is single-threaded (one call stack, one event loop thread), but Node itself uses multiple threads under the hood via libuv&#39;s thread pool for certain I/O operations, plus the OS&#39;s native async I/O for networking.</p>
+<p><strong>Q: What&#39;s the difference between <code class="inline-code">setImmediate()</code> and <code class="inline-code">setTimeout(fn, 0)</code>?</strong>
+A: <code class="inline-code">setImmediate</code> runs in the <em>check</em> phase, right after the <em>poll</em> phase completes in the current loop iteration. <code class="inline-code">setTimeout(fn, 0)</code> runs in the <em>timers</em> phase of a future iteration. Order at the top level is non-deterministic; inside an I/O callback, <code class="inline-code">setImmediate</code> always fires first.</p>
+<p><strong>Q: Why can <code class="inline-code">process.nextTick()</code> be dangerous?</strong>
+A: Because it&#39;s drained completely before the event loop can proceed to the next phase — if you recursively schedule <code class="inline-code">nextTick</code> calls, you can starve I/O indefinitely (&quot;I/O starvation&quot;).</p>
+<p><strong>Q: Does increasing <code class="inline-code">UV_THREADPOOL_SIZE</code> help scale an HTTP API?</strong>
+A: Only if the bottleneck is <code class="inline-code">fs</code>/<code class="inline-code">crypto</code>/<code class="inline-code">dns.lookup</code>/<code class="inline-code">zlib</code> work. Network I/O bypasses the thread pool entirely via epoll/kqueue/IOCP.</p>
+<hr>
+<p><a name="unit-18"></a></p>
+<h2 id="unit-18--module-system-amp-package-management"><a class="heading-anchor" href="#unit-18--module-system-amp-package-management" aria-hidden="true">#</a>Unit 18 — Module System &amp; Package Management</h2>
+<h3 id="181-commonjs-module-resolution-algorithm"><a class="heading-anchor" href="#181-commonjs-module-resolution-algorithm" aria-hidden="true">#</a>18.1 CommonJS Module Resolution Algorithm</h3>
+<p>When you call <code class="inline-code">require(&#39;./foo&#39;)</code> or <code class="inline-code">require(&#39;lodash&#39;)</code>, Node runs a well-defined resolution algorithm:</p>
+<ol>
+<li><strong>Core module?</strong> (<code class="inline-code">fs</code>, <code class="inline-code">path</code>, <code class="inline-code">http</code>...) → return immediately, these are baked into the binary.</li>
+<li><strong>Starts with <code class="inline-code">/</code>, <code class="inline-code">./</code>, or <code class="inline-code">../</code>?</strong> → treat as a <strong>file path</strong>:<ul>
+<li>Try exact file (<code class="inline-code">./foo.js</code>, <code class="inline-code">./foo.json</code>, <code class="inline-code">./foo.node</code>).</li>
+<li>Try as a directory: look for <code class="inline-code">package.json</code>&#39;s <code class="inline-code">&quot;main&quot;</code> field, or default to <code class="inline-code">./foo/index.js</code>.</li>
+</ul>
+</li>
+<li><strong>Otherwise (bare specifier like <code class="inline-code">&#39;lodash&#39;</code>)</strong> → treat as a <strong>node_modules lookup</strong>:<ul>
+<li>Look in <code class="inline-code">./node_modules/lodash</code>.</li>
+<li>If not found, walk <strong>up</strong> the directory tree: <code class="inline-code">../node_modules/lodash</code>, <code class="inline-code">../../node_modules/lodash</code>, ... until reaching the filesystem root.</li>
+<li>This is why nested <code class="inline-code">node_modules</code> folders exist (pre-npm3 / edge cases) and why two packages can each depend on a different version of the same dependency without conflict.</li>
+</ul>
+</li>
+</ol>
+<h3 id="182-the-module-cache"><a class="heading-anchor" href="#182-the-module-cache" aria-hidden="true">#</a>18.2 The Module Cache</h3>
+<p>Every module is <strong>cached by its fully resolved absolute file path</strong> after first <code class="inline-code">require()</code>. This has real consequences:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// counter.js</span>
+<span class="hljs-keyword">let</span> count = <span class="hljs-number">0</span>;
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = { <span class="hljs-attr">increment</span>: <span class="hljs-function">() =&gt;</span> ++count };
+
+<span class="hljs-comment">// a.js</span>
+<span class="hljs-keyword">const</span> counter = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./counter&#x27;</span>);
+counter.<span class="hljs-title function_">increment</span>(); <span class="hljs-comment">// count = 1</span>
+
+<span class="hljs-comment">// b.js</span>
+<span class="hljs-keyword">const</span> counter = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./counter&#x27;</span>);
+counter.<span class="hljs-title function_">increment</span>(); <span class="hljs-comment">// count = 2, SAME instance as a.js</span></code></pre></div>
+<p>Both <code class="inline-code">a.js</code> and <code class="inline-code">b.js</code> get the <strong>exact same object reference</strong> — <code class="inline-code">require</code> doesn&#39;t re-execute the module file on subsequent calls, it returns the cached <code class="inline-code">module.exports</code>. This is how singletons (like a shared DB connection pool) are commonly implemented in Node without any extra pattern — plain <code class="inline-code">require</code> caching does it for you.</p>
+<p><strong>Gotcha:</strong> the cache key is the <em>resolved absolute path</em>. Two different relative paths that resolve to the same file (<code class="inline-code">require(&#39;./foo&#39;)</code> vs <code class="inline-code">require(&#39;../src/foo&#39;)</code> from different callers) will hit the same cache entry. But if npm installs two <em>different</em> copies of the same package version in nested <code class="inline-code">node_modules</code> (dependency hell), you get two separate cache entries — this is a classic source of &quot;why is my singleton not actually a singleton&quot; bugs in monorepos.</p>
+<h3 id="183-how-moduleexports-actually-works"><a class="heading-anchor" href="#183-how-moduleexports-actually-works" aria-hidden="true">#</a>18.3 How <code class="inline-code">module.exports</code> Actually Works</h3>
+<p>Node wraps every file in an IIFE-like function before executing it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">(<span class="hljs-keyword">function</span>(<span class="hljs-params"><span class="hljs-built_in">exports</span>, <span class="hljs-built_in">require</span>, <span class="hljs-variable language_">module</span>, __filename, __dirname</span>) {
+  <span class="hljs-comment">// your file&#x27;s code goes here</span>
+});</code></pre></div>
+<p>This is why <code class="inline-code">require</code>, <code class="inline-code">module</code>, <code class="inline-code">exports</code>, <code class="inline-code">__filename</code>, <code class="inline-code">__dirname</code> are available without importing them — they&#39;re injected function parameters, not globals.</p>
+<p><strong>Common trap:</strong> <code class="inline-code">exports</code> is just a local variable that initially points to the same object as <code class="inline-code">module.exports</code>. Reassigning <code class="inline-code">exports = {...}</code> breaks the link (it now points somewhere else, but <code class="inline-code">module.exports</code> still points to the original object) — only mutating <code class="inline-code">exports</code> (<code class="inline-code">exports.foo = ...</code>) or reassigning <code class="inline-code">module.exports</code> directly works as expected.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-built_in">exports</span> = { <span class="hljs-attr">foo</span>: <span class="hljs-string">&#x27;bar&#x27;</span> };       <span class="hljs-comment">// BROKEN — module.exports unchanged, foo is lost</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = { <span class="hljs-attr">foo</span>: <span class="hljs-string">&#x27;bar&#x27;</span> }; <span class="hljs-comment">// CORRECT</span>
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">foo</span> = <span class="hljs-string">&#x27;bar&#x27;</span>;             <span class="hljs-comment">// CORRECT (mutation, not reassignment)</span></code></pre></div>
+<h3 id="184-commonjs-vs-esm--core-differences"><a class="heading-anchor" href="#184-commonjs-vs-esm--core-differences" aria-hidden="true">#</a>18.4 CommonJS vs ESM — Core Differences</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>CommonJS</th>
+<th>ESM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Syntax</td>
+<td><code class="inline-code">require()</code> / <code class="inline-code">module.exports</code></td>
+<td><code class="inline-code">import</code> / <code class="inline-code">export</code></td>
+</tr>
+<tr>
+<td>Loading</td>
+<td><strong>Synchronous</strong>, dynamic (can be called conditionally, inside <code class="inline-code">if</code>)</td>
+<td>Static analysis at parse time; top-level <code class="inline-code">import</code> can&#39;t be conditional</td>
+</tr>
+<tr>
+<td>Timing</td>
+<td>Loaded and executed at <code class="inline-code">require()</code> call time</td>
+<td>Hoisted — all imports resolved before module body runs</td>
+</tr>
+<tr>
+<td><code class="inline-code">this</code> at top level</td>
+<td><code class="inline-code">module.exports</code></td>
+<td><code class="inline-code">undefined</code></td>
+</tr>
+<tr>
+<td><code class="inline-code">__dirname</code>/<code class="inline-code">__filename</code></td>
+<td>Available</td>
+<td>Not available (use <code class="inline-code">import.meta.url</code> + <code class="inline-code">fileURLToPath</code>)</td>
+</tr>
+<tr>
+<td>Tree-shaking</td>
+<td>Not possible (dynamic, can&#39;t statically analyze)</td>
+<td>Possible — bundlers can eliminate unused exports</td>
+</tr>
+<tr>
+<td>File extension</td>
+<td><code class="inline-code">.js</code> (default) or <code class="inline-code">.cjs</code></td>
+<td><code class="inline-code">.mjs</code>, or <code class="inline-code">.js</code> with <code class="inline-code">&quot;type&quot;: &quot;module&quot;</code> in package.json</td>
+</tr>
+<tr>
+<td>Circular deps</td>
+<td>Returns partially-completed <code class="inline-code">exports</code> object</td>
+<td>Live bindings — updates propagate</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="185-cjsesm-interop-pitfalls-real-production-pain"><a class="heading-anchor" href="#185-cjsesm-interop-pitfalls-real-production-pain" aria-hidden="true">#</a>18.5 CJS/ESM Interop Pitfalls (real production pain)</h3>
+<ul>
+<li><code class="inline-code">require()</code>-ing an ESM-only package from CJS code <strong>fails</strong> — you must use dynamic <code class="inline-code">import()</code> (which returns a Promise) instead.</li>
+<li><code class="inline-code">import</code>-ing a CJS package from ESM generally <strong>works</strong>, but only the <code class="inline-code">default</code> export is guaranteed reliably — named exports from CJS packages are inferred via static analysis and sometimes miss exports that are added dynamically (e.g., via <code class="inline-code">Object.assign(module.exports, ...)</code>).</li>
+<li>Mixed default/named export interop is the #1 cause of <code class="inline-code">&quot;X is not a function&quot;</code> or <code class="inline-code">undefined</code> errors when migrating a codebase to ESM.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// If &#x27;some-esm-only-pkg&#x27; only ships ESM:</span>
+<span class="hljs-comment">// const pkg = require(&#x27;some-esm-only-pkg&#x27;); // ❌ throws ERR_REQUIRE_ESM</span>
+
+<span class="hljs-comment">// Fix — dynamic import (works in CJS too):</span>
+<span class="hljs-keyword">const</span> pkg = <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">&#x27;some-esm-only-pkg&#x27;</span>); <span class="hljs-comment">// ✅ (inside an async function)</span></code></pre></div>
+<h3 id="186-packagejson-essentials-for-interviews"><a class="heading-anchor" href="#186-packagejson-essentials-for-interviews" aria-hidden="true">#</a>18.6 package.json Essentials for Interviews</h3>
+<ul>
+<li><strong><code class="inline-code">&quot;main&quot;</code></strong> — CJS entry point (legacy).</li>
+<li><strong><code class="inline-code">&quot;exports&quot;</code></strong> — modern field; explicitly defines the public API surface and can differ per environment (<code class="inline-code">require</code> vs <code class="inline-code">import</code> vs <code class="inline-code">browser</code>), and — importantly — <strong>anything not listed in <code class="inline-code">&quot;exports&quot;</code> becomes unreachable from outside</strong>, even if the file physically exists (this is used to prevent consumers from deep-importing internal files).</li>
+<li><strong><code class="inline-code">&quot;type&quot;: &quot;module&quot;</code></strong> — makes <code class="inline-code">.js</code> files in that package be treated as ESM by default.</li>
+<li><strong><code class="inline-code">dependencies</code> vs <code class="inline-code">devDependencies</code> vs <code class="inline-code">peerDependencies</code></strong>: peerDependencies say &quot;the consumer must provide this&quot; (classic for plugins expecting a specific React/host version) rather than the package bundling its own copy.</li>
+</ul>
+<h3 id="187-semver-amp-lockfiles"><a class="heading-anchor" href="#187-semver-amp-lockfiles" aria-hidden="true">#</a>18.7 Semver &amp; Lockfiles</h3>
+<ul>
+<li><code class="inline-code">^1.2.3</code> → allows updates that don&#39;t change the <strong>leftmost non-zero</strong> digit (so <code class="inline-code">1.x.x</code> but not <code class="inline-code">2.0.0</code>; for <code class="inline-code">^0.2.3</code> it only allows <code class="inline-code">0.2.x</code>, quirk of pre-1.0 semver rules).</li>
+<li><code class="inline-code">~1.2.3</code> → allows only patch updates (<code class="inline-code">1.2.x</code>).</li>
+<li><strong>Lockfiles (<code class="inline-code">package-lock.json</code>, <code class="inline-code">pnpm-lock.yaml</code>, <code class="inline-code">yarn.lock</code>)</strong> pin the <em>exact resolved tree</em> (including transitive deps) so <code class="inline-code">npm install</code> is reproducible across machines/CI — without a lockfile, two installs of the same <code class="inline-code">package.json</code> weeks apart can silently pull different transitive versions.</li>
+</ul>
+<h3 id="188-npm-vs-pnpm-vs-yarn-quick-comparison"><a class="heading-anchor" href="#188-npm-vs-pnpm-vs-yarn-quick-comparison" aria-hidden="true">#</a>18.8 npm vs pnpm vs yarn (quick comparison)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>npm</th>
+<th>yarn (Berry)</th>
+<th>pnpm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>node_modules structure</td>
+<td>Flat (hoisted)</td>
+<td>Flat or PnP (no node_modules at all)</td>
+<td><strong>Symlinked, content-addressable store</strong> — real disk savings, strict by default</td>
+</tr>
+<tr>
+<td>Disallows phantom deps</td>
+<td>No (flat hoisting lets you accidentally <code class="inline-code">require</code> an undeclared transitive dep)</td>
+<td>Yes with PnP</td>
+<td>Yes — strict node_modules structure catches this</td>
+</tr>
+<tr>
+<td>Install speed</td>
+<td>Moderate</td>
+<td>Fast</td>
+<td>Fastest (global content store, hard links)</td>
+</tr>
+<tr>
+<td>Disk usage</td>
+<td>High (duplicated across projects)</td>
+<td>Moderate</td>
+<td>Low (single global store, symlinked)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Interview-relevant point:</strong> pnpm&#39;s non-flat <code class="inline-code">node_modules</code> prevents &quot;phantom dependency&quot; bugs — code that works because npm&#39;s flat hoisting happens to expose a transitive dependency, but breaks the moment the dependency tree shifts slightly.</p>
+<h3 id="interview-qampa--unit-18"><a class="heading-anchor" href="#interview-qampa--unit-18" aria-hidden="true">#</a>Interview Q&amp;A — Unit 18</h3>
+<p><strong>Q: Why does <code class="inline-code">require()</code> return the same object every time for the same module?</strong>
+A: Node caches modules by resolved absolute path after first execution — the file body runs once, and <code class="inline-code">module.exports</code> is cached and returned on every subsequent <code class="inline-code">require()</code> call.</p>
+<p><strong>Q: What breaks if you write <code class="inline-code">exports = {...}</code> instead of <code class="inline-code">module.exports = {...}</code>?</strong>
+A: <code class="inline-code">exports</code> is a local reference to the same object <code class="inline-code">module.exports</code> points to initially. Reassigning <code class="inline-code">exports</code> just repoints the local variable — <code class="inline-code">module.exports</code> (what the caller actually receives) is untouched, so your new object is silently lost.</p>
+<p><strong>Q: Can you <code class="inline-code">require()</code> an ESM-only package from CommonJS?</strong>
+A: Not with static <code class="inline-code">require()</code> — it throws <code class="inline-code">ERR_REQUIRE_ESM</code>. You need dynamic <code class="inline-code">import()</code>, which is async and returns a Promise.</p>
+<p><strong>Q: What&#39;s a &quot;phantom dependency&quot; and how does pnpm prevent it?</strong>
+A: A dependency your code imports but never declares in <code class="inline-code">package.json</code> — it &quot;works&quot; only because npm&#39;s flat <code class="inline-code">node_modules</code> hoisting happens to place it at the top level. pnpm uses a strict, non-flat structure so only declared dependencies are resolvable, surfacing the bug immediately.</p>
+<hr>
+<p><a name="unit-19"></a></p>
+<h2 id="unit-19--file-system-amp-streams"><a class="heading-anchor" href="#unit-19--file-system-amp-streams" aria-hidden="true">#</a>Unit 19 — File System &amp; Streams</h2>
+<h3 id="191-buffers--the-foundation"><a class="heading-anchor" href="#191-buffers--the-foundation" aria-hidden="true">#</a>19.1 Buffers — The Foundation</h3>
+<p>A <code class="inline-code">Buffer</code> is Node&#39;s way of handling raw binary data (before <code class="inline-code">Uint8Array</code> was standard in JS, this was Node&#39;s only tool; it now extends <code class="inline-code">Uint8Array</code>). Strings in JS are always UTF-16 internally, but files/network data are raw bytes — Buffers bridge that gap.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> buf = <span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">from</span>(<span class="hljs-string">&#x27;hello&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>); <span class="hljs-comment">// &lt;Buffer 68 65 6c 6c 6f&gt;</span>
+buf.<span class="hljs-title function_">toString</span>(<span class="hljs-string">&#x27;utf8&#x27;</span>); <span class="hljs-comment">// &#x27;hello&#x27;</span>
+buf.<span class="hljs-title function_">toString</span>(<span class="hljs-string">&#x27;hex&#x27;</span>);  <span class="hljs-comment">// &#x27;68656c6c6f&#x27;</span>
+buf.<span class="hljs-title function_">toString</span>(<span class="hljs-string">&#x27;base64&#x27;</span>); <span class="hljs-comment">// &#x27;aGVsbG8=&#x27;</span></code></pre></div>
+<p>Key facts:</p>
+<ul>
+<li>Buffers are allocated <strong>outside</strong> the V8 heap (they&#39;re backed by raw memory), which is why they don&#39;t count against <code class="inline-code">--max-old-space-size</code> limits the same way regular objects do.</li>
+<li><code class="inline-code">Buffer.alloc(n)</code> zero-fills; <code class="inline-code">Buffer.allocUnsafe(n)</code> doesn&#39;t (faster, but may contain old memory — never send <code class="inline-code">allocUnsafe</code> data to a client without overwriting it fully first — that&#39;s a real security bug class, &quot;buffer over-read&quot;).</li>
+</ul>
+<h3 id="192-the-four-stream-types"><a class="heading-anchor" href="#192-the-four-stream-types" aria-hidden="true">#</a>19.2 The Four Stream Types</h3>
+<p>Streams let you process data <strong>incrementally</strong> instead of loading it all into memory. All four types are <code class="inline-code">EventEmitter</code>s.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Direction</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Readable</strong></td>
+<td>Source you read <em>from</em></td>
+<td><code class="inline-code">fs.createReadStream()</code>, HTTP request (server-side)</td>
+</tr>
+<tr>
+<td><strong>Writable</strong></td>
+<td>Destination you write <em>to</em></td>
+<td><code class="inline-code">fs.createWriteStream()</code>, HTTP response</td>
+</tr>
+<tr>
+<td><strong>Duplex</strong></td>
+<td>Both readable and writable, independent</td>
+<td>TCP sockets</td>
+</tr>
+<tr>
+<td><strong>Transform</strong></td>
+<td>Duplex where output is derived from input</td>
+<td><code class="inline-code">zlib.createGzip()</code>, <code class="inline-code">crypto</code> cipher streams</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="193-why-streaming-matters-the-actual-reason-not-the-buzzword"><a class="heading-anchor" href="#193-why-streaming-matters-the-actual-reason-not-the-buzzword" aria-hidden="true">#</a>19.3 Why Streaming Matters (the actual reason, not the buzzword)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// BAD - loads entire file into memory before sending</span>
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/download&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> data = fs.<span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">&#x27;huge-5gb-file.csv&#x27;</span>);
+  res.<span class="hljs-title function_">send</span>(data); <span class="hljs-comment">// 5GB in RAM, blocks event loop while reading sync</span>
+});
+
+<span class="hljs-comment">// GOOD - constant, small memory footprint regardless of file size</span>
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/download&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+  fs.<span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">&#x27;huge-5gb-file.csv&#x27;</span>).<span class="hljs-title function_">pipe</span>(res);
+});</code></pre></div>
+<p>The readable stream reads a chunk (default <code class="inline-code">highWaterMark</code>: 64KB for files), pushes it into an internal buffer, and the writable side drains it as fast as it can consume — memory usage stays roughly constant no matter the file size.</p>
+<h3 id="194-backpressure--the-concept-interviewers-actually-care-about"><a class="heading-anchor" href="#194-backpressure--the-concept-interviewers-actually-care-about" aria-hidden="true">#</a>19.4 Backpressure — the Concept Interviewers Actually Care About</h3>
+<p><strong>Backpressure</strong> happens when a Readable stream produces data <strong>faster</strong> than a Writable stream can consume it (e.g., reading from a fast local SSD, writing to a slow network socket).</p>
+<ul>
+<li><code class="inline-code">writable.write(chunk)</code> returns <code class="inline-code">false</code> when its internal buffer has exceeded <code class="inline-code">highWaterMark</code> — this is the <em>signal</em> to pause.</li>
+<li>If you ignore this and keep writing anyway, memory balloons unboundedly — this is one of the most common causes of an OOM crash in a naive Node file-processing service.</li>
+<li><strong><code class="inline-code">.pipe()</code> handles backpressure automatically</strong> — it listens for that <code class="inline-code">false</code> return, calls <code class="inline-code">readable.pause()</code>, and resumes once the writable emits <code class="inline-code">&#39;drain&#39;</code>.</li>
+</ul>
+<p>Manual (advanced/interview-favorite) implementation of what <code class="inline-code">.pipe()</code> does internally:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">readable.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">chunk</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> ok = writable.<span class="hljs-title function_">write</span>(chunk);
+  <span class="hljs-keyword">if</span> (!ok) {
+    readable.<span class="hljs-title function_">pause</span>();
+    writable.<span class="hljs-title function_">once</span>(<span class="hljs-string">&#x27;drain&#x27;</span>, <span class="hljs-function">() =&gt;</span> readable.<span class="hljs-title function_">resume</span>());
+  }
+});
+readable.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function">() =&gt;</span> writable.<span class="hljs-title function_">end</span>());</code></pre></div>
+<h3 id="195-building-a-transform-stream"><a class="heading-anchor" href="#195-building-a-transform-stream" aria-hidden="true">#</a>19.5 Building a Transform Stream</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Transform</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;stream&#x27;</span>);
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">UppercaseTransform</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">Transform</span> {
+  <span class="hljs-title function_">_transform</span>(<span class="hljs-params">chunk, encoding, callback</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">push</span>(chunk.<span class="hljs-title function_">toString</span>().<span class="hljs-title function_">toUpperCase</span>());
+    <span class="hljs-title function_">callback</span>(); <span class="hljs-comment">// MUST be called, or the stream stalls forever</span>
+  }
+}
+
+fs.<span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">&#x27;in.txt&#x27;</span>)
+  .<span class="hljs-title function_">pipe</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">UppercaseTransform</span>())
+  .<span class="hljs-title function_">pipe</span>(fs.<span class="hljs-title function_">createWriteStream</span>(<span class="hljs-string">&#x27;out.txt&#x27;</span>));</code></pre></div>
+<p><strong>Gotcha interviewers love:</strong> forgetting to call <code class="inline-code">callback()</code> inside <code class="inline-code">_transform</code>/<code class="inline-code">_write</code> — the stream simply hangs with no error, which is a nasty silent production bug.</p>
+<h3 id="196-streaming-a-large-csv-without-loading-it-fully-lab-style-example"><a class="heading-anchor" href="#196-streaming-a-large-csv-without-loading-it-fully-lab-style-example" aria-hidden="true">#</a>19.6 Streaming a Large CSV Without Loading It Fully (lab-style example)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
+<span class="hljs-keyword">const</span> readline = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;readline&#x27;</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">processLargeCsv</span>(<span class="hljs-params">path</span>) {
+  <span class="hljs-keyword">const</span> rl = readline.<span class="hljs-title function_">createInterface</span>({
+    <span class="hljs-attr">input</span>: fs.<span class="hljs-title function_">createReadStream</span>(path),
+    <span class="hljs-attr">crlfDelay</span>: <span class="hljs-title class_">Infinity</span>,
+  });
+
+  <span class="hljs-keyword">let</span> lineCount = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> line <span class="hljs-keyword">of</span> rl) {
+    lineCount++;
+    <span class="hljs-comment">// process one line at a time, constant memory</span>
+  }
+  <span class="hljs-keyword">return</span> lineCount;
+}</code></pre></div>
+<p><code class="inline-code">for await...of</code> over a readable (or <code class="inline-code">readline</code> interface wrapping one) is the modern idiomatic pattern — it automatically manages backpressure by only pulling the next chunk once the previous iteration&#39;s <code class="inline-code">await</code> resolves.</p>
+<h3 id="197-fs-module-sync-vs-callback-vs-promises-api"><a class="heading-anchor" href="#197-fs-module-sync-vs-callback-vs-promises-api" aria-hidden="true">#</a>19.7 fs Module: Sync vs Callback vs Promises API</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
+<span class="hljs-keyword">const</span> fsp = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs/promises&#x27;</span>);
+
+fs.<span class="hljs-title function_">readFileSync</span>(path);                 <span class="hljs-comment">// blocks event loop — avoid in servers</span>
+fs.<span class="hljs-title function_">readFile</span>(path, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> {});  <span class="hljs-comment">// callback style, non-blocking</span>
+<span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> fsp.<span class="hljs-title function_">readFile</span>(path); <span class="hljs-comment">// Promise-based, modern preferred style</span></code></pre></div>
+<p><code class="inline-code">Sync</code> variants run entirely on the main thread and block everything — acceptable only at startup (e.g., reading a config file once before the server starts accepting requests), never inside a request handler.</p>
+<h3 id="interview-qampa--unit-19"><a class="heading-anchor" href="#interview-qampa--unit-19" aria-hidden="true">#</a>Interview Q&amp;A — Unit 19</h3>
+<p><strong>Q: What is backpressure and how does <code class="inline-code">.pipe()</code> handle it?</strong>
+A: Backpressure is when a writable destination can&#39;t consume data as fast as a readable source produces it. <code class="inline-code">.pipe()</code> detects when <code class="inline-code">write()</code> returns <code class="inline-code">false</code> (internal buffer full), pauses the readable, and resumes it once the writable emits <code class="inline-code">&#39;drain&#39;</code> — preventing unbounded memory growth.</p>
+<p><strong>Q: Why use <code class="inline-code">Buffer.alloc()</code> over <code class="inline-code">Buffer.allocUnsafe()</code> when handling user-facing data?</strong>
+A: <code class="inline-code">allocUnsafe</code> doesn&#39;t zero out the underlying memory — it can contain leftover data from previous allocations, which is a real information-disclosure risk if that buffer is ever sent to a client before being fully overwritten.</p>
+<p><strong>Q: What happens if you forget to call <code class="inline-code">callback()</code> in a custom Transform stream&#39;s <code class="inline-code">_transform</code>?</strong>
+A: The stream stalls indefinitely — no error is thrown, it just silently hangs, because the stream&#39;s internal machinery is waiting for that callback signal to pull the next chunk.</p>
+<p><strong>Q: When is <code class="inline-code">fs.readFileSync</code> acceptable in a production server?</strong>
+A: Only during startup/bootstrap (e.g., reading a config file before the HTTP server starts listening) — never inside a request handler, since it blocks the single JS thread for every concurrent request.</p>
+<hr>
+<p><a name="unit-20"></a></p>
+<h2 id="unit-20--process-child-processes-amp-eventemitter"><a class="heading-anchor" href="#unit-20--process-child-processes-amp-eventemitter" aria-hidden="true">#</a>Unit 20 — Process, Child Processes &amp; EventEmitter</h2>
+<h3 id="201-the-process-object"><a class="heading-anchor" href="#201-the-process-object" aria-hidden="true">#</a>20.1 The <code class="inline-code">process</code> Object</h3>
+<p>Global object giving access to the running Node process:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span>       <span class="hljs-comment">// environment variables</span>
+process.<span class="hljs-property">argv</span>                <span class="hljs-comment">// [&#x27;node&#x27;, &#x27;script.js&#x27;, &#x27;arg1&#x27;, &#x27;arg2&#x27;]</span>
+process.<span class="hljs-property">pid</span>                 <span class="hljs-comment">// process ID</span>
+process.<span class="hljs-property">exitCode</span> = <span class="hljs-number">1</span>;       <span class="hljs-comment">// set exit code without force-exiting (lets pending I/O finish)</span>
+process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);            <span class="hljs-comment">// force-exit immediately — can cut off pending async work</span>
+process.<span class="hljs-title function_">cwd</span>()                <span class="hljs-comment">// current working directory</span></code></pre></div>
+<p><strong><code class="inline-code">process.exitCode</code> vs <code class="inline-code">process.exit()</code>:</strong> interviewers often ask this. <code class="inline-code">process.exit()</code> terminates synchronously and can drop unflushed <code class="inline-code">stdout</code> writes or unfinished async callbacks. Setting <code class="inline-code">process.exitCode</code> and letting the event loop drain naturally is the safer pattern in production code.</p>
+<h3 id="202-signals-amp-graceful-shutdown"><a class="heading-anchor" href="#202-signals-amp-graceful-shutdown" aria-hidden="true">#</a>20.2 Signals &amp; Graceful Shutdown</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;SIGTERM&#x27;</span>, gracefulShutdown); <span class="hljs-comment">// sent by orchestrators (k8s, PM2, Docker stop)</span>
+process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;SIGINT&#x27;</span>, gracefulShutdown);  <span class="hljs-comment">// Ctrl+C</span>
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">gracefulShutdown</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Shutting down gracefully...&#x27;</span>);
+  server.<span class="hljs-title function_">close</span>(<span class="hljs-function">() =&gt;</span> {          <span class="hljs-comment">// stop accepting new connections, let existing finish</span>
+    db.<span class="hljs-title function_">disconnect</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> {
+      process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">0</span>);
+    });
+  });
+
+  <span class="hljs-comment">// safety net: force exit if graceful shutdown hangs</span>
+  <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>), <span class="hljs-number">10_000</span>).<span class="hljs-title function_">unref</span>();
+}</code></pre></div>
+<p>This pattern — <strong>stop accepting new work, drain existing work, then exit</strong> — is exactly what&#39;s expected in any container-orchestrated deployment (k8s sends <code class="inline-code">SIGTERM</code>, then <code class="inline-code">SIGKILL</code> after a grace period if the process hasn&#39;t exited).</p>
+<h3 id="203-eventemitter--the-pattern-underlying-almost-all-of-node-core"><a class="heading-anchor" href="#203-eventemitter--the-pattern-underlying-almost-all-of-node-core" aria-hidden="true">#</a>20.3 EventEmitter — the Pattern Underlying Almost All of Node Core</h3>
+<p><code class="inline-code">http.Server</code>, streams, <code class="inline-code">process</code> itself — all extend <code class="inline-code">EventEmitter</code>. It&#39;s the pub-sub backbone of Node.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">EventEmitter</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;events&#x27;</span>);
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">EventEmitter</span> {
+  <span class="hljs-title function_">placeOrder</span>(<span class="hljs-params">order</span>) {
+    <span class="hljs-comment">// ...business logic...</span>
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">emit</span>(<span class="hljs-string">&#x27;order:placed&#x27;</span>, order);
+  }
+}
+
+<span class="hljs-keyword">const</span> service = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrderService</span>();
+service.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;order:placed&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">order</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Send confirmation email&#x27;</span>, order.<span class="hljs-property">id</span>));
+service.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;order:placed&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">order</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Update inventory&#x27;</span>, order.<span class="hljs-property">id</span>));
+service.<span class="hljs-title function_">placeOrder</span>({ <span class="hljs-attr">id</span>: <span class="hljs-number">42</span> });</code></pre></div>
+<p>Key facts:</p>
+<ul>
+<li>Listeners are called <strong>synchronously</strong>, in registration order, on the emit call — <code class="inline-code">emit()</code> doesn&#39;t return until every listener has run (or thrown).</li>
+<li><code class="inline-code">emitter.once(event, fn)</code> — auto-removes after first invocation.</li>
+<li><strong>Default max listeners: 10</strong> per event — exceeding it logs a <code class="inline-code">MaxListenersExceededWarning</code>, which is usually a signal of a <strong>memory leak</strong> (listeners being added repeatedly without ever being removed, e.g., inside a request handler that attaches a new listener on every request).</li>
+<li>An <code class="inline-code">EventEmitter</code> that throws inside an <code class="inline-code">&#39;error&#39;</code> event listener (or has <strong>no</strong> <code class="inline-code">&#39;error&#39;</code> listener at all when <code class="inline-code">&#39;error&#39;</code> is emitted) will <strong>crash the process</strong> — <code class="inline-code">&#39;error&#39;</code> is a special-cased event name in Node; always attach an <code class="inline-code">&#39;error&#39;</code> handler on emitters you don&#39;t fully control (sockets, streams).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">emitter.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;handled:&#x27;</span>, err.<span class="hljs-property">message</span>); <span class="hljs-comment">// prevents process crash</span>
+});</code></pre></div>
+<h3 id="204-child-processes--spawn-vs-exec-vs-fork"><a class="heading-anchor" href="#204-child-processes--spawn-vs-exec-vs-fork" aria-hidden="true">#</a>20.4 Child Processes — <code class="inline-code">spawn</code> vs <code class="inline-code">exec</code> vs <code class="inline-code">fork</code></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Use case</th>
+<th>Output handling</th>
+<th>Shell</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">spawn()</code></td>
+<td>Long-running or large-output processes (e.g., streaming ffmpeg output)</td>
+<td>Streams via <code class="inline-code">stdout</code>/<code class="inline-code">stderr</code> (no buffering limit)</td>
+<td>No shell by default</td>
+</tr>
+<tr>
+<td><code class="inline-code">exec()</code></td>
+<td>Short commands, need the full output as a string</td>
+<td>Buffers entire output in memory (has a max buffer size, default ~1MB)</td>
+<td>Runs through a shell (<code class="inline-code">/bin/sh</code>) — supports pipes/glob, but <strong>shell-injection risk</strong> if interpolating user input</td>
+</tr>
+<tr>
+<td><code class="inline-code">execFile()</code></td>
+<td>Like exec but for running an executable directly</td>
+<td>Buffered</td>
+<td>No shell — safer than <code class="inline-code">exec</code> for untrusted input</td>
+</tr>
+<tr>
+<td><code class="inline-code">fork()</code></td>
+<td>Spawning another <strong>Node.js</strong> script specifically</td>
+<td>IPC channel built-in (<code class="inline-code">process.send()</code> / <code class="inline-code">.on(&#39;message&#39;)</code>)</td>
+<td>No shell</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> { spawn } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;child_process&#x27;</span>);
+<span class="hljs-keyword">const</span> child = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">&#x27;ffmpeg&#x27;</span>, [<span class="hljs-string">&#x27;-i&#x27;</span>, <span class="hljs-string">&#x27;input.mp4&#x27;</span>, <span class="hljs-string">&#x27;output.avi&#x27;</span>]);
+
+child.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`stdout: <span class="hljs-subst">${data}</span>`</span>));
+child.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`stderr: <span class="hljs-subst">${data}</span>`</span>));
+child.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;close&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`exited with code <span class="hljs-subst">${code}</span>`</span>));</code></pre></div>
+<p><strong>Security interview point:</strong> <code class="inline-code">exec(&#39;rm -rf &#39; + userInput)</code> is a classic <strong>shell injection</strong> vulnerability because <code class="inline-code">exec</code> runs through <code class="inline-code">/bin/sh</code>, letting <code class="inline-code">;</code>, <code class="inline-code">&amp;&amp;</code>, backticks etc. execute arbitrary commands. Always prefer <code class="inline-code">execFile</code>/<code class="inline-code">spawn</code> with an argument array (not a concatenated string) when any part of the command comes from user input.</p>
+<h3 id="205-fork-and-ipc--real-use-case"><a class="heading-anchor" href="#205-fork-and-ipc--real-use-case" aria-hidden="true">#</a>20.5 <code class="inline-code">fork()</code> and IPC — Real Use Case</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// parent.js</span>
+<span class="hljs-keyword">const</span> { fork } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;child_process&#x27;</span>);
+<span class="hljs-keyword">const</span> child = <span class="hljs-title function_">fork</span>(<span class="hljs-string">&#x27;worker.js&#x27;</span>);
+
+child.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">task</span>: <span class="hljs-string">&#x27;heavy-computation&#x27;</span>, <span class="hljs-attr">payload</span>: <span class="hljs-number">42</span> });
+child.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;message&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Got result:&#x27;</span>, result));
+
+<span class="hljs-comment">// worker.js</span>
+process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;message&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">msg</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> result = <span class="hljs-title function_">doHeavyWork</span>(msg.<span class="hljs-property">payload</span>); <span class="hljs-comment">// runs in a separate process, separate event loop</span>
+  process.<span class="hljs-title function_">send</span>(result);
+});</code></pre></div>
+<p>This offloads CPU-bound work to a fully separate process (separate V8 instance, separate event loop, separate memory) — the parent&#39;s event loop is never blocked. This is the older sibling of <code class="inline-code">worker_threads</code> (which is lighter-weight, shares memory via <code class="inline-code">SharedArrayBuffer</code>, but doesn&#39;t isolate crashes the way a separate process does — a crash in a <code class="inline-code">fork()</code>-ed child doesn&#39;t take down the parent, but a crash in a worker thread can, depending on how it&#39;s handled).</p>
+<h3 id="206-cluster-module--brief-preview-expanded-fully-in-phase-6"><a class="heading-anchor" href="#206-cluster-module--brief-preview-expanded-fully-in-phase-6" aria-hidden="true">#</a>20.6 <code class="inline-code">cluster</code> Module — Brief Preview (expanded fully in Phase 6)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;cluster&#x27;</span>);
+<span class="hljs-keyword">const</span> os = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;os&#x27;</span>);
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  os.<span class="hljs-title function_">cpus</span>().<span class="hljs-title function_">forEach</span>(<span class="hljs-function">() =&gt;</span> cluster.<span class="hljs-title function_">fork</span>()); <span class="hljs-comment">// one worker process per CPU core</span>
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./server&#x27;</span>); <span class="hljs-comment">// each worker runs its own HTTP server, OS load-balances between them</span>
+}</code></pre></div>
+<p>Uses <code class="inline-code">fork()</code> under the hood — each worker is a full separate Node process sharing the listening port via the OS.</p>
+<h3 id="interview-qampa--unit-20"><a class="heading-anchor" href="#interview-qampa--unit-20" aria-hidden="true">#</a>Interview Q&amp;A — Unit 20</h3>
+<p><strong>Q: What&#39;s the difference between <code class="inline-code">process.exit()</code> and <code class="inline-code">process.exitCode = n</code>?</strong>
+A: <code class="inline-code">process.exit()</code> terminates immediately and synchronously, potentially cutting off unflushed stdout writes or pending async callbacks (like a database close). Setting <code class="inline-code">process.exitCode</code> lets the event loop drain naturally and the process exits on its own once there&#39;s no more work — the safer choice in production.</p>
+<p><strong>Q: Why is <code class="inline-code">exec()</code> more dangerous than <code class="inline-code">spawn()</code>/<code class="inline-code">execFile()</code> for user-controlled input?</strong>
+A: <code class="inline-code">exec()</code> runs the command through a shell (<code class="inline-code">/bin/sh</code>), so shell metacharacters in unsanitized input (<code class="inline-code">;</code>, <code class="inline-code">&amp;&amp;</code>, backticks) can execute arbitrary commands — classic shell injection. <code class="inline-code">execFile</code>/<code class="inline-code">spawn</code> take an argument array and don&#39;t invoke a shell, so injection via those characters doesn&#39;t work the same way.</p>
+<p><strong>Q: What happens if an EventEmitter emits <code class="inline-code">&#39;error&#39;</code> with no listener attached?</strong>
+A: Node treats <code class="inline-code">&#39;error&#39;</code> as special — if there&#39;s no listener, it throws the error and crashes the process. Always attach an <code class="inline-code">.on(&#39;error&#39;, ...)</code> handler on any emitter you don&#39;t fully control.</p>
+<p><strong>Q: <code class="inline-code">fork()</code> vs <code class="inline-code">worker_threads</code> — when would you pick one over the other?</strong>
+A: <code class="inline-code">fork()</code> spawns a full separate OS process — total isolation (a crash doesn&#39;t affect the parent), higher memory overhead, IPC via message passing (serialized). <code class="inline-code">worker_threads</code> run in the same process, can share memory via <code class="inline-code">SharedArrayBuffer</code>, much lighter weight — better for CPU-bound tasks where you want speed and don&#39;t need process-level isolation.</p>
+<hr>
+<p><a name="unit-21"></a></p>
+<h2 id="unit-21--debugging-amp-diagnostics-in-node"><a class="heading-anchor" href="#unit-21--debugging-amp-diagnostics-in-node" aria-hidden="true">#</a>Unit 21 — Debugging &amp; Diagnostics in Node</h2>
+<h3 id="211-global-error-handlers"><a class="heading-anchor" href="#211-global-error-handlers" aria-hidden="true">#</a>21.1 Global Error Handlers</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js">process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;uncaughtException&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, origin</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Uncaught exception:&#x27;</span>, err, origin);
+  <span class="hljs-comment">// Node&#x27;s official guidance: log it, then exit.</span>
+  <span class="hljs-comment">// The process is in an undefined state after an uncaught sync exception —</span>
+  <span class="hljs-comment">// do NOT try to &quot;resume normal operation&quot;.</span>
+  process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
+});
+
+process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;unhandledRejection&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">reason, promise</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Unhandled rejection at:&#x27;</span>, promise, <span class="hljs-string">&#x27;reason:&#x27;</span>, reason);
+  <span class="hljs-comment">// Since Node 15+, unhandled rejections crash the process by default</span>
+  <span class="hljs-comment">// (previously just a warning) — treat this the same as uncaughtException.</span>
+});</code></pre></div>
+<p><strong>Key interview point:</strong> <code class="inline-code">uncaughtException</code> is a <strong>last-resort safety net</strong>, not a routine error-handling mechanism. Relying on it to &quot;catch&quot; errors instead of proper <code class="inline-code">try/catch</code> / <code class="inline-code">.catch()</code> / error-first callback handling is a red flag in code review — by the time it fires, you may have corrupted in-memory state, half-completed transactions, etc. The correct pattern is: handle errors as close to the source as possible; use <code class="inline-code">uncaughtException</code>/<code class="inline-code">unhandledRejection</code> only to log-and-exit so a process supervisor (PM2, k8s) can restart a clean instance.</p>
+<h3 id="212-node---inspect-and-chrome-devtools"><a class="heading-anchor" href="#212-node---inspect-and-chrome-devtools" aria-hidden="true">#</a>21.2 <code class="inline-code">node --inspect</code> and Chrome DevTools</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">node --inspect server.js          <span class="hljs-comment"># listens on ws://127.0.0.1:9229, attach via chrome://inspect</span>
+node --inspect-brk server.js      <span class="hljs-comment"># same, but pauses on the very first line — useful for debugging startup code</span></code></pre></div>
+<p>Workflow:</p>
+<ol>
+<li>Run with <code class="inline-code">--inspect</code> (or <code class="inline-code">--inspect-brk</code> to pause immediately).</li>
+<li>Open <code class="inline-code">chrome://inspect</code> in Chrome, click &quot;inspect&quot; under Remote Target.</li>
+<li>Full DevTools experience: breakpoints, step-through, call stack, watch expressions, <strong>and the Memory tab for heap snapshots</strong> (critical for diagnosing memory leaks).</li>
+</ol>
+<p><strong>VS Code equivalent:</strong> built-in <code class="inline-code">launch.json</code> config with <code class="inline-code">&quot;type&quot;: &quot;node&quot;</code> — same underlying inspector protocol.</p>
+<h3 id="213-diagnosing-a-hung-process"><a class="heading-anchor" href="#213-diagnosing-a-hung-process" aria-hidden="true">#</a>21.3 Diagnosing a Hung Process</h3>
+<p>If a process appears frozen (not responding, no crash):</p>
+<ol>
+<li>Attach <code class="inline-code">--inspect</code> to a <strong>running</strong> process without restarting it: <code class="inline-code">kill -USR1 &lt;pid&gt;</code> on Linux/macOS enables the inspector on a live process. Then attach via <code class="inline-code">chrome://inspect</code>.</li>
+<li>Check the <strong>Call Stack</strong> — if it&#39;s stuck in a <code class="inline-code">while(true)</code> loop or synchronous CPU-heavy code, DevTools will show exactly where.</li>
+<li>If it&#39;s stuck waiting on I/O that never resolves (e.g., a DB query with no timeout), the call stack will typically look idle rather than pinned — check for missing <code class="inline-code">await</code>/dangling Promises, or a connection pool that&#39;s exhausted (all connections checked out, none released — classic &quot;pool leak&quot;).</li>
+<li><code class="inline-code">process._getActiveHandles()</code> / <code class="inline-code">process._getActiveRequests()</code> (undocumented but commonly used in debugging) list what&#39;s keeping the event loop alive — useful for finding &quot;why won&#39;t this process exit.&quot;</li>
+</ol>
+<h3 id="214-graceful-shutdown-for-an-http-server-full-pattern-tying-units-20-amp-21-together"><a class="heading-anchor" href="#214-graceful-shutdown-for-an-http-server-full-pattern-tying-units-20-amp-21-together" aria-hidden="true">#</a>21.4 Graceful Shutdown for an HTTP Server (full pattern, tying Units 20 &amp; 21 together)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-keyword">const</span> server = app.<span class="hljs-title function_">listen</span>(<span class="hljs-number">3000</span>);
+
+<span class="hljs-keyword">let</span> isShuttingDown = <span class="hljs-literal">false</span>;
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">shutdown</span>(<span class="hljs-params">signal</span>) {
+  <span class="hljs-keyword">if</span> (isShuttingDown) <span class="hljs-keyword">return</span>;
+  isShuttingDown = <span class="hljs-literal">true</span>;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${signal}</span> received, starting graceful shutdown`</span>);
+
+  server.<span class="hljs-title function_">close</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (err) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Error closing server:&#x27;</span>, err);
+      process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
+    }
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;HTTP server closed — no longer accepting new connections&#x27;</span>);
+  });
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">close</span>();          <span class="hljs-comment">// close DB pool</span>
+    <span class="hljs-keyword">await</span> redisClient.<span class="hljs-title function_">quit</span>();  <span class="hljs-comment">// close cache connection</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;All connections closed cleanly&#x27;</span>);
+    process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">0</span>);
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Error during cleanup:&#x27;</span>, err);
+    process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
+  }
+
+  <span class="hljs-comment">// hard safety-net timeout in case something hangs</span>
+  <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Forced shutdown after timeout&#x27;</span>);
+    process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
+  }, <span class="hljs-number">10_000</span>).<span class="hljs-title function_">unref</span>();
+}
+
+process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;SIGTERM&#x27;</span>, <span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">shutdown</span>(<span class="hljs-string">&#x27;SIGTERM&#x27;</span>));
+process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;SIGINT&#x27;</span>, <span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">shutdown</span>(<span class="hljs-string">&#x27;SIGINT&#x27;</span>));</code></pre></div>
+<p><code class="inline-code">server.close()</code> stops the server from accepting <strong>new</strong> connections but lets in-flight requests finish — this is exactly what&#39;s needed for zero-downtime deploys under a rolling-update orchestrator.</p>
+<h3 id="215-other-diagnostic-tools-worth-knowing-name-drop-level-for-interviews"><a class="heading-anchor" href="#215-other-diagnostic-tools-worth-knowing-name-drop-level-for-interviews" aria-hidden="true">#</a>21.5 Other Diagnostic Tools Worth Knowing (name-drop level for interviews)</h3>
+<ul>
+<li><strong><code class="inline-code">node --prof</code></strong> — generates a V8 CPU profile log for later analysis (<code class="inline-code">node --prof-process</code>).</li>
+<li><strong><code class="inline-code">clinic.js</code></strong> (<code class="inline-code">clinic doctor</code>, <code class="inline-code">clinic flame</code>) — third-party but widely used for diagnosing event-loop delay, CPU flame graphs, memory issues in one command.</li>
+<li><strong><code class="inline-code">--max-old-space-size</code></strong> — tune V8&#39;s heap ceiling; relevant when discussing OOM crashes in containers with limited memory.</li>
+<li><strong>Heap snapshots</strong> (via <code class="inline-code">--inspect</code> Memory tab, or <code class="inline-code">heapdump</code> package) — compare two snapshots taken minutes apart to spot growing object counts = memory leak fingerprint.</li>
+</ul>
+<h3 id="interview-qampa--unit-21"><a class="heading-anchor" href="#interview-qampa--unit-21" aria-hidden="true">#</a>Interview Q&amp;A — Unit 21</h3>
+<p><strong>Q: Should you use <code class="inline-code">uncaughtException</code> as your main error-handling strategy?</strong>
+A: No — it&#39;s a last-resort safety net. By the time it fires, the process may be in a corrupted state (partial writes, half-open transactions). Best practice: log the error and exit, letting a process manager restart a clean instance; real error handling belongs in try/catch and proper async error propagation.</p>
+<p><strong>Q: How would you diagnose a Node process that&#39;s hung but not crashed?</strong>
+A: Attach the inspector to the live process (<code class="inline-code">kill -USR1 &lt;pid&gt;</code> then <code class="inline-code">chrome://inspect</code>), check the call stack for a blocking sync loop, or check for exhausted resources (DB pool with no released connections) if it looks idle rather than pinned. <code class="inline-code">process._getActiveHandles()</code> can reveal what&#39;s keeping the loop alive.</p>
+<p><strong>Q: What does <code class="inline-code">server.close()</code> actually do, and why is it central to graceful shutdown?</strong>
+A: It stops the server from accepting new incoming connections but does not forcibly terminate in-flight requests — they&#39;re allowed to complete normally. This is what enables zero-downtime rolling deploys, since the old process finishes its current work before exiting.</p>
+<hr>
+<p><a name="rapid-fire"></a></p>
+<h2 id="phase-4-rapid-fire-interview-round"><a class="heading-anchor" href="#phase-4-rapid-fire-interview-round" aria-hidden="true">#</a>Phase 4 Rapid-Fire Interview Round</h2>
+<p>Use these as flash-card style self-testing before an interview.</p>
+<ol>
+<li><p><strong>Q:</strong> What are the 6 phases of the event loop, in order?
+<strong>A:</strong> Timers → Pending callbacks → Idle/prepare → Poll → Check → Close callbacks.</p>
+</li>
+<li><p><strong>Q:</strong> Which queue is drained first — <code class="inline-code">process.nextTick</code> or Promise microtasks?
+<strong>A:</strong> <code class="inline-code">process.nextTick</code> queue, always.</p>
+</li>
+<li><p><strong>Q:</strong> Does <code class="inline-code">require()</code> execute a module file more than once?
+<strong>A:</strong> No — only on first call; subsequent calls return the cached <code class="inline-code">module.exports</code>.</p>
+</li>
+<li><p><strong>Q:</strong> What&#39;s the danger of <code class="inline-code">Buffer.allocUnsafe()</code>?
+<strong>A:</strong> Doesn&#39;t zero-fill memory — can leak old heap data if sent to a client before being overwritten.</p>
+</li>
+<li><p><strong>Q:</strong> How does <code class="inline-code">.pipe()</code> prevent OOM crashes on large file transfers?
+<strong>A:</strong> Automatic backpressure handling — pauses the readable when the writable&#39;s buffer is full, resumes on <code class="inline-code">&#39;drain&#39;</code>.</p>
+</li>
+<li><p><strong>Q:</strong> Why does <code class="inline-code">exec(&#39;cmd &#39; + userInput)</code> risk shell injection but <code class="inline-code">execFile</code>/<code class="inline-code">spawn</code> with an args array doesn&#39;t?
+<strong>A:</strong> <code class="inline-code">exec</code> invokes a shell that interprets metacharacters (<code class="inline-code">;</code>, <code class="inline-code">&amp;&amp;</code>, backticks); <code class="inline-code">execFile</code>/<code class="inline-code">spawn</code> pass arguments directly to the executable without shell interpretation.</p>
+</li>
+<li><p><strong>Q:</strong> What crashes the process if left unhandled: an <code class="inline-code">EventEmitter</code> emitting <code class="inline-code">&#39;error&#39;</code> with no listener, or emitting any other custom event with no listener?
+<strong>A:</strong> Only <code class="inline-code">&#39;error&#39;</code> — it&#39;s special-cased in Node to throw if unhandled. Other events with no listeners are silently no-ops.</p>
+</li>
+<li><p><strong>Q:</strong> Does <code class="inline-code">UV_THREADPOOL_SIZE</code> affect how many concurrent HTTP requests Node can handle?
+<strong>A:</strong> No — network I/O uses the OS&#39;s native async mechanism (epoll/kqueue/IOCP), not the libuv thread pool. The thread pool only matters for <code class="inline-code">fs</code>, <code class="inline-code">crypto</code>, <code class="inline-code">dns.lookup</code>, <code class="inline-code">zlib</code>.</p>
+</li>
+<li><p><strong>Q:</strong> What&#39;s the correct order of operations in a graceful shutdown handler?
+<strong>A:</strong> Stop accepting new connections (<code class="inline-code">server.close()</code>) → let in-flight requests finish → close DB/cache connections → exit; with a hard timeout fallback in case cleanup hangs.</p>
+</li>
+<li><p><strong>Q:</strong> Why is relying on <code class="inline-code">uncaughtException</code> for routine error handling considered bad practice?
+<strong>A:</strong> The process state is undefined after an uncaught synchronous exception; it should only be used to log-and-exit cleanly, not to &quot;catch and continue.&quot;</p>
+</li>
+</ol>
+<hr>
+<p><em>Generated as Phase 4 of your JS + Node.js Backend Mastery Roadmap (Units 17–21). Ready for chapter-by-chapter deep-dives or mock interview drilling on request.</em></p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>
