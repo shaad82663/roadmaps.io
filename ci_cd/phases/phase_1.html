@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 1 — Docker Foundations</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 1 — Docker Foundations</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-1--docker-foundations"><a class="heading-anchor" href="#phase-1--docker-foundations" aria-hidden="true">#</a>Phase 1 — Docker Foundations</h1>
+<h3 id="from-quot3-yoe-nodejs-backend-engineerquot--quotconfidently-ships-and-debugs-docker-in-dev-amp-prodquot"><a class="heading-anchor" href="#from-quot3-yoe-nodejs-backend-engineerquot--quotconfidently-ships-and-debugs-docker-in-dev-amp-prodquot" aria-hidden="true">#</a>From &quot;3 YOE Node.js Backend Engineer&quot; → &quot;Confidently ships and debugs Docker in dev &amp; prod&quot;</h3>
+<blockquote class="quote-plain"><p>This doc is self-contained. After reading it end-to-end and doing the labs, you should be able to explain, build, and debug everything in Units 0–4 of the roadmap without external references.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ul>
+<li><a href="#phase-1--docker-foundations">Phase 1 — Docker Foundations</a><ul>
+<li><a href="#how-to-use-this-doc">How to use this doc</a></li>
+<li><a href="#unit-0--docker-fundamentals--architecture">Unit 0 — Docker Fundamentals &amp; Architecture</a><ul>
+<li><a href="#01-containers-vs-virtual-machines">0.1 Containers vs Virtual Machines</a></li>
+<li><a href="#02-docker-engine-architecture">0.2 Docker Engine Architecture</a></li>
+<li><a href="#03-images-vs-containers">0.3 Images vs Containers</a></li>
+<li><a href="#04-installing--verifying-docker">0.4 Installing &amp; Verifying Docker</a></li>
+<li><a href="#05-what-actually-happens-on-docker-run">0.5 What Actually Happens on <code class="inline-code">docker run</code></a></li>
+<li><a href="#06-interview-trap-answered">0.6 Interview Trap Answered</a></li>
+<li><a href="#07-labs">0.7 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-1--dockerfile-images--layer-caching">Unit 1 — Dockerfile, Images &amp; Layer Caching</a><ul>
+<li><a href="#11-core-dockerfile-instructions">1.1 Core Dockerfile Instructions</a></li>
+<li><a href="#12-build-context--dockerignore">1.2 Build Context &amp; .dockerignore</a></li>
+<li><a href="#13-layer-caching-mechanics">1.3 Layer Caching Mechanics</a></li>
+<li><a href="#14-multi-stage-builds">1.4 Multi-Stage Builds</a></li>
+<li><a href="#15-cmd-vs-entrypoint-vs-add-vs-copy">1.5 CMD vs ENTRYPOINT vs ADD vs COPY</a></li>
+<li><a href="#16-labs">1.6 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-2--docker-networking">Unit 2 — Docker Networking</a><ul>
+<li><a href="#21-network-drivers-overview">2.1 Network Drivers Overview</a></li>
+<li><a href="#22-port-publishing-vs-exposing">2.2 Port Publishing vs Exposing</a></li>
+<li><a href="#23-user-defined-bridge-networks--dns">2.3 User-Defined Bridge Networks &amp; DNS</a></li>
+<li><a href="#24-multi-container-service-discovery">2.4 Multi-Container Service Discovery</a></li>
+<li><a href="#25-labs">2.5 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-3--docker-storage--volumes">Unit 3 — Docker Storage &amp; Volumes</a><ul>
+<li><a href="#31-named-volumes-vs-bind-mounts-vs-tmpfs">3.1 Named Volumes vs Bind Mounts vs tmpfs</a></li>
+<li><a href="#32-volume-lifecycle">3.2 Volume Lifecycle</a></li>
+<li><a href="#33-sharing-data-between-containers">3.3 Sharing Data Between Containers</a></li>
+<li><a href="#34-backup--restore">3.4 Backup &amp; Restore</a></li>
+<li><a href="#35-labs">3.5 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-4--docker-compose-for-multi-container-apps">Unit 4 — Docker Compose for Multi-Container Apps</a><ul>
+<li><a href="#41-compose-file-structure">4.1 Compose File Structure</a></li>
+<li><a href="#42-depends_on-healthchecks--startup-ordering">4.2 depends_on, Healthchecks &amp; Startup Ordering</a></li>
+<li><a href="#43-environment-variables--env-files">4.3 Environment Variables &amp; .env Files</a></li>
+<li><a href="#44-scaling-services-locally">4.4 Scaling Services Locally</a></li>
+<li><a href="#45-labs">4.5 Labs</a></li>
+</ul>
+</li>
+<li><a href="#phase-1-checklist">Phase 1 Checklist</a></li>
+<li><a href="#quick-reference-cheatsheet">Quick-Reference Cheatsheet</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="how-to-use-this-doc"><a class="heading-anchor" href="#how-to-use-this-doc" aria-hidden="true">#</a>How to use this doc</h2>
+<p>Each unit has: <strong>Theory</strong> (explained deeper than the roadmap bullet, with Node.js-relevant framing since that&#39;s your background) → <strong>Code/Commands</strong> → <strong>Interview Angle</strong> → <strong>Labs</strong> (do these, don&#39;t just read).</p>
+<hr>
+<h2 id="unit-0--docker-fundamentals-amp-architecture"><a class="heading-anchor" href="#unit-0--docker-fundamentals-amp-architecture" aria-hidden="true">#</a>Unit 0 — Docker Fundamentals &amp; Architecture</h2>
+<h3 id="01-containers-vs-virtual-machines"><a class="heading-anchor" href="#01-containers-vs-virtual-machines" aria-hidden="true">#</a>0.1 Containers vs Virtual Machines</h3>
+<p>As a Node backend engineer you&#39;ve probably deployed to VMs (EC2, a DigitalOcean droplet) before. The mental shift to containers is about <strong>what layer of the stack gets duplicated</strong>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Virtual Machine</th>
+<th>Container</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Isolation unit</td>
+<td>Full OS (own kernel)</td>
+<td>Process (shares host kernel)</td>
+</tr>
+<tr>
+<td>Boot time</td>
+<td>Seconds to minutes</td>
+<td>Milliseconds to ~1s</td>
+</tr>
+<tr>
+<td>Size</td>
+<td>GBs (full OS image)</td>
+<td>MBs (just app + deps)</td>
+</tr>
+<tr>
+<td>Isolation mechanism</td>
+<td>Hypervisor (hardware-level)</td>
+<td>Linux namespaces + cgroups</td>
+</tr>
+<tr>
+<td>Density per host</td>
+<td>Low (10s)</td>
+<td>High (100s–1000s)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Key insight: a container is <strong>just a regular Linux process</strong> that the kernel has made believe it has its own filesystem, network stack, and process tree, using two kernel features:</p>
+<ul>
+<li><strong>Namespaces</strong> — isolate what a process can <em>see</em> (PID namespace = its own process tree, NET namespace = its own network interfaces, MNT namespace = its own filesystem view, etc.)</li>
+<li><strong>cgroups (control groups)</strong> — limit what a process can <em>use</em> (CPU shares, memory limits, I/O bandwidth)</li>
+</ul>
+<p>Docker didn&#39;t invent either of these — it made them usable via a friendly CLI/API instead of raw <code class="inline-code">unshare</code>/<code class="inline-code">cgcreate</code> syscalls.</p>
+<h3 id="02-docker-engine-architecture"><a class="heading-anchor" href="#02-docker-engine-architecture" aria-hidden="true">#</a>0.2 Docker Engine Architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">┌─────────────────────────────────────────────┐
+│                 docker CLI                    │  (client - what you type)
+└───────────────────┬───────────────────────────┘
+                     │  REST API (over unix socket / TCP)
+┌───────────────────▼───────────────────────────┐
+│              dockerd (daemon)                  │  (manages images, networks, volumes)
+└───────────────────┬───────────────────────────┘
+                     │  gRPC
+┌───────────────────▼───────────────────────────┐
+│                containerd                      │  (manages container lifecycle)
+└───────────────────┬───────────────────────────┘
+                     │
+┌───────────────────▼───────────────────────────┐
+│                   runc                         │  (actually creates the container via
+└─────────────────────────────────────────────────┘   namespaces/cgroups, OCI spec)</code></pre></div>
+<ul>
+<li><strong><code class="inline-code">docker</code> CLI</strong> — the client you type commands into. It&#39;s a thin wrapper that calls the REST API.</li>
+<li><strong><code class="inline-code">dockerd</code></strong> — the daemon. Owns images, networks, volumes, and orchestrates containerd.</li>
+<li><strong>containerd</strong> — a separate CNCF project; handles pulling images, managing container lifecycle (start/stop/pause).</li>
+<li><strong>runc</strong> — the low-level OCI-compliant runtime that actually invokes <code class="inline-code">clone()</code> with namespace flags and sets up cgroups.</li>
+</ul>
+<p>This layered design is why Kubernetes can also talk to <code class="inline-code">containerd</code> directly without needing <code class="inline-code">dockerd</code> at all (this is why &quot;Docker support removed from Kubernetes&quot; headlines happened — only the <code class="inline-code">dockerd</code>-specific shim was dropped, not container tech itself).</p>
+<h3 id="03-images-vs-containers"><a class="heading-anchor" href="#03-images-vs-containers" aria-hidden="true">#</a>0.3 Images vs Containers</h3>
+<ul>
+<li>An <strong>image</strong> is a read-only template — a stack of filesystem layers plus metadata (entrypoint, env, exposed ports).</li>
+<li>A <strong>container</strong> is a running (or stopped) instance of an image, with one additional <strong>writable layer</strong> on top (via a union filesystem, typically <code class="inline-code">overlay2</code> on Linux).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Image layers (read-only, shared across containers):
+┌─────────────────────┐
+│ Layer 3: COPY . .    │
+├─────────────────────┤
+│ Layer 2: RUN npm ci  │
+├─────────────────────┤
+│ Layer 1: FROM node   │
+└─────────────────────┘
+           +
+┌─────────────────────┐
+│ Writable layer        │  ← unique per container, deleted with `docker rm`
+└─────────────────────┘</code></pre></div>
+<p>This is <em>why</em> container storage is ephemeral by default — anything written to that top writable layer disappears when the container is removed (this is exactly what Unit 3 / Volumes solves).</p>
+<h3 id="04-installing-amp-verifying-docker"><a class="heading-anchor" href="#04-installing-amp-verifying-docker" aria-hidden="true">#</a>0.4 Installing &amp; Verifying Docker</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># verify install</span>
+docker version        <span class="hljs-comment"># client + server (daemon) version info</span>
+docker info            <span class="hljs-comment"># daemon-level info: storage driver, cgroup version, # containers/images</span>
+
+<span class="hljs-comment"># sanity check</span>
+docker run hello-world</code></pre></div>
+<p>If <code class="inline-code">docker info</code> fails but <code class="inline-code">docker version</code> shows only the Client block — your daemon isn&#39;t running or your user lacks permission (on Linux, add yourself to the <code class="inline-code">docker</code> group: <code class="inline-code">sudo usermod -aG docker $USER</code>, then re-login).</p>
+<h3 id="05-what-actually-happens-on-docker-run"><a class="heading-anchor" href="#05-what-actually-happens-on-docker-run" aria-hidden="true">#</a>0.5 What Actually Happens on <code class="inline-code">docker run</code></h3>
+<p>This is the single most common Docker interview question. Walk through it precisely:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run -d -p 8080:3000 --name api my-node-app:1.0</code></pre></div>
+<ol>
+<li><strong>CLI → daemon</strong>: <code class="inline-code">docker</code> CLI sends a REST request to <code class="inline-code">dockerd</code>.</li>
+<li><strong>Image resolution</strong>: <code class="inline-code">dockerd</code> checks if <code class="inline-code">my-node-app:1.0</code> exists locally. If not, it pulls it from the configured registry (Docker Hub by default), layer by layer, verifying checksums.</li>
+<li><strong>containerd invoked</strong>: <code class="inline-code">dockerd</code> asks <code class="inline-code">containerd</code> to create a container from that image.</li>
+<li><strong>runc creates the container</strong>: <code class="inline-code">containerd</code> (via <code class="inline-code">containerd-shim</code>) invokes <code class="inline-code">runc</code>, which:<ul>
+<li>Creates new Linux namespaces (PID, NET, MNT, UTS, IPC, USER)</li>
+<li>Sets up cgroups for resource limits</li>
+<li>Sets up the union filesystem (image layers + new writable layer)</li>
+<li>Configures the network (creates a <code class="inline-code">veth</code> pair, attaches to the bridge network, assigns an IP)</li>
+</ul>
+</li>
+<li><strong>Entrypoint/CMD executed</strong>: The container&#39;s main process (PID 1 <em>inside</em> the container&#39;s PID namespace) starts — e.g., <code class="inline-code">node server.js</code>.</li>
+<li><strong>Port mapping applied</strong>: iptables/NAT rules are set up so host port <code class="inline-code">8080</code> forwards to container port <code class="inline-code">3000</code>.</li>
+<li><strong>Detached mode</strong>: since <code class="inline-code">-d</code> was passed, control returns to your shell immediately; the container runs in the background.</li>
+</ol>
+<h3 id="06-interview-trap-answered"><a class="heading-anchor" href="#06-interview-trap-answered" aria-hidden="true">#</a>0.6 Interview Trap Answered</h3>
+<blockquote class="quote-plain"><p>&quot;What&#39;s the difference between <code class="inline-code">docker run</code> and <code class="inline-code">docker start</code>?&quot;</p>
+</blockquote>
+<p><code class="inline-code">docker run</code> = <code class="inline-code">docker create</code> (make a new container from an image) + <code class="inline-code">docker start</code> (run it). <code class="inline-code">docker start</code> only works on an <strong>existing, stopped</strong> container — it reuses the same writable layer and won&#39;t re-pull the image.</p>
+<h3 id="07-labs"><a class="heading-anchor" href="#07-labs" aria-hidden="true">#</a>0.7 Labs</h3>
+<ol>
+<li>Install Docker and run <code class="inline-code">hello-world</code> and <code class="inline-code">nginx</code>; verify the nginx container&#39;s IP with <code class="inline-code">docker inspect</code>.</li>
+<li>Run <code class="inline-code">docker inspect &lt;container&gt;</code> vs <code class="inline-code">docker inspect &lt;image&gt;</code> — diff the JSON structures side by side.</li>
+<li>Write out, in your own words, all 7 steps above for a container you actually ran.</li>
+<li>Time <code class="inline-code">docker run</code> vs booting an EC2/VM instance for the same base OS. Compare orders of magnitude.</li>
+</ol>
+<hr>
+<h2 id="unit-1--dockerfile-images-amp-layer-caching"><a class="heading-anchor" href="#unit-1--dockerfile-images-amp-layer-caching" aria-hidden="true">#</a>Unit 1 — Dockerfile, Images &amp; Layer Caching</h2>
+<h3 id="11-core-dockerfile-instructions"><a class="heading-anchor" href="#11-core-dockerfile-instructions" aria-hidden="true">#</a>1.1 Core Dockerfile Instructions</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine        <span class="hljs-comment"># base image — always pin a version, never `node:latest` in prod</span>
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app                <span class="hljs-comment"># sets cwd for subsequent instructions; creates dir if missing</span></span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./       <span class="hljs-comment"># copy dependency manifests FIRST (see 1.3 on caching)</span></span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci --omit=dev       <span class="hljs-comment"># install deps in a reproducible, cache-friendly layer</span></span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .                    <span class="hljs-comment"># now copy the rest of the source</span></span>
+<span class="hljs-keyword">ENV</span> NODE_ENV=production
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>                 <span class="hljs-comment"># documentation only — does NOT publish the port (see Unit 2)</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]   <span class="hljs-comment"># default command when container starts</span></span></code></pre></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Instruction</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">FROM</code></td>
+<td>Base image to build on top of</td>
+</tr>
+<tr>
+<td><code class="inline-code">RUN</code></td>
+<td>Executes a command <strong>at build time</strong>, result baked into a new layer</td>
+</tr>
+<tr>
+<td><code class="inline-code">COPY</code></td>
+<td>Copies files from build context into the image</td>
+</tr>
+<tr>
+<td><code class="inline-code">ADD</code></td>
+<td>Like COPY, but also auto-extracts tarballs and fetches URLs (avoid unless you need that)</td>
+</tr>
+<tr>
+<td><code class="inline-code">WORKDIR</code></td>
+<td>Sets the working directory for subsequent instructions</td>
+</tr>
+<tr>
+<td><code class="inline-code">ENV</code></td>
+<td>Sets environment variables available at build <strong>and</strong> run time</td>
+</tr>
+<tr>
+<td><code class="inline-code">EXPOSE</code></td>
+<td>Documents which port the app listens on (metadata only)</td>
+</tr>
+<tr>
+<td><code class="inline-code">CMD</code></td>
+<td>Default command/args when container starts (overridable at <code class="inline-code">docker run</code>)</td>
+</tr>
+<tr>
+<td><code class="inline-code">ENTRYPOINT</code></td>
+<td>Fixed command that always runs; CMD becomes its default arguments</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="12-build-context-amp-dockerignore"><a class="heading-anchor" href="#12-build-context-amp-dockerignore" aria-hidden="true">#</a>1.2 Build Context &amp; .dockerignore</h3>
+<p>When you run <code class="inline-code">docker build .</code>, that <code class="inline-code">.</code> is the <strong>build context</strong> — the entire directory gets tar&#39;d and sent to the daemon before any instruction runs. If you don&#39;t exclude <code class="inline-code">node_modules</code> or <code class="inline-code">.git</code>, every build sends megabytes/gigabytes needlessly and can leak secrets.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text"># .dockerignore
+node_modules
+npm-debug.log
+.git
+.env
+*.md
+coverage
+.vscode
+Dockerfile</code></pre></div>
+<blockquote class="quote-plain"><p>Node-specific gotcha: if you <code class="inline-code">COPY . .</code> without ignoring <code class="inline-code">node_modules</code>, you&#39;ll ship your <strong>host&#39;s</strong> <code class="inline-code">node_modules</code> (wrong OS/arch native bindings) into the image instead of the ones installed cleanly inside the container by <code class="inline-code">RUN npm ci</code>.</p>
+</blockquote>
+<h3 id="13-layer-caching-mechanics"><a class="heading-anchor" href="#13-layer-caching-mechanics" aria-hidden="true">#</a>1.3 Layer Caching Mechanics</h3>
+<p>Every instruction in a Dockerfile creates a layer, and Docker caches each layer keyed by (instruction + its inputs). On a rebuild, Docker reuses cached layers <strong>until the first instruction whose input changed</strong> — everything after that is rebuilt from scratch.</p>
+<p>This is why instruction <strong>order</strong> matters enormously:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-comment"># ❌ BAD: any source change invalidates npm install too</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span>
+
+<span class="hljs-comment"># ✅ GOOD: dependency layer only invalidates when package*.json changes</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span></code></pre></div>
+<p>With the &quot;good&quot; ordering, editing <code class="inline-code">src/index.js</code> and rebuilding will <strong>skip</strong> the <code class="inline-code">npm ci</code> layer entirely (cache hit), saving potentially minutes per build — this is the #1 lever for fast CI pipelines.</p>
+<h3 id="14-multi-stage-builds"><a class="heading-anchor" href="#14-multi-stage-builds" aria-hidden="true">#</a>1.4 Multi-Stage Builds</h3>
+<p>Multi-stage builds let you use one image to <em>build</em> (with devDependencies, compilers, TypeScript, etc.) and a slim image to <em>run</em> — only copying the final build artifacts across.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-comment"># ---- Stage 1: build ----</span>
+<span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine AS builder
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci                     <span class="hljs-comment"># full deps, including devDependencies</span></span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm run build              <span class="hljs-comment"># e.g., tsc compiles TS -&gt; dist/</span></span>
+
+<span class="hljs-comment"># ---- Stage 2: production runtime ----</span>
+<span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine AS runner
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+<span class="hljs-keyword">ENV</span> NODE_ENV=production
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci --omit=dev          <span class="hljs-comment"># only prod deps in the final image</span></span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> --from=builder /app/dist ./dist</span>
+<span class="hljs-keyword">USER</span> node                      <span class="hljs-comment"># non-root (built into the official node image)</span>
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;dist/server.js&quot;</span>]</span></code></pre></div>
+<p>Result: the final image contains <strong>no TypeScript compiler, no devDependencies, no source .ts files</strong> — just compiled JS + prod node_modules. This commonly cuts image size by 60–80% and shrinks the attack surface.</p>
+<h3 id="15-cmd-vs-entrypoint-vs-add-vs-copy"><a class="heading-anchor" href="#15-cmd-vs-entrypoint-vs-add-vs-copy" aria-hidden="true">#</a>1.5 CMD vs ENTRYPOINT vs ADD vs COPY</h3>
+<p><strong>CMD vs ENTRYPOINT</strong> — the #1 asked Docker interview question:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>]</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;server.js&quot;</span>]</span></code></pre></div>
+<p><code class="inline-code">docker run my-image</code> → runs <code class="inline-code">node server.js</code>.
+<code class="inline-code">docker run my-image worker.js</code> → runs <code class="inline-code">node worker.js</code> (CMD is overridden, ENTRYPOINT is not).</p>
+<ul>
+<li><strong>CMD alone</strong>: provides a default command, fully replaceable at <code class="inline-code">docker run</code>.</li>
+<li><strong>ENTRYPOINT alone</strong>: the fixed command; anything passed at <code class="inline-code">docker run</code> becomes <strong>arguments appended</strong> to it.</li>
+<li><strong>ENTRYPOINT + CMD together</strong>: ENTRYPOINT is fixed, CMD provides default arguments that are easy to override — this is the idiomatic pattern for CLI-style images.</li>
+</ul>
+<p><strong>ADD vs COPY</strong>: Always prefer <code class="inline-code">COPY</code> — it&#39;s explicit and predictable. Only use <code class="inline-code">ADD</code> when you specifically need its two superpowers: auto-extracting local <code class="inline-code">.tar.gz</code> archives, or fetching a remote URL (though for URLs, a <code class="inline-code">RUN curl</code> is usually clearer and more cacheable).</p>
+<h3 id="16-labs"><a class="heading-anchor" href="#16-labs" aria-hidden="true">#</a>1.6 Labs</h3>
+<ol>
+<li>Write a Dockerfile for a Node app, deliberately putting <code class="inline-code">COPY . .</code> before <code class="inline-code">RUN npm ci</code>, then fix the ordering and prove the cache-hit difference with <code class="inline-code">docker build</code> timing.</li>
+<li>Convert a single-stage Dockerfile into a multi-stage build for a TypeScript app; compare <code class="inline-code">docker images</code> sizes before/after.</li>
+<li>Add <code class="inline-code">.dockerignore</code> for <code class="inline-code">node_modules</code>, <code class="inline-code">.git</code>, <code class="inline-code">.env</code>; compare &quot;Sending build context to Docker daemon&quot; size in build logs before/after.</li>
+<li>Build an image with <code class="inline-code">ENTRYPOINT [&quot;node&quot;]</code> + <code class="inline-code">CMD [&quot;server.js&quot;]</code>, then run it overriding CMD to execute a different script.</li>
+</ol>
+<hr>
+<h2 id="unit-2--docker-networking"><a class="heading-anchor" href="#unit-2--docker-networking" aria-hidden="true">#</a>Unit 2 — Docker Networking</h2>
+<h3 id="21-network-drivers-overview"><a class="heading-anchor" href="#21-network-drivers-overview" aria-hidden="true">#</a>2.1 Network Drivers Overview</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Driver</th>
+<th>Behavior</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">bridge</code> (default)</td>
+<td>Container gets its own private IP on a virtual bridge (<code class="inline-code">docker0</code>); NAT&#39;d to host</td>
+<td>Default for standalone containers</td>
+</tr>
+<tr>
+<td><code class="inline-code">host</code></td>
+<td>Container shares the host&#39;s network namespace directly — no isolation, no NAT</td>
+<td>Max performance, single-container-per-host scenarios</td>
+</tr>
+<tr>
+<td><code class="inline-code">none</code></td>
+<td>No networking at all</td>
+<td>Fully isolated / security-sensitive batch jobs</td>
+</tr>
+<tr>
+<td>user-defined bridge</td>
+<td>Like <code class="inline-code">bridge</code>, but with automatic DNS-based service discovery by container name</td>
+<td>Multi-container apps (recommended default)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker network <span class="hljs-built_in">ls</span>                 <span class="hljs-comment"># list networks</span>
+docker network create my-net      <span class="hljs-comment"># create a user-defined bridge</span>
+docker network inspect my-net     <span class="hljs-comment"># see connected containers, subnet, gateway</span></code></pre></div>
+<h3 id="22-port-publishing-vs-exposing"><a class="heading-anchor" href="#22-port-publishing-vs-exposing" aria-hidden="true">#</a>2.2 Port Publishing vs Exposing</h3>
+<p>This trips up almost every backend engineer new to Docker:</p>
+<ul>
+<li><code class="inline-code">EXPOSE 3000</code> in a Dockerfile is <strong>documentation only</strong> — it does not open any port to the host. It&#39;s a hint for humans and tools like Compose.</li>
+<li><code class="inline-code">-p 8080:3000</code> at <code class="inline-code">docker run</code> is what actually creates the host→container port mapping (via iptables NAT rules).</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run -d -p 8080:3000 my-node-app
+<span class="hljs-comment">#              ^host  ^container</span>
+<span class="hljs-comment"># Traffic to localhost:8080 on the HOST is forwarded to port 3000 INSIDE the container</span></code></pre></div>
+<p>Without <code class="inline-code">-p</code>, the container is still reachable <em>from other containers on the same Docker network</em> on port 3000 — just not from your host&#39;s browser/curl.</p>
+<h3 id="23-user-defined-bridge-networks-amp-dns"><a class="heading-anchor" href="#23-user-defined-bridge-networks-amp-dns" aria-hidden="true">#</a>2.3 User-Defined Bridge Networks &amp; DNS</h3>
+<p>The default <code class="inline-code">bridge</code> network does <strong>not</strong> provide automatic DNS resolution between containers by name — you&#39;d need to link containers manually or use raw IPs (fragile, since IPs change on restart). A <strong>user-defined bridge network</strong> solves this: Docker runs an embedded DNS server that resolves container names automatically.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker network create app-net
+
+docker run -d --name db --network app-net postgres:16
+docker run -d --name api --network app-net -p 3000:3000 my-node-app
+
+<span class="hljs-comment"># inside the `api` container&#x27;s code, you can now connect via:</span>
+<span class="hljs-comment"># postgresql://db:5432/mydb   &lt;-- &quot;db&quot; resolves via Docker&#x27;s embedded DNS</span></code></pre></div>
+<h3 id="24-multi-container-service-discovery"><a class="heading-anchor" href="#24-multi-container-service-discovery" aria-hidden="true">#</a>2.4 Multi-Container Service Discovery</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Node.js example — connecting to a container named &quot;db&quot; on the same user-defined network</span>
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">Pool</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;pg&#x27;</span>);
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({
+  <span class="hljs-attr">host</span>: <span class="hljs-string">&#x27;db&#x27;</span>,        <span class="hljs-comment">// container name = hostname, resolved by Docker&#x27;s DNS</span>
+  <span class="hljs-attr">port</span>: <span class="hljs-number">5432</span>,
+  <span class="hljs-attr">user</span>: <span class="hljs-string">&#x27;postgres&#x27;</span>,
+  <span class="hljs-attr">password</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DB_PASSWORD</span>,
+  <span class="hljs-attr">database</span>: <span class="hljs-string">&#x27;mydb&#x27;</span>,
+});</code></pre></div>
+<p>This is precisely the mechanism Docker Compose uses under the hood (Unit 4) — Compose auto-creates a user-defined network per project and every service is reachable by its service name.</p>
+<h3 id="25-labs"><a class="heading-anchor" href="#25-labs" aria-hidden="true">#</a>2.5 Labs</h3>
+<ol>
+<li>Create a user-defined bridge network, run two containers on it, and <code class="inline-code">ping</code> (or <code class="inline-code">curl</code>) one from the other by container name.</li>
+<li>Run a web server with <code class="inline-code">-p 8080:80</code> and confirm <code class="inline-code">curl localhost:8080</code> works from the host; then run it <em>without</em> <code class="inline-code">-p</code> and confirm it only works from another container.</li>
+<li>Compare <code class="inline-code">--network host</code> vs default bridge for a simple HTTP server — benchmark latency difference (usually negligible for most apps but worth seeing).</li>
+<li>Deliberately misconfigure two containers on <em>different</em> networks and diagnose the &quot;can&#39;t reach&quot; failure using <code class="inline-code">docker network inspect</code> and <code class="inline-code">docker exec ... ping</code>.</li>
+</ol>
+<hr>
+<h2 id="unit-3--docker-storage-amp-volumes"><a class="heading-anchor" href="#unit-3--docker-storage-amp-volumes" aria-hidden="true">#</a>Unit 3 — Docker Storage &amp; Volumes</h2>
+<h3 id="31-named-volumes-vs-bind-mounts-vs-tmpfs"><a class="heading-anchor" href="#31-named-volumes-vs-bind-mounts-vs-tmpfs" aria-hidden="true">#</a>3.1 Named Volumes vs Bind Mounts vs tmpfs</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Managed by</th>
+<th>Location</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Named volume</strong></td>
+<td>Docker</td>
+<td><code class="inline-code">/var/lib/docker/volumes/...</code> (Docker-managed)</td>
+<td>Persistent app data (DB files) — portable, backed up easily</td>
+</tr>
+<tr>
+<td><strong>Bind mount</strong></td>
+<td>You</td>
+<td>Any host path you specify</td>
+<td>Local dev — live-reload source code into a container</td>
+</tr>
+<tr>
+<td><strong>tmpfs mount</strong></td>
+<td>Docker (in-memory)</td>
+<td>RAM only, never touches disk</td>
+<td>Secrets/temp data that must never persist</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Named volume</span>
+docker run -d -v pgdata:/var/lib/postgresql/data postgres:16
+
+<span class="hljs-comment"># Bind mount (absolute host path required)</span>
+docker run -d -v $(<span class="hljs-built_in">pwd</span>)/src:/app/src -p 3000:3000 my-node-app
+
+<span class="hljs-comment"># tmpfs</span>
+docker run -d --tmpfs /app/tmp my-node-app</code></pre></div>
+<p>Modern, more explicit syntax (<code class="inline-code">--mount</code>, recommended for clarity in production Dockerfiles/scripts):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run -d \
+  --mount <span class="hljs-built_in">type</span>=volume,<span class="hljs-built_in">source</span>=pgdata,target=/var/lib/postgresql/data \
+  postgres:16</code></pre></div>
+<h3 id="32-volume-lifecycle"><a class="heading-anchor" href="#32-volume-lifecycle" aria-hidden="true">#</a>3.2 Volume Lifecycle</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker volume create pgdata          <span class="hljs-comment"># create explicitly (optional — auto-created on first use)</span>
+docker volume <span class="hljs-built_in">ls</span>                     <span class="hljs-comment"># list all volumes</span>
+docker volume inspect pgdata         <span class="hljs-comment"># see mountpoint, driver, labels</span>
+docker volume prune                  <span class="hljs-comment"># remove ALL unused (unmounted) volumes — careful!</span>
+docker volume <span class="hljs-built_in">rm</span> pgdata              <span class="hljs-comment"># remove a specific one (must not be in use)</span></code></pre></div>
+<p><strong>Key fact</strong>: data in a named volume <strong>survives</strong> <code class="inline-code">docker rm &lt;container&gt;</code> — the volume is a separate object from the container. It&#39;s only deleted if you explicitly <code class="inline-code">docker volume rm</code> it, or run <code class="inline-code">docker rm -v</code> combined with the volume having no other references.</p>
+<h3 id="33-sharing-data-between-containers"><a class="heading-anchor" href="#33-sharing-data-between-containers" aria-hidden="true">#</a>3.3 Sharing Data Between Containers</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker volume create shared-data
+
+docker run -d --name writer -v shared-data:/data alpine sh -c <span class="hljs-string">&quot;while true; do date &gt;&gt; /data/log.txt; sleep 5; done&quot;</span>
+docker run -d --name reader -v shared-data:/data alpine sh -c <span class="hljs-string">&quot;tail -f /data/log.txt&quot;</span></code></pre></div>
+<p>Both containers mount the same volume — Docker handles concurrent access at the filesystem level (your application is still responsible for handling concurrent writes safely, e.g., file locks, if that matters for your use case).</p>
+<h3 id="34-backup-amp-restore"><a class="heading-anchor" href="#34-backup-amp-restore" aria-hidden="true">#</a>3.4 Backup &amp; Restore</h3>
+<p>The standard pattern: spin up a throwaway container that mounts the volume plus a host directory, and use <code class="inline-code">tar</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Backup: tar the volume&#x27;s contents to a file on the host</span>
+docker run --<span class="hljs-built_in">rm</span> \
+  -v pgdata:/data \
+  -v $(<span class="hljs-built_in">pwd</span>)/backup:/backup \
+  alpine tar czf /backup/pgdata-backup.tar.gz -C /data .
+
+<span class="hljs-comment"># Restore: untar into a (new) volume</span>
+docker volume create pgdata-restored
+docker run --<span class="hljs-built_in">rm</span> \
+  -v pgdata-restored:/data \
+  -v $(<span class="hljs-built_in">pwd</span>)/backup:/backup \
+  alpine tar xzf /backup/pgdata-backup.tar.gz -C /data</code></pre></div>
+<h3 id="35-labs"><a class="heading-anchor" href="#35-labs" aria-hidden="true">#</a>3.5 Labs</h3>
+<ol>
+<li>Run Postgres with a named volume, insert data, <code class="inline-code">docker rm -f</code> the container, start a <em>new</em> container with the same volume, and confirm the data is still there.</li>
+<li>Bind-mount your local <code class="inline-code">src/</code> folder into a Node container running with <code class="inline-code">nodemon</code>, edit a file on the host, and observe the live reload.</li>
+<li>Back up a volume to a <code class="inline-code">.tar.gz</code>, then restore it into a freshly created volume and verify data integrity.</li>
+<li>Deliberately forget to attach a volume to a stateful container, remove the container, and confirm the data loss — then fix it.</li>
+</ol>
+<hr>
+<h2 id="unit-4--docker-compose-for-multi-container-apps"><a class="heading-anchor" href="#unit-4--docker-compose-for-multi-container-apps" aria-hidden="true">#</a>Unit 4 — Docker Compose for Multi-Container Apps</h2>
+<h3 id="41-compose-file-structure"><a class="heading-anchor" href="#41-compose-file-structure" aria-hidden="true">#</a>4.1 Compose File Structure</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># docker-compose.yml</span>
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">api:</span>
+    <span class="hljs-attr">build:</span> <span class="hljs-string">.</span>                      <span class="hljs-comment"># build from local Dockerfile</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;3000:3000&quot;</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">NODE_ENV=production</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">DB_HOST=db</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">REDIS_HOST=cache</span>
+    <span class="hljs-attr">depends_on:</span>
+      <span class="hljs-attr">db:</span>
+        <span class="hljs-attr">condition:</span> <span class="hljs-string">service_healthy</span>
+      <span class="hljs-attr">cache:</span>
+        <span class="hljs-attr">condition:</span> <span class="hljs-string">service_started</span>
+    <span class="hljs-attr">networks:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">app-net</span>
+
+  <span class="hljs-attr">db:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">postgres:16</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">POSTGRES_PASSWORD=secret</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">POSTGRES_DB=mydb</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">pgdata:/var/lib/postgresql/data</span>
+    <span class="hljs-attr">healthcheck:</span>
+      <span class="hljs-attr">test:</span> [<span class="hljs-string">&quot;CMD-SHELL&quot;</span>, <span class="hljs-string">&quot;pg_isready -U postgres&quot;</span>]
+      <span class="hljs-attr">interval:</span> <span class="hljs-string">5s</span>
+      <span class="hljs-attr">timeout:</span> <span class="hljs-string">3s</span>
+      <span class="hljs-attr">retries:</span> <span class="hljs-number">5</span>
+    <span class="hljs-attr">networks:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">app-net</span>
+
+  <span class="hljs-attr">cache:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">redis:7-alpine</span>
+    <span class="hljs-attr">networks:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">app-net</span>
+
+<span class="hljs-attr">volumes:</span>
+  <span class="hljs-attr">pgdata:</span>
+
+<span class="hljs-attr">networks:</span>
+  <span class="hljs-attr">app-net:</span>
+    <span class="hljs-attr">driver:</span> <span class="hljs-string">bridge</span></code></pre></div>
+<p>Compose does three things for you automatically that you&#39;d otherwise do manually: creates a dedicated network (so <code class="inline-code">db</code> and <code class="inline-code">cache</code> resolve by name, per Unit 2), creates named volumes as declared, and builds/starts everything with one command.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker compose up -d          <span class="hljs-comment"># build (if needed) + start everything, detached</span>
+docker compose ps             <span class="hljs-comment"># status of all services</span>
+docker compose logs -f api    <span class="hljs-comment"># follow logs for one service</span>
+docker compose down           <span class="hljs-comment"># stop and remove containers + network (NOT volumes, by default)</span>
+docker compose down -v        <span class="hljs-comment"># also remove volumes — destructive!</span></code></pre></div>
+<h3 id="42-depends_on-healthchecks-amp-startup-ordering"><a class="heading-anchor" href="#42-depends_on-healthchecks-amp-startup-ordering" aria-hidden="true">#</a>4.2 depends_on, Healthchecks &amp; Startup Ordering</h3>
+<p>A common Node.js pitfall: <code class="inline-code">depends_on</code> (without <code class="inline-code">condition</code>) only waits for the dependency <strong>container to start</strong>, not for the database inside it to be <em>ready to accept connections</em>. Postgres, for example, takes a moment after container-start before it accepts connections.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">depends_on:</span>
+  <span class="hljs-attr">db:</span>
+    <span class="hljs-attr">condition:</span> <span class="hljs-string">service_healthy</span>   <span class="hljs-comment"># waits for the healthcheck to pass, not just container start</span></code></pre></div>
+<p>Without this, your Node app may crash-loop on boot trying to connect to a DB that technically &quot;started&quot; but isn&#39;t accepting connections yet. Two common fixes:</p>
+<ol>
+<li>Use <code class="inline-code">condition: service_healthy</code> with a proper <code class="inline-code">healthcheck:</code> (shown above) — the Compose-native solution.</li>
+<li>Add retry/backoff logic in your Node app&#39;s DB connection code regardless (recommended even in production, since Compose ordering guarantees don&#39;t exist in real orchestrators like Kubernetes).</li>
+</ol>
+<h3 id="43-environment-variables-amp-env-files"><a class="heading-anchor" href="#43-environment-variables-amp-env-files" aria-hidden="true">#</a>4.3 Environment Variables &amp; .env Files</h3>
+<p>Compose automatically loads a <code class="inline-code">.env</code> file from the same directory for <strong>variable substitution</strong> inside <code class="inline-code">docker-compose.yml</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># .env</span>
+DB_PASSWORD=supersecret
+APP_PORT=3000</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">api:</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;${APP_PORT}:3000&quot;</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">DB_PASSWORD=${DB_PASSWORD}</span></code></pre></div>
+<p>For multiple environments, use override files instead of duplicating the whole file:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker compose -f docker-compose.yml -f docker-compose.dev.yml up</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># docker-compose.dev.yml — only the overrides for local dev</span>
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">api:</span>
+    <span class="hljs-attr">build:</span>
+      <span class="hljs-attr">target:</span> <span class="hljs-string">builder</span>            <span class="hljs-comment"># use the builder stage, not the slim runtime</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./src:/app/src</span>           <span class="hljs-comment"># bind mount for live reload</span>
+    <span class="hljs-attr">command:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">dev</span></code></pre></div>
+<h3 id="44-scaling-services-locally"><a class="heading-anchor" href="#44-scaling-services-locally" aria-hidden="true">#</a>4.4 Scaling Services Locally</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker compose up -d --scale api=3</code></pre></div>
+<p>Note: this only works cleanly when the service <strong>doesn&#39;t</strong> have a fixed host port mapping like <code class="inline-code">&quot;3000:3000&quot;</code> (three containers can&#39;t all bind host port 3000). For local scaling experiments, either omit the <code class="inline-code">ports:</code> mapping (access via the internal network only) or map to a range, and put something like Nginx/Traefik in front to load-balance.</p>
+<h3 id="45-labs"><a class="heading-anchor" href="#45-labs" aria-hidden="true">#</a>4.5 Labs</h3>
+<ol>
+<li>Write a <code class="inline-code">docker-compose.yml</code> for a Node API + Postgres + Redis; bring it all up with one command.</li>
+<li>Add a <code class="inline-code">healthcheck</code> to the Postgres service and set <code class="inline-code">depends_on.condition: service_healthy</code> on the API; verify the API no longer crash-loops on cold start.</li>
+<li>Split into <code class="inline-code">docker-compose.yml</code> (base) + <code class="inline-code">docker-compose.dev.yml</code> (bind mount + dev command), and run both merged for local development.</li>
+<li>Scale the API service to 3 replicas (no fixed host port) and verify with <code class="inline-code">docker compose ps</code> that 3 containers are running.</li>
+</ol>
+<hr>
+<h2 id="phase-1-checklist"><a class="heading-anchor" href="#phase-1-checklist" aria-hidden="true">#</a>Phase 1 Checklist</h2>
+<p>Before moving to Phase 2 (Docker Advanced &amp; Production), you should be able to, without looking anything up:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Explain containers vs VMs in terms of namespaces/cgroups vs hypervisors</li>
+<li><input disabled="" type="checkbox"> Draw and explain the CLI → dockerd → containerd → runc flow</li>
+<li><input disabled="" type="checkbox"> Explain why data written to a container&#39;s writable layer disappears on <code class="inline-code">docker rm</code></li>
+<li><input disabled="" type="checkbox"> Write a Dockerfile with correct instruction ordering for optimal layer caching</li>
+<li><input disabled="" type="checkbox"> Write a multi-stage Dockerfile that excludes build-time tooling from the final image</li>
+<li><input disabled="" type="checkbox"> Explain CMD vs ENTRYPOINT precisely, with an example of overriding each</li>
+<li><input disabled="" type="checkbox"> Explain the difference between <code class="inline-code">EXPOSE</code> and <code class="inline-code">-p</code></li>
+<li><input disabled="" type="checkbox"> Set up a user-defined bridge network and explain why it enables DNS-based service discovery</li>
+<li><input disabled="" type="checkbox"> Explain named volumes vs bind mounts vs tmpfs and pick the right one per scenario</li>
+<li><input disabled="" type="checkbox"> Back up and restore a Docker volume via the tar-container pattern</li>
+<li><input disabled="" type="checkbox"> Write a <code class="inline-code">docker-compose.yml</code> with healthchecks and correct <code class="inline-code">depends_on</code> conditions</li>
+<li><input disabled="" type="checkbox"> Explain why <code class="inline-code">depends_on</code> alone isn&#39;t sufficient for &quot;wait until DB is ready&quot;</li>
+</ul>
+<hr>
+<h2 id="quick-reference-cheatsheet"><a class="heading-anchor" href="#quick-reference-cheatsheet" aria-hidden="true">#</a>Quick-Reference Cheatsheet</h2>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Images</span>
+docker build -t myapp:1.0 .
+docker images
+docker rmi myapp:1.0
+
+<span class="hljs-comment"># Containers</span>
+docker run -d -p 8080:3000 --name api myapp:1.0
+docker ps -a
+docker logs -f api
+docker <span class="hljs-built_in">exec</span> -it api sh
+docker stop api &amp;&amp; docker <span class="hljs-built_in">rm</span> api
+
+<span class="hljs-comment"># Networks</span>
+docker network create app-net
+docker network inspect app-net
+
+<span class="hljs-comment"># Volumes</span>
+docker volume create pgdata
+docker volume inspect pgdata
+docker volume prune
+
+<span class="hljs-comment"># Compose</span>
+docker compose up -d
+docker compose down -v
+docker compose logs -f &lt;service&gt;
+docker compose <span class="hljs-built_in">exec</span> &lt;service&gt; sh</code></pre></div>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

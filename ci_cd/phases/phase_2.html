@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 2 — Docker Advanced &amp; Production</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 2 — Docker Advanced &amp; Production</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-2--docker-advanced-amp-production"><a class="heading-anchor" href="#phase-2--docker-advanced-amp-production" aria-hidden="true">#</a>Phase 2 — Docker Advanced &amp; Production</h1>
+<h3 id="for-a-3-yoe-nodejs-backend-engineer"><a class="heading-anchor" href="#for-a-3-yoe-nodejs-backend-engineer" aria-hidden="true">#</a>For a 3 YOE Node.js Backend Engineer</h3>
+<blockquote class="quote-plain"><p>Prerequisite assumption: you&#39;ve completed Phase 1 (Docker Foundations) — you&#39;re comfortable with <code class="inline-code">docker run</code>, Dockerfiles, networking, volumes, and Compose. This document goes deeper into what separates &quot;it runs on my laptop&quot; from &quot;it&#39;s safe and reliable in production.&quot;</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ul>
+<li><a href="#unit-05--docker-image-optimization--security">Unit 05 — Docker Image Optimization &amp; Security</a><ul>
+<li><a href="#51-choosing-a-base-image-alpine-vs-distroless-vs-slim">5.1 Choosing a Base Image: Alpine vs Distroless vs Slim</a></li>
+<li><a href="#52-running-as-a-non-root-user--dropping-capabilities">5.2 Running as a Non-Root User &amp; Dropping Capabilities</a></li>
+<li><a href="#53-image-vulnerability-scanning-with-trivy--docker-scout">5.3 Image Vulnerability Scanning with Trivy / Docker Scout</a></li>
+<li><a href="#54-handling-secrets-at-build-time-buildkit-secret-mounts">5.4 Handling Secrets at Build Time (BuildKit Secret Mounts)</a></li>
+<li><a href="#55-unit-05-labs">5.5 Unit 05 Labs</a></li>
+<li><a href="#56-unit-05-interview-qa">5.6 Unit 05 Interview Q&amp;A</a></li>
+</ul>
+</li>
+<li><a href="#unit-06--docker-registries--image-management">Unit 06 — Docker Registries &amp; Image Management</a><ul>
+<li><a href="#61-docker-hub-vs-private-registries">6.1 Docker Hub vs Private Registries</a></li>
+<li><a href="#62-tagging-strategy-why-latest-is-a-production-hazard">6.2 Tagging Strategy: Why &quot;latest&quot; Is a Production Hazard</a></li>
+<li><a href="#63-authenticating--pushing-to-a-private-registry">6.3 Authenticating &amp; Pushing to a Private Registry</a></li>
+<li><a href="#64-image-retention--cleanup-policies">6.4 Image Retention &amp; Cleanup Policies</a></li>
+<li><a href="#65-unit-06-labs">6.5 Unit 06 Labs</a></li>
+<li><a href="#66-unit-06-interview-qa">6.6 Unit 06 Interview Q&amp;A</a></li>
+</ul>
+</li>
+<li><a href="#unit-07--docker-logging-resource-limits--health-in-production">Unit 07 — Docker Logging, Resource Limits &amp; Health in Production</a><ul>
+<li><a href="#71-logging-drivers--log-rotation">7.1 Logging Drivers &amp; Log Rotation</a></li>
+<li><a href="#72-restart-policies">7.2 Restart Policies</a></li>
+<li><a href="#73-cpumemory-limits--the-oom-killer">7.3 CPU/Memory Limits &amp; the OOM Killer</a></li>
+<li><a href="#74-healthcheck-instruction">7.4 HEALTHCHECK Instruction</a></li>
+<li><a href="#75-docker-swarm--a-one-paragraph-orientation">7.5 Docker Swarm — A One-Paragraph Orientation</a></li>
+<li><a href="#76-unit-07-labs">7.6 Unit 07 Labs</a></li>
+<li><a href="#77-unit-07-interview-qa">7.7 Unit 07 Interview Q&amp;A</a></li>
+</ul>
+</li>
+<li><a href="#unit-08--docker-troubleshooting--interview-mastery">Unit 08 — Docker Troubleshooting &amp; Interview Mastery</a><ul>
+<li><a href="#81-the-systematic-debugging-workflow">8.1 The Systematic Debugging Workflow</a></li>
+<li><a href="#82-common-failure-scenarios-decoded">8.2 Common Failure Scenarios Decoded</a></li>
+<li><a href="#83-works-on-my-machine--diagnosing-environment-drift">8.3 &quot;Works on My Machine&quot; — Diagnosing Environment Drift</a></li>
+<li><a href="#84-rapid-fire-concept-sheet">8.4 Rapid-Fire Concept Sheet</a></li>
+<li><a href="#85-unit-08-labs">8.5 Unit 08 Labs</a></li>
+<li><a href="#86-scenario-based-mock-interview-script">8.6 Scenario-Based Mock Interview Script</a></li>
+</ul>
+</li>
+<li><a href="#phase-2-summary-checklist">Phase 2 Summary Checklist</a></li>
+</ul>
+<hr>
+<h2 id="unit-05--docker-image-optimization-amp-security"><a class="heading-anchor" href="#unit-05--docker-image-optimization-amp-security" aria-hidden="true">#</a>Unit 05 — Docker Image Optimization &amp; Security</h2>
+<p><strong>Difficulty:</strong> Intermediate · <strong>Goal:</strong> Ship images that are small, fast to pull, and hard to exploit.</p>
+<h3 id="51-choosing-a-base-image-alpine-vs-distroless-vs-slim"><a class="heading-anchor" href="#51-choosing-a-base-image-alpine-vs-distroless-vs-slim" aria-hidden="true">#</a>5.1 Choosing a Base Image: Alpine vs Distroless vs Slim</h3>
+<p>Every image you build inherits the attack surface and size of its base. For a Node.js service, you have three realistic tiers:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Base</th>
+<th>Size (approx)</th>
+<th>Shell/Package Manager</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">node:20</code> (Debian-based)</td>
+<td>~1 GB</td>
+<td>Yes (bash, apt)</td>
+<td>Local dev, debugging-heavy images</td>
+</tr>
+<tr>
+<td><code class="inline-code">node:20-slim</code></td>
+<td>~200 MB</td>
+<td>Yes (minimal apt)</td>
+<td>A good default balance</td>
+</tr>
+<tr>
+<td><code class="inline-code">node:20-alpine</code></td>
+<td>~120 MB</td>
+<td>Yes (<code class="inline-code">sh</code>, <code class="inline-code">apk</code>), musl libc</td>
+<td>Most production Node apps</td>
+</tr>
+<tr>
+<td><code class="inline-code">gcr.io/distroless/nodejs20-debian12</code></td>
+<td>~120 MB</td>
+<td><strong>No shell, no package manager</strong></td>
+<td>Maximum hardening</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Why this matters beyond disk space:</strong></p>
+<ul>
+<li>Smaller images pull faster → faster deploys, faster autoscaling, faster CI.</li>
+<li>Fewer installed packages = fewer CVEs to patch. A full Debian base can carry 100+ known CVEs from packages you never use.</li>
+<li>Alpine uses <code class="inline-code">musl</code> libc instead of <code class="inline-code">glibc</code>. This occasionally breaks native Node addons (e.g., some versions of <code class="inline-code">bcrypt</code>, <code class="inline-code">sharp</code>) that expect <code class="inline-code">glibc</code>. Always test your exact dependency tree on Alpine before committing to it — this is a very common real-world gotcha for Node engineers.</li>
+<li>Distroless images have <strong>no shell</strong>, which means <code class="inline-code">docker exec -it &lt;container&gt; sh</code> simply won&#39;t work. That&#39;s a deliberate security trade-off (an attacker who gets code execution can&#39;t spawn a shell) but it makes debugging harder — you typically debug against a <code class="inline-code">:debug</code> tag of the same distroless image, or attach an ephemeral debug container in Kubernetes.</li>
+</ul>
+<p><strong>Multi-stage build combining a full build environment with a lean runtime:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-comment"># ---------- Stage 1: builder ----------</span>
+<span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine AS builder
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+
+<span class="hljs-comment"># Install deps first (better layer caching)</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package.json package-lock.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span>
+
+<span class="hljs-comment"># Copy source and build (TypeScript compile, etc.)</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm run build</span>
+
+<span class="hljs-comment"># Prune dev dependencies so only prod deps remain</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm prune --omit=dev</span>
+
+<span class="hljs-comment"># ---------- Stage 2: runtime ----------</span>
+<span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine AS runtime
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+<span class="hljs-keyword">ENV</span> NODE_ENV=production
+
+<span class="hljs-comment"># Copy only what&#x27;s needed to run — not the whole build toolchain</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> --from=builder /app/node_modules ./node_modules</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> --from=builder /app/dist ./dist</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> --from=builder /app/package.json ./package.json</span>
+
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;dist/server.js&quot;</span>]</span></code></pre></div>
+<p>The builder stage (with <code class="inline-code">npm</code>, TypeScript, build tools) never ships. Only <code class="inline-code">runtime</code>&#39;s layers end up in the final image.</p>
+<h3 id="52-running-as-a-non-root-user-amp-dropping-capabilities"><a class="heading-anchor" href="#52-running-as-a-non-root-user-amp-dropping-capabilities" aria-hidden="true">#</a>5.2 Running as a Non-Root User &amp; Dropping Capabilities</h3>
+<p>By default, a process inside a container runs as <code class="inline-code">root</code> (UID 0) <strong>unless the image says otherwise</strong>. This is misleading — container root is not host root because of namespace isolation, but if an attacker breaks out of the container (via a kernel exploit or a misconfigured mount), root-in-container becomes root-on-host. Running as a non-root user is one of the cheapest, highest-leverage hardening steps you can take.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package.json package-lock.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci --omit=dev</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+
+<span class="hljs-comment"># The official node:alpine image already ships a low-privilege user called &quot;node&quot;</span>
+<span class="hljs-keyword">USER</span> node
+
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]</span></code></pre></div>
+<p>If your base image doesn&#39;t already provide a user, create one explicitly:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">RUN</span><span class="language-bash"> addgroup -S appgroup &amp;&amp; adduser -S appuser -G appgroup</span>
+<span class="hljs-keyword">USER</span> appuser</code></pre></div>
+<p><strong>Dropping Linux capabilities at run time</strong> (not in the Dockerfile, but worth knowing since it&#39;s an interview favorite):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run --cap-drop=ALL --cap-add=NET_BIND_SERVICE my-node-app</code></pre></div>
+<p>This strips every Linux capability except the one needed to bind to a privileged port (&lt;1024). It means even if the process is compromised, it can&#39;t, for example, load kernel modules or change file ownership arbitrarily.</p>
+<h3 id="53-image-vulnerability-scanning-with-trivy--docker-scout"><a class="heading-anchor" href="#53-image-vulnerability-scanning-with-trivy--docker-scout" aria-hidden="true">#</a>5.3 Image Vulnerability Scanning with Trivy / Docker Scout</h3>
+<p>Scanning inspects your image&#39;s OS packages and language dependencies (including your <code class="inline-code">package-lock.json</code>) against known-vulnerability databases (NVD, GitHub Advisories, etc.).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Install Trivy (macOS example; see docs for Linux/Windows)</span>
+brew install trivy
+
+<span class="hljs-comment"># Scan a local image</span>
+trivy image my-node-app:latest
+
+<span class="hljs-comment"># Fail a CI pipeline on HIGH or CRITICAL findings only</span>
+trivy image --severity HIGH,CRITICAL --exit-code 1 my-node-app:latest</code></pre></div>
+<p>Sample (trimmed) output to know how to read:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">my-node-app:latest (alpine 3.19.1)
+===================================
+Total: 3 (HIGH: 2, CRITICAL: 1)
+
+┌─────────────┬────────────────┬──────────┬───────────────────┐
+│   Library   │ Vulnerability  │ Severity │   Fixed Version    │
+├─────────────┼────────────────┼──────────┼───────────────────┤
+│ openssl     │ CVE-2024-XXXXX │ CRITICAL │ 3.1.4-r0           │
+│ busybox     │ CVE-2023-YYYYY │ HIGH     │ 1.36.1-r15         │
+└─────────────┴────────────────┴──────────┴───────────────────┘</code></pre></div>
+<p><strong>Fixing a finding usually means one of:</strong></p>
+<ol>
+<li>Bump the base image tag (<code class="inline-code">alpine:3.19</code> → <code class="inline-code">alpine:3.20</code>).</li>
+<li>Explicitly upgrade the vulnerable package (<code class="inline-code">RUN apk upgrade openssl</code>).</li>
+<li>If it&#39;s a transitive npm dependency: <code class="inline-code">npm audit fix</code>, or bump the parent package.</li>
+</ol>
+<p>Docker Scout (<code class="inline-code">docker scout cves my-node-app:latest</code>) does the same job natively inside Docker Desktop/CLI and is worth knowing exists, but Trivy is the more common interview and industry answer because it&#39;s open-source and CI-friendly.</p>
+<h3 id="54-handling-secrets-at-build-time-buildkit-secret-mounts"><a class="heading-anchor" href="#54-handling-secrets-at-build-time-buildkit-secret-mounts" aria-hidden="true">#</a>5.4 Handling Secrets at Build Time (BuildKit Secret Mounts)</h3>
+<p>A classic Node.js mistake: a private npm registry token or a <code class="inline-code">.npmrc</code> gets <code class="inline-code">COPY</code>&#39;d into an image to allow <code class="inline-code">npm install</code> to authenticate — and it stays in that layer&#39;s history <strong>forever</strong>, even if you delete it in a later <code class="inline-code">RUN</code> command. Anyone with <code class="inline-code">docker history</code> or access to the layer can extract it.</p>
+<p><strong>Wrong way (leaks the secret into a layer):</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">COPY</span><span class="language-bash"> .npmrc .npmrc</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> <span class="hljs-built_in">rm</span> .npmrc   <span class="hljs-comment"># too late — .npmrc already exists in an earlier layer</span></span></code></pre></div>
+<p><strong>Right way — BuildKit secret mount (never persisted in any layer):</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-comment"># syntax=docker/dockerfile:1</span>
+<span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package.json package-lock.json ./</span>
+
+<span class="hljs-keyword">RUN</span><span class="language-bash"> --mount=<span class="hljs-built_in">type</span>=secret,<span class="hljs-built_in">id</span>=npmrc,target=/app/.npmrc \
+    npm ci</span>
+
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]</span></code></pre></div>
+<p>Build it by passing the secret from the host, not baking it into the Dockerfile:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">DOCKER_BUILDKIT=1 docker build \
+  --secret <span class="hljs-built_in">id</span>=npmrc,src=<span class="hljs-variable">$HOME</span>/.npmrc \
+  -t my-node-app .</code></pre></div>
+<p>The secret is mounted only for the duration of that specific <code class="inline-code">RUN</code> instruction and is never written to any image layer.</p>
+<h3 id="55-unit-05-labs"><a class="heading-anchor" href="#55-unit-05-labs" aria-hidden="true">#</a>5.5 Unit 05 Labs</h3>
+<ol>
+<li><strong>Non-root conversion.</strong> Take a Dockerfile that runs as root, add a dedicated user, and rebuild. Verify with <code class="inline-code">docker run --rm my-image whoami</code> (expect a non-root username, not <code class="inline-code">root</code>).</li>
+<li><strong>Trivy scan-and-fix.</strong> Scan any existing image, find one HIGH/CRITICAL finding, fix it (base bump or dependency bump), and rescan to confirm it&#39;s gone.</li>
+<li><strong>Distroless rebuild.</strong> Rebuild your Node app on <code class="inline-code">gcr.io/distroless/nodejs20-debian12</code> and compare <code class="inline-code">docker images</code> size output against your Alpine build.</li>
+<li><strong>BuildKit secret mount.</strong> Simulate installing from a private npm registry using a fake <code class="inline-code">.npmrc</code> token, and prove (via <code class="inline-code">docker history --no-trunc &lt;image&gt;</code>) that the secret never appears in any layer.</li>
+</ol>
+<h3 id="56-unit-05-interview-qampa"><a class="heading-anchor" href="#56-unit-05-interview-qampa" aria-hidden="true">#</a>5.6 Unit 05 Interview Q&amp;A</h3>
+<ul>
+<li><p><strong>Q: &quot;How would you harden a Node.js Docker image for production?&quot;</strong>
+A: Use a minimal/distroless base, multi-stage build to exclude dev tools, run as non-root, drop unneeded Linux capabilities, scan with Trivy in CI and fail the build on critical CVEs, and never bake secrets into layers (use BuildKit secret mounts or runtime secret injection instead).</p>
+</li>
+<li><p><strong>Q: &quot;Why is <code class="inline-code">npm ci</code> preferred over <code class="inline-code">npm install</code> inside a Dockerfile?&quot;</strong>
+A: <code class="inline-code">npm ci</code> installs strictly from <code class="inline-code">package-lock.json</code>, is faster (it skips dependency resolution), and fails if the lockfile and <code class="inline-code">package.json</code> are out of sync — giving you reproducible, deterministic builds, which matters a lot for layer caching and for avoiding &quot;it worked yesterday&quot; drift.</p>
+</li>
+</ul>
+<hr>
+<h2 id="unit-06--docker-registries-amp-image-management"><a class="heading-anchor" href="#unit-06--docker-registries-amp-image-management" aria-hidden="true">#</a>Unit 06 — Docker Registries &amp; Image Management</h2>
+<p><strong>Difficulty:</strong> Intermediate · <strong>Goal:</strong> Know where images live, how they get versioned, and how they get cleaned up.</p>
+<h3 id="61-docker-hub-vs-private-registries"><a class="heading-anchor" href="#61-docker-hub-vs-private-registries" aria-hidden="true">#</a>6.1 Docker Hub vs Private Registries</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Registry</th>
+<th>Typical use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Docker Hub</td>
+<td>Public/open-source images, small teams, quick prototyping</td>
+</tr>
+<tr>
+<td>AWS ECR</td>
+<td>Teams already on AWS; tight IAM integration</td>
+</tr>
+<tr>
+<td>GCP Artifact Registry (GCR successor)</td>
+<td>Teams on GCP</td>
+</tr>
+<tr>
+<td>GitHub Container Registry (GHCR)</td>
+<td>Teams already using GitHub Actions — same auth token</td>
+</tr>
+<tr>
+<td>Harbor</td>
+<td>Self-hosted, enterprise, on-prem compliance requirements</td>
+</tr>
+</tbody>
+</table></div>
+<p>For most Node.js teams shipping to a cloud provider, the registry choice usually just follows the cloud provider you already deploy to, since it gives you IAM-based pull permissions without managing separate registry credentials.</p>
+<h3 id="62-tagging-strategy-why-quotlatestquot-is-a-production-hazard"><a class="heading-anchor" href="#62-tagging-strategy-why-quotlatestquot-is-a-production-hazard" aria-hidden="true">#</a>6.2 Tagging Strategy: Why &quot;latest&quot; Is a Production Hazard</h3>
+<p><code class="inline-code">latest</code> is not a &quot;the newest version&quot; pointer that Docker manages for you — it&#39;s just a tag name like any other, and by default <code class="inline-code">docker build</code> without <code class="inline-code">-t</code> assigns it. The danger:</p>
+<ul>
+<li>Two different commits can both be tagged <code class="inline-code">latest</code> over time, so <code class="inline-code">docker pull my-app:latest</code> is <strong>non-deterministic</strong> across environments and time — you can&#39;t be sure what code is actually running.</li>
+<li>Rollback becomes guesswork: if <code class="inline-code">latest</code> breaks, what was the <em>previous</em> <code class="inline-code">latest</code>? There&#39;s no built-in history.</li>
+<li>Kubernetes/orchestrators may not re-pull <code class="inline-code">latest</code> on redeploy if <code class="inline-code">imagePullPolicy</code> isn&#39;t set correctly, causing stale deployments.</li>
+</ul>
+<p><strong>A production-grade tagging convention combines semantic version + commit SHA:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Build once</span>
+docker build -t my-node-app:1.4.2 -t my-node-app:a1b2c3d .
+
+<span class="hljs-comment"># Push both tags — human-readable AND immutable/traceable</span>
+docker push my-node-app:1.4.2
+docker push my-node-app:a1b2c3d</code></pre></div>
+<p>A common CI pattern (conceptually, for GitHub Actions or Jenkins covered in later phases):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">GIT_SHA=$(git rev-parse --short HEAD)
+VERSION=$(node -p <span class="hljs-string">&quot;require(&#x27;./package.json&#x27;).version&quot;</span>)
+
+docker build -t my-registry/my-node-app:<span class="hljs-variable">${VERSION}</span> \
+             -t my-registry/my-node-app:<span class="hljs-variable">${GIT_SHA}</span> \
+             -t my-registry/my-node-app:latest .   <span class="hljs-comment"># optional convenience tag only, never deployed from directly</span></code></pre></div>
+<p>Deploy manifests should always reference the <strong>immutable SHA or semver tag</strong>, never <code class="inline-code">latest</code>.</p>
+<h3 id="63-authenticating-amp-pushing-to-a-private-registry"><a class="heading-anchor" href="#63-authenticating-amp-pushing-to-a-private-registry" aria-hidden="true">#</a>6.3 Authenticating &amp; Pushing to a Private Registry</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Docker Hub</span>
+docker login -u &lt;username&gt;
+
+<span class="hljs-comment"># AWS ECR (token expires after 12h, so this is usually scripted in CI)</span>
+aws ecr get-login-password --region ap-south-1 | \
+  docker login --username AWS --password-stdin \
+  &lt;account-id&gt;.dkr.ecr.ap-south-1.amazonaws.com
+
+<span class="hljs-comment"># GitHub Container Registry</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-variable">$GITHUB_TOKEN</span> | docker login ghcr.io -u &lt;github-username&gt; --password-stdin</code></pre></div>
+<p>Tagging for a private registry requires the full registry path as a prefix:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker tag my-node-app:1.4.2 &lt;account-id&gt;.dkr.ecr.ap-south-1.amazonaws.com/my-node-app:1.4.2
+docker push &lt;account-id&gt;.dkr.ecr.ap-south-1.amazonaws.com/my-node-app:1.4.2</code></pre></div>
+<p>On the pulling side (e.g., another host or a Kubernetes node), the same <code class="inline-code">docker login</code> is required unless the registry allows anonymous pulls or the platform uses an attached IAM role.</p>
+<h3 id="64-image-retention-amp-cleanup-policies"><a class="heading-anchor" href="#64-image-retention-amp-cleanup-policies" aria-hidden="true">#</a>6.4 Image Retention &amp; Cleanup Policies</h3>
+<p>Registries are not free, and old images accumulate fast in active CI pipelines. Two levels of cleanup:</p>
+<p><strong>1. Local Docker host cleanup:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Remove dangling (untagged) images</span>
+docker image prune -f
+
+<span class="hljs-comment"># Remove all unused images, not just dangling ones (careful — more aggressive)</span>
+docker image prune -a -f
+
+<span class="hljs-comment"># Remove everything unused: images, containers, networks, build cache</span>
+docker system prune -a -f</code></pre></div>
+<p><strong>2. Registry-side retention policy</strong> (conceptual example — AWS ECR lifecycle policy JSON):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;rules&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;rulePriority&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Expire untagged images older than 7 days&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;selection&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;tagStatus&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;untagged&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;countType&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;sinceImagePushed&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;countUnit&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;days&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;countNumber&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">7</span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;action&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;expire&quot;</span> <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;rulePriority&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Keep only the last 20 tagged images&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;selection&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;tagStatus&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tagged&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;tagPrefixList&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;v&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;countType&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;imageCountMoreThan&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;countNumber&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">20</span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;action&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;expire&quot;</span> <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<p>This kind of policy is applied once at the registry/repository level and runs automatically — no manual pruning needed.</p>
+<h3 id="65-unit-06-labs"><a class="heading-anchor" href="#65-unit-06-labs" aria-hidden="true">#</a>6.5 Unit 06 Labs</h3>
+<ol>
+<li><strong>Push/pull round trip.</strong> Push a tagged image to any private registry you have access to (Docker Hub private repo is fine for practice), then pull it on a second machine or a fresh terminal session after <code class="inline-code">docker logout</code>.</li>
+<li><strong>Auth setup.</strong> Configure <code class="inline-code">docker login</code> against one private registry (ECR, GHCR, or Docker Hub) and confirm token/credential expiry behavior.</li>
+<li><strong>Tagging convention design.</strong> Write a short shell script that builds and tags an image with both semver (from <code class="inline-code">package.json</code>) and the current git short SHA.</li>
+<li><strong>Cleanup policy.</strong> Either write a local cron-able <code class="inline-code">docker image prune</code> script, or draft a retention policy (like the ECR JSON above) for a hypothetical registry.</li>
+</ol>
+<h3 id="66-unit-06-interview-qampa"><a class="heading-anchor" href="#66-unit-06-interview-qampa" aria-hidden="true">#</a>6.6 Unit 06 Interview Q&amp;A</h3>
+<ul>
+<li><p><strong>Q: &quot;Why is tagging images <code class="inline-code">latest</code> risky in production pipelines?&quot;</strong>
+A: <code class="inline-code">latest</code> is mutable and non-deterministic — it doesn&#39;t guarantee which build is actually deployed, breaks reliable rollback, and can cause stale deploys if <code class="inline-code">imagePullPolicy</code> isn&#39;t configured to always re-pull. Production deployments should reference immutable tags (semver and/or commit SHA).</p>
+</li>
+<li><p><strong>Q: &quot;How do you keep a container registry from growing unbounded?&quot;</strong>
+A: Combine local <code class="inline-code">docker image prune</code> for dev machines/CI runners with a registry-level lifecycle/retention policy that expires untagged images after N days and caps the number of retained tagged versions.</p>
+</li>
+</ul>
+<hr>
+<h2 id="unit-07--docker-logging-resource-limits-amp-health-in-production"><a class="heading-anchor" href="#unit-07--docker-logging-resource-limits-amp-health-in-production" aria-hidden="true">#</a>Unit 07 — Docker Logging, Resource Limits &amp; Health in Production</h2>
+<p><strong>Difficulty:</strong> Advanced · <strong>Goal:</strong> Keep containers observable, bounded, and self-healing.</p>
+<h3 id="71-logging-drivers-amp-log-rotation"><a class="heading-anchor" href="#71-logging-drivers-amp-log-rotation" aria-hidden="true">#</a>7.1 Logging Drivers &amp; Log Rotation</h3>
+<p>By default Docker uses the <code class="inline-code">json-file</code> logging driver, writing every line of stdout/stderr to a JSON file on the host — with <strong>no rotation by default</strong>, which means a chatty Node app (<code class="inline-code">console.log</code> on every request) can silently fill a disk over weeks.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Run with size-capped, rotated JSON logging</span>
+docker run -d \
+  --log-driver json-file \
+  --log-opt max-size=10m \
+  --log-opt max-file=3 \
+  my-node-app</code></pre></div>
+<p>Or configure it as the Docker daemon default in <code class="inline-code">/etc/docker/daemon.json</code> so every container inherits it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;log-driver&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;json-file&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;log-opts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;max-size&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;10m&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;max-file&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;3&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<p>Other drivers worth knowing: <code class="inline-code">journald</code> (integrates with systemd&#39;s journal — common on Linux hosts), <code class="inline-code">syslog</code>, and drivers that forward straight to log aggregators (<code class="inline-code">fluentd</code>, <code class="inline-code">awslogs</code>, <code class="inline-code">gelf</code>). In real production stacks, you&#39;ll usually ship logs to a central system (CloudWatch, ELK, Loki) rather than relying on local JSON files.</p>
+<h3 id="72-restart-policies"><a class="heading-anchor" href="#72-restart-policies" aria-hidden="true">#</a>7.2 Restart Policies</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">no</code> (default)</td>
+<td>Never restart automatically</td>
+</tr>
+<tr>
+<td><code class="inline-code">on-failure[:max-retries]</code></td>
+<td>Restart only on non-zero exit code, optionally capped</td>
+</tr>
+<tr>
+<td><code class="inline-code">always</code></td>
+<td>Always restart, even after a manual <code class="inline-code">docker stop</code> + host reboot</td>
+</tr>
+<tr>
+<td><code class="inline-code">unless-stopped</code></td>
+<td>Like <code class="inline-code">always</code>, but stays stopped if you explicitly <code class="inline-code">docker stop</code>&#39;d it before a reboot</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run -d --restart unless-stopped my-node-app</code></pre></div>
+<p><strong>Interview nuance:</strong> <code class="inline-code">always</code> will bring a container back up even if you deliberately stopped it and the <em>host</em> reboots — this surprises people. <code class="inline-code">unless-stopped</code> is almost always the right choice for long-running services, because it respects an intentional stop while still surviving crashes and daemon restarts.</p>
+<h3 id="73-cpumemory-limits-amp-the-oom-killer"><a class="heading-anchor" href="#73-cpumemory-limits-amp-the-oom-killer" aria-hidden="true">#</a>7.3 CPU/Memory Limits &amp; the OOM Killer</h3>
+<p>Without limits, a single misbehaving container (e.g., a Node process with a memory leak) can starve every other container — or the whole host.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run -d \
+  --memory=<span class="hljs-string">&quot;512m&quot;</span> \
+  --memory-swap=<span class="hljs-string">&quot;512m&quot;</span> \
+  --cpus=<span class="hljs-string">&quot;0.5&quot;</span> \
+  my-node-app</code></pre></div>
+<ul>
+<li><code class="inline-code">--memory</code> caps RAM usage. <code class="inline-code">--memory-swap</code> set equal to <code class="inline-code">--memory</code> disables swap entirely for the container (common in production so a leaking process is killed fast rather than swapping into unusable latency).</li>
+<li><code class="inline-code">--cpus=&quot;0.5&quot;</code> caps the container to half a CPU core&#39;s worth of processing time.</li>
+</ul>
+<p><strong>What happens on OOM:</strong> if the process inside the container exceeds its memory ceiling, the Linux kernel&#39;s OOM killer sends <code class="inline-code">SIGKILL</code> to the process. <code class="inline-code">docker inspect</code> on that container will show:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-attr">&quot;State&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;OOMKilled&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;ExitCode&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">137</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<p>Exit code <strong>137</strong> = 128 + 9 (<code class="inline-code">SIGKILL</code>). This is one of the single most common &quot;why did my container die&quot; interview and real-world debugging questions — recognize <code class="inline-code">137</code> instantly as an OOM kill signature.</p>
+<p>For a Node.js app specifically, remember that <code class="inline-code">--memory</code> limits the <strong>container&#39;s</strong> total memory, but Node&#39;s own V8 heap has its own <code class="inline-code">--max-old-space-size</code> limit — set the V8 flag comfortably below the container limit, or V8 may not GC aggressively enough before the container gets OOM-killed:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;--max-old-space-size=384&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]</span></code></pre></div>
+<p>(with a 512m container limit, leaving headroom for non-heap memory like buffers and native modules.)</p>
+<h3 id="74-healthcheck-instruction"><a class="heading-anchor" href="#74-healthcheck-instruction" aria-hidden="true">#</a>7.4 HEALTHCHECK Instruction</h3>
+<p><code class="inline-code">HEALTHCHECK</code> tells Docker (and orchestrators) how to actively probe whether a container is actually serving traffic correctly — not just &quot;the process is running,&quot; but &quot;the process is <em>working</em>.&quot;</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package.json package-lock.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci --omit=dev</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+
+<span class="hljs-keyword">HEALTHCHECK</span><span class="language-bash"> --interval=30s --<span class="hljs-built_in">timeout</span>=5s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || <span class="hljs-built_in">exit</span> 1</span>
+
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]</span></code></pre></div>
+<p>A minimal Express health endpoint to back it:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-javascript">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/health&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+  <span class="hljs-comment">// Optionally check DB connectivity, cache, etc. here</span>
+  res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;ok&#x27;</span> });
+});</code></pre></div>
+<p><code class="inline-code">docker ps</code> will then show <code class="inline-code">healthy</code>, <code class="inline-code">unhealthy</code>, or <code class="inline-code">starting</code> in the STATUS column. Orchestrators (Swarm, Kubernetes via its own probes) use this signal to decide whether to route traffic to a container or restart it.</p>
+<h3 id="75-docker-swarm--a-one-paragraph-orientation"><a class="heading-anchor" href="#75-docker-swarm--a-one-paragraph-orientation" aria-hidden="true">#</a>7.5 Docker Swarm — A One-Paragraph Orientation</h3>
+<p>Docker Swarm is Docker&#39;s own built-in orchestrator: <code class="inline-code">docker swarm init</code>, then <code class="inline-code">docker service create --replicas 3 my-node-app</code> gives you multi-node scheduling, rolling updates, and service discovery without installing Kubernetes. It&#39;s far simpler to operate than Kubernetes but has a much smaller ecosystem and is rarely the default choice for new production systems today — most teams either stay on plain Docker Compose for small deployments or go straight to Kubernetes for anything that needs to scale. Know it exists and roughly what it does; you won&#39;t be expected to be a Swarm expert, but &quot;Swarm vs Kubernetes, when would you pick Swarm?&quot; is a fair interview question (answer: small team, want native Docker CLI/UX, don&#39;t need Kubernetes&#39; ecosystem).</p>
+<h3 id="76-unit-07-labs"><a class="heading-anchor" href="#76-unit-07-labs" aria-hidden="true">#</a>7.6 Unit 07 Labs</h3>
+<ol>
+<li><strong>Restart policy simulation.</strong> Run a container with <code class="inline-code">--restart on-failure:3</code>, make the app process <code class="inline-code">process.exit(1)</code> deliberately, and watch <code class="inline-code">docker ps</code>/<code class="inline-code">docker inspect</code> track the restart count.</li>
+<li><strong>Trigger an OOM kill.</strong> Run a small Node script that intentionally allocates memory in a loop, cap the container at <code class="inline-code">--memory=100m</code>, and confirm via <code class="inline-code">docker inspect</code> that <code class="inline-code">OOMKilled: true</code> and exit code <code class="inline-code">137</code> appear.</li>
+<li><strong>Add and observe a HEALTHCHECK.</strong> Add the Express <code class="inline-code">/health</code> example above, break it deliberately (e.g., return 500), and watch the container flip to <code class="inline-code">unhealthy</code> in <code class="inline-code">docker ps</code>.</li>
+<li><strong>Log rotation.</strong> Configure <code class="inline-code">--log-opt max-size=1m --log-opt max-file=2</code> on a container that logs heavily, and confirm old log files get rotated/deleted on disk.</li>
+</ol>
+<h3 id="77-unit-07-interview-qampa"><a class="heading-anchor" href="#77-unit-07-interview-qampa" aria-hidden="true">#</a>7.7 Unit 07 Interview Q&amp;A</h3>
+<ul>
+<li><p><strong>Q: &quot;A container keeps exiting with code 137 — what&#39;s happening and how do you fix it?&quot;</strong>
+A: 137 = 128 + SIGKILL(9), almost always an OOM kill. Confirm with <code class="inline-code">docker inspect</code> (<code class="inline-code">OOMKilled: true</code>), then either raise the memory limit if the workload genuinely needs it, fix a memory leak in the app, or tune the app&#39;s own memory ceiling (e.g., V8&#39;s <code class="inline-code">--max-old-space-size</code> for Node) to stay safely under the container limit.</p>
+</li>
+<li><p><strong>Q: &quot;What&#39;s the difference between <code class="inline-code">always</code> and <code class="inline-code">unless-stopped</code> restart policies?&quot;</strong>
+A: Both restart the container on crash or daemon restart. The difference is after a host reboot: <code class="inline-code">always</code> will restart the container even if you had manually stopped it before the reboot; <code class="inline-code">unless-stopped</code> respects that manual stop and leaves it stopped.</p>
+</li>
+</ul>
+<hr>
+<h2 id="unit-08--docker-troubleshooting-amp-interview-mastery"><a class="heading-anchor" href="#unit-08--docker-troubleshooting-amp-interview-mastery" aria-hidden="true">#</a>Unit 08 — Docker Troubleshooting &amp; Interview Mastery</h2>
+<p><strong>Difficulty:</strong> Advanced · <strong>Goal:</strong> Debug confidently, under time pressure, in front of an interviewer or a production incident.</p>
+<h3 id="81-the-systematic-debugging-workflow"><a class="heading-anchor" href="#81-the-systematic-debugging-workflow" aria-hidden="true">#</a>8.1 The Systematic Debugging Workflow</h3>
+<p>When something&#39;s wrong with a container, work through this order rather than guessing:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker ps -a                     <span class="hljs-comment"># 1. Is it running, exited, or restarting?</span>
+docker logs --<span class="hljs-built_in">tail</span> 100 -f &lt;<span class="hljs-built_in">id</span>&gt;   <span class="hljs-comment"># 2. What did the app itself say before it died?</span>
+docker inspect &lt;<span class="hljs-built_in">id</span>&gt;              <span class="hljs-comment"># 3. Exit code, OOMKilled, mounts, env, network config</span>
+docker stats &lt;<span class="hljs-built_in">id</span>&gt;                <span class="hljs-comment"># 4. Live CPU/memory — is it starved or leaking?</span>
+docker <span class="hljs-built_in">exec</span> -it &lt;<span class="hljs-built_in">id</span>&gt; sh          <span class="hljs-comment"># 5. Get inside (if a shell exists) and look around live</span>
+docker events                    <span class="hljs-comment"># 6. Host-level timeline of container lifecycle events</span></code></pre></div>
+<p><code class="inline-code">docker inspect</code> is the single richest source of truth — <code class="inline-code">docker inspect &lt;id&gt; --format &#39;{{.State.ExitCode}} {{.State.OOMKilled}}&#39;</code> gets you the two most important fields directly without hunting through JSON.</p>
+<h3 id="82-common-failure-scenarios-decoded"><a class="heading-anchor" href="#82-common-failure-scenarios-decoded" aria-hidden="true">#</a>8.2 Common Failure Scenarios Decoded</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>How to confirm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exit code <code class="inline-code">137</code></td>
+<td>OOM killed (or manual <code class="inline-code">docker kill</code>)</td>
+<td><code class="inline-code">docker inspect</code> → <code class="inline-code">OOMKilled: true</code></td>
+</tr>
+<tr>
+<td>Exit code <code class="inline-code">1</code></td>
+<td>Uncaught app exception / non-zero <code class="inline-code">process.exit</code></td>
+<td><code class="inline-code">docker logs</code> will show the stack trace</td>
+</tr>
+<tr>
+<td>Exit code <code class="inline-code">139</code></td>
+<td>Segfault (SIGSEGV) — rare in pure JS, more common with native addons</td>
+<td>Check native module compatibility (e.g., glibc vs musl on Alpine)</td>
+</tr>
+<tr>
+<td><code class="inline-code">docker run</code> fails with &quot;port is already allocated&quot;</td>
+<td>Another container/process already bound that host port</td>
+<td><code class="inline-code">docker ps</code> / <code class="inline-code">lsof -i :&lt;port&gt;</code> on host</td>
+</tr>
+<tr>
+<td>&quot;Permission denied&quot; writing to a mounted volume</td>
+<td>UID mismatch between container user and host file ownership</td>
+<td><code class="inline-code">docker exec &lt;id&gt; id</code> vs <code class="inline-code">ls -la</code> on the host path</td>
+</tr>
+<tr>
+<td>Container can&#39;t resolve another container&#39;s hostname</td>
+<td>Both containers aren&#39;t on the same user-defined network (default bridge has no automatic DNS)</td>
+<td><code class="inline-code">docker network inspect &lt;network&gt;</code></td>
+</tr>
+<tr>
+<td>Container starts then immediately exits with code <code class="inline-code">0</code></td>
+<td>The main process (PID 1) finished and had nothing left to do — common when <code class="inline-code">CMD</code> runs a one-shot script instead of a long-running server</td>
+<td>Check your <code class="inline-code">CMD</code>/<code class="inline-code">ENTRYPOINT</code> actually starts a persistent process</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="83-quotworks-on-my-machinequot--diagnosing-environment-drift"><a class="heading-anchor" href="#83-quotworks-on-my-machinequot--diagnosing-environment-drift" aria-hidden="true">#</a>8.3 &quot;Works on My Machine&quot; — Diagnosing Environment Drift</h3>
+<p>The most common Node.js-specific cause: <strong>native modules built against the wrong libc.</strong> A dependency like <code class="inline-code">bcrypt</code> or <code class="inline-code">sharp</code> compiled on your Mac (or a Debian-based CI runner) may not load correctly inside an <code class="inline-code">alpine</code> (musl libc) container.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Reproduce a &quot;works on my machine&quot; bug by building inside the exact target image</span>
+docker run --<span class="hljs-built_in">rm</span> -v $(<span class="hljs-built_in">pwd</span>):/app -w /app node:20-alpine npm ci
+
+<span class="hljs-comment"># Inspect what actually got installed inside the container vs locally</span>
+docker run --<span class="hljs-built_in">rm</span> -v $(<span class="hljs-built_in">pwd</span>):/app -w /app node:20-alpine \
+  node -e <span class="hljs-string">&quot;console.log(require(&#x27;bcrypt&#x27;))&quot;</span></code></pre></div>
+<p>Other common drift sources: different Node.js versions between local and image (<code class="inline-code">node --version</code> inside vs outside the container), timezone/locale differences affecting date logic, and missing environment variables that exist in a local <code class="inline-code">.env</code> but were never passed via <code class="inline-code">-e</code> or <code class="inline-code">--env-file</code> to the container.</p>
+<h3 id="84-rapid-fire-concept-sheet"><a class="heading-anchor" href="#84-rapid-fire-concept-sheet" aria-hidden="true">#</a>8.4 Rapid-Fire Concept Sheet</h3>
+<p>Use this as flash-card material before an interview:</p>
+<ul>
+<li><strong>Image vs container:</strong> an image is a read-only, layered template; a container is a running (or stopped) instance of that image with its own writable layer.</li>
+<li><strong>Union filesystem:</strong> Docker stacks image layers using a copy-on-write filesystem (overlay2 is the modern default), so multiple containers can share the same underlying read-only layers while each keeps its own thin writable layer.</li>
+<li><strong>PID 1 in containers:</strong> the process specified in <code class="inline-code">CMD</code>/<code class="inline-code">ENTRYPOINT</code> becomes PID 1 inside the container&#39;s PID namespace. PID 1 doesn&#39;t get default signal handling the way normal processes do, so if your app doesn&#39;t explicitly handle <code class="inline-code">SIGTERM</code>, <code class="inline-code">docker stop</code> may hang until the timeout and then force-kill it. This is why tools like <code class="inline-code">tini</code> or Node&#39;s built-in signal handling (<code class="inline-code">process.on(&#39;SIGTERM&#39;, ...)</code>) matter for graceful shutdown.</li>
+<li><strong>Idempotency of builds:</strong> given the same Dockerfile and build context, you should get a functionally identical image — this is why pinning versions (<code class="inline-code">node:20.11.1-alpine</code> instead of <code class="inline-code">node:latest</code>) matters.</li>
+<li><strong>Artifact immutability:</strong> once an image is built and tagged with a specific version/SHA, it should never be overwritten — rebuild and re-tag instead, so every environment can trust that a given tag always means the same bits.</li>
+<li><strong>Secrets handling:</strong> never <code class="inline-code">COPY</code> secrets into a layer; use BuildKit secret mounts at build time and runtime secret injection (env vars from a vault, mounted files, or orchestrator secrets) at run time.</li>
+<li><strong>Rollback strategy:</strong> because tags are immutable and versioned, rollback is just redeploying the previous known-good tag — this is the entire reason the &quot;latest is dangerous&quot; rule from Unit 06 exists.</li>
+</ul>
+<h3 id="85-unit-08-labs"><a class="heading-anchor" href="#85-unit-08-labs" aria-hidden="true">#</a>8.5 Unit 08 Labs</h3>
+<ol>
+<li><strong>Restart-loop debugging.</strong> Deliberately misconfigure a container (e.g., point it at a nonexistent env var it requires) so it crash-loops, then use <code class="inline-code">docker logs</code> + <code class="inline-code">docker inspect</code> to identify and fix the root cause.</li>
+<li><strong>Exit code triage.</strong> Produce three containers that exit with codes <code class="inline-code">137</code> (OOM), <code class="inline-code">1</code> (app crash), and <code class="inline-code">0</code> (process finished normally) on purpose, and write down how you distinguished each using only <code class="inline-code">docker inspect</code>/<code class="inline-code">docker logs</code>.</li>
+<li><strong>Live <code class="inline-code">exec</code> investigation.</strong> Start a container, <code class="inline-code">docker exec -it</code> into it, and inspect running processes (<code class="inline-code">ps aux</code>), open files, and environment variables from inside — without stopping the container.</li>
+<li><strong>End-to-end mock walkthrough.</strong> Out loud (or in writing), narrate the full flow of <code class="inline-code">docker build</code> → <code class="inline-code">docker run</code> → networking → volume mounting for a Node.js app, as if explaining it to an interviewer, without skipping a step.</li>
+</ol>
+<h3 id="86-scenario-based-mock-interview-script"><a class="heading-anchor" href="#86-scenario-based-mock-interview-script" aria-hidden="true">#</a>8.6 Scenario-Based Mock Interview Script</h3>
+<p><strong>Interviewer:</strong> &quot;A container keeps restarting in prod. Walk me through your debugging steps.&quot;</p>
+<p><strong>Strong answer structure:</strong></p>
+<ol>
+<li>&quot;First I&#39;d check <code class="inline-code">docker ps -a</code> to confirm it&#39;s actually in a restart loop and see the restart count.&quot;</li>
+<li>&quot;Then <code class="inline-code">docker logs --tail 200</code> to see what the application printed right before each crash — usually the actual root cause is right there in the stack trace.&quot;</li>
+<li>&quot;I&#39;d run <code class="inline-code">docker inspect</code> and check the exit code and <code class="inline-code">OOMKilled</code> field specifically — that immediately tells me if it&#39;s a memory issue versus an application-level crash.&quot;</li>
+<li>&quot;If it&#39;s memory, I&#39;d check <code class="inline-code">docker stats</code> for a live view, and consider whether it&#39;s a genuine leak (fix the code) or just an undersized limit (adjust <code class="inline-code">--memory</code> or the container&#39;s replica sizing).&quot;</li>
+<li>&quot;If it&#39;s an application exception, I&#39;d reproduce locally by running the <em>exact</em> image (not just the source code) with the same environment variables, since drift between the image and local dev is a very common cause.&quot;</li>
+<li>&quot;Finally, I&#39;d check whether this started right after a deploy — if so, the fastest safe mitigation is rolling back to the previous immutable tag while I root-cause the new one.&quot;</li>
+</ol>
+<p>That six-step shape (observe → logs → inspect → live metrics → reproduce → mitigate/rollback) is a reusable template for almost any &quot;walk me through debugging X&quot; question in Docker/CI interviews.</p>
+<hr>
+<h2 id="phase-2-summary-checklist"><a class="heading-anchor" href="#phase-2-summary-checklist" aria-hidden="true">#</a>Phase 2 Summary Checklist</h2>
+<p>By the end of Phase 2 you should be able to, without notes:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Build a multi-stage Dockerfile for a Node.js app with a minimal, non-root final image</li>
+<li><input disabled="" type="checkbox"> Explain Alpine vs Distroless vs Slim trade-offs, including the musl/glibc native-module gotcha</li>
+<li><input disabled="" type="checkbox"> Run a Trivy scan and fix at least one real finding</li>
+<li><input disabled="" type="checkbox"> Use a BuildKit secret mount instead of <code class="inline-code">COPY</code>-ing a secret into a layer</li>
+<li><input disabled="" type="checkbox"> Explain why <code class="inline-code">latest</code> is dangerous and design a semver + SHA tagging scheme</li>
+<li><input disabled="" type="checkbox"> Authenticate and push/pull against at least one private registry</li>
+<li><input disabled="" type="checkbox"> Explain restart policies (<code class="inline-code">no</code>/<code class="inline-code">on-failure</code>/<code class="inline-code">always</code>/<code class="inline-code">unless-stopped</code>) and pick the right one for a service</li>
+<li><input disabled="" type="checkbox"> Set memory/CPU limits and correctly diagnose exit code 137 as an OOM kill</li>
+<li><input disabled="" type="checkbox"> Write and verify a <code class="inline-code">HEALTHCHECK</code> backed by a real app endpoint</li>
+<li><input disabled="" type="checkbox"> Run the full <code class="inline-code">docker ps → logs → inspect → stats → exec</code> debugging workflow from memory</li>
+<li><input disabled="" type="checkbox"> Deliver the six-step &quot;container keeps restarting in prod&quot; answer fluently</li>
+</ul>
+<hr>
+<p><em>End of Phase 2. Next: Phase 3 — CI/CD Foundation (CI/CD fundamentals, DORA metrics, Git branching strategies for pipelines, and build/artifact/dependency management).</em></p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

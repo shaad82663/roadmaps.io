@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 4 — GitHub Actions</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 4 — GitHub Actions</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-4--github-actions"><a class="heading-anchor" href="#phase-4--github-actions" aria-hidden="true">#</a>Phase 4 — GitHub Actions</h1>
+<h3 id="from-quot3-yoe-nodejs-backend-engineerquot--quotships-production-cicd-pipelines-on-github-actions-confidentlyquot"><a class="heading-anchor" href="#from-quot3-yoe-nodejs-backend-engineerquot--quotships-production-cicd-pipelines-on-github-actions-confidentlyquot" aria-hidden="true">#</a>From &quot;3 YOE Node.js Backend Engineer&quot; → &quot;Ships production CI/CD pipelines on GitHub Actions confidently&quot;</h3>
+<blockquote class="quote-plain"><p>This doc is self-contained. After reading it end-to-end and doing the labs, you should be able to explain, build, and debug everything in Units 12–15 of the roadmap without external references.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ul>
+<li><a href="#phase-4--github-actions">Phase 4 — GitHub Actions</a><ul>
+<li><a href="#how-to-use-this-doc">How to use this doc</a></li>
+<li><a href="#unit-12--github-actions-fundamentals">Unit 12 — GitHub Actions Fundamentals</a><ul>
+<li><a href="#121-anatomy-of-a-workflow-file">12.1 Anatomy of a Workflow File</a></li>
+<li><a href="#122-event-triggers">12.2 Event Triggers</a></li>
+<li><a href="#123-jobs-steps--runners">12.3 Jobs, Steps &amp; Runners</a></li>
+<li><a href="#124-using-marketplace-actions">12.4 Using Marketplace Actions</a></li>
+<li><a href="#125-reading-logs--run-history">12.5 Reading Logs &amp; Run History</a></li>
+<li><a href="#126-labs">12.6 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-13--github-actions-workflow-syntax-deep-dive">Unit 13 — GitHub Actions Workflow Syntax Deep Dive</a><ul>
+<li><a href="#131-contexts--expressions">13.1 Contexts &amp; Expressions</a></li>
+<li><a href="#132-needs-and-job-dependency-graphs">13.2 <code class="inline-code">needs:</code> and Job Dependency Graphs</a></li>
+<li><a href="#133-conditionals-with-if">13.3 Conditionals with <code class="inline-code">if:</code></a></li>
+<li><a href="#134-artifacts-between-jobs">13.4 Artifacts Between Jobs</a></li>
+<li><a href="#135-job-outputs">13.5 Job Outputs</a></li>
+<li><a href="#136-labs">13.6 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-14--secrets-environments--deployments">Unit 14 — Secrets, Environments &amp; Deployments</a><ul>
+<li><a href="#141-secret-scopes">14.1 Secret Scopes</a></li>
+<li><a href="#142-github-environments--protection-rules">14.2 GitHub Environments &amp; Protection Rules</a></li>
+<li><a href="#143-oidc--keyless-cloud-authentication">14.3 OIDC — Keyless Cloud Authentication</a></li>
+<li><a href="#144-approval-gates-for-production">14.4 Approval Gates for Production</a></li>
+<li><a href="#145-labs">14.5 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-15--github-actions-advanced-patterns">Unit 15 — GitHub Actions Advanced Patterns</a><ul>
+<li><a href="#151-matrix-builds">15.1 Matrix Builds</a></li>
+<li><a href="#152-caching-with-actionscache">15.2 Caching with actions/cache</a></li>
+<li><a href="#153-reusable-workflows-vs-composite-actions">15.3 Reusable Workflows vs Composite Actions</a></li>
+<li><a href="#154-self-hosted-runners">15.4 Self-Hosted Runners</a></li>
+<li><a href="#155-concurrency-groups">15.5 Concurrency Groups</a></li>
+<li><a href="#156-labs">15.6 Labs</a></li>
+</ul>
+</li>
+<li><a href="#phase-4-checklist">Phase 4 Checklist</a></li>
+<li><a href="#quick-reference-cheatsheet">Quick-Reference Cheatsheet</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="how-to-use-this-doc"><a class="heading-anchor" href="#how-to-use-this-doc" aria-hidden="true">#</a>How to use this doc</h2>
+<p>Each unit has: <strong>Theory</strong> (explained deeper than the roadmap bullet, framed around a typical Node.js repo) → <strong>Code/YAML</strong> → <strong>Interview Angle</strong> → <strong>Labs</strong> (do these, don&#39;t just read).</p>
+<hr>
+<h2 id="unit-12--github-actions-fundamentals"><a class="heading-anchor" href="#unit-12--github-actions-fundamentals" aria-hidden="true">#</a>Unit 12 — GitHub Actions Fundamentals</h2>
+<h3 id="121-anatomy-of-a-workflow-file"><a class="heading-anchor" href="#121-anatomy-of-a-workflow-file" aria-hidden="true">#</a>12.1 Anatomy of a Workflow File</h3>
+<p>Workflows live in <code class="inline-code">.github/workflows/*.yml</code>. Every workflow file has three top-level keys: <code class="inline-code">name</code>, <code class="inline-code">on</code> (trigger), and <code class="inline-code">jobs</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># .github/workflows/ci.yml</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">CI</span>
+
+<span class="hljs-attr">on:</span>
+  <span class="hljs-attr">push:</span>
+    <span class="hljs-attr">branches:</span> [<span class="hljs-string">main</span>]
+  <span class="hljs-attr">pull_request:</span>
+    <span class="hljs-attr">branches:</span> [<span class="hljs-string">main</span>]
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">test:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span> <span class="hljs-string">code</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Setup</span> <span class="hljs-string">Node.js</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;20&#x27;</span>
+          <span class="hljs-attr">cache:</span> <span class="hljs-string">&#x27;npm&#x27;</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">dependencies</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Run</span> <span class="hljs-string">tests</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">test</span></code></pre></div>
+<p>Key structural facts:</p>
+<ul>
+<li>A workflow can have multiple <code class="inline-code">jobs:</code> — by default they run <strong>in parallel</strong> unless linked with <code class="inline-code">needs:</code> (Unit 13).</li>
+<li>A job runs on a fresh <strong>runner</strong> (VM) — nothing persists between jobs unless you explicitly pass artifacts or use caching.</li>
+<li>Each <code class="inline-code">step</code> either runs a shell command (<code class="inline-code">run:</code>) or invokes a reusable <strong>action</strong> (<code class="inline-code">uses:</code>).</li>
+</ul>
+<h3 id="122-event-triggers"><a class="heading-anchor" href="#122-event-triggers" aria-hidden="true">#</a>12.2 Event Triggers</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Fires on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">push</code></td>
+<td>Commits pushed to matching branches/tags</td>
+</tr>
+<tr>
+<td><code class="inline-code">pull_request</code></td>
+<td>PR opened/updated targeting matching branches</td>
+</tr>
+<tr>
+<td><code class="inline-code">workflow_dispatch</code></td>
+<td>Manual trigger via UI/API, supports custom inputs</td>
+</tr>
+<tr>
+<td><code class="inline-code">schedule</code></td>
+<td>Cron-based, e.g. nightly builds</td>
+</tr>
+<tr>
+<td><code class="inline-code">release</code></td>
+<td>When a GitHub release is published</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">on:</span>
+  <span class="hljs-attr">push:</span>
+    <span class="hljs-attr">branches:</span> [<span class="hljs-string">main</span>]
+    <span class="hljs-attr">paths:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;src/**&#x27;</span>              <span class="hljs-comment"># only trigger if these paths changed</span>
+  <span class="hljs-attr">workflow_dispatch:</span>
+    <span class="hljs-attr">inputs:</span>
+      <span class="hljs-attr">environment:</span>
+        <span class="hljs-attr">description:</span> <span class="hljs-string">&#x27;Target environment&#x27;</span>
+        <span class="hljs-attr">required:</span> <span class="hljs-literal">true</span>
+        <span class="hljs-attr">default:</span> <span class="hljs-string">&#x27;staging&#x27;</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">choice</span>
+        <span class="hljs-attr">options:</span> [<span class="hljs-string">staging</span>, <span class="hljs-string">production</span>]
+  <span class="hljs-attr">schedule:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">cron:</span> <span class="hljs-string">&#x27;0 2 * * *&#x27;</span>       <span class="hljs-comment"># 2 AM UTC daily</span></code></pre></div>
+<p><code class="inline-code">paths:</code> filtering is a common optimization for monorepos — avoid running a Node service&#39;s CI when only docs changed.</p>
+<h3 id="123-jobs-steps-amp-runners"><a class="heading-anchor" href="#123-jobs-steps-amp-runners" aria-hidden="true">#</a>12.3 Jobs, Steps &amp; Runners</h3>
+<p><code class="inline-code">runs-on</code> selects the runner OS/image. GitHub-hosted runners come pre-installed with common tooling (Node, Docker, git) but versions drift over time — pin explicitly with <code class="inline-code">setup-node</code> rather than relying on the image default.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">build:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>      <span class="hljs-comment"># also: windows-latest, macos-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">node</span> <span class="hljs-string">--version</span>     <span class="hljs-comment"># whatever came pre-installed — don&#x27;t rely on this</span></code></pre></div>
+<p>Each <strong>step</strong> in a job runs sequentially on the <em>same</em> runner/filesystem — so <code class="inline-code">npm ci</code> in step 2 is visible to <code class="inline-code">npm test</code> in step 3. But nothing crosses <strong>job</strong> boundaries without artifacts (Unit 13) since each job gets a brand-new runner VM.</p>
+<h3 id="124-using-marketplace-actions"><a class="heading-anchor" href="#124-using-marketplace-actions" aria-hidden="true">#</a>12.4 Using Marketplace Actions</h3>
+<p>Actions are reusable units published to the <a href="https://github.com/marketplace?type=actions">GitHub Marketplace</a>, referenced as <code class="inline-code">owner/repo@ref</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>          <span class="hljs-comment"># clones your repo into the runner</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v4</span>        <span class="hljs-comment"># installs Node + optionally caches npm</span>
+  <span class="hljs-attr">with:</span>
+    <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;20&#x27;</span>
+    <span class="hljs-attr">cache:</span> <span class="hljs-string">&#x27;npm&#x27;</span></code></pre></div>
+<p>Security note (relevant for interviews and real audits): always pin to a <strong>version tag</strong> (<code class="inline-code">@v4</code>) or, for maximum supply-chain safety, a <strong>commit SHA</strong> (<code class="inline-code">@a1b2c3d...</code>) rather than <code class="inline-code">@main</code>, since a compromised action&#39;s <code class="inline-code">main</code> branch could inject malicious code into your pipeline.</p>
+<h3 id="125-reading-logs-amp-run-history"><a class="heading-anchor" href="#125-reading-logs-amp-run-history" aria-hidden="true">#</a>12.5 Reading Logs &amp; Run History</h3>
+<p>The <strong>Actions</strong> tab on GitHub shows every workflow run, grouped by workflow file, with pass/fail status, duration, and expandable per-step logs. Key skill: reading a failed step&#39;s raw log output to find the actual error (often buried under noisy <code class="inline-code">npm ci</code> output) — click &quot;Search logs&quot; or expand only the failing step rather than scrolling everything.</p>
+<h3 id="126-labs"><a class="heading-anchor" href="#126-labs" aria-hidden="true">#</a>12.6 Labs</h3>
+<ol>
+<li>Write a workflow that runs <code class="inline-code">npm test</code> on every push to <code class="inline-code">main</code>.</li>
+<li>Add a <code class="inline-code">workflow_dispatch</code> trigger with a required <code class="inline-code">environment</code> choice input, and trigger it manually from the Actions tab.</li>
+<li>Add a scheduled nightly workflow using cron syntax; verify it appears correctly under &quot;Scheduled workflows.&quot;</li>
+<li>Intentionally break a test, push it, and practice navigating the Actions log viewer to find the exact failing assertion.</li>
+</ol>
+<hr>
+<h2 id="unit-13--github-actions-workflow-syntax-deep-dive"><a class="heading-anchor" href="#unit-13--github-actions-workflow-syntax-deep-dive" aria-hidden="true">#</a>Unit 13 — GitHub Actions Workflow Syntax Deep Dive</h2>
+<h3 id="131-contexts-amp-expressions"><a class="heading-anchor" href="#131-contexts-amp-expressions" aria-hidden="true">#</a>13.1 Contexts &amp; Expressions</h3>
+<p>Contexts expose structured data you can reference with <code class="inline-code">${{ }}</code> expression syntax.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Example use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="inline-code">github</code></td>
+<td><code class="inline-code">${{ github.ref }}</code>, <code class="inline-code">${{ github.sha }}</code>, <code class="inline-code">${{ github.event_name }}</code></td>
+</tr>
+<tr>
+<td><code class="inline-code">env</code></td>
+<td><code class="inline-code">${{ env.NODE_ENV }}</code></td>
+</tr>
+<tr>
+<td><code class="inline-code">secrets</code></td>
+<td><code class="inline-code">${{ secrets.NPM_TOKEN }}</code></td>
+</tr>
+<tr>
+<td><code class="inline-code">needs</code></td>
+<td><code class="inline-code">${{ needs.build.outputs.version }}</code></td>
+</tr>
+<tr>
+<td><code class="inline-code">matrix</code></td>
+<td><code class="inline-code">${{ matrix.node-version }}</code></td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">steps:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;Building commit $<span class="hljs-template-variable">{{ github.sha }}</span> on branch $<span class="hljs-template-variable">{{ github.ref_name }}</span>&quot;</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;Event was $<span class="hljs-template-variable">{{ github.event_name }}</span>&quot;</span></code></pre></div>
+<h3 id="132-needs-and-job-dependency-graphs"><a class="heading-anchor" href="#132-needs-and-job-dependency-graphs" aria-hidden="true">#</a>13.2 <code class="inline-code">needs:</code> and Job Dependency Graphs</h3>
+<p>By default, all jobs run in parallel. <code class="inline-code">needs:</code> makes a job wait for one or more others to succeed first, forming a DAG.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">build:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">build</span>
+
+  <span class="hljs-attr">test:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">build</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">npm</span> <span class="hljs-string">test</span>
+
+  <span class="hljs-attr">deploy:</span>
+    <span class="hljs-attr">needs:</span> [<span class="hljs-string">build</span>, <span class="hljs-string">test</span>]        <span class="hljs-comment"># waits for BOTH to succeed</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;Deploying...&quot;</span></code></pre></div>
+<p>If <code class="inline-code">build</code> fails, <code class="inline-code">test</code> and <code class="inline-code">deploy</code> are skipped automatically — no explicit failure handling needed for the common case.</p>
+<h3 id="133-conditionals-with-if"><a class="heading-anchor" href="#133-conditionals-with-if" aria-hidden="true">#</a>13.3 Conditionals with <code class="inline-code">if:</code></h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">deploy:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">test</span>
+    <span class="hljs-attr">if:</span> <span class="hljs-string">github.ref</span> <span class="hljs-string">==</span> <span class="hljs-string">&#x27;refs/heads/main&#x27;</span>    <span class="hljs-comment"># only deploy from main</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;deploying&quot;</span>
+
+  <span class="hljs-attr">notify-on-failure:</span>
+    <span class="hljs-attr">needs:</span> [<span class="hljs-string">build</span>, <span class="hljs-string">test</span>]
+    <span class="hljs-attr">if:</span> <span class="hljs-string">failure()</span>                          <span class="hljs-comment"># only runs if a prior needs job failed</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;Something broke — notify Slack&quot;</span></code></pre></div>
+<p>Common built-in functions: <code class="inline-code">success()</code> (default implicit condition), <code class="inline-code">failure()</code>, <code class="inline-code">always()</code> (run regardless — useful for cleanup/notifications), <code class="inline-code">cancelled()</code>.</p>
+<h3 id="134-artifacts-between-jobs"><a class="heading-anchor" href="#134-artifacts-between-jobs" aria-hidden="true">#</a>13.4 Artifacts Between Jobs</h3>
+<p>Since each job is a fresh VM, passing files (build output, coverage reports) requires explicit upload/download.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">build:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">build</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/upload-artifact@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">name:</span> <span class="hljs-string">dist-output</span>
+          <span class="hljs-attr">path:</span> <span class="hljs-string">dist/</span>
+
+  <span class="hljs-attr">deploy:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">build</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/download-artifact@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">name:</span> <span class="hljs-string">dist-output</span>
+          <span class="hljs-attr">path:</span> <span class="hljs-string">dist/</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">ls</span> <span class="hljs-string">dist/</span>    <span class="hljs-comment"># the build output from the other job is now here</span></code></pre></div>
+<h3 id="135-job-outputs"><a class="heading-anchor" href="#135-job-outputs" aria-hidden="true">#</a>13.5 Job Outputs</h3>
+<p>For small values (a version string, a computed flag) rather than whole files, use job <code class="inline-code">outputs:</code> instead of artifacts — lighter weight.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">version:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">outputs:</span>
+      <span class="hljs-attr">app_version:</span> <span class="hljs-string">${{</span> <span class="hljs-string">steps.get_version.outputs.version</span> <span class="hljs-string">}}</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">id:</span> <span class="hljs-string">get_version</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;version=$(node -p &quot;</span><span class="hljs-string">require(&#x27;./package.json&#x27;).version&quot;)&quot;</span> <span class="hljs-string">&gt;&gt;</span> <span class="hljs-string">&quot;$GITHUB_OUTPUT&quot;</span>
+
+  <span class="hljs-attr">build:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">version</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;Building version $<span class="hljs-template-variable">{{ needs.version.outputs.app_version }}</span>&quot;</span></code></pre></div>
+<p>Note the <code class="inline-code">&gt;&gt; &quot;$GITHUB_OUTPUT&quot;</code> pattern — this is the current (post-2022) way to set step outputs; the older <code class="inline-code">::set-output::</code> command syntax is deprecated.</p>
+<h3 id="136-labs"><a class="heading-anchor" href="#136-labs" aria-hidden="true">#</a>13.6 Labs</h3>
+<ol>
+<li>Build a 3-job pipeline (<code class="inline-code">build</code> → <code class="inline-code">test</code> → <code class="inline-code">deploy</code>) using <code class="inline-code">needs:</code>, and verify in the Actions UI that they run sequentially, not in parallel.</li>
+<li>Add <code class="inline-code">if: github.ref == &#39;refs/heads/main&#39;</code> to the deploy job and confirm it&#39;s skipped on a feature-branch PR.</li>
+<li>Upload a build artifact from a <code class="inline-code">build</code> job and download it inside a separate <code class="inline-code">deploy</code> job.</li>
+<li>Compute a version string as a job output in one job and consume it via <code class="inline-code">needs.&lt;job&gt;.outputs.*</code> in another.</li>
+</ol>
+<hr>
+<h2 id="unit-14--secrets-environments-amp-deployments"><a class="heading-anchor" href="#unit-14--secrets-environments-amp-deployments" aria-hidden="true">#</a>Unit 14 — Secrets, Environments &amp; Deployments</h2>
+<h3 id="141-secret-scopes"><a class="heading-anchor" href="#141-secret-scopes" aria-hidden="true">#</a>14.1 Secret Scopes</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>Set at</th>
+<th>Visible to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Repository secret</td>
+<td>Repo Settings → Secrets and variables</td>
+<td>All workflows in that repo</td>
+</tr>
+<tr>
+<td>Organization secret</td>
+<td>Org settings</td>
+<td>Selected/all repos in the org</td>
+</tr>
+<tr>
+<td>Environment secret</td>
+<td>Repo → Environments → <code class="inline-code">&lt;env&gt;</code></td>
+<td>Only jobs targeting that environment</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">deploy:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;Deploying with token&quot;</span>
+        <span class="hljs-attr">env:</span>
+          <span class="hljs-attr">NPM_TOKEN:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.NPM_TOKEN</span> <span class="hljs-string">}}</span></code></pre></div>
+<p>Secrets are masked in logs automatically (GitHub redacts any exact-match substring), but <strong>never <code class="inline-code">echo</code> a secret directly</strong> — masking can be defeated with encoding tricks, and it&#39;s just bad practice.</p>
+<h3 id="142-github-environments-amp-protection-rules"><a class="heading-anchor" href="#142-github-environments-amp-protection-rules" aria-hidden="true">#</a>14.2 GitHub Environments &amp; Protection Rules</h3>
+<p>An <strong>Environment</strong> (Settings → Environments) groups deployment-related config: environment-scoped secrets, required reviewers, wait timers, and deployment branch restrictions.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">deploy-prod:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-attr">name:</span> <span class="hljs-string">production</span>
+      <span class="hljs-attr">url:</span> <span class="hljs-string">https://myapp.com</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">./deploy.sh</span></code></pre></div>
+<p>If <code class="inline-code">production</code> has a <strong>required reviewer</strong> configured, this job will <strong>pause</strong> and show up as &quot;Waiting for approval&quot; in the Actions UI until an authorized person approves it — a native manual gate, no extra tooling needed.</p>
+<h3 id="143-oidc--keyless-cloud-authentication"><a class="heading-anchor" href="#143-oidc--keyless-cloud-authentication" aria-hidden="true">#</a>14.3 OIDC — Keyless Cloud Authentication</h3>
+<p>Instead of storing long-lived cloud credentials (<code class="inline-code">AWS_ACCESS_KEY_ID</code> etc.) as secrets forever, GitHub Actions can present a short-lived OIDC token that your cloud provider trusts, exchanging it for temporary credentials per-run.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">permissions:</span>
+  <span class="hljs-attr">id-token:</span> <span class="hljs-string">write</span>     <span class="hljs-comment"># required for OIDC — must be explicitly granted</span>
+  <span class="hljs-attr">contents:</span> <span class="hljs-string">read</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">deploy:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">aws-actions/configure-aws-credentials@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">role-to-assume:</span> <span class="hljs-string">arn:aws:iam::123456789012:role/github-actions-deploy</span>
+          <span class="hljs-attr">aws-region:</span> <span class="hljs-string">us-east-1</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">aws</span> <span class="hljs-string">s3</span> <span class="hljs-string">sync</span> <span class="hljs-string">./dist</span> <span class="hljs-string">s3://my-bucket</span></code></pre></div>
+<p>Why this matters (common interview question — &quot;how do you avoid storing cloud credentials in CI?&quot;): no static AWS keys sit in GitHub Secrets at all. The IAM role&#39;s trust policy is scoped to your specific repo/branch, so even if the workflow file were compromised, there&#39;s no long-lived credential to steal — tokens expire in minutes.</p>
+<h3 id="144-approval-gates-for-production"><a class="heading-anchor" href="#144-approval-gates-for-production" aria-hidden="true">#</a>14.4 Approval Gates for Production</h3>
+<p>Combine Environments + OIDC + branch restrictions for a realistic production deploy flow:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">deploy-staging:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">test</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">environment:</span> <span class="hljs-string">staging</span>          <span class="hljs-comment"># no reviewers required — auto-deploys</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">./deploy.sh</span> <span class="hljs-string">staging</span>
+
+  <span class="hljs-attr">deploy-prod:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">deploy-staging</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">environment:</span> <span class="hljs-string">production</span>       <span class="hljs-comment"># required reviewers configured in repo settings</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">./deploy.sh</span> <span class="hljs-string">production</span></code></pre></div>
+<p>Staging deploys automatically on every merge to <code class="inline-code">main</code>; production requires a human click — a very common real-world pattern.</p>
+<h3 id="145-labs"><a class="heading-anchor" href="#145-labs" aria-hidden="true">#</a>14.5 Labs</h3>
+<ol>
+<li>Create a <code class="inline-code">production</code> environment with a required reviewer, and observe a deploy job pause for approval.</li>
+<li>Set up OIDC federation to a cloud provider (or simulate with a mock role) and deploy without any static access keys stored as secrets.</li>
+<li>Store an <code class="inline-code">NPM_TOKEN</code> as a repository secret and use it in a publish step; verify it&#39;s masked in the logs.</li>
+<li>Build a two-stage pipeline: auto-deploy to staging, but require manual approval before production.</li>
+</ol>
+<hr>
+<h2 id="unit-15--github-actions-advanced-patterns"><a class="heading-anchor" href="#unit-15--github-actions-advanced-patterns" aria-hidden="true">#</a>Unit 15 — GitHub Actions Advanced Patterns</h2>
+<h3 id="151-matrix-builds"><a class="heading-anchor" href="#151-matrix-builds" aria-hidden="true">#</a>15.1 Matrix Builds</h3>
+<p>Run the same job across multiple combinations of variables (Node versions, OSes) in parallel.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">test:</span>
+    <span class="hljs-attr">strategy:</span>
+      <span class="hljs-attr">matrix:</span>
+        <span class="hljs-attr">node-version:</span> [<span class="hljs-number">18</span>, <span class="hljs-number">20</span>, <span class="hljs-number">22</span>]
+        <span class="hljs-attr">os:</span> [<span class="hljs-string">ubuntu-latest</span>, <span class="hljs-string">macos-latest</span>]
+      <span class="hljs-attr">fail-fast:</span> <span class="hljs-literal">false</span>        <span class="hljs-comment"># let all combos finish even if one fails</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">${{</span> <span class="hljs-string">matrix.os</span> <span class="hljs-string">}}</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">node-version:</span> <span class="hljs-string">${{</span> <span class="hljs-string">matrix.node-version</span> <span class="hljs-string">}}</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">npm</span> <span class="hljs-string">test</span></code></pre></div>
+<p>This spins up <strong>6 parallel jobs</strong> (3 Node versions × 2 OSes) from one job definition.</p>
+<h3 id="152-caching-with-actionscache"><a class="heading-anchor" href="#152-caching-with-actionscache" aria-hidden="true">#</a>15.2 Caching with actions/cache</h3>
+<p><code class="inline-code">setup-node</code>&#39;s built-in <code class="inline-code">cache: &#39;npm&#39;</code> covers the common case, but <code class="inline-code">actions/cache</code> gives you full control for custom caching needs (e.g., build output, Docker layers, other package managers).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/cache@v4</span>
+  <span class="hljs-attr">with:</span>
+    <span class="hljs-attr">path:</span> <span class="hljs-string">~/.npm</span>
+    <span class="hljs-attr">key:</span> <span class="hljs-string">${{</span> <span class="hljs-string">runner.os</span> <span class="hljs-string">}}-npm-${{</span> <span class="hljs-string">hashFiles(&#x27;**/package-lock.json&#x27;)</span> <span class="hljs-string">}}</span>
+    <span class="hljs-attr">restore-keys:</span> <span class="hljs-string">|</span>
+      <span class="hljs-string">${{</span> <span class="hljs-string">runner.os</span> <span class="hljs-string">}}-npm-</span></code></pre></div>
+<p>The <code class="inline-code">key</code> includes a hash of <code class="inline-code">package-lock.json</code> — cache invalidates automatically when dependencies change; <code class="inline-code">restore-keys</code> provides a fallback partial-match cache if no exact key hits.</p>
+<h3 id="153-reusable-workflows-vs-composite-actions"><a class="heading-anchor" href="#153-reusable-workflows-vs-composite-actions" aria-hidden="true">#</a>15.3 Reusable Workflows vs Composite Actions</h3>
+<p><strong>Reusable workflow</strong> (<code class="inline-code">workflow_call</code>) — an entire callable workflow, good for sharing whole pipelines (build+test+deploy) across repos:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># .github/workflows/reusable-deploy.yml</span>
+<span class="hljs-attr">on:</span>
+  <span class="hljs-attr">workflow_call:</span>
+    <span class="hljs-attr">inputs:</span>
+      <span class="hljs-attr">environment:</span>
+        <span class="hljs-attr">required:</span> <span class="hljs-literal">true</span>
+        <span class="hljs-attr">type:</span> <span class="hljs-string">string</span>
+    <span class="hljs-attr">secrets:</span>
+      <span class="hljs-attr">DEPLOY_TOKEN:</span>
+        <span class="hljs-attr">required:</span> <span class="hljs-literal">true</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">deploy:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;Deploying to $<span class="hljs-template-variable">{{ inputs.environment }}</span>&quot;</span>
+        <span class="hljs-attr">env:</span>
+          <span class="hljs-attr">TOKEN:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.DEPLOY_TOKEN</span> <span class="hljs-string">}}</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># caller workflow in another repo</span>
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">call-deploy:</span>
+    <span class="hljs-attr">uses:</span> <span class="hljs-string">my-org/shared-workflows/.github/workflows/reusable-deploy.yml@main</span>
+    <span class="hljs-attr">with:</span>
+      <span class="hljs-attr">environment:</span> <span class="hljs-string">production</span>
+    <span class="hljs-attr">secrets:</span>
+      <span class="hljs-attr">DEPLOY_TOKEN:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.DEPLOY_TOKEN</span> <span class="hljs-string">}}</span></code></pre></div>
+<p><strong>Composite action</strong> — a bundle of steps reused <em>within</em> a job (not a whole separate job), good for sharing a handful of common steps:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># .github/actions/setup-and-lint/action.yml</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">&#x27;Setup and Lint&#x27;</span>
+<span class="hljs-attr">runs:</span>
+  <span class="hljs-attr">using:</span> <span class="hljs-string">&#x27;composite&#x27;</span>
+  <span class="hljs-attr">steps:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v4</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;20&#x27;</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span>
+      <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">lint</span>
+      <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># used inside any job&#x27;s steps</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">./.github/actions/setup-and-lint</span></code></pre></div>
+<p>Rule of thumb: reusable workflow = share a <strong>pipeline</strong>; composite action = share a handful of <strong>steps</strong>.</p>
+<h3 id="154-self-hosted-runners"><a class="heading-anchor" href="#154-self-hosted-runners" aria-hidden="true">#</a>15.4 Self-Hosted Runners</h3>
+<p>GitHub-hosted runners are convenient but limited (no persistent cache beyond <code class="inline-code">actions/cache</code>, capped resources, can&#39;t access private-network resources like an internal DB). Self-hosted runners are your own machines/VMs/containers registered to your repo/org.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">build:</span>
+    <span class="hljs-attr">runs-on:</span> [<span class="hljs-string">self-hosted</span>, <span class="hljs-string">linux</span>, <span class="hljs-string">gpu</span>]   <span class="hljs-comment"># matches runner labels you configured</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">./run-gpu-heavy-build.sh</span></code></pre></div>
+<p>Use when you need: access to private VPC resources, specialized hardware (GPU), persistent local caches across runs, or cost control at high volume. Trade-off: you now own patching, scaling, and securing those machines.</p>
+<h3 id="155-concurrency-groups"><a class="heading-anchor" href="#155-concurrency-groups" aria-hidden="true">#</a>15.5 Concurrency Groups</h3>
+<p>Prevents wasted runs when multiple pushes happen in quick succession (e.g., someone pushes 5 times to the same PR in a minute).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">concurrency:</span>
+  <span class="hljs-attr">group:</span> <span class="hljs-string">ci-${{</span> <span class="hljs-string">github.ref</span> <span class="hljs-string">}}</span>
+  <span class="hljs-attr">cancel-in-progress:</span> <span class="hljs-literal">true</span></code></pre></div>
+<p>This cancels any <strong>in-progress</strong> run for the same branch/PR when a newer one starts — saving CI minutes and avoiding confusing out-of-order deploy results.</p>
+<h3 id="156-labs"><a class="heading-anchor" href="#156-labs" aria-hidden="true">#</a>15.6 Labs</h3>
+<ol>
+<li>Build a matrix workflow testing across 3 Node versions and 2 OSes; confirm 6 parallel jobs appear in the Actions UI.</li>
+<li>Add <code class="inline-code">actions/cache</code> for <code class="inline-code">~/.npm</code> keyed on <code class="inline-code">package-lock.json</code> hash; measure build time improvement on a cache hit.</li>
+<li>Extract a shared &quot;setup + lint&quot; sequence into a composite action, and a full &quot;test + deploy&quot; sequence into a reusable workflow called from two different workflow files.</li>
+<li>Add a <code class="inline-code">concurrency</code> block to a workflow, push twice quickly to the same branch, and verify the first run gets cancelled.</li>
+</ol>
+<hr>
+<h2 id="phase-4-checklist"><a class="heading-anchor" href="#phase-4-checklist" aria-hidden="true">#</a>Phase 4 Checklist</h2>
+<p>Before moving to Phase 5 (Jenkins), you should be able to, without looking anything up:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Write a workflow file from scratch: <code class="inline-code">name</code>, <code class="inline-code">on</code>, <code class="inline-code">jobs</code>, <code class="inline-code">steps</code></li>
+<li><input disabled="" type="checkbox"> Explain the difference between <code class="inline-code">push</code>, <code class="inline-code">pull_request</code>, <code class="inline-code">workflow_dispatch</code>, and <code class="inline-code">schedule</code> triggers</li>
+<li><input disabled="" type="checkbox"> Explain why data doesn&#39;t persist between jobs by default, and how artifacts fix that</li>
+<li><input disabled="" type="checkbox"> Chain jobs with <code class="inline-code">needs:</code> and use <code class="inline-code">if:</code> conditionals (including <code class="inline-code">success()</code>/<code class="inline-code">failure()</code>/<code class="inline-code">always()</code>)</li>
+<li><input disabled="" type="checkbox"> Pass a computed value between jobs using <code class="inline-code">outputs:</code></li>
+<li><input disabled="" type="checkbox"> Explain the 3 secret scopes (repo/org/environment) and when to use each</li>
+<li><input disabled="" type="checkbox"> Set up a GitHub Environment with a required-reviewer approval gate</li>
+<li><input disabled="" type="checkbox"> Explain OIDC and why it&#39;s preferred over static cloud credentials</li>
+<li><input disabled="" type="checkbox"> Write a matrix build and explain how many jobs a given matrix produces</li>
+<li><input disabled="" type="checkbox"> Explain the difference between a reusable workflow and a composite action, and when to use each</li>
+<li><input disabled="" type="checkbox"> Explain when a self-hosted runner is worth the operational cost</li>
+<li><input disabled="" type="checkbox"> Add a concurrency group to cancel superseded runs</li>
+</ul>
+<hr>
+<h2 id="quick-reference-cheatsheet"><a class="heading-anchor" href="#quick-reference-cheatsheet" aria-hidden="true">#</a>Quick-Reference Cheatsheet</h2>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># Minimal CI workflow</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">CI</span>
+<span class="hljs-attr">on:</span>
+  <span class="hljs-attr">push:</span>
+    <span class="hljs-attr">branches:</span> [<span class="hljs-string">main</span>]
+  <span class="hljs-attr">pull_request:</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">test:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;20&#x27;</span>
+          <span class="hljs-attr">cache:</span> <span class="hljs-string">&#x27;npm&#x27;</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">test</span>
+
+<span class="hljs-comment"># Common context references</span>
+<span class="hljs-string">${{</span> <span class="hljs-string">github.sha</span> <span class="hljs-string">}}</span>
+<span class="hljs-string">${{</span> <span class="hljs-string">github.ref_name</span> <span class="hljs-string">}}</span>
+<span class="hljs-string">${{</span> <span class="hljs-string">github.event_name</span> <span class="hljs-string">}}</span>
+<span class="hljs-string">${{</span> <span class="hljs-string">secrets.MY_SECRET</span> <span class="hljs-string">}}</span>
+<span class="hljs-string">${{</span> <span class="hljs-string">needs.&lt;job&gt;.outputs.&lt;name&gt;</span> <span class="hljs-string">}}</span>
+<span class="hljs-string">${{</span> <span class="hljs-string">matrix.&lt;key&gt;</span> <span class="hljs-string">}}</span>
+
+<span class="hljs-comment"># Job chaining</span>
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">a:</span> {}
+  <span class="hljs-attr">b:</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">a</span>
+  <span class="hljs-attr">c:</span>
+    <span class="hljs-attr">needs:</span> [<span class="hljs-string">a</span>, <span class="hljs-string">b</span>]
+    <span class="hljs-attr">if:</span> <span class="hljs-string">success()</span>
+
+<span class="hljs-comment"># Artifacts</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/upload-artifact@v4</span>
+  <span class="hljs-attr">with:</span> { <span class="hljs-attr">name:</span> <span class="hljs-string">build</span>, <span class="hljs-attr">path:</span> <span class="hljs-string">dist/</span> }
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/download-artifact@v4</span>
+  <span class="hljs-attr">with:</span> { <span class="hljs-attr">name:</span> <span class="hljs-string">build</span>, <span class="hljs-attr">path:</span> <span class="hljs-string">dist/</span> }
+
+<span class="hljs-comment"># Concurrency</span>
+<span class="hljs-attr">concurrency:</span>
+  <span class="hljs-attr">group:</span> <span class="hljs-string">ci-${{</span> <span class="hljs-string">github.ref</span> <span class="hljs-string">}}</span>
+  <span class="hljs-attr">cancel-in-progress:</span> <span class="hljs-literal">true</span></code></pre></div>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

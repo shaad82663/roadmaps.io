@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 3: CI/CD Foundation — Complete Study Guide</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 3: CI/CD Foundation — Complete Study Guide</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-3-cicd-foundation--complete-study-guide"><a class="heading-anchor" href="#phase-3-cicd-foundation--complete-study-guide" aria-hidden="true">#</a>Phase 3: CI/CD Foundation — Complete Study Guide</h1>
+<blockquote class="quote-plain"><p>Track: Docker + CI/CD Mastery Roadmap
+Phase 3 covers Units 09, 10, 11 — the conceptual bedrock before you touch GitHub Actions or Jenkins syntax.
+Audience note: written for a 3 YOE Node.js backend engineer. Examples use <code class="inline-code">npm</code>/<code class="inline-code">package.json</code>/Express where relevant.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ul>
+<li><a href="#unit-09-cicd-fundamentals--devops-culture">Unit 09: CI/CD Fundamentals &amp; DevOps Culture</a><ul>
+<li><a href="#91-ci-vs-cd-vs-continuous-deployment">9.1 CI vs CD vs Continuous Deployment</a></li>
+<li><a href="#92-devops-culture--dora-metrics">9.2 DevOps Culture &amp; DORA Metrics</a></li>
+<li><a href="#93-anatomy-of-a-cicd-pipeline">9.3 Anatomy of a CI/CD Pipeline</a></li>
+<li><a href="#94-shift-left-testing--fail-fast">9.4 Shift-Left Testing &amp; Fail Fast</a></li>
+<li><a href="#95-interview-trap-ci-vs-cd-vs-continuous-deployment">9.5 Interview Trap: CI vs CD vs Continuous Deployment</a></li>
+<li><a href="#96-labs-unit-09">9.6 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-10-git-branching-strategies-for-cicd">Unit 10: Git Branching Strategies for CI/CD</a><ul>
+<li><a href="#101-trunk-based-development-vs-gitflow-vs-github-flow">10.1 Trunk-Based Development vs GitFlow vs GitHub Flow</a></li>
+<li><a href="#102-how-branching-strategy-drives-pipeline-trigger-design">10.2 How Branching Strategy Drives Pipeline Trigger Design</a></li>
+<li><a href="#103-feature-flags-as-an-alternative-to-long-lived-branches">10.3 Feature Flags as an Alternative to Long-Lived Branches</a></li>
+<li><a href="#104-pull-request-workflows--required-status-checks">10.4 Pull Request Workflows &amp; Required Status Checks</a></li>
+<li><a href="#105-interview-angle-choosing-a-branching-strategy">10.5 Interview Angle: Choosing a Branching Strategy</a></li>
+<li><a href="#106-labs-unit-10">10.6 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-11-build-systems-artifacts--dependency-management">Unit 11: Build Systems, Artifacts &amp; Dependency Management</a><ul>
+<li><a href="#111-build-tools-overview">11.1 Build Tools Overview</a></li>
+<li><a href="#112-artifact-repositories">11.2 Artifact Repositories</a></li>
+<li><a href="#113-semantic-versioning--immutable-artifacts">11.3 Semantic Versioning &amp; Immutable Artifacts</a></li>
+<li><a href="#114-dependency-caching">11.4 Dependency Caching</a></li>
+<li><a href="#115-interview-favorite-build-once-deploy-many">11.5 Interview Favorite: Build Once, Deploy Many</a></li>
+<li><a href="#116-labs-unit-11">11.6 Labs</a></li>
+</ul>
+</li>
+<li><a href="#phase-3-interview-cheat-sheet">Phase 3 Interview Cheat Sheet</a></li>
+<li><a href="#phase-3-self-check-quiz">Phase 3 Self-Check Quiz</a></li>
+</ul>
+<hr>
+<h2 id="unit-09-cicd-fundamentals-amp-devops-culture"><a class="heading-anchor" href="#unit-09-cicd-fundamentals-amp-devops-culture" aria-hidden="true">#</a>Unit 09: CI/CD Fundamentals &amp; DevOps Culture</h2>
+<p><strong>Difficulty:</strong> Beginner | <strong>Phase:</strong> CI/CD Foundation</p>
+<h3 id="91-ci-vs-cd-vs-continuous-deployment"><a class="heading-anchor" href="#91-ci-vs-cd-vs-continuous-deployment" aria-hidden="true">#</a>9.1 CI vs CD vs Continuous Deployment</h3>
+<p>These three terms get mixed up constantly, including in interviews. Nail the distinction precisely.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What it guarantees</th>
+<th>What happens automatically</th>
+<th>Human gate?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Continuous Integration (CI)</strong></td>
+<td>Every code change is built and tested automatically as soon as it&#39;s pushed/merged</td>
+<td>Build + automated tests run on every commit/PR</td>
+<td>N/A (this stage ends at &quot;tests passed&quot;)</td>
+</tr>
+<tr>
+<td><strong>Continuous Delivery (CD)</strong></td>
+<td>Every change that passes CI is automatically packaged into a release-ready artifact</td>
+<td>Build → test → package → stage in a deployable state</td>
+<td><strong>Yes</strong> — a human clicks &quot;deploy to prod&quot;</td>
+</tr>
+<tr>
+<td><strong>Continuous Deployment (also CD)</strong></td>
+<td>Every change that passes all pipeline stages goes to production automatically</td>
+<td>Build → test → package → deploy to prod</td>
+<td><strong>No</strong> — no human in the loop</td>
+</tr>
+</tbody>
+</table></div>
+<p>Think of it as a ladder:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">CI  →  Continuous Delivery  →  Continuous Deployment
+(build+test)   (+ package, always releasable)   (+ auto-release to prod, zero manual gate)</code></pre></div>
+<p>As a Node.js dev, you&#39;ve lived CI already: every time a PR triggers <code class="inline-code">npm test</code> and <code class="inline-code">npm run lint</code>, that&#39;s CI. The moment your team says &quot;and if that passes, it auto-deploys to production with no approval,&quot; that&#39;s Continuous Deployment — the strictest, most automated end of the spectrum.</p>
+<p><strong>Common misconception to avoid:</strong> Continuous Delivery does NOT mean auto-deploying to prod. It means you are <em>always in a state where you could</em> deploy to prod with one click. Continuous Deployment is the one where that click is removed entirely.</p>
+<h3 id="92-devops-culture-amp-dora-metrics"><a class="heading-anchor" href="#92-devops-culture-amp-dora-metrics" aria-hidden="true">#</a>9.2 DevOps Culture &amp; DORA Metrics</h3>
+<p>DevOps is a cultural and technical practice that removes the wall between &quot;Dev&quot; (who writes code) and &quot;Ops&quot; (who runs it in production) so the same team owns a change from commit to production and back.</p>
+<p><strong>DORA metrics</strong> (from Google&#39;s DevOps Research and Assessment team) are the four industry-standard metrics used to measure software delivery performance:</p>
+<ol>
+<li><strong>Deployment Frequency (DF)</strong> — how often you ship to production.<ul>
+<li>Elite teams: multiple deploys per day. Low performers: once every few months.</li>
+</ul>
+</li>
+<li><strong>Lead Time for Changes (LT)</strong> — time from code committed to code running in production.<ul>
+<li>Elite: less than 1 hour. Low: more than 6 months.</li>
+</ul>
+</li>
+<li><strong>Mean Time to Restore (MTTR)</strong> — how long it takes to recover from a production incident/failed deploy.<ul>
+<li>Elite: less than 1 hour. Low: more than 1 week.</li>
+</ul>
+</li>
+<li><strong>Change Failure Rate (CFR)</strong> — percentage of deployments that cause a production failure requiring a fix (rollback, hotfix, patch).<ul>
+<li>Elite: 0-15%. Low: 46-60%.</li>
+</ul>
+</li>
+</ol>
+<p>Simple mental formulas:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Deployment Frequency = (# of production deployments) / (time period)
+Lead Time for Changes = (time of deploy) - (time of first commit for that change)
+MTTR                  = (time incident resolved) - (time incident detected)
+Change Failure Rate   = (# failed deployments) / (total # deployments) × 100</code></pre></div>
+<p><strong>Why this matters to you as an engineer:</strong> DORA metrics are what separates &quot;we have a CI/CD pipeline&quot; from &quot;our CI/CD pipeline is actually good.&quot; In interviews, being able to say &quot;we improved deployment frequency by doing X&quot; is far stronger than describing YAML syntax.</p>
+<h3 id="93-anatomy-of-a-cicd-pipeline"><a class="heading-anchor" href="#93-anatomy-of-a-cicd-pipeline" aria-hidden="true">#</a>9.3 Anatomy of a CI/CD Pipeline</h3>
+<p>A pipeline is a sequence of automated stages a code change passes through. The canonical shape:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text"> Source  →  Build  →  Test  →  Package  →  Deploy  →  Monitor
+   |          |         |          |           |          |
+ git push   compile   unit/int   docker      staging/   logs,
+ /PR merge  transpile  tests     image or    prod       alerts,
+                                  build zip   rollout    metrics</code></pre></div>
+<p>Mapped to a typical Node.js/Express service:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Node.js example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Source</strong></td>
+<td>Push to <code class="inline-code">feature/add-auth</code> → PR opened against <code class="inline-code">main</code></td>
+</tr>
+<tr>
+<td><strong>Build</strong></td>
+<td><code class="inline-code">npm ci</code> (clean install), <code class="inline-code">npm run build</code> (if using TypeScript, transpile to <code class="inline-code">dist/</code>)</td>
+</tr>
+<tr>
+<td><strong>Test</strong></td>
+<td><code class="inline-code">npm run lint</code>, <code class="inline-code">npm test</code> (Jest/Mocha), <code class="inline-code">npm audit</code></td>
+</tr>
+<tr>
+<td><strong>Package</strong></td>
+<td><code class="inline-code">docker build -t myapp:sha123</code> or <code class="inline-code">npm pack</code> for a library</td>
+</tr>
+<tr>
+<td><strong>Deploy</strong></td>
+<td>Push image to registry → <code class="inline-code">kubectl apply</code> / <code class="inline-code">docker compose up</code> / cloud deploy</td>
+</tr>
+<tr>
+<td><strong>Monitor</strong></td>
+<td>Health checks, log aggregation, error tracking (Sentry), metrics (Prometheus)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each stage acts as a <strong>gate</strong> — if <code class="inline-code">Test</code> fails, the pipeline stops and <code class="inline-code">Package</code>/<code class="inline-code">Deploy</code> never run. This is what &quot;fail fast, fail early&quot; means in practice.</p>
+<h3 id="94-shift-left-testing-amp-fail-fast"><a class="heading-anchor" href="#94-shift-left-testing-amp-fail-fast" aria-hidden="true">#</a>9.4 Shift-Left Testing &amp; Fail Fast</h3>
+<p>&quot;Shift-left&quot; means moving quality checks (tests, linting, security scans) as early as possible in the pipeline/timeline — ideally to the developer&#39;s local machine and the first CI step — rather than discovering problems late (in staging, or worse, in production).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Traditional (shift-right, expensive):
+  Code → Deploy → QA finds bug → Ops finds it broke prod → Fix
+
+Shift-left (cheap):
+  Local lint/test → Pre-commit hook → CI unit tests → CI integration tests → Deploy
+  (bug caught here)                                                          ↑
+                                                              never gets this far</code></pre></div>
+<p>Practical shift-left tools you&#39;d recognize as a Node dev:</p>
+<ul>
+<li><strong>Pre-commit hooks</strong> (Husky + lint-staged) running <code class="inline-code">eslint</code> and <code class="inline-code">prettier</code> before a commit is even allowed.</li>
+<li><strong>CI unit tests</strong> running on every push, not just before release.</li>
+<li><strong>Static analysis</strong> (ESLint, TypeScript compiler checks) catching type errors before runtime.</li>
+</ul>
+<p>The &quot;fail fast&quot; philosophy: it&#39;s far cheaper to fail a build in 30 seconds on a laptop than to fail a deployment in production at 2 AM. Every stage of your pipeline should be ordered fastest-and-cheapest-first (lint before unit tests, unit tests before integration tests, integration tests before deploy) so failures surface as early and cheaply as possible.</p>
+<h3 id="95-interview-trap-ci-vs-cd-vs-continuous-deployment"><a class="heading-anchor" href="#95-interview-trap-ci-vs-cd-vs-continuous-deployment" aria-hidden="true">#</a>9.5 Interview Trap: CI vs CD vs Continuous Deployment</h3>
+<p><strong>How to answer this cleanly if asked live:</strong></p>
+<blockquote class="quote-plain"><p>&quot;CI is about integrating and validating code changes constantly — every push triggers a build and automated test suite. Continuous Delivery extends that by ensuring the validated code is always packaged into a deployable artifact, but a human still approves the actual production release. Continuous Deployment removes that human gate entirely — anything that passes the pipeline goes live automatically. The confusion usually comes from both Delivery and Deployment sharing the abbreviation &#39;CD&#39; — you have to listen for which one is meant from context.&quot;</p>
+</blockquote>
+<p>Follow-up they may ask: <em>&quot;Which would you deploy at a bank vs a SaaS startup?&quot;</em> — Banks/regulated industries usually stop at Continuous Delivery (compliance requires a human sign-off); fast-moving SaaS products often run full Continuous Deployment.</p>
+<h3 id="96-labs-unit-09"><a class="heading-anchor" href="#96-labs-unit-09" aria-hidden="true">#</a>9.6 Labs (Unit 09)</h3>
+<ol>
+<li><p><strong>Map a manual release process onto pipeline stages.</strong>
+Take any release process you&#39;ve been part of (even manually zipping and FTP-ing a Node app) and write it out under the six stage headers (Source/Build/Test/Package/Deploy/Monitor). Identify which stages currently have zero automation.</p>
+</li>
+<li><p><strong>Calculate DORA metrics for a sample team&#39;s release history.</strong>
+Given this sample data, compute all four metrics:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Deployments in last 30 days: 12
+Commit-to-deploy times (hours): 4, 6, 3, 12, 5, 8, 2, 9, 4, 6, 3, 5
+Deployments that caused an incident: 2
+Incident detection → resolution times (minutes): 45, 90</code></pre></div>
+<ul>
+<li>Deployment Frequency = 12 / 30 days ≈ 0.4/day</li>
+<li>Lead Time (avg) = sum(times)/12 ≈ 5.6 hours</li>
+<li>Change Failure Rate = 2/12 × 100 ≈ 16.7%</li>
+<li>MTTR (avg) = (45+90)/2 = 67.5 minutes</li>
+</ul>
+</li>
+<li><p><strong>Diagram a pipeline for a sample app from commit to production.</strong>
+Take a simple Express + PostgreSQL API and draw/write out every stage it needs (lint → test → build Docker image → scan image → push to registry → deploy to staging → smoke test → manual approval → deploy to prod).</p>
+</li>
+<li><p><strong>Compare CI/CD maturity across two hypothetical teams.</strong>
+Team A deploys weekly, has a 25% change failure rate, and MTTR of 2 days. Team B deploys 10x/day, 8% change failure rate, MTTR of 20 minutes. Write 3-4 sentences on what practices (smaller batches, feature flags, automated rollback) likely explain the gap.</p>
+</li>
+</ol>
+<hr>
+<h2 id="unit-10-git-branching-strategies-for-cicd"><a class="heading-anchor" href="#unit-10-git-branching-strategies-for-cicd" aria-hidden="true">#</a>Unit 10: Git Branching Strategies for CI/CD</h2>
+<p><strong>Difficulty:</strong> Beginner | <strong>Phase:</strong> CI/CD Foundation</p>
+<h3 id="101-trunk-based-development-vs-gitflow-vs-github-flow"><a class="heading-anchor" href="#101-trunk-based-development-vs-gitflow-vs-github-flow" aria-hidden="true">#</a>10.1 Trunk-Based Development vs GitFlow vs GitHub Flow</h3>
+<p><strong>GitFlow</strong> — the classic, heavyweight model with long-lived branches:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">main        ─────●───────────────●──────────  (production releases only)
+                  \               /
+release/1.2        ●───●───●────●            (stabilization branch)
+                   /            
+develop     ──●───●───●───●───●───●──────    (integration branch)
+              /        \
+feature/x    ●──●──●    (merged back into develop)</code></pre></div>
+<ul>
+<li><code class="inline-code">main</code> = always production. <code class="inline-code">develop</code> = integration branch. <code class="inline-code">feature/*</code>, <code class="inline-code">release/*</code>, <code class="inline-code">hotfix/*</code> branches all exist.</li>
+<li>Pros: very structured, good for scheduled/versioned releases (e.g., mobile apps, enterprise software with release trains).</li>
+<li>Cons: merge conflicts pile up on long-lived branches, slows down CI/CD velocity, doesn&#39;t suit multiple-deploys-per-day teams.</li>
+</ul>
+<p><strong>GitHub Flow</strong> — simplified, CD-friendly:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">main   ──●───────●───────●───────●──────  (always deployable)
+          \      /\      /\      /
+feature/a  ●────●  \    /  \    /
+feature/b            ●──●    </code></pre></div>
+<ul>
+<li>Only <code class="inline-code">main</code> + short-lived <code class="inline-code">feature/*</code> branches. Every feature branch opens a PR, gets reviewed + CI-checked, merges to <code class="inline-code">main</code>, and <code class="inline-code">main</code> is always deployable (often auto-deployed to staging).</li>
+<li>This is the default for most modern SaaS teams using GitHub Actions.</li>
+</ul>
+<p><strong>Trunk-Based Development (TBD)</strong> — the most CI/CD-native model:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">main (trunk) ──●─●─●─●─●─●─●─●─●─●─●─●──   (everyone commits here, directly or via &lt;1 day branches)</code></pre></div>
+<ul>
+<li>Developers commit directly to <code class="inline-code">main</code> (or via branches living hours, not days), gated by feature flags for anything incomplete.</li>
+<li>Requires strong automated testing and feature-flag discipline, since there&#39;s no isolation branch to &quot;hide&quot; in-progress work.</li>
+<li>This is what elite DORA performers use — it&#39;s what enables multiple-deploys-per-day.</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Branch lifespan</th>
+<th>Best for</th>
+<th>CI/CD fit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GitFlow</td>
+<td>Days-weeks (release/hotfix branches)</td>
+<td>Versioned releases, mobile apps</td>
+<td>Poor — batches changes, slows delivery</td>
+</tr>
+<tr>
+<td>GitHub Flow</td>
+<td>Hours-days (PR-based)</td>
+<td>Most SaaS/web teams</td>
+<td>Good — pairs naturally with Continuous Delivery</td>
+</tr>
+<tr>
+<td>Trunk-Based</td>
+<td>Hours or direct-to-trunk</td>
+<td>High-velocity teams, elite DORA performers</td>
+<td>Best — enables Continuous Deployment</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="102-how-branching-strategy-drives-pipeline-trigger-design"><a class="heading-anchor" href="#102-how-branching-strategy-drives-pipeline-trigger-design" aria-hidden="true">#</a>10.2 How Branching Strategy Drives Pipeline Trigger Design</h3>
+<p>Your branching model directly decides what your CI config&#39;s <code class="inline-code">on:</code> (GitHub Actions) or trigger block (Jenkins) looks like.</p>
+<ul>
+<li><strong>GitFlow</strong> → you need separate pipelines/jobs per branch type: <code class="inline-code">develop</code> pushes trigger integration tests + deploy-to-dev; <code class="inline-code">release/*</code> triggers full regression + deploy-to-staging; <code class="inline-code">main</code> triggers production release pipeline.</li>
+<li><strong>GitHub Flow</strong> → simpler: PRs against <code class="inline-code">main</code> trigger the full test suite (required check before merge); merges to <code class="inline-code">main</code> trigger deploy-to-staging, and a tag/release triggers deploy-to-prod.</li>
+<li><strong>Trunk-Based</strong> → every commit to <code class="inline-code">main</code> runs the full pipeline immediately, often followed by automatic deployment gated only by feature flags, not branches.</li>
+</ul>
+<p>Example GitHub Actions trigger block illustrating a GitHub-Flow-style setup:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">on:</span>
+  <span class="hljs-attr">pull_request:</span>
+    <span class="hljs-attr">branches:</span> [<span class="hljs-string">main</span>]        <span class="hljs-comment"># run tests on every PR targeting main</span>
+  <span class="hljs-attr">push:</span>
+    <span class="hljs-attr">branches:</span> [<span class="hljs-string">main</span>]        <span class="hljs-comment"># deploy to staging on every merge to main</span>
+  <span class="hljs-attr">release:</span>
+    <span class="hljs-attr">types:</span> [<span class="hljs-string">published</span>]      <span class="hljs-comment"># deploy to prod only when a release/tag is published</span></code></pre></div>
+<h3 id="103-feature-flags-as-an-alternative-to-long-lived-branches"><a class="heading-anchor" href="#103-feature-flags-as-an-alternative-to-long-lived-branches" aria-hidden="true">#</a>10.3 Feature Flags as an Alternative to Long-Lived Branches</h3>
+<p>A <strong>feature flag</strong> (aka feature toggle) is a runtime conditional that lets you merge incomplete or risky code into <code class="inline-code">main</code> while keeping it invisible/inactive in production, until you&#39;re ready to switch it on — without a deploy.</p>
+<p>Why this replaces long-lived feature branches: instead of keeping a branch alive for 3 weeks while a feature is built (accumulating merge-conflict risk), you merge small pieces continuously behind a flag, and flip the flag when the feature is complete.</p>
+<p>Minimal Node.js example — a simple flag check:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-javascript"><span class="hljs-comment">// featureFlags.js</span>
+<span class="hljs-keyword">const</span> flags = {
+  <span class="hljs-attr">newCheckoutFlow</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">FF_NEW_CHECKOUT</span> === <span class="hljs-string">&#x27;true&#x27;</span>
+};
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = flags;</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-javascript"><span class="hljs-comment">// checkoutController.js</span>
+<span class="hljs-keyword">const</span> flags = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./featureFlags&#x27;</span>);
+
+app.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;/checkout&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (flags.<span class="hljs-property">newCheckoutFlow</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleNewCheckout</span>(req, res);
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleLegacyCheckout</span>(req, res);
+});</code></pre></div>
+<p>In production, tools like LaunchDarkly, Unleash, or a simple config service manage flags dynamically (no redeploy needed to flip them), and can target flags by user %, region, or account — enabling <strong>canary-style rollouts</strong> without touching your deployment pipeline at all.</p>
+<h3 id="104-pull-request-workflows-amp-required-status-checks"><a class="heading-anchor" href="#104-pull-request-workflows-amp-required-status-checks" aria-hidden="true">#</a>10.4 Pull Request Workflows &amp; Required Status Checks</h3>
+<p>A PR workflow is how most teams gate code quality before it reaches <code class="inline-code">main</code>:</p>
+<ol>
+<li>Developer opens a PR from <code class="inline-code">feature/x</code> → <code class="inline-code">main</code>.</li>
+<li>CI automatically runs (lint, unit tests, build) — these appear as <strong>status checks</strong> on the PR.</li>
+<li><strong>Branch protection rules</strong> on <code class="inline-code">main</code> require: at least N approving reviews, all status checks passing, and (optionally) branches to be up to date with <code class="inline-code">main</code> before merge.</li>
+<li>Only once all of the above pass can the PR be merged (often only via &quot;Squash and merge&quot; for a clean history).</li>
+</ol>
+<p>Example of a GitHub branch protection setup (conceptually, since it&#39;s UI-configured, not YAML):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Branch protection rule for `main`:
+  ✔ Require a pull request before merging
+  ✔ Require approvals: 1
+  ✔ Require status checks to pass before merging:
+        - lint
+        - test
+        - build
+  ✔ Require branches to be up to date before merging
+  ✔ Do not allow bypassing the above settings</code></pre></div>
+<p>This is the mechanism that makes &quot;main is always deployable&quot; actually true — it&#39;s enforced by tooling, not by developer discipline alone.</p>
+<h3 id="105-interview-angle-choosing-a-branching-strategy"><a class="heading-anchor" href="#105-interview-angle-choosing-a-branching-strategy" aria-hidden="true">#</a>10.5 Interview Angle: Choosing a Branching Strategy</h3>
+<p><strong>Sample answer:</strong></p>
+<blockquote class="quote-plain"><p>&quot;It depends on release cadence and team size. For a small team shipping a SaaS product multiple times a day, I&#39;d pick GitHub Flow or trunk-based development with feature flags — it minimizes merge overhead and pairs naturally with continuous deployment. For a product with scheduled, versioned releases — like a mobile app that goes through app-store review — GitFlow&#39;s release branches make more sense because you need a stabilization window. I&#39;d avoid GitFlow for a fast-moving backend service; the long-lived <code class="inline-code">develop</code> branch becomes a merge-conflict bottleneck and slows deployment frequency, which hurts DORA metrics.&quot;</p>
+</blockquote>
+<h3 id="106-labs-unit-10"><a class="heading-anchor" href="#106-labs-unit-10" aria-hidden="true">#</a>10.6 Labs (Unit 10)</h3>
+<ol>
+<li><p><strong>Set up branch protection rules requiring passing CI before merge.</strong>
+On a GitHub repo: Settings → Branches → Add rule for <code class="inline-code">main</code> → require status checks (<code class="inline-code">test</code>, <code class="inline-code">lint</code>) and 1 approval before merge. Try pushing directly to <code class="inline-code">main</code> and confirm it&#39;s blocked.</p>
+</li>
+<li><p><strong>Simulate a trunk-based workflow with short-lived feature branches.</strong>
+Create a branch, make one small commit, open a PR, merge within the same session (simulating a &lt;1 day lifespan), delete the branch immediately after merge.</p>
+</li>
+<li><p><strong>Configure a pipeline that triggers only on PRs targeting <code class="inline-code">main</code>.</strong>
+Use the <code class="inline-code">on: pull_request: branches: [main]</code> trigger shown in section 10.2 and verify it does NOT trigger on pushes to feature branches directly.</p>
+</li>
+<li><p><strong>Implement a feature flag to decouple deploy from release.</strong>
+Use the pattern in section 10.3 — wrap a new Express route/behavior behind an environment-variable flag, deploy it with the flag off, then flip it via env var/restart (or a config service) without a new deployment.</p>
+</li>
+</ol>
+<hr>
+<h2 id="unit-11-build-systems-artifacts-amp-dependency-management"><a class="heading-anchor" href="#unit-11-build-systems-artifacts-amp-dependency-management" aria-hidden="true">#</a>Unit 11: Build Systems, Artifacts &amp; Dependency Management</h2>
+<p><strong>Difficulty:</strong> Beginner | <strong>Phase:</strong> CI/CD Foundation</p>
+<h3 id="111-build-tools-overview"><a class="heading-anchor" href="#111-build-tools-overview" aria-hidden="true">#</a>11.1 Build Tools Overview</h3>
+<p>A <strong>build tool</strong> takes source code and produces a runnable/packaged artifact. Different ecosystems have different standard tools:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ecosystem</th>
+<th>Build tool</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js/JS</td>
+<td><code class="inline-code">npm</code>/<code class="inline-code">yarn</code>/<code class="inline-code">pnpm</code> + bundlers (<code class="inline-code">tsc</code>, <code class="inline-code">webpack</code>, <code class="inline-code">esbuild</code>)</td>
+<td>Install deps, transpile TS→JS, bundle for prod</td>
+</tr>
+<tr>
+<td>Java</td>
+<td>Maven / Gradle</td>
+<td>Compile, run tests, package as JAR/WAR</td>
+</tr>
+<tr>
+<td>.NET</td>
+<td>MSBuild</td>
+<td>Compile, package as DLL/EXE</td>
+</tr>
+</tbody>
+</table></div>
+<p>For your Node.js background specifically, the &quot;build&quot; step usually means:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm ci                 <span class="hljs-comment"># clean, reproducible install from package-lock.json</span>
+npm run lint           <span class="hljs-comment"># static analysis</span>
+npm <span class="hljs-built_in">test</span>               <span class="hljs-comment"># unit/integration tests</span>
+npm run build          <span class="hljs-comment"># tsc compile TypeScript → dist/, or bundle with esbuild/webpack</span></code></pre></div>
+<p><strong><code class="inline-code">npm ci</code> vs <code class="inline-code">npm install</code> — a common CI interview question:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><code class="inline-code">npm install</code></th>
+<th><code class="inline-code">npm ci</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uses <code class="inline-code">package-lock.json</code> exactly</td>
+<td>No — may update it</td>
+<td>Yes — fails if lockfile and package.json mismatch</td>
+</tr>
+<tr>
+<td>Speed in CI</td>
+<td>Slower</td>
+<td>Faster (deletes <code class="inline-code">node_modules</code> first, installs from lockfile directly)</td>
+</tr>
+<tr>
+<td>Use case</td>
+<td>Local development</td>
+<td>CI/CD pipelines (reproducibility matters)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Always use <code class="inline-code">npm ci</code> in pipelines, never <code class="inline-code">npm install</code> — it guarantees every build uses the exact same dependency versions, eliminating &quot;works on my machine&quot; drift.</p>
+<h3 id="112-artifact-repositories"><a class="heading-anchor" href="#112-artifact-repositories" aria-hidden="true">#</a>11.2 Artifact Repositories</h3>
+<p>An <strong>artifact repository</strong> stores the packaged output of your build (JARs, npm packages, Docker images, zip files) so it can be pulled by later pipeline stages or other services — instead of being rebuilt from source every time.</p>
+<p>Common ones you&#39;ll encounter:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Repository</th>
+<th>Stores</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>npm registry / GitHub Packages</strong></td>
+<td>npm packages</td>
+<td>Public npm registry, or private via GitHub Packages/Verdaccio</td>
+</tr>
+<tr>
+<td><strong>Nexus / JFrog Artifactory</strong></td>
+<td>Generic artifacts (JARs, npm, Docker, etc.)</td>
+<td>Enterprise-grade, supports many formats in one tool</td>
+</tr>
+<tr>
+<td><strong>Container registries</strong> (Docker Hub, ECR, GCR, GitHub Container Registry)</td>
+<td>Docker images</td>
+<td>The artifact store for anything containerized</td>
+</tr>
+</tbody>
+</table></div>
+<p>Publishing a Node.js package to GitHub Packages (example <code class="inline-code">package.json</code> + workflow snippet):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;@your-org/my-lib&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.2.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;publishConfig&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;registry&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;https://npm.pkg.github.com&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm publish</code></pre></div>
+<p>The key principle: <strong>the artifact is built once and stored</strong> — every later pipeline stage (staging deploy, prod deploy) pulls that exact same artifact rather than rebuilding, which is the foundation of the &quot;build once, deploy many&quot; principle covered in 11.5.</p>
+<h3 id="113-semantic-versioning-amp-immutable-artifacts"><a class="heading-anchor" href="#113-semantic-versioning-amp-immutable-artifacts" aria-hidden="true">#</a>11.3 Semantic Versioning &amp; Immutable Artifacts</h3>
+<p><strong>Semantic Versioning (SemVer)</strong> format: <code class="inline-code">MAJOR.MINOR.PATCH</code> (e.g., <code class="inline-code">2.4.1</code>)</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">MAJOR — incremented for breaking/incompatible API changes       (1.x.x → 2.0.0)
+MINOR — incremented for backward-compatible new functionality    (1.2.x → 1.3.0)
+PATCH — incremented for backward-compatible bug fixes             (1.2.3 → 1.2.4)</code></pre></div>
+<p>In <code class="inline-code">package.json</code>, the caret/tilde ranges you already use daily are built on this:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;express&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^4.18.2&quot;</span><span class="hljs-punctuation">,</span>   <span class="hljs-comment">// ^ = accept MINOR and PATCH updates, not MAJOR</span>
+  <span class="hljs-attr">&quot;lodash&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;~4.17.21&quot;</span>    <span class="hljs-comment">// ~ = accept only PATCH updates</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<p><strong>Immutable artifacts:</strong> once a build artifact is created and tagged (e.g., a Docker image tagged <code class="inline-code">myapp:1.4.2</code> or <code class="inline-code">myapp:abc1234</code> using the commit SHA), it must never be overwritten or rebuilt with the same tag. If you need a fix, you produce a <em>new</em> artifact with a <em>new</em> tag/version. This guarantees that &quot;what passed staging is exactly what runs in production&quot; — the same bytes, not a re-build that could differ.</p>
+<p>Tagging convention combining SemVer + commit SHA (recommended in production pipelines):</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker build -t myapp:1.4.2 -t myapp:abc1234 -t myapp:latest .
+docker push myapp:1.4.2
+docker push myapp:abc1234</code></pre></div>
+<ul>
+<li><code class="inline-code">1.4.2</code> — human-readable release version.</li>
+<li><code class="inline-code">abc1234</code> (commit SHA) — guarantees a unique, traceable tag per build, even between two commits that don&#39;t bump the version.</li>
+<li><code class="inline-code">latest</code> — convenient for local dev only; <strong>never deploy <code class="inline-code">latest</code> to production</strong> (see 11.5&#39;s interview trap).</li>
+</ul>
+<h3 id="114-dependency-caching"><a class="heading-anchor" href="#114-dependency-caching" aria-hidden="true">#</a>11.4 Dependency Caching</h3>
+<p>CI pipelines are billed/measured in minutes, so re-downloading <code class="inline-code">node_modules</code> on every run wastes time and money. Dependency caching stores previously-downloaded dependencies and restores them on the next run if the lockfile hasn&#39;t changed.</p>
+<p>GitHub Actions example using <code class="inline-code">actions/cache</code> keyed on the lockfile hash:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Cache</span> <span class="hljs-string">node</span> <span class="hljs-string">modules</span>
+  <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/cache@v4</span>
+  <span class="hljs-attr">with:</span>
+    <span class="hljs-attr">path:</span> <span class="hljs-string">~/.npm</span>
+    <span class="hljs-attr">key:</span> <span class="hljs-string">npm-${{</span> <span class="hljs-string">hashFiles(&#x27;package-lock.json&#x27;)</span> <span class="hljs-string">}}</span>
+    <span class="hljs-attr">restore-keys:</span> <span class="hljs-string">|
+      npm-
+</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">dependencies</span>
+  <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span></code></pre></div>
+<p>How this works:</p>
+<ul>
+<li><code class="inline-code">key</code> is computed from a hash of <code class="inline-code">package-lock.json</code>. If the lockfile hasn&#39;t changed since the last run, the cache hits and <code class="inline-code">npm ci</code> runs much faster (dependencies restored from cache instead of the network).</li>
+<li><code class="inline-code">restore-keys</code> provides a fallback prefix match if there&#39;s no exact hit — useful for partial cache reuse.</li>
+</ul>
+<p>Many modern setup actions (<code class="inline-code">actions/setup-node</code>) support caching built-in:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v4</span>
+  <span class="hljs-attr">with:</span>
+    <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;20&#x27;</span>
+    <span class="hljs-attr">cache:</span> <span class="hljs-string">&#x27;npm&#x27;</span></code></pre></div>
+<h3 id="115-interview-favorite-build-once-deploy-many"><a class="heading-anchor" href="#115-interview-favorite-build-once-deploy-many" aria-hidden="true">#</a>11.5 Interview Favorite: Build Once, Deploy Many</h3>
+<p><strong>The principle:</strong> compile/package your application into a single immutable artifact exactly once per change, then <strong>promote that same artifact</strong> through environments (dev → staging → prod) without rebuilding it at any stage.</p>
+<p>Why this matters: if you rebuild the artifact separately for staging and for production, you risk subtle differences — a different dependency resolving slightly differently, a different base image patch version, an environment-specific bug that only appears in one build. &quot;Build once, deploy many&quot; eliminates that entire class of bugs by guaranteeing bit-for-bit identical artifacts across environments; only <em>configuration</em> (env vars, secrets, connection strings) changes between environments, never the artifact itself.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">        ┌─────────────┐
+        │  Build once │ →  myapp:abc1234 (immutable artifact)
+        └─────────────┘
+               │
+   ┌───────────┼────────────┐
+   ▼           ▼            ▼
+ Deploy to   Deploy to    Deploy to
+   dev       staging        prod
+(same image, different env vars/config only)</code></pre></div>
+<p><strong>Sample interview answer:</strong></p>
+<blockquote class="quote-plain"><p>&quot;The idea is that whatever you tested in staging is byte-for-byte identical to what runs in production — you&#39;re never re-compiling between environments, only re-configuring. I tag Docker images with the commit SHA so the artifact is uniquely identifiable and immutable, then use environment-specific config (via env vars or a config service) to control behavior per environment, rather than baking environment differences into the build.&quot;</p>
+</blockquote>
+<h3 id="116-labs-unit-11"><a class="heading-anchor" href="#116-labs-unit-11" aria-hidden="true">#</a>11.6 Labs (Unit 11)</h3>
+<ol>
+<li><p><strong>Publish a build artifact to GitHub Packages.</strong>
+Configure <code class="inline-code">publishConfig.registry</code> in <code class="inline-code">package.json</code> as shown in 11.2, authenticate with a <code class="inline-code">GITHUB_TOKEN</code>, and run <code class="inline-code">npm publish</code> from a workflow step.</p>
+</li>
+<li><p><strong>Configure dependency caching in a sample pipeline.</strong>
+Add the <code class="inline-code">actions/cache</code> block from section 11.4 to a workflow and compare build time on a cache-miss run vs a cache-hit run.</p>
+</li>
+<li><p><strong>Tag a Docker image with a semantic version and commit SHA.</strong>
+Run the multi-tag <code class="inline-code">docker build</code> command from 11.3, push both tags to a registry, and confirm both tags point to the identical image digest (<code class="inline-code">docker inspect --format=&#39;{{.Id}}&#39;</code>).</p>
+</li>
+<li><p><strong>Demo &quot;build once, promote everywhere&quot; across three environments.</strong>
+Build a single Docker image once, then run it three times with three different <code class="inline-code">.env</code> files (dev/staging/prod-like config) to prove the same artifact behaves correctly across environments with only config changes.</p>
+</li>
+</ol>
+<hr>
+<h2 id="phase-3-interview-cheat-sheet"><a class="heading-anchor" href="#phase-3-interview-cheat-sheet" aria-hidden="true">#</a>Phase 3 Interview Cheat Sheet</h2>
+<p>Quick-fire answers you should be able to give in under 15 seconds each:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>One-line answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CI vs CD vs Continuous Deployment?</td>
+<td>CI = auto build+test on every change; CD(elivery) = always release-ready, human approves; Continuous Deployment = auto-releases with no human gate</td>
+</tr>
+<tr>
+<td>Name the 4 DORA metrics</td>
+<td>Deployment Frequency, Lead Time for Changes, MTTR, Change Failure Rate</td>
+</tr>
+<tr>
+<td>Why avoid <code class="inline-code">latest</code> tag in prod?</td>
+<td>It&#39;s mutable — you can&#39;t guarantee which exact build is running, breaks rollback/traceability</td>
+</tr>
+<tr>
+<td><code class="inline-code">npm ci</code> vs <code class="inline-code">npm install</code> in CI?</td>
+<td><code class="inline-code">npm ci</code> is reproducible (locked to <code class="inline-code">package-lock.json</code>) and faster in CI</td>
+</tr>
+<tr>
+<td>Trunk-based vs GitFlow?</td>
+<td>Trunk-based = short-lived/direct commits, enables high deploy frequency; GitFlow = long-lived branches, suits scheduled/versioned releases</td>
+</tr>
+<tr>
+<td>What replaces long-lived feature branches?</td>
+<td>Feature flags — merge small increments continuously, toggle behavior at runtime</td>
+</tr>
+<tr>
+<td>&quot;Build once, deploy many&quot; — why?</td>
+<td>Guarantees the exact same artifact runs in every environment; only config changes, eliminating environment-specific build bugs</td>
+</tr>
+<tr>
+<td>What enforces &quot;main is always deployable&quot;?</td>
+<td>Branch protection rules + required status checks, not developer discipline alone</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="phase-3-self-check-quiz"><a class="heading-anchor" href="#phase-3-self-check-quiz" aria-hidden="true">#</a>Phase 3 Self-Check Quiz</h2>
+<p>Answer these without looking back — if you can&#39;t, revisit that section.</p>
+<ol>
+<li>What&#39;s the difference between Continuous Delivery and Continuous Deployment, precisely?</li>
+<li>Write the formula for Change Failure Rate.</li>
+<li>In a GitHub Flow model, what triggers a deploy to staging vs a deploy to production?</li>
+<li>Why is <code class="inline-code">npm ci</code> preferred over <code class="inline-code">npm install</code> in a pipeline?</li>
+<li>What problem does <code class="inline-code">actions/cache</code> keyed on <code class="inline-code">hashFiles(&#39;package-lock.json&#39;)</code> solve, and what happens if you change a dependency version?</li>
+<li>Give an example of a SemVer MAJOR bump vs a PATCH bump for an Express-based API.</li>
+<li>Explain in your own words why deploying <code class="inline-code">myapp:latest</code> to production is risky.</li>
+<li>What&#39;s the mechanical difference (in Git) between how trunk-based development and GitFlow handle a new feature?</li>
+</ol>
+<hr>
+<p><em>End of Phase 3 — CI/CD Foundation. Next: Phase 4 (GitHub Actions) builds directly on the pipeline-trigger and branching concepts from Unit 10, and the artifact/caching concepts from Unit 11.</em></p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 7 — Security &amp; Governance</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 7 — Security &amp; Governance</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-7--security-amp-governance"><a class="heading-anchor" href="#phase-7--security-amp-governance" aria-hidden="true">#</a>Phase 7 — Security &amp; Governance</h1>
+<h3 id="from-quot3-yoe-nodejs-backend-engineerquot--quotbuilds-cicd-pipelines-that-are-secure-and-audit-ready-by-designquot"><a class="heading-anchor" href="#from-quot3-yoe-nodejs-backend-engineerquot--quotbuilds-cicd-pipelines-that-are-secure-and-audit-ready-by-designquot" aria-hidden="true">#</a>From &quot;3 YOE Node.js Backend Engineer&quot; → &quot;Builds CI/CD pipelines that are secure and audit-ready by design&quot;</h3>
+<blockquote class="quote-plain"><p>This doc is self-contained. After reading it end-to-end and doing the labs, you should be able to explain, build, and debug everything in Units 23–24 of the roadmap without external references.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ul>
+<li><a href="#phase-7--security--governance">Phase 7 — Security &amp; Governance</a><ul>
+<li><a href="#how-to-use-this-doc">How to use this doc</a></li>
+<li><a href="#unit-23--cicd-security-secrets-sastdast-supply-chain">Unit 23 — CI/CD Security: Secrets, SAST/DAST, Supply Chain</a><ul>
+<li><a href="#231-secrets-management">23.1 Secrets Management</a></li>
+<li><a href="#232-secret-scanning">23.2 Secret Scanning</a></li>
+<li><a href="#233-sast-vs-dast">23.3 SAST vs DAST</a></li>
+<li><a href="#234-software-bill-of-materials-sbom">23.4 Software Bill of Materials (SBOM)</a></li>
+<li><a href="#235-supply-chain-attacks--real-lessons">23.5 Supply Chain Attacks — Real Lessons</a></li>
+<li><a href="#236-signing-artifacts--verifying-provenance">23.6 Signing Artifacts &amp; Verifying Provenance</a></li>
+<li><a href="#237-labs">23.7 Labs</a></li>
+</ul>
+</li>
+<li><a href="#unit-24--rbac-compliance--governance-in-cicd">Unit 24 — RBAC, Compliance &amp; Governance in CI/CD</a><ul>
+<li><a href="#241-role-based-access-control">24.1 Role-Based Access Control</a></li>
+<li><a href="#242-audit-logging--traceability">24.2 Audit Logging &amp; Traceability</a></li>
+<li><a href="#243-policy-as-code">24.3 Policy as Code</a></li>
+<li><a href="#244-codeowners--protected-branches-at-scale">24.4 CODEOWNERS &amp; Protected Branches at Scale</a></li>
+<li><a href="#245-labs">24.5 Labs</a></li>
+</ul>
+</li>
+<li><a href="#phase-7-checklist">Phase 7 Checklist</a></li>
+<li><a href="#quick-reference-cheatsheet">Quick-Reference Cheatsheet</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="how-to-use-this-doc"><a class="heading-anchor" href="#how-to-use-this-doc" aria-hidden="true">#</a>How to use this doc</h2>
+<p>Each unit has: <strong>Theory</strong> (deeper than the roadmap bullet, framed for a Node.js/npm-ecosystem context) → <strong>Code/Config</strong> → <strong>Interview Angle</strong> → <strong>Labs</strong> (do these, don&#39;t just read).</p>
+<hr>
+<h2 id="unit-23--cicd-security-secrets-sastdast-supply-chain"><a class="heading-anchor" href="#unit-23--cicd-security-secrets-sastdast-supply-chain" aria-hidden="true">#</a>Unit 23 — CI/CD Security: Secrets, SAST/DAST, Supply Chain</h2>
+<h3 id="231-secrets-management"><a class="heading-anchor" href="#231-secrets-management" aria-hidden="true">#</a>23.1 Secrets Management</h3>
+<p>Never hardcode credentials in source or in plain pipeline YAML. The maturity ladder, from weakest to strongest:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Risk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hardcoded in source / committed <code class="inline-code">.env</code></td>
+<td>Critical — permanently in git history</td>
+</tr>
+<tr>
+<td>CI provider&#39;s encrypted secrets (GitHub Secrets, Jenkins Credentials)</td>
+<td>Good baseline — encrypted at rest, masked in logs</td>
+</tr>
+<tr>
+<td>Centralized secrets vault (HashiCorp Vault, AWS Secrets Manager)</td>
+<td>Better — rotation, fine-grained access policies, audit trail</td>
+</tr>
+<tr>
+<td>Short-lived tokens via OIDC (no stored secret at all)</td>
+<td>Best — nothing to leak because nothing persists</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># GitHub Actions pulling a secret from HashiCorp Vault at runtime instead of storing it directly</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">hashicorp/vault-action@v3</span>
+  <span class="hljs-attr">with:</span>
+    <span class="hljs-attr">url:</span> <span class="hljs-string">https://vault.mycompany.com</span>
+    <span class="hljs-attr">method:</span> <span class="hljs-string">jwt</span>
+    <span class="hljs-attr">role:</span> <span class="hljs-string">github-actions-role</span>
+    <span class="hljs-attr">secrets:</span> <span class="hljs-string">|</span>
+      <span class="hljs-string">secret/data/prod/db</span> <span class="hljs-string">PASSWORD</span> <span class="hljs-string">|</span> <span class="hljs-string">DB_PASSWORD</span></code></pre></div>
+<p>A Node.js habit worth building: never <code class="inline-code">console.log(process.env)</code> in shared code paths, and add a lint rule / pre-commit hook to catch accidental secret-looking strings before they&#39;re even committed.</p>
+<h3 id="232-secret-scanning"><a class="heading-anchor" href="#232-secret-scanning" aria-hidden="true">#</a>23.2 Secret Scanning</h3>
+<p>Secret scanning tools scan git history and diffs for patterns that look like credentials (AWS keys, private keys, API tokens) and block the commit/PR before it merges.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># .github/workflows/secret-scan.yml</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">Secret</span> <span class="hljs-string">Scan</span>
+<span class="hljs-attr">on:</span> [<span class="hljs-string">pull_request</span>]
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">gitleaks:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">fetch-depth:</span> <span class="hljs-number">0</span>        <span class="hljs-comment"># full history — gitleaks needs to scan past commits too</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">gitleaks/gitleaks-action@v2</span>
+        <span class="hljs-attr">env:</span>
+          <span class="hljs-attr">GITHUB_TOKEN:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GITHUB_TOKEN</span> <span class="hljs-string">}}</span></code></pre></div>
+<p>Why <code class="inline-code">fetch-depth: 0</code> matters: a shallow checkout (default is depth=1) only has the latest commit — a secret introduced 3 commits ago in the same PR could slip through unscanned.</p>
+<h3 id="233-sast-vs-dast"><a class="heading-anchor" href="#233-sast-vs-dast" aria-hidden="true">#</a>23.3 SAST vs DAST</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>SAST (Static)</th>
+<th>DAST (Dynamic)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What it analyzes</td>
+<td>Source code, without running it</td>
+<td>A running application, via simulated attacks</td>
+</tr>
+<tr>
+<td>When it runs</td>
+<td>On every commit/PR, fast</td>
+<td>Usually against a deployed staging environment</td>
+</tr>
+<tr>
+<td>Finds</td>
+<td>SQL injection patterns, hardcoded secrets, insecure deserialization, known-vulnerable code patterns</td>
+<td>Actual exploitable behavior — auth bypass, XSS that fires in the browser, misconfigured headers</td>
+</tr>
+<tr>
+<td>Node.js tools</td>
+<td>CodeQL, SonarQube, Semgrep, <code class="inline-code">npm audit</code></td>
+<td>OWASP ZAP, Burp Suite</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># CodeQL SAST scan for a Node.js repo</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">CodeQL</span>
+<span class="hljs-attr">on:</span>
+  <span class="hljs-attr">push:</span>
+    <span class="hljs-attr">branches:</span> [<span class="hljs-string">main</span>]
+  <span class="hljs-attr">pull_request:</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">analyze:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">permissions:</span>
+      <span class="hljs-attr">security-events:</span> <span class="hljs-string">write</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">github/codeql-action/init@v3</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">languages:</span> <span class="hljs-string">javascript-typescript</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">github/codeql-action/analyze@v3</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># npm&#x27;s built-in dependency vulnerability check — cheap first line of defense</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">audit</span> <span class="hljs-string">--audit-level=high</span></code></pre></div>
+<p>Interview framing: SAST catches &quot;this code pattern is dangerous&quot; <strong>before</strong> deploy; DAST catches &quot;this deployed system is actually exploitable&quot; <strong>after</strong> deploy. Mature pipelines run both — SAST as a fast PR gate, DAST as a slower scheduled/staging-environment job.</p>
+<h3 id="234-software-bill-of-materials-sbom"><a class="heading-anchor" href="#234-software-bill-of-materials-sbom" aria-hidden="true">#</a>23.4 Software Bill of Materials (SBOM)</h3>
+<p>An SBOM is a machine-readable inventory of every dependency (direct and transitive) in your build artifact — critical for answering &quot;are we affected by CVE-2024-XXXX?&quot; in minutes instead of days.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Generate an SBOM for a Node project using Syft</span>
+syft packages <span class="hljs-built_in">dir</span>:. -o cyclonedx-json &gt; sbom.json
+
+<span class="hljs-comment"># Or for a built Docker image</span>
+syft packages my-app:1.0 -o spdx-json &gt; sbom.json</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># In a pipeline</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Generate</span> <span class="hljs-string">SBOM</span>
+  <span class="hljs-attr">uses:</span> <span class="hljs-string">anchore/sbom-action@v0</span>
+  <span class="hljs-attr">with:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">my-app:1.0</span>
+    <span class="hljs-attr">format:</span> <span class="hljs-string">cyclonedx-json</span>
+    <span class="hljs-attr">output-file:</span> <span class="hljs-string">sbom.json</span>
+
+<span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Upload</span> <span class="hljs-string">SBOM</span> <span class="hljs-string">as</span> <span class="hljs-string">artifact</span>
+  <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/upload-artifact@v4</span>
+  <span class="hljs-attr">with:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">sbom</span>
+    <span class="hljs-attr">path:</span> <span class="hljs-string">sbom.json</span></code></pre></div>
+<p>For a Node.js app specifically, <code class="inline-code">npm ls --all --json</code> gives you the raw dependency tree, but a proper SBOM tool (Syft, <code class="inline-code">cdxgen</code>) produces a standardized format (SPDX or CycloneDX) that vulnerability scanners and compliance tooling can actually consume.</p>
+<h3 id="235-supply-chain-attacks--real-lessons"><a class="heading-anchor" href="#235-supply-chain-attacks--real-lessons" aria-hidden="true">#</a>23.5 Supply Chain Attacks — Real Lessons</h3>
+<p>These are commonly referenced in interviews as case studies:</p>
+<ul>
+<li><strong><code class="inline-code">event-stream</code> (2018, npm)</strong> — a popular npm package&#39;s maintainership was socially engineered away from the original author; the new &quot;maintainer&quot; injected code that targeted a specific cryptocurrency wallet app&#39;s users. Lesson: transitive dependencies you&#39;ve never heard of can run arbitrary code in your build/runtime.</li>
+<li><strong>SolarWinds (2020)</strong> — attackers compromised the <strong>build system</strong> itself, not the source repo, injecting malicious code during compilation. Lesson: your CI/CD pipeline is as much an attack target as your source code — pipeline integrity matters.</li>
+<li><strong><code class="inline-code">xz-utils</code> backdoor (2024)</strong> — a long-con social-engineering campaign gained co-maintainer trust over years before inserting a backdoor into a foundational compression library used by OpenSSH indirectly. Lesson: even deeply trusted, boring infrastructure dependencies need scrutiny; &quot;it&#39;s a well-known library&quot; isn&#39;t sufficient assurance.</li>
+</ul>
+<p>Practical Node.js takeaways: pin exact dependency versions (<code class="inline-code">package-lock.json</code> committed, <code class="inline-code">npm ci</code> not <code class="inline-code">npm install</code> in CI), audit new transitive dependencies before major version bumps, and treat your CI runners/build servers as sensitive infrastructure, not throwaway compute.</p>
+<h3 id="236-signing-artifacts-amp-verifying-provenance"><a class="heading-anchor" href="#236-signing-artifacts-amp-verifying-provenance" aria-hidden="true">#</a>23.6 Signing Artifacts &amp; Verifying Provenance</h3>
+<p>Signing proves an artifact (container image, npm package, binary) genuinely came from your pipeline and wasn&#39;t tampered with afterward. <strong>Sigstore/cosign</strong> does this without requiring you to manage long-lived signing keys yourself (it uses short-lived certificates tied to your CI identity via OIDC).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Sign a container image (keyless, using OIDC identity from CI)</span>
+cosign sign my-registry.io/my-app:1.0
+
+<span class="hljs-comment"># Verify it later, e.g. before a Kubernetes deploy</span>
+cosign verify my-registry.io/my-app:1.0 \
+  --certificate-identity=https://github.com/my-org/my-repo/.github/workflows/deploy.yml@refs/heads/main \
+  --certificate-oidc-issuer=https://token.actions.githubusercontent.com</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># In a GitHub Actions pipeline</span>
+<span class="hljs-attr">permissions:</span>
+  <span class="hljs-attr">id-token:</span> <span class="hljs-string">write</span>     <span class="hljs-comment"># required for keyless signing via OIDC</span>
+  <span class="hljs-attr">contents:</span> <span class="hljs-string">read</span>
+
+<span class="hljs-attr">steps:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">cosign</span>
+    <span class="hljs-attr">uses:</span> <span class="hljs-string">sigstore/cosign-installer@v3</span>
+
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Sign</span> <span class="hljs-string">image</span>
+    <span class="hljs-attr">run:</span> <span class="hljs-string">cosign</span> <span class="hljs-string">sign</span> <span class="hljs-string">--yes</span> <span class="hljs-string">my-registry.io/my-app:${{</span> <span class="hljs-string">github.sha</span> <span class="hljs-string">}}</span></code></pre></div>
+<p>A deploy step can then <strong>refuse to deploy</strong> any image that doesn&#39;t verify — closing the loop between &quot;this image was actually built by our pipeline&quot; and &quot;we only run verified images in production.&quot;</p>
+<h3 id="237-labs"><a class="heading-anchor" href="#237-labs" aria-hidden="true">#</a>23.7 Labs</h3>
+<ol>
+<li>Add a <code class="inline-code">gitleaks</code> step to a pipeline, commit a fake AWS key on a branch, and confirm the PR gets blocked.</li>
+<li>Integrate CodeQL (or Semgrep) into a Node.js repo&#39;s pipeline and fix one real finding it surfaces.</li>
+<li>Generate an SBOM for a sample project with Syft, and grep it to check whether a specific vulnerable package version is present.</li>
+<li>Sign a container image with <code class="inline-code">cosign</code> (keyless via OIDC) and write a deploy-gate step that verifies the signature before allowing deployment.</li>
+</ol>
+<hr>
+<h2 id="unit-24--rbac-compliance-amp-governance-in-cicd"><a class="heading-anchor" href="#unit-24--rbac-compliance-amp-governance-in-cicd" aria-hidden="true">#</a>Unit 24 — RBAC, Compliance &amp; Governance in CI/CD</h2>
+<h3 id="241-role-based-access-control"><a class="heading-anchor" href="#241-role-based-access-control" aria-hidden="true">#</a>24.1 Role-Based Access Control</h3>
+<p><strong>GitHub Actions / repo-level:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Can do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Read</td>
+<td>View workflows and runs</td>
+</tr>
+<tr>
+<td>Triage/Write</td>
+<td>Trigger workflow_dispatch, re-run failed jobs</td>
+</tr>
+<tr>
+<td>Maintain/Admin</td>
+<td>Edit workflow files, manage secrets, manage environments</td>
+</tr>
+</tbody>
+</table></div>
+<p>Environment-level protection (from Phase 4) is itself a form of RBAC — you can restrict <em>who</em> can approve a deploy to <code class="inline-code">production</code> independent of general repo write access.</p>
+<p><strong>Jenkins</strong>, via the <strong>Role Strategy plugin</strong>, applies RBAC at folder level:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Folder: team-payments/
+  Role: payments-developer
+    - Job/Build
+    - Job/Read
+    - Job/Workspace
+  Role: payments-admin
+    - Job/Configure
+    - Job/Delete
+    - Credentials/Manage</code></pre></div>
+<p>This lets a large org give the <code class="inline-code">payments</code> team full control over their own jobs without granting access to, say, the <code class="inline-code">infra</code> team&#39;s Jenkins folder — critical once you&#39;re past a handful of pipelines.</p>
+<h3 id="242-audit-logging-amp-traceability"><a class="heading-anchor" href="#242-audit-logging-amp-traceability" aria-hidden="true">#</a>24.2 Audit Logging &amp; Traceability</h3>
+<p>For SOC2/ISO 27001-style compliance, you generally need to answer: <strong>who did what, when, and was it authorized?</strong></p>
+<ul>
+<li>GitHub: <strong>Audit log</strong> (org settings) records repo/secret/permission changes; combined with required PR reviews + branch protection, gives you &quot;who approved this deploy&quot; traceability.</li>
+<li>Jenkins: the <strong>Audit Trail plugin</strong> logs job config changes, credential access, and build triggers with the triggering user.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># Branch protection config (illustrative — normally set via GitHub UI/API)</span>
+<span class="hljs-attr">required_status_checks:</span>
+  <span class="hljs-attr">contexts:</span> [<span class="hljs-string">&quot;ci/test&quot;</span>, <span class="hljs-string">&quot;ci/security-scan&quot;</span>]
+<span class="hljs-attr">required_pull_request_reviews:</span>
+  <span class="hljs-attr">required_approving_review_count:</span> <span class="hljs-number">2</span>
+  <span class="hljs-attr">require_code_owner_reviews:</span> <span class="hljs-literal">true</span>
+<span class="hljs-attr">enforce_admins:</span> <span class="hljs-literal">true</span>         <span class="hljs-comment"># even admins can&#x27;t bypass the rules</span></code></pre></div>
+<p><code class="inline-code">enforce_admins: true</code> is the detail auditors specifically look for — without it, admins can merge around every control you just configured, which defeats the compliance story.</p>
+<h3 id="243-policy-as-code"><a class="heading-anchor" href="#243-policy-as-code" aria-hidden="true">#</a>24.3 Policy as Code</h3>
+<p>Rather than relying on tribal knowledge (&quot;everyone knows pipelines need a security-scan stage&quot;), <strong>Policy as Code</strong> encodes and automatically enforces such rules using tools like <strong>OPA (Open Policy Agent)</strong> with <strong>Conftest</strong>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">rego</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-rego"># <span class="hljs-keyword">policy</span>/pipeline.rego — deny <span class="hljs-keyword">any</span> pipeline missing a <span class="hljs-keyword">security</span> scan stage
+package main
+
+deny[msg] {
+    <span class="hljs-keyword">not</span> contains_stage(<span class="hljs-keyword">input</span>, &quot;security-scan&quot;)
+    msg := &quot;Pipeline is missing a required &#x27;security-scan&#x27; stage&quot;
+}
+
+contains_stage(pipeline, <span class="hljs-type">name</span>) {
+    <span class="hljs-keyword">some</span> job
+    pipeline.jobs[job].name == <span class="hljs-type">name</span>
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Run as a CI gate against a parsed pipeline definition</span>
+conftest <span class="hljs-built_in">test</span> pipeline-config.json --policy policy/</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># Wired into GitHub Actions as a hard gate</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Validate</span> <span class="hljs-string">pipeline</span> <span class="hljs-string">policy</span>
+  <span class="hljs-attr">run:</span> <span class="hljs-string">conftest</span> <span class="hljs-string">test</span> <span class="hljs-string">.github/workflows/deploy.yml</span> <span class="hljs-string">--policy</span> <span class="hljs-string">policy/</span></code></pre></div>
+<p>This turns &quot;you&#39;re supposed to include a security scan&quot; from a code-review nitpick into a machine-enforced, unbypassable rule across every one of an org&#39;s repos.</p>
+<h3 id="244-codeowners-amp-protected-branches-at-scale"><a class="heading-anchor" href="#244-codeowners-amp-protected-branches-at-scale" aria-hidden="true">#</a>24.4 CODEOWNERS &amp; Protected Branches at Scale</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text"># .github/CODEOWNERS
+# Require specific teams to review sensitive paths
+
+/infra/                 @my-org/platform-team
+/.github/workflows/     @my-org/platform-team
+/src/payments/          @my-org/payments-team
+*.tf                    @my-org/platform-team</code></pre></div>
+<p>Combined with branch protection&#39;s &quot;Require review from Code Owners,&quot; this guarantees that, e.g., no one can change a GitHub Actions workflow file (a common privilege-escalation vector — modifying CI to exfiltrate secrets) without platform-team sign-off, regardless of who opens the PR.</p>
+<p>At scale (200+ pipelines, the classic interview framing), the governance stack layers as:</p>
+<ol>
+<li><strong>CODEOWNERS</strong> — the right humans review the right code</li>
+<li><strong>Branch protection + required status checks</strong> — nothing merges without CI passing</li>
+<li><strong>Policy as Code (OPA/Conftest)</strong> — every pipeline structurally complies with org rules, checked automatically</li>
+<li><strong>Audit logs</strong> — a durable record for after-the-fact review</li>
+<li><strong>RBAC</strong> — least-privilege access to secrets, environments, and job configuration</li>
+</ol>
+<h3 id="245-labs"><a class="heading-anchor" href="#245-labs" aria-hidden="true">#</a>24.5 Labs</h3>
+<ol>
+<li>Configure RBAC in a Jenkins folder using the Role Strategy plugin, giving one team build/read-only and another team full admin.</li>
+<li>Add a <code class="inline-code">CODEOWNERS</code> file requiring your platform/infra team to review any change under <code class="inline-code">.github/workflows/</code>.</li>
+<li>Write an OPA/Conftest policy that fails a pipeline definition missing a required <code class="inline-code">security-scan</code> stage, and wire it into a workflow as a gate.</li>
+<li>Audit a sample pipeline against a compliance checklist (secrets scanning present? required reviewers on prod? <code class="inline-code">enforce_admins</code> set?) and document the gaps you find plus how you&#39;d fix each.</li>
+</ol>
+<hr>
+<h2 id="phase-7-checklist"><a class="heading-anchor" href="#phase-7-checklist" aria-hidden="true">#</a>Phase 7 Checklist</h2>
+<p>Before moving to Phase 8 (Industry &amp; Interview Mastery), you should be able to, without looking anything up:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Rank secrets-management approaches from hardcoded creds to OIDC, and explain the risk at each tier</li>
+<li><input disabled="" type="checkbox"> Explain why <code class="inline-code">fetch-depth: 0</code> matters for secret-scanning tools</li>
+<li><input disabled="" type="checkbox"> Explain SAST vs DAST — what each catches and when each runs in the pipeline</li>
+<li><input disabled="" type="checkbox"> Generate and explain the purpose of an SBOM</li>
+<li><input disabled="" type="checkbox"> Describe at least one real supply-chain attack and the lesson it teaches</li>
+<li><input disabled="" type="checkbox"> Explain how keyless artifact signing (Sigstore/cosign) works without managing long-lived keys</li>
+<li><input disabled="" type="checkbox"> Explain RBAC at both the GitHub repo/environment level and the Jenkins folder level</li>
+<li><input disabled="" type="checkbox"> Explain why <code class="inline-code">enforce_admins: true</code> matters for a real compliance story</li>
+<li><input disabled="" type="checkbox"> Write a basic OPA/Conftest policy and explain &quot;Policy as Code&quot; in one sentence</li>
+<li><input disabled="" type="checkbox"> Explain how CODEOWNERS closes the &quot;anyone can silently edit CI to exfiltrate secrets&quot; gap</li>
+<li><input disabled="" type="checkbox"> Describe the 5-layer governance stack (CODEOWNERS → branch protection → policy as code → audit logs → RBAC) for a 200-pipeline org</li>
+</ul>
+<hr>
+<h2 id="quick-reference-cheatsheet"><a class="heading-anchor" href="#quick-reference-cheatsheet" aria-hidden="true">#</a>Quick-Reference Cheatsheet</h2>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># Secret scanning (gitleaks)</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+  <span class="hljs-attr">with:</span> { <span class="hljs-attr">fetch-depth:</span> <span class="hljs-number">0</span> }
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">gitleaks/gitleaks-action@v2</span>
+
+<span class="hljs-comment"># SAST (CodeQL)</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">github/codeql-action/init@v3</span>
+  <span class="hljs-attr">with:</span> { <span class="hljs-attr">languages:</span> <span class="hljs-string">javascript-typescript</span> }
+<span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">github/codeql-action/analyze@v3</span>
+
+<span class="hljs-comment"># npm&#x27;s built-in check</span>
+<span class="hljs-string">npm</span> <span class="hljs-string">audit</span> <span class="hljs-string">--audit-level=high</span>
+
+<span class="hljs-comment"># SBOM generation (Syft)</span>
+<span class="hljs-string">syft</span> <span class="hljs-string">packages</span> <span class="hljs-string">dir:.</span> <span class="hljs-string">-o</span> <span class="hljs-string">cyclonedx-json</span> <span class="hljs-string">&gt;</span> <span class="hljs-string">sbom.json</span>
+
+<span class="hljs-comment"># Keyless artifact signing (cosign)</span>
+<span class="hljs-string">cosign</span> <span class="hljs-string">sign</span> <span class="hljs-string">my-registry.io/my-app:1.0</span>
+<span class="hljs-string">cosign</span> <span class="hljs-string">verify</span> <span class="hljs-string">my-registry.io/my-app:1.0</span> <span class="hljs-string">\</span>
+  <span class="hljs-string">--certificate-identity=&lt;workflow-url&gt;</span> <span class="hljs-string">\</span>
+  <span class="hljs-string">--certificate-oidc-issuer=https://token.actions.githubusercontent.com</span>
+
+<span class="hljs-comment"># Policy as code (Conftest/OPA)</span>
+<span class="hljs-string">conftest</span> <span class="hljs-string">test</span> <span class="hljs-string">pipeline-config.json</span> <span class="hljs-string">--policy</span> <span class="hljs-string">policy/</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text"># Governance layers, outside-in
+CODEOWNERS → who must review
+Branch protection (enforce_admins: true) → nothing merges without checks
+Policy as Code (OPA/Conftest) → pipelines structurally comply, automatically
+Audit logs → durable &quot;who did what, when&quot; record
+RBAC (repo roles / Jenkins folder roles) → least-privilege access</code></pre></div>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

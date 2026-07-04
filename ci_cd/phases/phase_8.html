@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 8 — Industry &amp; Interview Mastery</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 8 — Industry &amp; Interview Mastery</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-8--industry-amp-interview-mastery"><a class="heading-anchor" href="#phase-8--industry-amp-interview-mastery" aria-hidden="true">#</a>Phase 8 — Industry &amp; Interview Mastery</h1>
+<h3 id="for-a-3-yoe-nodejs-backend-engineer"><a class="heading-anchor" href="#for-a-3-yoe-nodejs-backend-engineer" aria-hidden="true">#</a>For a 3 YOE Node.js Backend Engineer</h3>
+<blockquote class="quote-plain"><p>Prerequisite assumption: you&#39;ve completed Phases 1-7 — Docker (Foundations &amp; Advanced), CI/CD Foundation, GitHub Actions, Jenkins, Deployment &amp; Pipeline-as-Code, and Security &amp; Governance. This final phase is different in nature from the rest: it&#39;s less about learning new mechanics and more about <strong>operating pipelines like a senior engineer</strong> and <strong>performing well when someone is evaluating you on all of it at once</strong>. Treat this as your consolidation and interview-readiness pass.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ul>
+<li><a href="#unit-25--monitoring-observability--incident-response">Unit 25 — Monitoring, Observability &amp; Incident Response</a><ul>
+<li><a href="#251-what-pipeline-health-actually-means">25.1 What &quot;Pipeline Health&quot; Actually Means</a></li>
+<li><a href="#252-alerting-on-failed-deployments">25.2 Alerting on Failed Deployments</a></li>
+<li><a href="#253-tracking-dora-metrics-on-a-dashboard">25.3 Tracking DORA Metrics on a Dashboard</a></li>
+<li><a href="#254-incident-response-workflow-for-a-bad-deploy">25.4 Incident Response Workflow for a Bad Deploy</a></li>
+<li><a href="#255-writing-a-blameless-post-mortem">25.5 Writing a Blameless Post-Mortem</a></li>
+<li><a href="#256-unit-25-labs">25.6 Unit 25 Labs</a></li>
+<li><a href="#257-unit-25-interview-qa">25.7 Unit 25 Interview Q&amp;A</a></li>
+</ul>
+</li>
+<li><a href="#unit-26--cicd--docker-interview-mastery-scenario-based-qa">Unit 26 — CI/CD &amp; Docker Interview Mastery: Scenario-Based Q&amp;A</a><ul>
+<li><a href="#261-system-design-design-a-cicd-pipeline-for-a-containerized-microservices-app">26.1 System Design: &quot;Design a CI/CD Pipeline for a Containerized Microservices App&quot;</a></li>
+<li><a href="#262-github-actions-vs-jenkins--when-would-you-choose-one">26.2 GitHub Actions vs Jenkins — When Would You Choose One?</a></li>
+<li><a href="#263-troubleshooting-scenario-image-builds-fine-container-crashes-in-prod">26.3 Troubleshooting Scenario: &quot;Image Builds Fine, Container Crashes in Prod&quot;</a></li>
+<li><a href="#264-behavioral-question-tell-me-about-a-time-you-fixed-a-slow-or-broken-pipeline">26.4 Behavioral Question: &quot;Tell Me About a Time You Fixed a Slow or Broken Pipeline&quot;</a></li>
+<li><a href="#265-rapid-fire-concept-checks-full-roadmap-recap">26.5 Rapid-Fire Concept Checks (Full Roadmap Recap)</a></li>
+<li><a href="#266-unit-26-labs">26.6 Unit 26 Labs</a></li>
+<li><a href="#267-full-mock-interview-script">26.7 Full Mock Interview Script</a></li>
+</ul>
+</li>
+<li><a href="#phase-8--program-completion-checklist">Phase 8 / Program Completion Checklist</a></li>
+</ul>
+<hr>
+<h2 id="unit-25--monitoring-observability-amp-incident-response"><a class="heading-anchor" href="#unit-25--monitoring-observability-amp-incident-response" aria-hidden="true">#</a>Unit 25 — Monitoring, Observability &amp; Incident Response</h2>
+<p><strong>Difficulty:</strong> Advanced · <strong>Goal:</strong> Treat the pipeline itself as a production system that needs monitoring, not just a tool that occasionally runs.</p>
+<h3 id="251-what-quotpipeline-healthquot-actually-means"><a class="heading-anchor" href="#251-what-quotpipeline-healthquot-actually-means" aria-hidden="true">#</a>25.1 What &quot;Pipeline Health&quot; Actually Means</h3>
+<p>Most engineers only look at a pipeline when it&#39;s red. A mature team tracks it continuously across three dimensions:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>What it tells you</th>
+<th>Node.js-relevant example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Success rate</strong></td>
+<td>% of runs that pass without manual re-trigger</td>
+<td>A <code class="inline-code">main</code> branch pipeline passing 99% of the time is healthy; 80% means something (flaky tests, infra) is chronically wrong</td>
+</tr>
+<tr>
+<td><strong>Duration</strong></td>
+<td>How long a full pipeline takes, and where time goes</td>
+<td><code class="inline-code">npm ci</code> taking 4 minutes because dependency caching isn&#39;t configured is a common, fixable culprit</td>
+</tr>
+<tr>
+<td><strong>Flaky-test rate</strong></td>
+<td>Tests that pass/fail non-deterministically on the same code</td>
+<td>Async tests with race conditions, or tests hitting real timers/network, are the classic Node.js flakiness source</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Instrumenting duration per stage</strong> in a GitHub Actions workflow (from Phase 4) is often as simple as timestamping around steps, or using the built-in per-step timing already shown in the Actions UI. In Jenkins (Phase 5), the <strong>Pipeline: Stage View</strong> and Blue Ocean UI already break down per-stage duration without extra work — the job is to actually look at it regularly, not just when something breaks.</p>
+<h3 id="252-alerting-on-failed-deployments"><a class="heading-anchor" href="#252-alerting-on-failed-deployments" aria-hidden="true">#</a>25.2 Alerting on Failed Deployments</h3>
+<p>A pipeline failure that nobody sees until the next morning stand-up is a monitoring gap, not a &quot;the pipeline was fine&quot; outcome. Wire notifications directly into the pipeline itself.</p>
+<p><strong>GitHub Actions → Slack:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Notify</span> <span class="hljs-string">Slack</span> <span class="hljs-string">on</span> <span class="hljs-string">failure</span>
+  <span class="hljs-attr">if:</span> <span class="hljs-string">failure()</span>
+  <span class="hljs-attr">uses:</span> <span class="hljs-string">slackapi/slack-github-action@v1.27.0</span>
+  <span class="hljs-attr">with:</span>
+    <span class="hljs-attr">channel-id:</span> <span class="hljs-string">&#x27;deployments&#x27;</span>
+    <span class="hljs-attr">slack-message:</span> <span class="hljs-string">&quot;❌ Deploy failed on $<span class="hljs-template-variable">{{ github.ref_name }}</span> — &lt;$<span class="hljs-template-variable">{{ github.server_url }}</span>/$<span class="hljs-template-variable">{{ github.repository }}</span>/actions/runs/$<span class="hljs-template-variable">{{ github.run_id }}</span>|view run&gt;&quot;</span>
+  <span class="hljs-attr">env:</span>
+    <span class="hljs-attr">SLACK_BOT_TOKEN:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.SLACK_BOT_TOKEN</span> <span class="hljs-string">}}</span></code></pre></div>
+<p><strong>Jenkins (Declarative <code class="inline-code">post</code>, from Phase 5):</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">post {
+    failure {
+        slackSend(
+            <span class="hljs-symbol">channel:</span> <span class="hljs-string">&#x27;#deployments&#x27;</span>,
+            <span class="hljs-symbol">color:</span> <span class="hljs-string">&#x27;danger&#x27;</span>,
+            <span class="hljs-symbol">message:</span> <span class="hljs-string">&quot;❌ Deploy failed: ${env.JOB_NAME} #${env.BUILD_NUMBER} — ${env.BUILD_URL}&quot;</span>
+        )
+    }
+}</code></pre></div>
+<p>For production incidents specifically (not just CI failures), route to <strong>PagerDuty</strong> or <strong>Opsgenie</strong> rather than Slack alone, since Slack messages can go unread for hours — a paging tool guarantees someone is actually notified in real time for on-call rotations.</p>
+<h3 id="253-tracking-dora-metrics-on-a-dashboard"><a class="heading-anchor" href="#253-tracking-dora-metrics-on-a-dashboard" aria-hidden="true">#</a>25.3 Tracking DORA Metrics on a Dashboard</h3>
+<p>You met the four DORA metrics conceptually back in Phase 3 (CI/CD Foundation). In production, you actually track them over time:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>DORA metric</th>
+<th>How you&#39;d compute it from pipeline data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Deployment frequency</strong></td>
+<td>Count of successful production deploy pipeline runs per day/week</td>
+</tr>
+<tr>
+<td><strong>Lead time for changes</strong></td>
+<td>Time from commit merged → that commit live in production</td>
+</tr>
+<tr>
+<td><strong>Change failure rate</strong></td>
+<td>% of deploys that require a hotfix or rollback within N hours</td>
+</tr>
+<tr>
+<td><strong>MTTR (Mean Time to Recovery)</strong></td>
+<td>Average time from an incident/failed deploy being detected to service restored</td>
+</tr>
+</tbody>
+</table></div>
+<p>A simple approach many teams start with: emit a structured event (JSON line, or a metric to Prometheus/Datadog) at the end of every deploy pipeline run —</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">javascript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-javascript"><span class="hljs-comment">// deploy-metrics.js — called as a final pipeline step after a deploy completes</span>
+<span class="hljs-keyword">const</span> fetch = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;node-fetch&#x27;</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">recordDeployMetric</span>(<span class="hljs-params">{ status, commitSha, leadTimeSeconds }</span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">METRICS_ENDPOINT</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
+    <span class="hljs-attr">headers</span>: { <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span> },
+    <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({
+      <span class="hljs-attr">event</span>: <span class="hljs-string">&#x27;deployment&#x27;</span>,
+      status,          <span class="hljs-comment">// &#x27;success&#x27; | &#x27;failure&#x27;</span>
+      <span class="hljs-attr">commit</span>: commitSha,
+      leadTimeSeconds,
+      <span class="hljs-attr">timestamp</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>(),
+    }),
+  });
+}</code></pre></div>
+<p>These events feed a Grafana/Datadog dashboard so the team can see trends (e.g., &quot;deployment frequency dropped 40% this sprint — why?&quot;) instead of relying on gut feel.</p>
+<h3 id="254-incident-response-workflow-for-a-bad-deploy"><a class="heading-anchor" href="#254-incident-response-workflow-for-a-bad-deploy" aria-hidden="true">#</a>25.4 Incident Response Workflow for a Bad Deploy</h3>
+<p>A calm, structured response beats a fast, panicked one. A standard shape:</p>
+<ol>
+<li><strong>Detect.</strong> Alert fires (failed health check, error-rate spike, or a failed pipeline notification).</li>
+<li><strong>Assess.</strong> Is this actually caused by the latest deploy? Check the deploy timeline against when the errors started.</li>
+<li><strong>Mitigate first, root-cause later.</strong> If it&#39;s deploy-related, the fastest safe action is almost always <strong>rollback to the last known-good immutable tag</strong> (Phase 2/6 lessons: this is <em>why</em> you never deploy <code class="inline-code">latest</code> and always keep tagged, promotable artifacts).</li>
+<li><strong>Communicate.</strong> A short, factual status update to stakeholders (&quot;investigating elevated error rates since 14:02 UTC, rollback in progress&quot;) beats silence.</li>
+<li><strong>Confirm recovery.</strong> Watch the health checks/error rate actually return to baseline — don&#39;t declare victory the instant the rollback command finishes.</li>
+<li><strong>Post-mortem.</strong> Once stable, do the retrospective (next section) — while it&#39;s fresh, but after the fire is out.</li>
+</ol>
+<h3 id="255-writing-a-blameless-post-mortem"><a class="heading-anchor" href="#255-writing-a-blameless-post-mortem" aria-hidden="true">#</a>25.5 Writing a Blameless Post-Mortem</h3>
+<p>&quot;Blameless&quot; doesn&#39;t mean &quot;no accountability&quot; — it means the analysis targets the <strong>system and process gaps</strong> that allowed a mistake to reach production, not the individual who made a human error that everyone on the team could plausibly have made.</p>
+<p><strong>A minimal structure:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">markdown</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-markdown"><span class="hljs-section">## Incident: Elevated 500 errors on checkout-service — 2026-06-14</span>
+
+<span class="hljs-strong">**Impact:**</span> 12% of checkout requests failed for 18 minutes (14:02–14:20 UTC).
+
+<span class="hljs-strong">**Timeline:**</span>
+<span class="hljs-bullet">-</span> 14:02 — Deploy of checkout-service v2.4.1 completes
+<span class="hljs-bullet">-</span> 14:03 — Error rate alert fires
+<span class="hljs-bullet">-</span> 14:07 — On-call confirms correlation with the deploy
+<span class="hljs-bullet">-</span> 14:09 — Rollback to v2.4.0 initiated
+<span class="hljs-bullet">-</span> 14:11 — Error rate returns to baseline
+
+<span class="hljs-strong">**Root cause:**</span> v2.4.1 introduced a null-pointer-style bug (accessing <span class="hljs-code">`.total`</span> on an
+undefined cart object) that only triggers for guest checkouts, which weren&#x27;t covered
+by the pipeline&#x27;s test suite.
+
+<span class="hljs-strong">**Why didn&#x27;t CI catch it?**</span> No test coverage exists for the guest-checkout code path.
+
+<span class="hljs-strong">**Action items:**</span>
+<span class="hljs-bullet">-</span> [ ] Add guest-checkout test coverage to the test suite (Owner: X, Due: date)
+<span class="hljs-bullet">-</span> [ ] Add a canary stage before full rollout so this class of bug affects &lt;5% of traffic first (Owner: Y, Due: date)</code></pre></div>
+<p>The action items — not blame — are the actual output that prevents recurrence.</p>
+<h3 id="256-unit-25-labs"><a class="heading-anchor" href="#256-unit-25-labs" aria-hidden="true">#</a>25.6 Unit 25 Labs</h3>
+<ol>
+<li><strong>Slack notification.</strong> Wire a failure notification into any pipeline you built in earlier phases (GitHub Actions or Jenkins) using a real or test Slack webhook.</li>
+<li><strong>Dashboard sketch.</strong> Using whatever pipeline history you have (or synthetic data), calculate your own deployment frequency and lead-time-for-changes for the last 10 &quot;deploys.&quot;</li>
+<li><strong>Flaky test hunt.</strong> Deliberately write a flaky Node.js test (e.g., one that depends on <code class="inline-code">Date.now()</code> timing or an unmocked <code class="inline-code">setTimeout</code>), run it 20 times in a loop, and quantify its failure rate before fixing it.</li>
+<li><strong>Post-mortem practice.</strong> Write a full blameless post-mortem (using the template above) for a simulated incident: &quot;a bad deploy caused 15 minutes of 500 errors.&quot;</li>
+</ol>
+<h3 id="257-unit-25-interview-qampa"><a class="heading-anchor" href="#257-unit-25-interview-qampa" aria-hidden="true">#</a>25.7 Unit 25 Interview Q&amp;A</h3>
+<ul>
+<li><p><strong>Q: &quot;How do you monitor the health of your CI/CD pipelines themselves, not just the app?&quot;</strong>
+A: Track success rate, duration trends, and flaky-test rate over time, alert directly from the pipeline (Slack for CI failures, PagerDuty for production incidents), and roll deploy outcomes into DORA metrics (deployment frequency, lead time, change failure rate, MTTR) on a dashboard so regressions in the <em>process</em> are visible, not just regressions in the app.</p>
+</li>
+<li><p><strong>Q: &quot;Walk me through your incident response when a deploy breaks production.&quot;</strong>
+A: Detect via alerting, confirm the deploy is actually the cause by correlating timelines, mitigate immediately via rollback to the last known-good immutable tag rather than trying to hotfix forward under pressure, communicate status to stakeholders, confirm the metrics actually recover, then run a blameless post-mortem focused on process/system gaps and concrete action items.</p>
+</li>
+</ul>
+<hr>
+<h2 id="unit-26--cicd-amp-docker-interview-mastery-scenario-based-qampa"><a class="heading-anchor" href="#unit-26--cicd-amp-docker-interview-mastery-scenario-based-qampa" aria-hidden="true">#</a>Unit 26 — CI/CD &amp; Docker Interview Mastery: Scenario-Based Q&amp;A</h2>
+<p><strong>Difficulty:</strong> Advanced · <strong>Goal:</strong> Synthesize all 7 prior phases into fluent, structured answers under interview time pressure.</p>
+<h3 id="261-system-design-quotdesign-a-cicd-pipeline-for-a-containerized-microservices-appquot"><a class="heading-anchor" href="#261-system-design-quotdesign-a-cicd-pipeline-for-a-containerized-microservices-appquot" aria-hidden="true">#</a>26.1 System Design: &quot;Design a CI/CD Pipeline for a Containerized Microservices App&quot;</h3>
+<p>This is the single most common senior-leaning interview question in this space. <strong>Structure your answer end-to-end, narrating each phase you&#39;ve studied as you go</strong> — don&#39;t just list buzzwords.</p>
+<p><strong>A strong answer outline (say this out loud, practicing until it&#39;s fluent):</strong></p>
+<ol>
+<li><p><strong>Source &amp; branching (Phase 3):</strong> &quot;I&#39;d use trunk-based development with short-lived feature branches, required PR reviews, and branch protection requiring CI to pass before merge.&quot;</p>
+</li>
+<li><p><strong>Build (Phases 1-2):</strong> &quot;Each service has its own multi-stage Dockerfile — a builder stage with full toolchain, a lean Alpine or distroless runtime stage, running as non-root, with <code class="inline-code">.dockerignore</code> keeping the build context small.&quot;</p>
+</li>
+<li><p><strong>Test:</strong> &quot;Unit tests run first (fast feedback), then integration tests against real dependencies via Docker Compose (Phase 1), gated before anything expensive happens.&quot;</p>
+</li>
+<li><p><strong>Security gates (Phase 7):</strong> &quot;Trivy scan on the built image, gitleaks for secret scanning, SAST via CodeQL — all as hard pipeline gates, not advisory-only.&quot;</p>
+</li>
+<li><p><strong>Package &amp; tag (Phase 2/6):</strong> &quot;Build once, tag with both semver and commit SHA, push to a private registry — never redeploy <code class="inline-code">latest</code>. This is the &#39;build once, promote everywhere&#39; principle.&quot;</p>
+</li>
+<li><p><strong>Deploy (Phase 6):</strong> &quot;The same immutable artifact is promoted through dev → staging → production via a pipeline promotion pattern, using a progressive strategy — canary or blue-green depending on the service&#39;s risk profile — with automated rollback triggers on failed health checks.&quot;</p>
+</li>
+<li><p><strong>Tooling choice (Phase 4-5):</strong> &quot;GitHub Actions if the org is already on GitHub and wants managed infrastructure; Jenkins if there&#39;s a need for heavy customization, on-prem requirements, or it&#39;s already the org standard.&quot;</p>
+</li>
+<li><p><strong>Observability (Phase 8):</strong> &quot;Deploy events feed a DORA dashboard, failures alert immediately, and every incident gets a blameless post-mortem with action items fed back into the pipeline (e.g., new test coverage, an added canary gate).&quot;</p>
+</li>
+</ol>
+<p><strong>Why this structure wins interviews:</strong> it shows you can reason about a pipeline as a <em>system</em> with feedback loops, not just recite a list of tools.</p>
+<h3 id="262-github-actions-vs-jenkins--when-would-you-choose-one"><a class="heading-anchor" href="#262-github-actions-vs-jenkins--when-would-you-choose-one" aria-hidden="true">#</a>26.2 GitHub Actions vs Jenkins — When Would You Choose One?</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Favors GitHub Actions</th>
+<th>Favors Jenkins</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hosting</td>
+<td>Already on GitHub, want zero infra to manage</td>
+<td>Need on-prem/air-gapped, or already have Jenkins infra investment</td>
+</tr>
+<tr>
+<td>Customization</td>
+<td>Standard workflows, marketplace actions cover most needs</td>
+<td>Deeply custom logic, legacy integrations, complex Groovy-based orchestration</td>
+</tr>
+<tr>
+<td>Cost model</td>
+<td>Pay-per-minute on hosted runners (or free for public repos)</td>
+<td>Self-hosted — infra cost instead of per-minute billing</td>
+</tr>
+<tr>
+<td>Ecosystem</td>
+<td>Large marketplace, tight GitHub-native integration (PRs, environments, OIDC)</td>
+<td>Massive plugin ecosystem built over 15+ years, but variable plugin quality/maintenance</td>
+</tr>
+<tr>
+<td>Scaling model</td>
+<td>GitHub-hosted runners scale automatically; self-hosted runners for special needs</td>
+<td>Requires you to manage agent scaling yourself (static pools or Kubernetes plugin)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>A concise interview answer:</strong> &quot;I&#39;d default to GitHub Actions for a team already living in GitHub, since it minimizes infrastructure to maintain and integrates natively with PRs, environments, and OIDC-based cloud auth. I&#39;d reach for Jenkins in an enterprise with existing Jenkins infrastructure, on-prem/compliance constraints, or pipeline requirements complex enough to need Shared Libraries and deep customization that off-the-shelf Actions don&#39;t cover as cleanly.&quot;</p>
+<h3 id="263-troubleshooting-scenario-quotimage-builds-fine-container-crashes-in-prodquot"><a class="heading-anchor" href="#263-troubleshooting-scenario-quotimage-builds-fine-container-crashes-in-prodquot" aria-hidden="true">#</a>26.3 Troubleshooting Scenario: &quot;Image Builds Fine, Container Crashes in Prod&quot;</h3>
+<p>This tests whether you can distinguish <strong>build-time correctness</strong> from <strong>runtime correctness</strong> — a very common real gap.</p>
+<p><strong>Structured answer:</strong></p>
+<ol>
+<li><p>&quot;First, I&#39;d get the actual crash reason: <code class="inline-code">docker logs</code> in prod, or <code class="inline-code">kubectl logs</code> if it&#39;s Kubernetes — the image building successfully tells me nothing about whether it runs correctly in the target environment.&quot;</p>
+</li>
+<li><p>&quot;I&#39;d check <code class="inline-code">docker inspect</code>/<code class="inline-code">kubectl describe pod</code> for the exit code — 137 means OOM (Phase 2), which is common if the prod resource limits are tighter than what I tested locally.&quot;</p>
+</li>
+<li><p>&quot;I&#39;d check for <strong>environment drift</strong> (Phase 2, Unit 8): missing environment variables that exist in staging config but not prod, a database/service the container can&#39;t reach due to networking/DNS differences, or a secret that wasn&#39;t mounted correctly in this environment.&quot;</p>
+</li>
+<li><p>&quot;I&#39;d check for <strong>native module drift</strong>: if the image is Alpine-based (musl libc) and was tested on a glibc dev machine, a native dependency like <code class="inline-code">bcrypt</code> might behave differently or fail to load — I&#39;d reproduce by running the <em>exact</em> pushed image locally with <code class="inline-code">docker run</code>, not just the source code.&quot;</p>
+</li>
+<li><p>&quot;I&#39;d also verify the image actually deployed matches the one tested — this is exactly why immutable, SHA-based tagging (Phase 2/6) matters: I can confirm prod is running the SHA I think it&#39;s running, not a stale or mismatched <code class="inline-code">latest</code>.&quot;</p>
+</li>
+<li><p>&quot;Once identified, fix forward if it&#39;s quick and safe, or roll back to the last known-good tag immediately if user impact is ongoing — mitigate before you fully root-cause.&quot;</p>
+</li>
+</ol>
+<h3 id="264-behavioral-question-quottell-me-about-a-time-you-fixed-a-slow-or-broken-pipelinequot"><a class="heading-anchor" href="#264-behavioral-question-quottell-me-about-a-time-you-fixed-a-slow-or-broken-pipelinequot" aria-hidden="true">#</a>26.4 Behavioral Question: &quot;Tell Me About a Time You Fixed a Slow or Broken Pipeline&quot;</h3>
+<p>Use the <strong>STAR</strong> format (Situation, Task, Action, Result). A template you can adapt to a real experience:</p>
+<blockquote class="quote-plain"><p><strong>Situation:</strong> &quot;Our CI pipeline for a Node.js service was taking 14 minutes per run, and the team had started skipping CI locally before merging just to move faster — which was itself risky.&quot;</p>
+<p><strong>Task:</strong> &quot;I was asked to bring build time down without cutting test coverage.&quot;</p>
+<p><strong>Action:</strong> &quot;I profiled the pipeline stage-by-stage and found <code class="inline-code">npm ci</code> alone was taking 5 minutes because dependency caching wasn&#39;t configured. I added caching keyed on <code class="inline-code">package-lock.json</code>&#39;s hash, split unit and integration tests into parallel jobs instead of sequential, and moved a slow, low-value end-to-end suite to a nightly schedule instead of every PR.&quot;</p>
+<p><strong>Result:</strong> &quot;Pipeline time dropped from 14 minutes to under 5 minutes for the common path, and the team stopped skipping CI locally — deploy frequency actually went up the following sprint because the feedback loop was fast enough to trust again.&quot;</p>
+</blockquote>
+<p>Practice one real, specific version of this from your own experience (resume-writing background aside — pull from your actual Node.js backend work) so it doesn&#39;t sound rehearsed-generic.</p>
+<h3 id="265-rapid-fire-concept-checks-full-roadmap-recap"><a class="heading-anchor" href="#265-rapid-fire-concept-checks-full-roadmap-recap" aria-hidden="true">#</a>26.5 Rapid-Fire Concept Checks (Full Roadmap Recap)</h3>
+<p>A closing flash-card pass spanning the entire roadmap — if you can answer all of these confidently in under 20 seconds each, you&#39;re ready:</p>
+<ul>
+<li><strong>Image layers &amp; caching:</strong> order Dockerfile instructions from least-to-most frequently changing to maximize cache hits.</li>
+<li><strong>Idempotency:</strong> the same Dockerfile + context should always produce a functionally identical image; pin versions, don&#39;t float on <code class="inline-code">:latest</code>.</li>
+<li><strong>Artifact immutability:</strong> build once, tag immutably, promote the <em>same</em> artifact through every environment — never rebuild per environment.</li>
+<li><strong>Secrets handling:</strong> never bake into layers; use BuildKit secret mounts at build time, vault/orchestrator secrets at runtime.</li>
+<li><strong>Rollback strategy:</strong> only possible because of immutable tags — rollback = redeploy the previous tag, not &quot;figure out what changed.&quot;</li>
+<li><strong>CI vs CD vs Continuous Deployment:</strong> CI = auto build/test on every change; Continuous Delivery = always release-ready, deploy is a manual trigger; Continuous Deployment = every passing change auto-deploys to production.</li>
+<li><strong>Blue-green vs canary:</strong> blue-green = instant full cutover between two complete environments; canary = gradual traffic shift to the new version with automated rollback on regression.</li>
+<li><strong>OIDC in CI:</strong> exchanges a short-lived, workflow-scoped token for cloud credentials — no long-lived static secrets stored in CI at all.</li>
+<li><strong>GitOps:</strong> desired state lives in Git; an in-cluster agent (ArgoCD/Flux) pulls and reconciles, rather than the pipeline pushing changes directly.</li>
+</ul>
+<h3 id="266-unit-26-labs"><a class="heading-anchor" href="#266-unit-26-labs" aria-hidden="true">#</a>26.6 Unit 26 Labs</h3>
+<ol>
+<li><strong>Whiteboard mock.</strong> Without notes, verbally (or in writing) design the full pipeline from 26.1 for a 3-service app, timing yourself — aim to cover source-to-observability in under 5 minutes.</li>
+<li><strong>Broken GitHub Actions debug.</strong> Deliberately break a GitHub Actions workflow (bad secret name, wrong <code class="inline-code">needs:</code> reference, missing checkout step) and time yourself fixing it under pressure.</li>
+<li><strong>Broken Jenkinsfile debug.</strong> Same exercise, but break a Jenkinsfile (bad credential ID, missing <code class="inline-code">agent</code>, malformed <code class="inline-code">when</code> expression).</li>
+<li><strong>STAR rehearsal.</strong> Write and rehearse three STAR-format behavioral answers: one about a pipeline fix, one about a production incident, one about a security issue you caught or should have caught.</li>
+</ol>
+<h3 id="267-full-mock-interview-script"><a class="heading-anchor" href="#267-full-mock-interview-script" aria-hidden="true">#</a>26.7 Full Mock Interview Script</h3>
+<p>Run through this end-to-end, playing both roles if needed, as your final readiness check before a real interview:</p>
+<p><strong>Q1 (System design):</strong> &quot;Design a CI/CD pipeline for a containerized microservices app.&quot;
+→ Use the 26.1 structure fluently, narrating source → build → test → security → package → deploy → observability.</p>
+<p><strong>Q2 (Tool comparison):</strong> &quot;GitHub Actions or Jenkins — which would you pick for a 50-person engineering org migrating off manual deploys?&quot;
+→ Use the 26.2 table; land on a clear recommendation with a stated reason, don&#39;t just describe both neutrally forever.</p>
+<p><strong>Q3 (Troubleshooting):</strong> &quot;The image builds fine in CI, but the container crashes immediately in production. Walk me through your debugging.&quot;
+→ Use the 26.3 six-step structure.</p>
+<p><strong>Q4 (Docker fundamentals, from Phase 1/2):</strong> &quot;What&#39;s the difference between <code class="inline-code">CMD</code> and <code class="inline-code">ENTRYPOINT</code>, and why does it matter for how a container gets debugged?&quot;
+→ <code class="inline-code">ENTRYPOINT</code> sets the fixed executable; <code class="inline-code">CMD</code> supplies default arguments (or the whole command if <code class="inline-code">ENTRYPOINT</code> isn&#39;t set) that <em>can</em> be overridden at <code class="inline-code">docker run</code> time — this matters because it determines whether <code class="inline-code">docker run &lt;image&gt; sh</code> gives you a shell or just appends <code class="inline-code">sh</code> as an argument to a fixed entrypoint.</p>
+<p><strong>Q5 (Behavioral):</strong> &quot;Tell me about a time a deploy went wrong.&quot;
+→ Use a STAR answer built on the incident-response workflow (25.4) and blameless post-mortem practice (25.5).</p>
+<p><strong>Q6 (Rapid-fire, pick 3-4 from 26.5):</strong> e.g., &quot;What&#39;s GitOps?&quot; / &quot;Why avoid <code class="inline-code">latest</code> in production?&quot; / &quot;What does OIDC buy you in a pipeline?&quot;</p>
+<p>If you can move through all six without notes and without long pauses, you are genuinely interview-ready for a DevOps/CI-CD-adjacent Node.js backend role.</p>
+<hr>
+<h2 id="phase-8--program-completion-checklist"><a class="heading-anchor" href="#phase-8--program-completion-checklist" aria-hidden="true">#</a>Phase 8 / Program Completion Checklist</h2>
+<p>By the end of Phase 8 — and the full roadmap — you should be able to, without notes:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Explain what &quot;pipeline health&quot; means beyond pass/fail and name the metrics that measure it</li>
+<li><input disabled="" type="checkbox"> Wire real failure alerting into a pipeline (Slack/PagerDuty pattern)</li>
+<li><input disabled="" type="checkbox"> Compute/explain all four DORA metrics from real or synthetic pipeline data</li>
+<li><input disabled="" type="checkbox"> Run a structured incident-response workflow for a bad deploy, ending in a blameless post-mortem</li>
+<li><input disabled="" type="checkbox"> Deliver the full &quot;design a CI/CD pipeline for a microservices app&quot; answer fluently end-to-end</li>
+<li><input disabled="" type="checkbox"> Give a decisive, well-reasoned GitHub Actions vs Jenkins recommendation</li>
+<li><input disabled="" type="checkbox"> Debug &quot;builds fine, crashes in prod&quot; using the six-step structure without prompting</li>
+<li><input disabled="" type="checkbox"> Tell a real, specific STAR story about fixing a pipeline or handling an incident</li>
+<li><input disabled="" type="checkbox"> Pass a rapid-fire concept check spanning all 8 phases of this roadmap</li>
+<li><input disabled="" type="checkbox"> Complete a full 6-question mock interview without notes</li>
+</ul>
+<p><strong>This completes the Docker + CI/CD Mastery Roadmap (27 units, 8 phases).</strong> The natural next step beyond this roadmap is applying these patterns to a real side project end-to-end — build a small Node.js service, containerize it with the Phase 1-2 practices, wire a real GitHub Actions <em>and</em> a real Jenkins pipeline for it, and deploy it somewhere real (even a free-tier cloud VM). Nothing cements interview fluency like having actually operated the full loop yourself.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

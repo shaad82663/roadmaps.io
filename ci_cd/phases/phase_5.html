@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 5 — Jenkins</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>Phase 5 — Jenkins</h1>
+</header>
+<main class="article-wrap">
+<h1 id="phase-5--jenkins"><a class="heading-anchor" href="#phase-5--jenkins" aria-hidden="true">#</a>Phase 5 — Jenkins</h1>
+<h3 id="for-a-3-yoe-nodejs-backend-engineer"><a class="heading-anchor" href="#for-a-3-yoe-nodejs-backend-engineer" aria-hidden="true">#</a>For a 3 YOE Node.js Backend Engineer</h3>
+<blockquote class="quote-plain"><p>Prerequisite assumption: you&#39;ve completed Phases 1-4 (Docker Foundations &amp; Advanced, CI/CD Foundation, GitHub Actions). You already know pipeline concepts, branching strategies, and artifact management from a GitHub Actions lens — this phase maps those same concepts onto Jenkins, which is still extremely common in enterprise/regulated environments (finance, government, large legacy orgs) and comes up constantly in interviews even at companies that don&#39;t use it, because it&#39;s the &quot;classic&quot; CI/CD tool everyone is expected to know.</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
+<ul>
+<li><a href="#unit-16--jenkins-fundamentals--architecture">Unit 16 — Jenkins Fundamentals &amp; Architecture</a><ul>
+<li><a href="#161-controlleragent-architecture">16.1 Controller/Agent Architecture</a></li>
+<li><a href="#162-installing-jenkins-docker-route">16.2 Installing Jenkins (Docker Route)</a></li>
+<li><a href="#163-freestyle-vs-pipeline-vs-multibranch-pipeline-jobs">16.3 Freestyle vs Pipeline vs Multibranch Pipeline Jobs</a></li>
+<li><a href="#164-the-plugin-ecosystem">16.4 The Plugin Ecosystem</a></li>
+<li><a href="#165-blue-ocean-vs-classic-ui">16.5 Blue Ocean vs Classic UI</a></li>
+<li><a href="#166-unit-16-labs">16.6 Unit 16 Labs</a></li>
+<li><a href="#167-unit-16-interview-qa">16.7 Unit 16 Interview Q&amp;A</a></li>
+</ul>
+</li>
+<li><a href="#unit-17--jenkins-pipelines-declarative-vs-scripted">Unit 17 — Jenkins Pipelines: Declarative vs Scripted</a><ul>
+<li><a href="#171-declarative-pipeline-anatomy">17.1 Declarative Pipeline Anatomy</a></li>
+<li><a href="#172-scripted-pipeline--when-you-still-need-groovy">17.2 Scripted Pipeline — When You Still Need Groovy</a></li>
+<li><a href="#173-post--blocks">17.3 post {} Blocks</a></li>
+<li><a href="#174-parameters-environment-variables--when-">17.4 Parameters, Environment Variables &amp; when {}</a></li>
+<li><a href="#175-a-full-nodejs-jenkinsfile">17.5 A Full Node.js Jenkinsfile</a></li>
+<li><a href="#176-unit-17-labs">17.6 Unit 17 Labs</a></li>
+<li><a href="#177-unit-17-interview-qa">17.7 Unit 17 Interview Q&amp;A</a></li>
+</ul>
+</li>
+<li><a href="#unit-18--jenkins-shared-libraries-plugins--multibranch-pipelines">Unit 18 — Jenkins Shared Libraries, Plugins &amp; Multibranch Pipelines</a><ul>
+<li><a href="#181-why-shared-libraries-exist">18.1 Why Shared Libraries Exist</a></li>
+<li><a href="#182-the-vars-and-src-directory-structure">18.2 The vars/ and src/ Directory Structure</a></li>
+<li><a href="#183-multibranch-pipelines">18.3 Multibranch Pipelines</a></li>
+<li><a href="#184-webhooks--instant-triggers">18.4 Webhooks — Instant Triggers</a></li>
+<li><a href="#185-key-plugins-reference">18.5 Key Plugins Reference</a></li>
+<li><a href="#186-unit-18-labs">18.6 Unit 18 Labs</a></li>
+<li><a href="#187-unit-18-interview-qa">18.7 Unit 18 Interview Q&amp;A</a></li>
+</ul>
+</li>
+<li><a href="#unit-19--jenkins-distributed-builds--scaling">Unit 19 — Jenkins Distributed Builds &amp; Scaling</a><ul>
+<li><a href="#191-static-vs-dynamicephemeral-agents">19.1 Static vs Dynamic/Ephemeral Agents</a></li>
+<li><a href="#192-labels--routing-jobs-to-the-right-agent">19.2 Labels — Routing Jobs to the Right Agent</a></li>
+<li><a href="#193-the-kubernetes-plugin">19.3 The Kubernetes Plugin</a></li>
+<li><a href="#194-managing-build-queues--executors">19.4 Managing Build Queues &amp; Executors</a></li>
+<li><a href="#195-scaling-jenkins-for-large-orgs">19.5 Scaling Jenkins for Large Orgs</a></li>
+<li><a href="#196-unit-19-labs">19.6 Unit 19 Labs</a></li>
+<li><a href="#197-unit-19-interview-qa">19.7 Unit 19 Interview Q&amp;A</a></li>
+</ul>
+</li>
+<li><a href="#phase-5-summary-checklist">Phase 5 Summary Checklist</a></li>
+</ul>
+<hr>
+<h2 id="unit-16--jenkins-fundamentals-amp-architecture"><a class="heading-anchor" href="#unit-16--jenkins-fundamentals-amp-architecture" aria-hidden="true">#</a>Unit 16 — Jenkins Fundamentals &amp; Architecture</h2>
+<p><strong>Difficulty:</strong> Beginner · <strong>Goal:</strong> Understand how Jenkins is put together before writing a single pipeline.</p>
+<h3 id="161-controlleragent-architecture"><a class="heading-anchor" href="#161-controlleragent-architecture" aria-hidden="true">#</a>16.1 Controller/Agent Architecture</h3>
+<p>Jenkins runs as a <strong>controller</strong> (historically called &quot;master&quot; — you&#39;ll still see both terms in older docs/plugins) that:</p>
+<ul>
+<li>Hosts the web UI and REST API</li>
+<li>Stores job configuration and build history</li>
+<li>Schedules builds and distributes work to <strong>agents</strong></li>
+</ul>
+<p><strong>Agents</strong> (a.k.a. nodes) are the machines/pods that actually execute build steps. Each agent has one or more <strong>executors</strong> — a slot that can run one build step at a time. This split matters because:</p>
+<ul>
+<li>The controller should ideally do <em>no</em> heavy building itself in production — it just orchestrates. Running builds directly on the controller ties up its resources and is a common anti-pattern flagged in interviews.</li>
+<li>Agents can run different OSes, tool versions, or be ephemeral (spun up per-build and destroyed after), which lets you match a build&#39;s environment to what it actually needs.</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">                    ┌─────────────────────┐
+                    │   Jenkins Controller │
+                    │  (UI, scheduler,     │
+                    │   job configs, DB)   │
+                    └──────────┬──────────┘
+                               │ (SSH / JNLP / Kubernetes API)
+              ┌────────────────┼────────────────┐
+              ▼                ▼                ▼
+        ┌───────────┐   ┌───────────┐   ┌───────────────┐
+        │  Agent 1  │   │  Agent 2  │   │ Ephemeral Pod │
+        │ (Linux,   │   │ (Windows, │   │ (Kubernetes,  │
+        │  Node.js) │   │  .NET)    │   │  per-build)   │
+        └───────────┘   └───────────┘   └───────────────┘</code></pre></div>
+<h3 id="162-installing-jenkins-docker-route"><a class="heading-anchor" href="#162-installing-jenkins-docker-route" aria-hidden="true">#</a>16.2 Installing Jenkins (Docker Route)</h3>
+<p>The fastest way to get a real Jenkins instance running locally — and it plays directly into everything you learned in Phases 1-2:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker volume create jenkins_home
+
+docker run -d \
+  --name jenkins \
+  -p 8080:8080 \
+  -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jenkins/jenkins:lts</code></pre></div>
+<ul>
+<li>Port <code class="inline-code">8080</code> is the web UI; <code class="inline-code">50000</code> is used for JNLP agent connections.</li>
+<li>Mounting <code class="inline-code">/var/run/docker.sock</code> lets Jenkins itself spin up Docker containers as build agents/steps (&quot;Docker outside of Docker&quot; pattern) — very common when Jenkins needs to build and push Docker images as part of a pipeline.</li>
+<li>On first boot, get the unlock password with:</li>
+</ul>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker <span class="hljs-built_in">exec</span> jenkins <span class="hljs-built_in">cat</span> /var/jenkins_home/secrets/initialAdminPassword</code></pre></div>
+<h3 id="163-freestyle-vs-pipeline-vs-multibranch-pipeline-jobs"><a class="heading-anchor" href="#163-freestyle-vs-pipeline-vs-multibranch-pipeline-jobs" aria-hidden="true">#</a>16.3 Freestyle vs Pipeline vs Multibranch Pipeline Jobs</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Job type</th>
+<th>What it is</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Freestyle</strong></td>
+<td>Configured entirely through the UI, no code</td>
+<td>Legacy/simple jobs; rarely recommended for new work</td>
+</tr>
+<tr>
+<td><strong>Pipeline</strong></td>
+<td>A single <code class="inline-code">Jenkinsfile</code>-driven pipeline, one branch</td>
+<td>A project with one long-lived branch or a manually-managed pipeline</td>
+</tr>
+<tr>
+<td><strong>Multibranch Pipeline</strong></td>
+<td>Jenkins auto-discovers every branch/PR in a repo and runs each one&#39;s own <code class="inline-code">Jenkinsfile</code></td>
+<td>The default modern choice — mirrors how you&#39;d use GitHub Actions across branches</td>
+</tr>
+</tbody>
+</table></div>
+<p>The industry (and interview) consensus: avoid Freestyle for anything beyond a quick throwaway job. Pipeline-as-code (<code class="inline-code">Jenkinsfile</code> committed to the repo) is the expected standard, exactly like a <code class="inline-code">.github/workflows/*.yml</code> file.</p>
+<h3 id="164-the-plugin-ecosystem"><a class="heading-anchor" href="#164-the-plugin-ecosystem" aria-hidden="true">#</a>16.4 The Plugin Ecosystem</h3>
+<p>Jenkins&#39; core is intentionally minimal — almost everything useful comes from plugins. As a baseline for a Node.js pipeline you&#39;ll typically install:</p>
+<ul>
+<li><strong>Git plugin</strong> — checkout support</li>
+<li><strong>Pipeline plugin</strong> — Jenkinsfile support (usually pre-installed via the &quot;suggested plugins&quot; set)</li>
+<li><strong>NodeJS plugin</strong> — manages Node.js versions per job, similar to <code class="inline-code">actions/setup-node</code></li>
+<li><strong>Credentials Binding plugin</strong> — safely injects secrets into pipeline steps</li>
+<li><strong>Blue Ocean plugin</strong> — modern visual pipeline UI</li>
+</ul>
+<p>Install via <strong>Manage Jenkins → Plugins</strong>, or declaratively for reproducible instances using a <code class="inline-code">plugins.txt</code> baked into a custom Jenkins Docker image:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">FROM</span> jenkins/jenkins:lts
+<span class="hljs-keyword">COPY</span><span class="language-bash"> plugins.txt /usr/share/jenkins/ref/plugins.txt</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text"># plugins.txt
+git:latest
+workflow-aggregator:latest
+nodejs:latest
+credentials-binding:latest
+blueocean:latest</code></pre></div>
+<h3 id="165-blue-ocean-vs-classic-ui"><a class="heading-anchor" href="#165-blue-ocean-vs-classic-ui" aria-hidden="true">#</a>16.5 Blue Ocean vs Classic UI</h3>
+<p>Blue Ocean gives you a visual, left-to-right pipeline graph (similar to GitHub Actions&#39; run visualization) instead of the classic UI&#39;s plain stage-view table. It&#39;s largely a UX layer over the same underlying Jenkinsfile — nothing about your pipeline code changes. Worth knowing it exists; don&#39;t over-invest time in it, since many orgs still use the classic UI exclusively and Blue Ocean&#39;s own development has slowed in recent years.</p>
+<h3 id="166-unit-16-labs"><a class="heading-anchor" href="#166-unit-16-labs" aria-hidden="true">#</a>16.6 Unit 16 Labs</h3>
+<ol>
+<li><strong>Docker install.</strong> Run Jenkins via the Docker command above, unlock it, and complete the setup wizard with the &quot;suggested plugins&quot; set.</li>
+<li><strong>Freestyle job.</strong> Create a Freestyle job that clones a small Node.js repo and runs <code class="inline-code">npm test</code> as a build step, just to see the legacy UI-driven flow.</li>
+<li><strong>SSH agent.</strong> Add a second machine (or another container) as an SSH agent node under <strong>Manage Jenkins → Nodes</strong>, and confirm a job can be routed to it.</li>
+<li><strong>Plugin install.</strong> Install the NodeJS plugin, then configure a global Node.js installation under <strong>Manage Jenkins → Tools</strong> so any job can request &quot;Node 20&quot; without manually installing it.</li>
+</ol>
+<h3 id="167-unit-16-interview-qampa"><a class="heading-anchor" href="#167-unit-16-interview-qampa" aria-hidden="true">#</a>16.7 Unit 16 Interview Q&amp;A</h3>
+<ul>
+<li><p><strong>Q: &quot;Explain Jenkins&#39; controller/agent architecture.&quot;</strong>
+A: The controller hosts the UI, stores configuration/history, and schedules work; agents (nodes) execute the actual build steps via executors. Production setups avoid running builds directly on the controller to keep it responsive and to isolate build environments per job.</p>
+</li>
+<li><p><strong>Q: &quot;Freestyle vs Pipeline — which would you use and why?&quot;</strong>
+A: Pipeline (ideally Multibranch), because it&#39;s defined as code in a <code class="inline-code">Jenkinsfile</code> committed alongside the application — versioned, reviewable, and portable across environments, unlike Freestyle jobs which live only in Jenkins&#39; UI configuration.</p>
+</li>
+</ul>
+<hr>
+<h2 id="unit-17--jenkins-pipelines-declarative-vs-scripted"><a class="heading-anchor" href="#unit-17--jenkins-pipelines-declarative-vs-scripted" aria-hidden="true">#</a>Unit 17 — Jenkins Pipelines: Declarative vs Scripted</h2>
+<p><strong>Difficulty:</strong> Intermediate · <strong>Goal:</strong> Write real Jenkinsfiles fluently, the way you already write GitHub Actions YAML.</p>
+<h3 id="171-declarative-pipeline-anatomy"><a class="heading-anchor" href="#171-declarative-pipeline-anatomy" aria-hidden="true">#</a>17.1 Declarative Pipeline Anatomy</h3>
+<p>Declarative syntax is structured, opinionated, and closer to what you already know from GitHub Actions YAML — it&#39;s the recommended default for nearly all new pipelines.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">pipeline {
+    agent any
+
+    stages {
+        stage(<span class="hljs-string">&#x27;Install&#x27;</span>) {
+            steps {
+                sh <span class="hljs-string">&#x27;npm ci&#x27;</span>
+            }
+        }
+        stage(<span class="hljs-string">&#x27;Test&#x27;</span>) {
+            steps {
+                sh <span class="hljs-string">&#x27;npm test&#x27;</span>
+            }
+        }
+        stage(<span class="hljs-string">&#x27;Build&#x27;</span>) {
+            steps {
+                sh <span class="hljs-string">&#x27;npm run build&#x27;</span>
+            }
+        }
+        stage(<span class="hljs-string">&#x27;Deploy&#x27;</span>) {
+            steps {
+                sh <span class="hljs-string">&#x27;./deploy.sh&#x27;</span>
+            }
+        }
+    }
+}</code></pre></div>
+<ul>
+<li><code class="inline-code">agent any</code> tells Jenkins to run this on any available agent. You can scope it more tightly (see Unit 19) with <code class="inline-code">agent { label &#39;node20&#39; }</code>.</li>
+<li><code class="inline-code">stages</code> / <code class="inline-code">stage</code> / <code class="inline-code">steps</code> map roughly to GitHub Actions&#39; <code class="inline-code">jobs</code> / <code class="inline-code">job</code> / <code class="inline-code">steps</code>, though Jenkins stages are sequential within one job by default (parallelism needs an explicit <code class="inline-code">parallel</code> block).</li>
+</ul>
+<h3 id="172-scripted-pipeline--when-you-still-need-groovy"><a class="heading-anchor" href="#172-scripted-pipeline--when-you-still-need-groovy" aria-hidden="true">#</a>17.2 Scripted Pipeline — When You Still Need Groovy</h3>
+<p>Scripted Pipeline is full Groovy code, giving you loops, complex conditionals, and dynamic stage generation that Declarative&#39;s stricter grammar doesn&#39;t allow directly (Declarative can still drop into Groovy via <code class="inline-code">script {}</code> blocks for the same effect — see below).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">node {
+    stage(<span class="hljs-string">&#x27;Install&#x27;</span>) {
+        sh <span class="hljs-string">&#x27;npm ci&#x27;</span>
+    }
+    stage(<span class="hljs-string">&#x27;Test&#x27;</span>) {
+        sh <span class="hljs-string">&#x27;npm test&#x27;</span>
+    }
+    stage(<span class="hljs-string">&#x27;Dynamic Matrix&#x27;</span>) {
+        <span class="hljs-keyword">def</span> versions = [<span class="hljs-string">&#x27;18&#x27;</span>, <span class="hljs-string">&#x27;20&#x27;</span>, <span class="hljs-string">&#x27;22&#x27;</span>]
+        <span class="hljs-keyword">for</span> (v <span class="hljs-keyword">in</span> versions) {
+            sh <span class="hljs-string">&quot;docker run --rm node:${v}-alpine node --version&quot;</span>
+        }
+    }
+}</code></pre></div>
+<p><strong>In practice:</strong> most teams write Declarative pipelines and only drop into Groovy where needed via a <code class="inline-code">script {}</code> block inside a stage, rather than writing a fully Scripted pipeline from scratch:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">pipeline {
+    agent any
+    stages {
+        stage(<span class="hljs-string">&#x27;Conditional Logic&#x27;</span>) {
+            steps {
+                script {
+                    <span class="hljs-keyword">if</span> (env.BRANCH_NAME == <span class="hljs-string">&#x27;main&#x27;</span>) {
+                        echo <span class="hljs-string">&#x27;Deploying to production&#x27;</span>
+                    } <span class="hljs-keyword">else</span> {
+                        echo <span class="hljs-string">&#x27;Skipping deploy for feature branch&#x27;</span>
+                    }
+                }
+            }
+        }
+    }
+}</code></pre></div>
+<p><strong>Interview framing:</strong> &quot;I default to Declarative for readability, structure, and built-in validation, and drop into a <code class="inline-code">script {}</code> block only when I need Groovy-level logic Declarative doesn&#39;t natively support — I&#39;d reach for a full Scripted pipeline only for genuinely complex, highly dynamic pipeline generation.&quot;</p>
+<h3 id="173-post--blocks"><a class="heading-anchor" href="#173-post--blocks" aria-hidden="true">#</a>17.3 post {} Blocks</h3>
+<p><code class="inline-code">post</code> runs cleanup/notification logic after the pipeline (or a stage) finishes, based on the outcome — directly analogous to GitHub Actions&#39; <code class="inline-code">if: failure()</code> / <code class="inline-code">if: always()</code> step conditions, but centralized in one block.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">pipeline {
+    agent any
+    stages {
+        stage(<span class="hljs-string">&#x27;Test&#x27;</span>) {
+            steps {
+                sh <span class="hljs-string">&#x27;npm test&#x27;</span>
+            }
+        }
+    }
+    post {
+        always {
+            junit <span class="hljs-string">&#x27;test-results/*.xml&#x27;</span>
+        }
+        success {
+            slackSend(<span class="hljs-attr">color:</span> <span class="hljs-string">&#x27;good&#x27;</span>, <span class="hljs-attr">message:</span> <span class="hljs-string">&quot;Build #${env.BUILD_NUMBER} passed ✅&quot;</span>)
+        }
+        failure {
+            slackSend(<span class="hljs-attr">color:</span> <span class="hljs-string">&#x27;danger&#x27;</span>, <span class="hljs-attr">message:</span> <span class="hljs-string">&quot;Build #${env.BUILD_NUMBER} failed ❌&quot;</span>)
+        }
+        cleanup {
+            sh <span class="hljs-string">&#x27;docker system prune -f&#x27;</span>
+        }
+    }
+}</code></pre></div>
+<h3 id="174-parameters-environment-variables-amp-when-"><a class="heading-anchor" href="#174-parameters-environment-variables-amp-when-" aria-hidden="true">#</a>17.4 Parameters, Environment Variables &amp; when {}</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">pipeline {
+    agent any
+
+    parameters {
+        choice(<span class="hljs-attr">name:</span> <span class="hljs-string">&#x27;ENVIRONMENT&#x27;</span>, <span class="hljs-attr">choices:</span> [<span class="hljs-string">&#x27;staging&#x27;</span>, <span class="hljs-string">&#x27;production&#x27;</span>], <span class="hljs-attr">description:</span> <span class="hljs-string">&#x27;Target environment&#x27;</span>)
+        string(<span class="hljs-attr">name:</span> <span class="hljs-string">&#x27;VERSION&#x27;</span>, <span class="hljs-attr">defaultValue:</span> <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-attr">description:</span> <span class="hljs-string">&#x27;Version to deploy&#x27;</span>)
+    }
+
+    environment {
+        NODE_ENV = <span class="hljs-string">&#x27;production&#x27;</span>
+        REGISTRY  = <span class="hljs-string">&#x27;my-registry.example.com&#x27;</span>
+    }
+
+    stages {
+        stage(<span class="hljs-string">&#x27;Deploy&#x27;</span>) {
+            when {
+                expression { params.ENVIRONMENT == <span class="hljs-string">&#x27;production&#x27;</span> }
+            }
+            steps {
+                echo <span class="hljs-string">&quot;Deploying version ${params.VERSION} to ${params.ENVIRONMENT}&quot;</span>
+            }
+        }
+    }
+}</code></pre></div>
+<p><code class="inline-code">when {}</code> is Jenkins&#39; equivalent of GitHub Actions&#39; <code class="inline-code">if:</code> on a job/step — it decides whether a <em>stage</em> runs at all, based on branch name, parameter values, or arbitrary expressions.</p>
+<h3 id="175-a-full-nodejs-jenkinsfile"><a class="heading-anchor" href="#175-a-full-nodejs-jenkinsfile" aria-hidden="true">#</a>17.5 A Full Node.js Jenkinsfile</h3>
+<p>Putting it together — a realistic pipeline for a Node.js service that builds a Docker image (tying back to Phase 2&#39;s tagging lessons) and deploys conditionally:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = <span class="hljs-string">&#x27;my-node-app&#x27;</span>
+        REGISTRY   = <span class="hljs-string">&#x27;my-registry.example.com&#x27;</span>
+        GIT_SHA    = <span class="hljs-string">&quot;${sh(script: &#x27;git rev-parse --short HEAD&#x27;, returnStdout: true).trim()}&quot;</span>
+    }
+
+    stages {
+        stage(<span class="hljs-string">&#x27;Install &amp; Test&#x27;</span>) {
+            steps {
+                sh <span class="hljs-string">&#x27;npm ci&#x27;</span>
+                sh <span class="hljs-string">&#x27;npm test&#x27;</span>
+            }
+        }
+
+        stage(<span class="hljs-string">&#x27;Build Docker Image&#x27;</span>) {
+            steps {
+                sh <span class="hljs-string">&quot;docker build -t ${REGISTRY}/${IMAGE_NAME}:${GIT_SHA} .&quot;</span>
+            }
+        }
+
+        stage(<span class="hljs-string">&#x27;Push Image&#x27;</span>) {
+            steps {
+                withCredentials([usernamePassword(
+                    <span class="hljs-symbol">credentialsId:</span> <span class="hljs-string">&#x27;registry-creds&#x27;</span>,
+                    <span class="hljs-symbol">usernameVariable:</span> <span class="hljs-string">&#x27;REG_USER&#x27;</span>,
+                    <span class="hljs-symbol">passwordVariable:</span> <span class="hljs-string">&#x27;REG_PASS&#x27;</span>
+                )]) {
+                    sh <span class="hljs-string">&quot;echo $REG_PASS | docker login ${REGISTRY} -u $REG_USER --password-stdin&quot;</span>
+                    sh <span class="hljs-string">&quot;docker push ${REGISTRY}/${IMAGE_NAME}:${GIT_SHA}&quot;</span>
+                }
+            }
+        }
+
+        stage(<span class="hljs-string">&#x27;Deploy to Staging&#x27;</span>) {
+            when { branch <span class="hljs-string">&#x27;main&#x27;</span> }
+            steps {
+                sh <span class="hljs-string">&quot;kubectl set image deployment/my-node-app app=${REGISTRY}/${IMAGE_NAME}:${GIT_SHA} -n staging&quot;</span>
+            }
+        }
+    }
+
+    post {
+        failure {
+            slackSend(<span class="hljs-attr">color:</span> <span class="hljs-string">&#x27;danger&#x27;</span>, <span class="hljs-attr">message:</span> <span class="hljs-string">&quot;Pipeline failed on commit ${GIT_SHA}&quot;</span>)
+        }
+    }
+}</code></pre></div>
+<p><code class="inline-code">withCredentials</code> is Jenkins&#39; safe pattern for injecting secrets stored in <strong>Manage Jenkins → Credentials</strong> into shell steps — the values are masked in console logs automatically.</p>
+<h3 id="176-unit-17-labs"><a class="heading-anchor" href="#176-unit-17-labs" aria-hidden="true">#</a>17.6 Unit 17 Labs</h3>
+<ol>
+<li><strong>Declarative pipeline.</strong> Write a Jenkinsfile with <code class="inline-code">Install → Test → Build → Deploy</code> stages for a small Node.js repo, committed to the repo root.</li>
+<li><strong>post block.</strong> Add a <code class="inline-code">post</code> block that sends a notification (Slack webhook or even just an <code class="inline-code">echo</code>/email step) only on failure.</li>
+<li><strong>Parameterized pipeline.</strong> Add a <code class="inline-code">choice</code> parameter for environment and a <code class="inline-code">when { expression {...} }</code> stage that only runs for <code class="inline-code">production</code>.</li>
+<li><strong>Scripted-to-Declarative conversion.</strong> Take a small Scripted snippet (like the dynamic Node-version loop above) and convert it into a <code class="inline-code">script {}</code> block inside a Declarative pipeline.</li>
+</ol>
+<h3 id="177-unit-17-interview-qampa"><a class="heading-anchor" href="#177-unit-17-interview-qampa" aria-hidden="true">#</a>17.7 Unit 17 Interview Q&amp;A</h3>
+<ul>
+<li><p><strong>Q: &quot;Declarative vs Scripted — which would you use, and why?&quot;</strong>
+A: Declarative by default — it&#39;s more structured, easier to read and review, has built-in validation, and covers the vast majority of real pipeline needs. I&#39;d only reach for Scripted (or a <code class="inline-code">script {}</code> block inside Declarative) when I need Groovy-level dynamic logic that Declarative&#39;s stricter syntax can&#39;t express directly, like generating stages in a loop.</p>
+</li>
+<li><p><strong>Q: &quot;How do you safely use secrets in a Jenkinsfile?&quot;</strong>
+A: Store them in Jenkins&#39; Credentials store (never hardcode them in the Jenkinsfile), and inject them into a step scope using <code class="inline-code">withCredentials</code>, which also automatically masks the values in console output.</p>
+</li>
+</ul>
+<hr>
+<h2 id="unit-18--jenkins-shared-libraries-plugins-amp-multibranch-pipelines"><a class="heading-anchor" href="#unit-18--jenkins-shared-libraries-plugins-amp-multibranch-pipelines" aria-hidden="true">#</a>Unit 18 — Jenkins Shared Libraries, Plugins &amp; Multibranch Pipelines</h2>
+<p><strong>Difficulty:</strong> Advanced · <strong>Goal:</strong> Stop copy-pasting the same 200 lines of Jenkinsfile across every repo.</p>
+<h3 id="181-why-shared-libraries-exist"><a class="heading-anchor" href="#181-why-shared-libraries-exist" aria-hidden="true">#</a>18.1 Why Shared Libraries Exist</h3>
+<p>Once you have more than a handful of services, most of their Jenkinsfiles end up nearly identical — same Docker build steps, same deploy logic, same Slack notification format. A <strong>Shared Library</strong> is a separate Git repo containing reusable Groovy code that any Jenkinsfile can import, exactly like extracting a GitHub Actions <strong>reusable workflow</strong> or <strong>composite action</strong> (which you covered in Phase 4) — same motivation, different tool.</p>
+<h3 id="182-the-vars-and-src-directory-structure"><a class="heading-anchor" href="#182-the-vars-and-src-directory-structure" aria-hidden="true">#</a>18.2 The vars/ and src/ Directory Structure</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">my-shared-library/
+├── vars/
+│   ├── deployApp.groovy          # becomes a global &quot;deployApp()&quot; step
+│   └── buildAndPushImage.groovy  # becomes a global &quot;buildAndPushImage()&quot; step
+├── src/
+│   └── org/
+│       └── mycompany/
+│           └── DockerUtils.groovy   # a full Groovy class for more complex logic
+└── resources/
+    └── org/mycompany/notify-template.json</code></pre></div>
+<ul>
+<li><strong><code class="inline-code">vars/</code></strong> — each <code class="inline-code">.groovy</code> file here becomes a callable step, named after the file. This is the 90% use case.</li>
+<li><strong><code class="inline-code">src/</code></strong> — standard Groovy/Java-style classes for logic too complex for a single <code class="inline-code">vars/</code> script, imported with normal <code class="inline-code">import</code> statements.</li>
+<li><strong><code class="inline-code">resources/</code></strong> — static files (templates, JSON, etc.) loadable via <code class="inline-code">libraryResource()</code>.</li>
+</ul>
+<p><strong><code class="inline-code">vars/buildAndPushImage.groovy</code>:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy"><span class="hljs-keyword">def</span> call(Map config) {
+    <span class="hljs-keyword">def</span> imageName = config.imageName
+    <span class="hljs-keyword">def</span> registry  = config.registry
+    <span class="hljs-keyword">def</span> tag       = config.tag ?: sh(<span class="hljs-attr">script:</span> <span class="hljs-string">&#x27;git rev-parse --short HEAD&#x27;</span>, <span class="hljs-attr">returnStdout:</span> <span class="hljs-literal">true</span>).trim()
+
+    sh <span class="hljs-string">&quot;docker build -t ${registry}/${imageName}:${tag} .&quot;</span>
+    withCredentials([usernamePassword(
+        <span class="hljs-symbol">credentialsId:</span> config.credentialsId,
+        <span class="hljs-symbol">usernameVariable:</span> <span class="hljs-string">&#x27;REG_USER&#x27;</span>,
+        <span class="hljs-symbol">passwordVariable:</span> <span class="hljs-string">&#x27;REG_PASS&#x27;</span>
+    )]) {
+        sh <span class="hljs-string">&quot;echo \$REG_PASS | docker login ${registry} -u \$REG_USER --password-stdin&quot;</span>
+        sh <span class="hljs-string">&quot;docker push ${registry}/${imageName}:${tag}&quot;</span>
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;${registry}/${imageName}:${tag}&quot;</span>
+}</code></pre></div>
+<p><strong>Using it from any Jenkinsfile, across any number of repos:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy"><span class="hljs-meta">@Library</span>(<span class="hljs-string">&#x27;my-shared-library@main&#x27;</span>) _
+
+pipeline {
+    agent any
+    stages {
+        stage(<span class="hljs-string">&#x27;Build &amp; Push&#x27;</span>) {
+            steps {
+                script {
+                    <span class="hljs-keyword">def</span> image = buildAndPushImage(
+                        <span class="hljs-symbol">imageName:</span> <span class="hljs-string">&#x27;my-node-app&#x27;</span>,
+                        <span class="hljs-symbol">registry:</span> <span class="hljs-string">&#x27;my-registry.example.com&#x27;</span>,
+                        <span class="hljs-symbol">credentialsId:</span> <span class="hljs-string">&#x27;registry-creds&#x27;</span>
+                    )
+                    echo <span class="hljs-string">&quot;Pushed ${image}&quot;</span>
+                }
+            }
+        }
+    }
+}</code></pre></div>
+<p>The library is registered once under <strong>Manage Jenkins → System → Global Pipeline Libraries</strong>, and every team&#39;s Jenkinsfile can then call <code class="inline-code">buildAndPushImage(...)</code> with a single line instead of duplicating 15+ lines of shell.</p>
+<h3 id="183-multibranch-pipelines"><a class="heading-anchor" href="#183-multibranch-pipelines" aria-hidden="true">#</a>18.3 Multibranch Pipelines</h3>
+<p>A <strong>Multibranch Pipeline</strong> job points at a repository (or an entire GitHub org/organization via the <strong>GitHub Organization</strong> job type) and automatically:</p>
+<ul>
+<li>Discovers every branch and open pull request</li>
+<li>Runs each one&#39;s own <code class="inline-code">Jenkinsfile</code> from that branch&#39;s HEAD</li>
+<li>Creates/destroys per-branch jobs automatically as branches are created/deleted</li>
+</ul>
+<p>This is the direct equivalent of GitHub Actions triggering on every <code class="inline-code">push</code>/<code class="inline-code">pull_request</code> — except Jenkins manages a distinct job entry per branch, which gives you per-branch build history and status in the UI rather than one flat log stream.</p>
+<p>Setup: <strong>New Item → Multibranch Pipeline</strong> → point at the Git repo URL → Jenkins scans and creates branch jobs on save, and re-scans periodically (or instantly via webhook, see 18.4).</p>
+<h3 id="184-webhooks--instant-triggers"><a class="heading-anchor" href="#184-webhooks--instant-triggers" aria-hidden="true">#</a>18.4 Webhooks — Instant Triggers</h3>
+<p>Without a webhook, Jenkins has to <strong>poll</strong> the repo on a schedule to notice new commits — slow and wasteful. A webhook makes GitHub/GitLab push straight to Jenkins the instant something happens.</p>
+<p><strong>GitHub → Jenkins webhook URL:</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">http://&lt;jenkins-host&gt;:8080/github-webhook/</code></pre></div>
+<p>Configured under the GitHub repo&#39;s <strong>Settings → Webhooks</strong>, with content type <code class="inline-code">application/json</code> and the &quot;push events&quot; (and optionally &quot;pull request events&quot;) triggers checked. On the Jenkins side, the <strong>GitHub plugin</strong> needs &quot;GitHub hook trigger for GITScm polling&quot; enabled on the job (or it&#39;s automatic for Multibranch jobs using the GitHub Branch Source plugin).</p>
+<h3 id="185-key-plugins-reference"><a class="heading-anchor" href="#185-key-plugins-reference" aria-hidden="true">#</a>18.5 Key Plugins Reference</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Plugin</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pipeline (workflow-aggregator)</td>
+<td>Core Jenkinsfile/Declarative support</td>
+</tr>
+<tr>
+<td>Git / GitHub Branch Source</td>
+<td>Repo checkout + Multibranch discovery</td>
+</tr>
+<tr>
+<td>Credentials Binding</td>
+<td><code class="inline-code">withCredentials</code> support</td>
+</tr>
+<tr>
+<td>Docker Pipeline</td>
+<td><code class="inline-code">docker.build()</code>/<code class="inline-code">docker.withRegistry()</code> DSL steps inside Jenkinsfiles</td>
+</tr>
+<tr>
+<td>Blue Ocean</td>
+<td>Visual pipeline UI</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>Ephemeral pod-based agents (see Unit 19)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="186-unit-18-labs"><a class="heading-anchor" href="#186-unit-18-labs" aria-hidden="true">#</a>18.6 Unit 18 Labs</h3>
+<ol>
+<li><strong>Build a shared library.</strong> Create a <code class="inline-code">my-shared-library</code> repo with a single <code class="inline-code">vars/deployApp.groovy</code> step, register it globally, and call it from two different sample Jenkinsfiles.</li>
+<li><strong>Multibranch setup.</strong> Point a Multibranch Pipeline job at a repo with at least two branches, each containing a slightly different Jenkinsfile, and confirm Jenkins builds each independently.</li>
+<li><strong>Webhook wiring.</strong> Configure a GitHub webhook pointing at your Jenkins instance (ngrok or similar if running locally) and confirm a push triggers a build within seconds instead of waiting for the polling interval.</li>
+<li><strong>Reuse across repos.</strong> Call the same <code class="inline-code">vars/</code> function from three different Jenkinsfiles/repos and confirm a single library update propagates to all three on their next run.</li>
+</ol>
+<h3 id="187-unit-18-interview-qampa"><a class="heading-anchor" href="#187-unit-18-interview-qampa" aria-hidden="true">#</a>18.7 Unit 18 Interview Q&amp;A</h3>
+<ul>
+<li><p><strong>Q: &quot;What problem do Jenkins Shared Libraries solve?&quot;</strong>
+A: They eliminate duplicated pipeline logic across many Jenkinsfiles — reusable steps (like building/pushing a Docker image, or sending a standardized notification) live in one versioned Groovy repo and get imported everywhere, so a fix or improvement in one place propagates to every consuming pipeline. It&#39;s the Jenkins equivalent of GitHub Actions reusable workflows/composite actions.</p>
+</li>
+<li><p><strong>Q: &quot;How does a Multibranch Pipeline differ from a regular Pipeline job?&quot;</strong>
+A: A regular Pipeline job runs one fixed Jenkinsfile, typically tied to one branch. A Multibranch Pipeline automatically discovers every branch (and PR) in a repo and runs each one&#39;s own <code class="inline-code">Jenkinsfile</code> from that branch, creating/removing per-branch jobs as branches come and go — no manual job creation per branch.</p>
+</li>
+</ul>
+<hr>
+<h2 id="unit-19--jenkins-distributed-builds-amp-scaling"><a class="heading-anchor" href="#unit-19--jenkins-distributed-builds-amp-scaling" aria-hidden="true">#</a>Unit 19 — Jenkins Distributed Builds &amp; Scaling</h2>
+<p><strong>Difficulty:</strong> Advanced · <strong>Goal:</strong> Keep Jenkins fast and reliable as team size and build volume grow.</p>
+<h3 id="191-static-vs-dynamicephemeral-agents"><a class="heading-anchor" href="#191-static-vs-dynamicephemeral-agents" aria-hidden="true">#</a>19.1 Static vs Dynamic/Ephemeral Agents</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+<th>Trade-off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Static agent</strong></td>
+<td>A long-lived VM/machine registered permanently with Jenkins</td>
+<td>Simple, predictable, but idles (wastes cost) when not building, and can accumulate state/drift between builds</td>
+</tr>
+<tr>
+<td><strong>Dynamic/ephemeral agent</strong></td>
+<td>Spun up on-demand (e.g., a fresh Kubernetes pod) for a single build, then destroyed</td>
+<td>Clean environment every time, scales to zero cost when idle, but has cold-start latency</td>
+</tr>
+</tbody>
+</table></div>
+<p>Most modern production Jenkins setups favor ephemeral agents (via the Kubernetes plugin, or cloud-specific plugins for EC2/Azure) specifically to avoid &quot;works on this agent but not that one&quot; drift — directly analogous to why GitHub-hosted runners give you a clean VM per job.</p>
+<h3 id="192-labels--routing-jobs-to-the-right-agent"><a class="heading-anchor" href="#192-labels--routing-jobs-to-the-right-agent" aria-hidden="true">#</a>19.2 Labels — Routing Jobs to the Right Agent</h3>
+<p>Labels are tags assigned to agents (e.g., <code class="inline-code">linux</code>, <code class="inline-code">node20</code>, <code class="inline-code">gpu</code>, <code class="inline-code">windows</code>) that a pipeline can request via <code class="inline-code">agent { label &#39;...&#39; }</code>, ensuring a job only runs where its dependencies actually exist.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">pipeline {
+    agent { label <span class="hljs-string">&#x27;node20 &amp;&amp; linux&#x27;</span> }
+    stages {
+        stage(<span class="hljs-string">&#x27;Test&#x27;</span>) {
+            steps {
+                sh <span class="hljs-string">&#x27;node --version&#x27;</span>
+                sh <span class="hljs-string">&#x27;npm test&#x27;</span>
+            }
+        }
+    }
+}</code></pre></div>
+<p>Labels can be combined with boolean expressions (<code class="inline-code">&amp;&amp;</code>, <code class="inline-code">||</code>, <code class="inline-code">!</code>) exactly as shown, letting you target precisely the capability set a build needs.</p>
+<h3 id="193-the-kubernetes-plugin"><a class="heading-anchor" href="#193-the-kubernetes-plugin" aria-hidden="true">#</a>19.3 The Kubernetes Plugin</h3>
+<p>The Kubernetes plugin lets Jenkins schedule each build as a <strong>pod</strong> in a Kubernetes cluster — a natural fit if your org already runs services on Kubernetes (which ties directly back to Phase 2&#39;s Docker/registry work: the pod&#39;s containers are just Docker images).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">groovy</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-groovy">pipeline {
+    agent {
+        kubernetes {
+            yaml <span class="hljs-string">&quot;&quot;&quot;
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: node
+    image: node:20-alpine
+    command: [&#x27;cat&#x27;]
+    tty: true
+&quot;&quot;&quot;</span>
+        }
+    }
+    stages {
+        stage(<span class="hljs-string">&#x27;Test&#x27;</span>) {
+            steps {
+                container(<span class="hljs-string">&#x27;node&#x27;</span>) {
+                    sh <span class="hljs-string">&#x27;npm ci &amp;&amp; npm test&#x27;</span>
+                }
+            }
+        }
+    }
+}</code></pre></div>
+<p>Each build gets a brand-new pod with exactly the container image(s) it needs, and Kubernetes destroys the pod when the build finishes — zero long-term agent maintenance, and natural horizontal scaling since the cluster can schedule as many pods as it has capacity for.</p>
+<h3 id="194-managing-build-queues-amp-executors"><a class="heading-anchor" href="#194-managing-build-queues-amp-executors" aria-hidden="true">#</a>19.4 Managing Build Queues &amp; Executors</h3>
+<p>Each agent has a configured number of <strong>executors</strong> (concurrent build slots). If more builds are triggered than there are free executors across all matching agents, they sit in the <strong>build queue</strong> (visible on the Jenkins dashboard) until a slot frees up.</p>
+<p>Symptoms of an under-provisioned setup: builds sitting &quot;queued&quot; for minutes with idle developer time. Fixes:</p>
+<ul>
+<li>Increase executor count per static agent (bounded by that machine&#39;s actual CPU/memory)</li>
+<li>Add more static agents</li>
+<li>Switch to the Kubernetes plugin so capacity scales elastically with cluster resources instead of a fixed executor count</li>
+</ul>
+<h3 id="195-scaling-jenkins-for-large-orgs"><a class="heading-anchor" href="#195-scaling-jenkins-for-large-orgs" aria-hidden="true">#</a>19.5 Scaling Jenkins for Large Orgs</h3>
+<p>At real scale, a few structural decisions matter beyond individual pipelines:</p>
+<ul>
+<li><strong>Controller sizing:</strong> the controller should be sized for orchestration load (many jobs, UI/API traffic, plugin overhead), not build execution — keep <code class="inline-code">agent any</code> builds off it entirely by not adding executors to the controller itself.</li>
+<li><strong>Agent pools:</strong> dedicated pools per team/tech-stack (e.g., a Node.js pool with the right Node versions pre-baked, a separate .NET pool) reduces cold-start time versus one generic pool.</li>
+<li><strong>Configuration as Code (JCasC):</strong> for reproducible Jenkins instances across environments, the <strong>Configuration as Code plugin</strong> lets you define the entire Jenkins system config (credentials references, tool installations, security realm, etc.) in a YAML file checked into version control, rather than manual UI clicking — this is the Jenkins equivalent of infrastructure-as-code.</li>
+</ul>
+<h3 id="196-unit-19-labs"><a class="heading-anchor" href="#196-unit-19-labs" aria-hidden="true">#</a>19.6 Unit 19 Labs</h3>
+<ol>
+<li><strong>Label routing.</strong> Set up two agents with different labels (e.g., <code class="inline-code">node18</code> and <code class="inline-code">node20</code>) and write a pipeline that uses <code class="inline-code">agent { label &#39;node20&#39; }</code> to confirm it lands on the correct one.</li>
+<li><strong>Kubernetes plugin.</strong> If you have access to any Kubernetes cluster (minikube/kind is fine), configure the Kubernetes plugin and run a build inside an ephemeral pod as shown above.</li>
+<li><strong>Queue bottleneck simulation.</strong> Configure an agent with only 1 executor, trigger 3 builds simultaneously, and observe 2 of them sitting in the queue — then add executors/agents and re-run to see the queue clear faster.</li>
+<li><strong>Benchmark.</strong> Time a build on a static agent vs the same build on a freshly-scheduled Kubernetes pod agent, and note the cold-start overhead difference.</li>
+</ol>
+<h3 id="197-unit-19-interview-qampa"><a class="heading-anchor" href="#197-unit-19-interview-qampa" aria-hidden="true">#</a>19.7 Unit 19 Interview Q&amp;A</h3>
+<ul>
+<li><p><strong>Q: &quot;Static agents vs dynamic/ephemeral agents — what&#39;s the trade-off?&quot;</strong>
+A: Static agents are simple and always warm (no cold-start delay) but idle-cost money and can drift in configuration over time. Ephemeral agents (e.g., Kubernetes pods) give a guaranteed-clean environment per build and scale to zero when idle, at the cost of pod-startup latency on each build.</p>
+</li>
+<li><p><strong>Q: &quot;How would you scale Jenkins for a large organization with many teams?&quot;</strong>
+A: Keep the controller dedicated to orchestration only (no build executors on it), use dedicated or Kubernetes-based ephemeral agent pools sized per team/tech-stack, manage system configuration via Configuration-as-Code (JCasC) instead of manual UI setup, and use Shared Libraries so pipeline logic stays consistent and maintainable across many teams&#39; Jenkinsfiles.</p>
+</li>
+</ul>
+<hr>
+<h2 id="phase-5-summary-checklist"><a class="heading-anchor" href="#phase-5-summary-checklist" aria-hidden="true">#</a>Phase 5 Summary Checklist</h2>
+<p>By the end of Phase 5 you should be able to, without notes:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Explain the controller/agent/executor architecture and why builds shouldn&#39;t run on the controller</li>
+<li><input disabled="" type="checkbox"> Stand up Jenkins via Docker and install/configure plugins</li>
+<li><input disabled="" type="checkbox"> Write a Declarative Jenkinsfile with stages, <code class="inline-code">post {}</code>, parameters, and <code class="inline-code">when {}</code> conditions</li>
+<li><input disabled="" type="checkbox"> Explain when you&#39;d drop into <code class="inline-code">script {}</code> or full Scripted Groovy</li>
+<li><input disabled="" type="checkbox"> Build and consume a Shared Library <code class="inline-code">vars/</code> step across multiple Jenkinsfiles</li>
+<li><input disabled="" type="checkbox"> Set up a Multibranch Pipeline and wire a GitHub webhook for instant triggers</li>
+<li><input disabled="" type="checkbox"> Explain static vs ephemeral agents, and configure <code class="inline-code">agent { label ... }</code> routing</li>
+<li><input disabled="" type="checkbox"> Run a build inside a Kubernetes-plugin-scheduled pod</li>
+<li><input disabled="" type="checkbox"> Diagnose and resolve a build-queue bottleneck</li>
+<li><input disabled="" type="checkbox"> Deliver a clear answer on how you&#39;d scale Jenkins for a large org (controller sizing, agent pools, JCasC, shared libraries)</li>
+</ul>
+<hr>
+<p><em>End of Phase 5. Next: Phase 6 — Deployment &amp; Pipeline-as-Code (Containerized CI/CD with Docker &amp; Kubernetes integration, deployment strategies like blue-green/canary, and GitOps).</em></p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>
