@@ -460,68 +460,28 @@ table code.inline-code{white-space:nowrap;}
 </header>
 <main class="article-wrap">
 <h1 id="phase-1--docker-foundations"><a class="heading-anchor" href="#phase-1--docker-foundations" aria-hidden="true">#</a>Phase 1 — Docker Foundations</h1>
-<blockquote class="quote-plain"><p>This doc is self-contained. After reading it end-to-end and doing the labs, you should be able to explain, build, and debug everything in Units 0–4 of the roadmap without external references.</p>
+<h3 id="from-quot3-yoe-nodejs-backend-engineerquot--confident-with-docker-in-dev-and-prod"><a class="heading-anchor" href="#from-quot3-yoe-nodejs-backend-engineerquot--confident-with-docker-in-dev-and-prod" aria-hidden="true">#</a>From &quot;3 YOE Node.js Backend Engineer&quot; → confident with Docker in dev and prod</h3>
+<blockquote class="quote-plain"><p>Goal of this doc: not just &quot;know the answer if asked&quot; but actually <strong>understand why it works this way</strong> and <strong>be able to do it with your hands</strong> — build, break, and fix each concept yourself. Every unit follows the same shape: <strong>Concept</strong> (the &quot;why&quot;) → <strong>Hands-On Walkthrough</strong> (do this in your terminal right now) → <strong>Practical Takeaway</strong> (what this means for real work) → <strong>Try It Yourself</strong> (short extra reps).</p>
 </blockquote>
 <hr>
 <h2 id="table-of-contents"><a class="heading-anchor" href="#table-of-contents" aria-hidden="true">#</a>Table of Contents</h2>
 <ul>
-<li><a href="#phase-1--docker-foundations">Phase 1 — Docker Foundations</a><ul>
 <li><a href="#how-to-use-this-doc">How to use this doc</a></li>
-<li><a href="#unit-0--docker-fundamentals--architecture">Unit 0 — Docker Fundamentals &amp; Architecture</a><ul>
-<li><a href="#01-containers-vs-virtual-machines">0.1 Containers vs Virtual Machines</a></li>
-<li><a href="#02-docker-engine-architecture">0.2 Docker Engine Architecture</a></li>
-<li><a href="#03-images-vs-containers">0.3 Images vs Containers</a></li>
-<li><a href="#04-installing--verifying-docker">0.4 Installing &amp; Verifying Docker</a></li>
-<li><a href="#05-what-actually-happens-on-docker-run">0.5 What Actually Happens on <code class="inline-code">docker run</code></a></li>
-<li><a href="#06-interview-trap-answered">0.6 Interview Trap Answered</a></li>
-<li><a href="#07-labs">0.7 Labs</a></li>
-</ul>
-</li>
-<li><a href="#unit-1--dockerfile-images--layer-caching">Unit 1 — Dockerfile, Images &amp; Layer Caching</a><ul>
-<li><a href="#11-core-dockerfile-instructions">1.1 Core Dockerfile Instructions</a></li>
-<li><a href="#12-build-context--dockerignore">1.2 Build Context &amp; .dockerignore</a></li>
-<li><a href="#13-layer-caching-mechanics">1.3 Layer Caching Mechanics</a></li>
-<li><a href="#14-multi-stage-builds">1.4 Multi-Stage Builds</a></li>
-<li><a href="#15-cmd-vs-entrypoint-vs-add-vs-copy">1.5 CMD vs ENTRYPOINT vs ADD vs COPY</a></li>
-<li><a href="#16-labs">1.6 Labs</a></li>
-</ul>
-</li>
-<li><a href="#unit-2--docker-networking">Unit 2 — Docker Networking</a><ul>
-<li><a href="#21-network-drivers-overview">2.1 Network Drivers Overview</a></li>
-<li><a href="#22-port-publishing-vs-exposing">2.2 Port Publishing vs Exposing</a></li>
-<li><a href="#23-user-defined-bridge-networks--dns">2.3 User-Defined Bridge Networks &amp; DNS</a></li>
-<li><a href="#24-multi-container-service-discovery">2.4 Multi-Container Service Discovery</a></li>
-<li><a href="#25-labs">2.5 Labs</a></li>
-</ul>
-</li>
-<li><a href="#unit-3--docker-storage--volumes">Unit 3 — Docker Storage &amp; Volumes</a><ul>
-<li><a href="#31-named-volumes-vs-bind-mounts-vs-tmpfs">3.1 Named Volumes vs Bind Mounts vs tmpfs</a></li>
-<li><a href="#32-volume-lifecycle">3.2 Volume Lifecycle</a></li>
-<li><a href="#33-sharing-data-between-containers">3.3 Sharing Data Between Containers</a></li>
-<li><a href="#34-backup--restore">3.4 Backup &amp; Restore</a></li>
-<li><a href="#35-labs">3.5 Labs</a></li>
-</ul>
-</li>
-<li><a href="#unit-4--docker-compose-for-multi-container-apps">Unit 4 — Docker Compose for Multi-Container Apps</a><ul>
-<li><a href="#41-compose-file-structure">4.1 Compose File Structure</a></li>
-<li><a href="#42-depends_on-healthchecks--startup-ordering">4.2 depends_on, Healthchecks &amp; Startup Ordering</a></li>
-<li><a href="#43-environment-variables--env-files">4.3 Environment Variables &amp; .env Files</a></li>
-<li><a href="#44-scaling-services-locally">4.4 Scaling Services Locally</a></li>
-<li><a href="#45-labs">4.5 Labs</a></li>
-</ul>
-</li>
+<li><a href="#unit-0--docker-fundamentals--architecture">Unit 0 — Docker Fundamentals &amp; Architecture</a></li>
+<li><a href="#unit-1--dockerfile-images--layer-caching">Unit 1 — Dockerfile, Images &amp; Layer Caching</a></li>
+<li><a href="#unit-2--docker-networking">Unit 2 — Docker Networking</a></li>
+<li><a href="#unit-3--docker-storage--volumes">Unit 3 — Docker Storage &amp; Volumes</a></li>
+<li><a href="#unit-4--docker-compose-for-multi-container-apps">Unit 4 — Docker Compose for Multi-Container Apps</a></li>
 <li><a href="#phase-1-checklist">Phase 1 Checklist</a></li>
 <li><a href="#quick-reference-cheatsheet">Quick-Reference Cheatsheet</a></li>
 </ul>
-</li>
-</ul>
 <hr>
 <h2 id="how-to-use-this-doc"><a class="heading-anchor" href="#how-to-use-this-doc" aria-hidden="true">#</a>How to use this doc</h2>
-<p>Each unit has: <strong>Theory</strong> (explained deeper than the roadmap bullet, with Node.js-relevant framing since that&#39;s your background) → <strong>Code/Commands</strong> → <strong>Interview Angle</strong> → <strong>Labs</strong> (do these, don&#39;t just read).</p>
+<p>Read a unit&#39;s <strong>Concept</strong> section once, slowly. Then actually type out the <strong>Hands-On Walkthrough</strong> — don&#39;t skim it, run it. The goal is muscle memory + real understanding, not memorized one-liners. Each unit takes roughly 45–75 minutes if you actually run the commands. That&#39;s the whole point — this phase is meant to be done at the terminal, not just read.</p>
 <hr>
 <h2 id="unit-0--docker-fundamentals-amp-architecture"><a class="heading-anchor" href="#unit-0--docker-fundamentals-amp-architecture" aria-hidden="true">#</a>Unit 0 — Docker Fundamentals &amp; Architecture</h2>
-<h3 id="01-containers-vs-virtual-machines"><a class="heading-anchor" href="#01-containers-vs-virtual-machines" aria-hidden="true">#</a>0.1 Containers vs Virtual Machines</h3>
-<p>As a Node backend engineer you&#39;ve probably deployed to VMs (EC2, a DigitalOcean droplet) before. The mental shift to containers is about <strong>what layer of the stack gets duplicated</strong>.</p>
+<h3 id="concept-what-a-container-actually-is"><a class="heading-anchor" href="#concept-what-a-container-actually-is" aria-hidden="true">#</a>Concept: What a container actually is</h3>
+<p>You&#39;ve deployed Node apps to VMs before — EC2, a droplet, a bare-metal box. The mental shift to containers is about <strong>which layer of the stack gets duplicated per app</strong>.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -534,7 +494,7 @@ table code.inline-code{white-space:nowrap;}
 <tr>
 <td>Isolation unit</td>
 <td>Full OS (own kernel)</td>
-<td>Process (shares host kernel)</td>
+<td>A process (shares host kernel)</td>
 </tr>
 <tr>
 <td>Boot time</td>
@@ -544,7 +504,7 @@ table code.inline-code{white-space:nowrap;}
 <tr>
 <td>Size</td>
 <td>GBs (full OS image)</td>
-<td>MBs (just app + deps)</td>
+<td>MBs (app + deps only)</td>
 </tr>
 <tr>
 <td>Isolation mechanism</td>
@@ -558,41 +518,30 @@ table code.inline-code{white-space:nowrap;}
 </tr>
 </tbody>
 </table></div>
-<p>Key insight: a container is <strong>just a regular Linux process</strong> that the kernel has made believe it has its own filesystem, network stack, and process tree, using two kernel features:</p>
+<p>Here&#39;s the part that actually matters for understanding, not memorizing: <strong>a container is just a normal Linux process</strong> that the kernel has been told to partially blind. Two kernel features make this possible:</p>
 <ul>
-<li><strong>Namespaces</strong> — isolate what a process can <em>see</em> (PID namespace = its own process tree, NET namespace = its own network interfaces, MNT namespace = its own filesystem view, etc.)</li>
-<li><strong>cgroups (control groups)</strong> — limit what a process can <em>use</em> (CPU shares, memory limits, I/O bandwidth)</li>
+<li><strong>Namespaces</strong> — control what a process can <em>see</em>. A PID namespace gives it its own process tree (it thinks it&#39;s PID 1). A NET namespace gives it its own network interfaces. A MNT namespace gives it its own filesystem view.</li>
+<li><strong>cgroups (control groups)</strong> — control what a process can <em>use</em>. CPU shares, memory ceiling, I/O bandwidth.</li>
 </ul>
-<p>Docker didn&#39;t invent either of these — it made them usable via a friendly CLI/API instead of raw <code class="inline-code">unshare</code>/<code class="inline-code">cgcreate</code> syscalls.</p>
-<h3 id="02-docker-engine-architecture"><a class="heading-anchor" href="#02-docker-engine-architecture" aria-hidden="true">#</a>0.2 Docker Engine Architecture</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">┌─────────────────────────────────────────────┐
-│                 docker CLI                    │  (client - what you type)
-└───────────────────┬───────────────────────────┘
-                     │  REST API (over unix socket / TCP)
-┌───────────────────▼───────────────────────────┐
-│              dockerd (daemon)                  │  (manages images, networks, volumes)
-└───────────────────┬───────────────────────────┘
-                     │  gRPC
-┌───────────────────▼───────────────────────────┐
-│                containerd                      │  (manages container lifecycle)
-└───────────────────┬───────────────────────────┘
-                     │
-┌───────────────────▼───────────────────────────┐
-│                   runc                         │  (actually creates the container via
-└─────────────────────────────────────────────────┘   namespaces/cgroups, OCI spec)</code></pre></div>
+<p>Docker didn&#39;t invent either of these — they&#39;re kernel features that existed for years. Docker&#39;s real contribution was packaging them behind a friendly CLI and a distributable image format, instead of raw <code class="inline-code">unshare</code>/<code class="inline-code">cgcreate</code> syscalls that almost nobody used directly.</p>
+<h3 id="concept-the-architecture-behind-docker-run"><a class="heading-anchor" href="#concept-the-architecture-behind-docker-run" aria-hidden="true">#</a>Concept: The architecture behind <code class="inline-code">docker run</code></h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">docker CLI  →  dockerd (daemon)  →  containerd  →  runc
+ (what you        (owns images,      (manages          (actually creates
+  type)            networks,          container          the container via
+                    volumes)          lifecycle)          namespaces/cgroups)</code></pre></div>
 <ul>
-<li><strong><code class="inline-code">docker</code> CLI</strong> — the client you type commands into. It&#39;s a thin wrapper that calls the REST API.</li>
-<li><strong><code class="inline-code">dockerd</code></strong> — the daemon. Owns images, networks, volumes, and orchestrates containerd.</li>
-<li><strong>containerd</strong> — a separate CNCF project; handles pulling images, managing container lifecycle (start/stop/pause).</li>
-<li><strong>runc</strong> — the low-level OCI-compliant runtime that actually invokes <code class="inline-code">clone()</code> with namespace flags and sets up cgroups.</li>
+<li><strong><code class="inline-code">docker</code> CLI</strong> — a thin client. Every command you type becomes a REST call.</li>
+<li><strong><code class="inline-code">dockerd</code></strong> — the daemon. Owns images, networks, volumes; delegates actual container execution.</li>
+<li><strong>containerd</strong> — a separate CNCF project that handles pulling images and managing container lifecycle (start/stop/pause).</li>
+<li><strong>runc</strong> — the low-level OCI runtime that literally calls <code class="inline-code">clone()</code> with namespace flags and wires up cgroups.</li>
 </ul>
-<p>This layered design is why Kubernetes can also talk to <code class="inline-code">containerd</code> directly without needing <code class="inline-code">dockerd</code> at all (this is why &quot;Docker support removed from Kubernetes&quot; headlines happened — only the <code class="inline-code">dockerd</code>-specific shim was dropped, not container tech itself).</p>
-<h3 id="03-images-vs-containers"><a class="heading-anchor" href="#03-images-vs-containers" aria-hidden="true">#</a>0.3 Images vs Containers</h3>
+<p>This layering is why Kubernetes dropped <code class="inline-code">dockerd</code> specifically but still runs containers fine — it talks to <code class="inline-code">containerd</code> directly. The underlying container tech didn&#39;t go anywhere.</p>
+<h3 id="concept-images-vs-containers"><a class="heading-anchor" href="#concept-images-vs-containers" aria-hidden="true">#</a>Concept: Images vs. containers</h3>
 <ul>
-<li>An <strong>image</strong> is a read-only template — a stack of filesystem layers plus metadata (entrypoint, env, exposed ports).</li>
-<li>A <strong>container</strong> is a running (or stopped) instance of an image, with one additional <strong>writable layer</strong> on top (via a union filesystem, typically <code class="inline-code">overlay2</code> on Linux).</li>
+<li>An <strong>image</strong> = a read-only stack of filesystem layers + metadata (entrypoint, env, exposed ports).</li>
+<li>A <strong>container</strong> = a running (or stopped) instance of that image, plus <strong>one writable layer</strong> on top (via a union filesystem — <code class="inline-code">overlay2</code> on Linux).</li>
 </ul>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Image layers (read-only, shared across containers):
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Image layers (read-only, shared across every container built from it):
 ┌─────────────────────┐
 │ Layer 3: COPY . .    │
 ├─────────────────────┤
@@ -602,62 +551,70 @@ table code.inline-code{white-space:nowrap;}
 └─────────────────────┘
            +
 ┌─────────────────────┐
-│ Writable layer        │  ← unique per container, deleted with `docker rm`
+│ Writable layer       │  ← unique per container, gone when you `docker rm`
 └─────────────────────┘</code></pre></div>
-<p>This is <em>why</em> container storage is ephemeral by default — anything written to that top writable layer disappears when the container is removed (this is exactly what Unit 3 / Volumes solves).</p>
-<h3 id="04-installing-amp-verifying-docker"><a class="heading-anchor" href="#04-installing-amp-verifying-docker" aria-hidden="true">#</a>0.4 Installing &amp; Verifying Docker</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># verify install</span>
-docker version        <span class="hljs-comment"># client + server (daemon) version info</span>
-docker info            <span class="hljs-comment"># daemon-level info: storage driver, cgroup version, # containers/images</span>
+<p>This single fact explains almost every &quot;why did my data disappear&quot; bug you&#39;ll hit later (Unit 3 solves it with volumes) — anything written to that top writable layer dies with the container.</p>
+<h3 id="hands-on-walkthrough"><a class="heading-anchor" href="#hands-on-walkthrough" aria-hidden="true">#</a>Hands-On Walkthrough</h3>
+<p>Open a terminal. Do each step and actually read the output before moving to the next.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># 1. Verify Docker is installed and the daemon is reachable</span>
+docker version
+docker info | <span class="hljs-built_in">head</span> -20
 
-<span class="hljs-comment"># sanity check</span>
-docker run hello-world</code></pre></div>
-<p>If <code class="inline-code">docker info</code> fails but <code class="inline-code">docker version</code> shows only the Client block — your daemon isn&#39;t running or your user lacks permission (on Linux, add yourself to the <code class="inline-code">docker</code> group: <code class="inline-code">sudo usermod -aG docker $USER</code>, then re-login).</p>
-<h3 id="05-what-actually-happens-on-docker-run"><a class="heading-anchor" href="#05-what-actually-happens-on-docker-run" aria-hidden="true">#</a>0.5 What Actually Happens on <code class="inline-code">docker run</code></h3>
-<p>This is the single most common Docker interview question. Walk through it precisely:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run -d -p 8080:3000 --name api my-node-app:1.0</code></pre></div>
+<span class="hljs-comment"># 2. Run your first container and watch it pull layer by layer</span>
+docker run hello-world
+
+<span class="hljs-comment"># 3. Run something real, in the background</span>
+docker run -d --name my-nginx -p 8080:80 nginx
+curl localhost:8080 | <span class="hljs-built_in">head</span> -5          <span class="hljs-comment"># you should see nginx&#x27;s welcome HTML</span>
+
+<span class="hljs-comment"># 4. Look inside the running container</span>
+docker inspect my-nginx | less         <span class="hljs-comment"># scroll through: Network, Mounts, Config</span>
+docker <span class="hljs-built_in">exec</span> -it my-nginx sh            <span class="hljs-comment"># you&#x27;re now inside the container&#x27;s shell</span>
+   ps aux                              <span class="hljs-comment"># notice: nginx is PID 1 in here</span>
+   <span class="hljs-built_in">exit</span>
+
+<span class="hljs-comment"># 5. Compare an image&#x27;s metadata vs a container&#x27;s metadata</span>
+docker inspect nginx | <span class="hljs-built_in">head</span> -30        <span class="hljs-comment"># image: layers, no &quot;State&quot; block</span>
+docker inspect my-nginx | <span class="hljs-built_in">head</span> -30     <span class="hljs-comment"># container: has &quot;State&quot;, &quot;NetworkSettings&quot;</span>
+
+<span class="hljs-comment"># 6. See the layers themselves</span>
+docker <span class="hljs-built_in">history</span> nginx
+
+<span class="hljs-comment"># 7. Clean up</span>
+docker stop my-nginx &amp;&amp; docker <span class="hljs-built_in">rm</span> my-nginx</code></pre></div>
+<p>Now trace, out loud, what happened when you ran step 3 — this is the exact chain from the Concept section above:</p>
 <ol>
-<li><strong>CLI → daemon</strong>: <code class="inline-code">docker</code> CLI sends a REST request to <code class="inline-code">dockerd</code>.</li>
-<li><strong>Image resolution</strong>: <code class="inline-code">dockerd</code> checks if <code class="inline-code">my-node-app:1.0</code> exists locally. If not, it pulls it from the configured registry (Docker Hub by default), layer by layer, verifying checksums.</li>
-<li><strong>containerd invoked</strong>: <code class="inline-code">dockerd</code> asks <code class="inline-code">containerd</code> to create a container from that image.</li>
-<li><strong>runc creates the container</strong>: <code class="inline-code">containerd</code> (via <code class="inline-code">containerd-shim</code>) invokes <code class="inline-code">runc</code>, which:<ul>
-<li>Creates new Linux namespaces (PID, NET, MNT, UTS, IPC, USER)</li>
-<li>Sets up cgroups for resource limits</li>
-<li>Sets up the union filesystem (image layers + new writable layer)</li>
-<li>Configures the network (creates a <code class="inline-code">veth</code> pair, attaches to the bridge network, assigns an IP)</li>
+<li>CLI sent the request to <code class="inline-code">dockerd</code>.</li>
+<li><code class="inline-code">dockerd</code> found <code class="inline-code">nginx:latest</code> locally or pulled it layer by layer from Docker Hub.</li>
+<li><code class="inline-code">dockerd</code> asked <code class="inline-code">containerd</code> to create a container from it.</li>
+<li><code class="inline-code">containerd</code> → <code class="inline-code">runc</code> created new namespaces (PID/NET/MNT/etc.), set up cgroups, mounted the union filesystem, created a network interface.</li>
+<li>The image&#39;s <code class="inline-code">CMD</code>/<code class="inline-code">ENTRYPOINT</code> (nginx&#39;s start script) ran as PID 1 inside the new PID namespace.</li>
+<li>Because you passed <code class="inline-code">-p 8080:80</code>, iptables/NAT rules were added so <code class="inline-code">localhost:8080</code> on your machine forwards to port <code class="inline-code">80</code> inside the container.</li>
+<li>Because you passed <code class="inline-code">-d</code>, control returned to your shell immediately.</li>
+</ol>
+<h3 id="practical-takeaway"><a class="heading-anchor" href="#practical-takeaway" aria-hidden="true">#</a>Practical Takeaway</h3>
+<p><code class="inline-code">docker run</code> = <code class="inline-code">docker create</code> + <code class="inline-code">docker start</code>. <code class="inline-code">docker start &lt;name&gt;</code> only works on an <strong>existing, stopped</strong> container — it reuses the same writable layer and does not re-pull the image. This distinction matters in real debugging: if a container keeps failing right after start, <code class="inline-code">docker start</code> won&#39;t fix a bad image — you need to fix the image and re-create the container.</p>
+<h3 id="try-it-yourself"><a class="heading-anchor" href="#try-it-yourself" aria-hidden="true">#</a>Try It Yourself</h3>
+<ul>
+<li>Time <code class="inline-code">docker run hello-world</code> vs. spinning up any VM (even a local one) — compare orders of magnitude, not just &quot;it&#39;s faster.&quot;</li>
+<li>Run <code class="inline-code">docker stats</code> in one terminal while doing normal work in another, and watch CPU/memory of running containers live.</li>
 </ul>
-</li>
-<li><strong>Entrypoint/CMD executed</strong>: The container&#39;s main process (PID 1 <em>inside</em> the container&#39;s PID namespace) starts — e.g., <code class="inline-code">node server.js</code>.</li>
-<li><strong>Port mapping applied</strong>: iptables/NAT rules are set up so host port <code class="inline-code">8080</code> forwards to container port <code class="inline-code">3000</code>.</li>
-<li><strong>Detached mode</strong>: since <code class="inline-code">-d</code> was passed, control returns to your shell immediately; the container runs in the background.</li>
-</ol>
-<h3 id="06-interview-trap-answered"><a class="heading-anchor" href="#06-interview-trap-answered" aria-hidden="true">#</a>0.6 Interview Trap Answered</h3>
-<blockquote class="quote-plain"><p>&quot;What&#39;s the difference between <code class="inline-code">docker run</code> and <code class="inline-code">docker start</code>?&quot;</p>
-</blockquote>
-<p><code class="inline-code">docker run</code> = <code class="inline-code">docker create</code> (make a new container from an image) + <code class="inline-code">docker start</code> (run it). <code class="inline-code">docker start</code> only works on an <strong>existing, stopped</strong> container — it reuses the same writable layer and won&#39;t re-pull the image.</p>
-<h3 id="07-labs"><a class="heading-anchor" href="#07-labs" aria-hidden="true">#</a>0.7 Labs</h3>
-<ol>
-<li>Install Docker and run <code class="inline-code">hello-world</code> and <code class="inline-code">nginx</code>; verify the nginx container&#39;s IP with <code class="inline-code">docker inspect</code>.</li>
-<li>Run <code class="inline-code">docker inspect &lt;container&gt;</code> vs <code class="inline-code">docker inspect &lt;image&gt;</code> — diff the JSON structures side by side.</li>
-<li>Write out, in your own words, all 7 steps above for a container you actually ran.</li>
-<li>Time <code class="inline-code">docker run</code> vs booting an EC2/VM instance for the same base OS. Compare orders of magnitude.</li>
-</ol>
 <hr>
 <h2 id="unit-1--dockerfile-images-amp-layer-caching"><a class="heading-anchor" href="#unit-1--dockerfile-images-amp-layer-caching" aria-hidden="true">#</a>Unit 1 — Dockerfile, Images &amp; Layer Caching</h2>
-<h3 id="11-core-dockerfile-instructions"><a class="heading-anchor" href="#11-core-dockerfile-instructions" aria-hidden="true">#</a>1.1 Core Dockerfile Instructions</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine        <span class="hljs-comment"># base image — always pin a version, never `node:latest` in prod</span>
-<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app                <span class="hljs-comment"># sets cwd for subsequent instructions; creates dir if missing</span></span>
-<span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./       <span class="hljs-comment"># copy dependency manifests FIRST (see 1.3 on caching)</span></span>
+<h3 id="concept-core-dockerfile-instructions"><a class="heading-anchor" href="#concept-core-dockerfile-instructions" aria-hidden="true">#</a>Concept: Core Dockerfile instructions</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine        <span class="hljs-comment"># base image — pin a version, never `node:latest` in prod</span>
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app                <span class="hljs-comment"># sets cwd for everything after; creates the dir if missing</span></span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./       <span class="hljs-comment"># copy dependency manifests FIRST — see caching below</span></span>
 <span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci --omit=dev       <span class="hljs-comment"># install deps in a reproducible, cache-friendly layer</span></span>
 <span class="hljs-keyword">COPY</span><span class="language-bash"> . .                    <span class="hljs-comment"># now copy the rest of the source</span></span>
 <span class="hljs-keyword">ENV</span> NODE_ENV=production
-<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>                 <span class="hljs-comment"># documentation only — does NOT publish the port (see Unit 2)</span>
-<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]   <span class="hljs-comment"># default command when container starts</span></span></code></pre></div>
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>                 <span class="hljs-comment"># documentation only — does NOT publish the port (Unit 2)</span>
+<span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]   <span class="hljs-comment"># default command when the container starts</span></span></code></pre></div>
 <div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Instruction</th>
-<th>Purpose</th>
+<th>What it actually does</th>
 </tr>
 </thead>
 <tbody>
@@ -667,40 +624,40 @@ docker run hello-world</code></pre></div>
 </tr>
 <tr>
 <td><code class="inline-code">RUN</code></td>
-<td>Executes a command <strong>at build time</strong>, result baked into a new layer</td>
+<td>Executes a command <strong>at build time</strong>; the result is baked into a new layer</td>
 </tr>
 <tr>
 <td><code class="inline-code">COPY</code></td>
-<td>Copies files from build context into the image</td>
+<td>Copies files from the build context into the image</td>
 </tr>
 <tr>
 <td><code class="inline-code">ADD</code></td>
-<td>Like COPY, but also auto-extracts tarballs and fetches URLs (avoid unless you need that)</td>
+<td>Like COPY, but also auto-extracts local tarballs and can fetch URLs</td>
 </tr>
 <tr>
 <td><code class="inline-code">WORKDIR</code></td>
-<td>Sets the working directory for subsequent instructions</td>
+<td>Sets the working directory for everything after it</td>
 </tr>
 <tr>
 <td><code class="inline-code">ENV</code></td>
-<td>Sets environment variables available at build <strong>and</strong> run time</td>
+<td>Sets an environment variable, available at build <strong>and</strong> run time</td>
 </tr>
 <tr>
 <td><code class="inline-code">EXPOSE</code></td>
-<td>Documents which port the app listens on (metadata only)</td>
+<td>Documents the port the app listens on (metadata only, doesn&#39;t open anything)</td>
 </tr>
 <tr>
 <td><code class="inline-code">CMD</code></td>
-<td>Default command/args when container starts (overridable at <code class="inline-code">docker run</code>)</td>
+<td>Default command/args on container start — fully overridable at <code class="inline-code">docker run</code></td>
 </tr>
 <tr>
 <td><code class="inline-code">ENTRYPOINT</code></td>
-<td>Fixed command that always runs; CMD becomes its default arguments</td>
+<td>The fixed command that always runs; CMD becomes its default arguments</td>
 </tr>
 </tbody>
 </table></div>
-<h3 id="12-build-context-amp-dockerignore"><a class="heading-anchor" href="#12-build-context-amp-dockerignore" aria-hidden="true">#</a>1.2 Build Context &amp; .dockerignore</h3>
-<p>When you run <code class="inline-code">docker build .</code>, that <code class="inline-code">.</code> is the <strong>build context</strong> — the entire directory gets tar&#39;d and sent to the daemon before any instruction runs. If you don&#39;t exclude <code class="inline-code">node_modules</code> or <code class="inline-code">.git</code>, every build sends megabytes/gigabytes needlessly and can leak secrets.</p>
+<h3 id="concept-build-context-and-why-dockerignore-matters"><a class="heading-anchor" href="#concept-build-context-and-why-dockerignore-matters" aria-hidden="true">#</a>Concept: Build context and why <code class="inline-code">.dockerignore</code> matters</h3>
+<p><code class="inline-code">docker build .</code> — that <code class="inline-code">.</code> is the <strong>build context</strong>: the entire directory gets tarred and sent to the daemon <em>before any instruction runs</em>. Skip <code class="inline-code">.dockerignore</code> and you&#39;ll send <code class="inline-code">node_modules</code>, <code class="inline-code">.git</code>, and possibly <code class="inline-code">.env</code> secrets into every single build, even the ones that don&#39;t need them.</p>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text"># .dockerignore
 node_modules
 npm-debug.log
@@ -710,29 +667,27 @@ npm-debug.log
 coverage
 .vscode
 Dockerfile</code></pre></div>
-<blockquote class="quote-plain"><p>Node-specific gotcha: if you <code class="inline-code">COPY . .</code> without ignoring <code class="inline-code">node_modules</code>, you&#39;ll ship your <strong>host&#39;s</strong> <code class="inline-code">node_modules</code> (wrong OS/arch native bindings) into the image instead of the ones installed cleanly inside the container by <code class="inline-code">RUN npm ci</code>.</p>
-</blockquote>
-<h3 id="13-layer-caching-mechanics"><a class="heading-anchor" href="#13-layer-caching-mechanics" aria-hidden="true">#</a>1.3 Layer Caching Mechanics</h3>
-<p>Every instruction in a Dockerfile creates a layer, and Docker caches each layer keyed by (instruction + its inputs). On a rebuild, Docker reuses cached layers <strong>until the first instruction whose input changed</strong> — everything after that is rebuilt from scratch.</p>
-<p>This is why instruction <strong>order</strong> matters enormously:</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-comment"># ❌ BAD: any source change invalidates npm install too</span>
+<p>Node-specific trap: if you <code class="inline-code">COPY . .</code> without ignoring <code class="inline-code">node_modules</code>, you ship your <strong>host&#39;s</strong> <code class="inline-code">node_modules</code> (wrong OS/architecture native bindings, e.g. a Mac-built <code class="inline-code">bcrypt</code> binary inside a Linux container) instead of the ones <code class="inline-code">RUN npm ci</code> installs cleanly inside the container.</p>
+<h3 id="concept-why-instruction-order-controls-build-speed"><a class="heading-anchor" href="#concept-why-instruction-order-controls-build-speed" aria-hidden="true">#</a>Concept: Why instruction order controls build speed</h3>
+<p>Every instruction creates a layer, cached by (instruction + its inputs). On rebuild, Docker reuses layers <strong>until the first one whose input changed</strong> — everything after that rebuilds from scratch, in order, no exceptions.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-comment"># ❌ Any source file change invalidates npm ci too — full reinstall every time</span>
 <span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
 <span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span>
 
-<span class="hljs-comment"># ✅ GOOD: dependency layer only invalidates when package*.json changes</span>
+<span class="hljs-comment"># ✅ npm ci only reruns when package*.json actually changes</span>
 <span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./</span>
 <span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span>
 <span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span></code></pre></div>
-<p>With the &quot;good&quot; ordering, editing <code class="inline-code">src/index.js</code> and rebuilding will <strong>skip</strong> the <code class="inline-code">npm ci</code> layer entirely (cache hit), saving potentially minutes per build — this is the #1 lever for fast CI pipelines.</p>
-<h3 id="14-multi-stage-builds"><a class="heading-anchor" href="#14-multi-stage-builds" aria-hidden="true">#</a>1.4 Multi-Stage Builds</h3>
-<p>Multi-stage builds let you use one image to <em>build</em> (with devDependencies, compilers, TypeScript, etc.) and a slim image to <em>run</em> — only copying the final build artifacts across.</p>
+<p>With the second ordering, editing <code class="inline-code">src/index.js</code> and rebuilding skips <code class="inline-code">npm ci</code> entirely — a cache hit. On a real Node project with a few hundred dependencies, that&#39;s the difference between a 2-second rebuild and a 90-second one. Multiply that by every CI run in a day and you&#39;ll see why this is the single highest-leverage Docker skill for pipeline speed.</p>
+<h3 id="concept-multi-stage-builds"><a class="heading-anchor" href="#concept-multi-stage-builds" aria-hidden="true">#</a>Concept: Multi-stage builds</h3>
+<p>One image builds (compiles TypeScript, needs devDependencies); a second, slimmer image actually runs. Only the build&#39;s output crosses over.</p>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-comment"># ---- Stage 1: build ----</span>
 <span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine AS builder
 <span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
 <span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./</span>
 <span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci                     <span class="hljs-comment"># full deps, including devDependencies</span></span>
 <span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
-<span class="hljs-keyword">RUN</span><span class="language-bash"> npm run build              <span class="hljs-comment"># e.g., tsc compiles TS -&gt; dist/</span></span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm run build              <span class="hljs-comment"># tsc compiles TS -&gt; dist/</span></span>
 
 <span class="hljs-comment"># ---- Stage 2: production runtime ----</span>
 <span class="hljs-keyword">FROM</span> node:<span class="hljs-number">20</span>-alpine AS runner
@@ -744,186 +699,279 @@ Dockerfile</code></pre></div>
 <span class="hljs-keyword">USER</span> node                      <span class="hljs-comment"># non-root (built into the official node image)</span>
 <span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">3000</span>
 <span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;dist/server.js&quot;</span>]</span></code></pre></div>
-<p>Result: the final image contains <strong>no TypeScript compiler, no devDependencies, no source .ts files</strong> — just compiled JS + prod node_modules. This commonly cuts image size by 60–80% and shrinks the attack surface.</p>
-<h3 id="15-cmd-vs-entrypoint-vs-add-vs-copy"><a class="heading-anchor" href="#15-cmd-vs-entrypoint-vs-add-vs-copy" aria-hidden="true">#</a>1.5 CMD vs ENTRYPOINT vs ADD vs COPY</h3>
-<p><strong>CMD vs ENTRYPOINT</strong> — the #1 asked Docker interview question:</p>
+<p>The final image has no TypeScript compiler, no devDependencies, no <code class="inline-code">.ts</code> source — just compiled JS and prod <code class="inline-code">node_modules</code>. In practice this commonly cuts image size 60–80% and meaningfully shrinks what an attacker could exploit if they got a shell in the container.</p>
+<h3 id="concept-cmd-vs-entrypoint-add-vs-copy"><a class="heading-anchor" href="#concept-cmd-vs-entrypoint-add-vs-copy" aria-hidden="true">#</a>Concept: CMD vs. ENTRYPOINT, ADD vs. COPY</h3>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-dockerfile"><span class="hljs-keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="hljs-string">&quot;node&quot;</span>]</span>
 <span class="hljs-keyword">CMD</span><span class="language-bash"> [<span class="hljs-string">&quot;server.js&quot;</span>]</span></code></pre></div>
-<p><code class="inline-code">docker run my-image</code> → runs <code class="inline-code">node server.js</code>.
-<code class="inline-code">docker run my-image worker.js</code> → runs <code class="inline-code">node worker.js</code> (CMD is overridden, ENTRYPOINT is not).</p>
 <ul>
-<li><strong>CMD alone</strong>: provides a default command, fully replaceable at <code class="inline-code">docker run</code>.</li>
-<li><strong>ENTRYPOINT alone</strong>: the fixed command; anything passed at <code class="inline-code">docker run</code> becomes <strong>arguments appended</strong> to it.</li>
-<li><strong>ENTRYPOINT + CMD together</strong>: ENTRYPOINT is fixed, CMD provides default arguments that are easy to override — this is the idiomatic pattern for CLI-style images.</li>
+<li><p><code class="inline-code">docker run my-image</code> → runs <code class="inline-code">node server.js</code></p>
+</li>
+<li><p><code class="inline-code">docker run my-image worker.js</code> → runs <code class="inline-code">node worker.js</code> (CMD got replaced, ENTRYPOINT didn&#39;t)</p>
+</li>
+<li><p><strong>CMD alone</strong> — a default, fully replaceable at <code class="inline-code">docker run</code>.</p>
+</li>
+<li><p><strong>ENTRYPOINT alone</strong> — fixed; anything passed at <code class="inline-code">docker run</code> is appended as arguments to it.</p>
+</li>
+<li><p><strong>ENTRYPOINT + CMD together</strong> — ENTRYPOINT fixed, CMD gives easily-overridden default arguments. This is the idiomatic pattern for CLI-style images.</p>
+</li>
 </ul>
-<p><strong>ADD vs COPY</strong>: Always prefer <code class="inline-code">COPY</code> — it&#39;s explicit and predictable. Only use <code class="inline-code">ADD</code> when you specifically need its two superpowers: auto-extracting local <code class="inline-code">.tar.gz</code> archives, or fetching a remote URL (though for URLs, a <code class="inline-code">RUN curl</code> is usually clearer and more cacheable).</p>
-<h3 id="16-labs"><a class="heading-anchor" href="#16-labs" aria-hidden="true">#</a>1.6 Labs</h3>
-<ol>
-<li>Write a Dockerfile for a Node app, deliberately putting <code class="inline-code">COPY . .</code> before <code class="inline-code">RUN npm ci</code>, then fix the ordering and prove the cache-hit difference with <code class="inline-code">docker build</code> timing.</li>
-<li>Convert a single-stage Dockerfile into a multi-stage build for a TypeScript app; compare <code class="inline-code">docker images</code> sizes before/after.</li>
-<li>Add <code class="inline-code">.dockerignore</code> for <code class="inline-code">node_modules</code>, <code class="inline-code">.git</code>, <code class="inline-code">.env</code>; compare &quot;Sending build context to Docker daemon&quot; size in build logs before/after.</li>
-<li>Build an image with <code class="inline-code">ENTRYPOINT [&quot;node&quot;]</code> + <code class="inline-code">CMD [&quot;server.js&quot;]</code>, then run it overriding CMD to execute a different script.</li>
-</ol>
+<p><strong>ADD vs. COPY</strong>: default to <code class="inline-code">COPY</code> — explicit, predictable. Only reach for <code class="inline-code">ADD</code> when you need its two extra powers (auto-extracting a local <code class="inline-code">.tar.gz</code>, or fetching a URL) — and even then, a plain <code class="inline-code">RUN curl</code> is usually clearer and more cache-friendly.</p>
+<h3 id="hands-on-walkthrough-1"><a class="heading-anchor" href="#hands-on-walkthrough-1" aria-hidden="true">#</a>Hands-On Walkthrough</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> docker-lab-unit1 &amp;&amp; <span class="hljs-built_in">cd</span> docker-lab-unit1
+npm init -y
+npm install express
+<span class="hljs-built_in">cat</span> &gt; server.js &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+const express = require(<span class="hljs-string">&#x27;express&#x27;</span>);
+const app = express();
+app.get(<span class="hljs-string">&#x27;/&#x27;</span>, (req, res) =&gt; res.send(<span class="hljs-string">&#x27;hello from &#x27;</span> + process.argv[2] || <span class="hljs-string">&#x27;default&#x27;</span>));
+app.listen(3000, () =&gt; console.log(<span class="hljs-string">&#x27;listening on 3000&#x27;</span>));
+EOF
+
+<span class="hljs-comment"># 1. Bad ordering — prove the cache miss</span>
+<span class="hljs-built_in">cat</span> &gt; Dockerfile.bad &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+FROM node:20-alpine
+WORKDIR /app
+COPY . .
+RUN npm ci
+CMD [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]
+EOF
+docker build -t bad-order -f Dockerfile.bad .
+<span class="hljs-built_in">touch</span> server.js &amp;&amp; docker build -t bad-order -f Dockerfile.bad .   <span class="hljs-comment"># watch: npm ci reruns</span>
+
+<span class="hljs-comment"># 2. Good ordering — prove the cache hit</span>
+<span class="hljs-built_in">cat</span> &gt; Dockerfile.good &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+CMD [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]
+EOF
+docker build -t good-order -f Dockerfile.good .
+<span class="hljs-built_in">touch</span> server.js &amp;&amp; docker build -t good-order -f Dockerfile.good .  <span class="hljs-comment"># watch: npm ci step says &quot;CACHED&quot;</span>
+
+<span class="hljs-comment"># 3. .dockerignore effect</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;node_modules&quot;</span> &gt; .dockerignore
+docker build -t good-order -f Dockerfile.good . 2&gt;&amp;1 | grep <span class="hljs-string">&quot;Sending build context&quot;</span>
+
+<span class="hljs-comment"># 4. ENTRYPOINT/CMD override behavior</span>
+<span class="hljs-built_in">cat</span> &gt; Dockerfile.entry &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+ENTRYPOINT [<span class="hljs-string">&quot;node&quot;</span>]
+CMD [<span class="hljs-string">&quot;server.js&quot;</span>]
+EOF
+docker build -t entry-demo -f Dockerfile.entry .
+docker run --<span class="hljs-built_in">rm</span> entry-demo                 <span class="hljs-comment"># runs node server.js</span>
+docker run --<span class="hljs-built_in">rm</span> entry-demo -e <span class="hljs-string">&quot;console.log(1+1)&quot;</span>   <span class="hljs-comment"># ENTRYPOINT stays &quot;node&quot;, CMD is replaced</span></code></pre></div>
+<h3 id="practical-takeaway-1"><a class="heading-anchor" href="#practical-takeaway-1" aria-hidden="true">#</a>Practical Takeaway</h3>
+<p>If you only remember one thing from this unit: <strong>put whatever changes least at the top of the Dockerfile, and whatever changes most at the bottom.</strong> Dependency manifests change rarely; source code changes constantly. That single ordering decision is responsible for most of the build-speed difference you&#39;ll see between a slow CI pipeline and a fast one.</p>
+<h3 id="try-it-yourself-1"><a class="heading-anchor" href="#try-it-yourself-1" aria-hidden="true">#</a>Try It Yourself</h3>
+<ul>
+<li>Convert a single-stage Dockerfile for a TypeScript app into a multi-stage build; compare <code class="inline-code">docker images</code> sizes before/after.</li>
+<li>Deliberately break <code class="inline-code">.dockerignore</code> (delete it) and watch the build context size balloon in the build log.</li>
+</ul>
 <hr>
 <h2 id="unit-2--docker-networking"><a class="heading-anchor" href="#unit-2--docker-networking" aria-hidden="true">#</a>Unit 2 — Docker Networking</h2>
-<h3 id="21-network-drivers-overview"><a class="heading-anchor" href="#21-network-drivers-overview" aria-hidden="true">#</a>2.1 Network Drivers Overview</h3>
+<h3 id="concept-the-four-network-modes"><a class="heading-anchor" href="#concept-the-four-network-modes" aria-hidden="true">#</a>Concept: The four network modes</h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Driver</th>
-<th>Behavior</th>
-<th>When to use</th>
+<th>What happens</th>
+<th>When you&#39;d use it</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code class="inline-code">bridge</code> (default)</td>
-<td>Container gets its own private IP on a virtual bridge (<code class="inline-code">docker0</code>); NAT&#39;d to host</td>
-<td>Default for standalone containers</td>
+<td>Container gets a private IP on a virtual bridge (<code class="inline-code">docker0</code>); NAT&#39;d to the host</td>
+<td>Default for a single standalone container</td>
 </tr>
 <tr>
 <td><code class="inline-code">host</code></td>
 <td>Container shares the host&#39;s network namespace directly — no isolation, no NAT</td>
-<td>Max performance, single-container-per-host scenarios</td>
+<td>Max performance, single container per host</td>
 </tr>
 <tr>
 <td><code class="inline-code">none</code></td>
 <td>No networking at all</td>
-<td>Fully isolated / security-sensitive batch jobs</td>
+<td>Fully isolated batch/security-sensitive jobs</td>
 </tr>
 <tr>
 <td>user-defined bridge</td>
-<td>Like <code class="inline-code">bridge</code>, but with automatic DNS-based service discovery by container name</td>
-<td>Multi-container apps (recommended default)</td>
+<td>Like <code class="inline-code">bridge</code>, but with automatic DNS resolution by container name</td>
+<td>Multi-container apps — this is what you&#39;ll use 90% of the time</td>
 </tr>
 </tbody>
 </table></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker network <span class="hljs-built_in">ls</span>                 <span class="hljs-comment"># list networks</span>
-docker network create my-net      <span class="hljs-comment"># create a user-defined bridge</span>
-docker network inspect my-net     <span class="hljs-comment"># see connected containers, subnet, gateway</span></code></pre></div>
-<h3 id="22-port-publishing-vs-exposing"><a class="heading-anchor" href="#22-port-publishing-vs-exposing" aria-hidden="true">#</a>2.2 Port Publishing vs Exposing</h3>
-<p>This trips up almost every backend engineer new to Docker:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker network <span class="hljs-built_in">ls</span>
+docker network create my-net
+docker network inspect my-net     <span class="hljs-comment"># connected containers, subnet, gateway</span></code></pre></div>
+<h3 id="concept-expose-vs--p--the-thing-that-confuses-everyone"><a class="heading-anchor" href="#concept-expose-vs--p--the-thing-that-confuses-everyone" aria-hidden="true">#</a>Concept: <code class="inline-code">EXPOSE</code> vs. <code class="inline-code">-p</code> — the thing that confuses everyone</h3>
 <ul>
-<li><code class="inline-code">EXPOSE 3000</code> in a Dockerfile is <strong>documentation only</strong> — it does not open any port to the host. It&#39;s a hint for humans and tools like Compose.</li>
-<li><code class="inline-code">-p 8080:3000</code> at <code class="inline-code">docker run</code> is what actually creates the host→container port mapping (via iptables NAT rules).</li>
+<li><code class="inline-code">EXPOSE 3000</code> in a Dockerfile is <strong>documentation only</strong>. It opens nothing. It&#39;s a hint for humans and for tools like Compose.</li>
+<li><code class="inline-code">-p 8080:3000</code> at <code class="inline-code">docker run</code> is what actually creates the host→container port mapping, via iptables NAT rules.</li>
 </ul>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run -d -p 8080:3000 my-node-app
 <span class="hljs-comment">#              ^host  ^container</span>
-<span class="hljs-comment"># Traffic to localhost:8080 on the HOST is forwarded to port 3000 INSIDE the container</span></code></pre></div>
-<p>Without <code class="inline-code">-p</code>, the container is still reachable <em>from other containers on the same Docker network</em> on port 3000 — just not from your host&#39;s browser/curl.</p>
-<h3 id="23-user-defined-bridge-networks-amp-dns"><a class="heading-anchor" href="#23-user-defined-bridge-networks-amp-dns" aria-hidden="true">#</a>2.3 User-Defined Bridge Networks &amp; DNS</h3>
-<p>The default <code class="inline-code">bridge</code> network does <strong>not</strong> provide automatic DNS resolution between containers by name — you&#39;d need to link containers manually or use raw IPs (fragile, since IPs change on restart). A <strong>user-defined bridge network</strong> solves this: Docker runs an embedded DNS server that resolves container names automatically.</p>
+<span class="hljs-comment"># traffic to localhost:8080 on the HOST forwards to port 3000 INSIDE the container</span></code></pre></div>
+<p>Without <code class="inline-code">-p</code>, the container is still reachable <em>from other containers on the same Docker network</em>, on port 3000 — just not from your host&#39;s browser or <code class="inline-code">curl</code>.</p>
+<h3 id="concept-why-user-defined-bridge-networks-give-you-dns-for-free"><a class="heading-anchor" href="#concept-why-user-defined-bridge-networks-give-you-dns-for-free" aria-hidden="true">#</a>Concept: Why user-defined bridge networks give you DNS for free</h3>
+<p>The default <code class="inline-code">bridge</code> network does <strong>not</strong> resolve container names — you&#39;d be stuck hardcoding IPs, which break on every restart. A user-defined bridge network runs an embedded DNS server that resolves container names automatically:</p>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker network create app-net
-
 docker run -d --name db --network app-net postgres:16
 docker run -d --name api --network app-net -p 3000:3000 my-node-app
-
-<span class="hljs-comment"># inside the `api` container&#x27;s code, you can now connect via:</span>
-<span class="hljs-comment"># postgresql://db:5432/mydb   &lt;-- &quot;db&quot; resolves via Docker&#x27;s embedded DNS</span></code></pre></div>
-<h3 id="24-multi-container-service-discovery"><a class="heading-anchor" href="#24-multi-container-service-discovery" aria-hidden="true">#</a>2.4 Multi-Container Service Discovery</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Node.js example — connecting to a container named &quot;db&quot; on the same user-defined network</span>
+<span class="hljs-comment"># inside &quot;api&quot;&#x27;s code: postgresql://db:5432/mydb  &lt;-- &quot;db&quot; resolves via Docker&#x27;s DNS</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">js</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-js"><span class="hljs-comment">// Node example: connecting to a container named &quot;db&quot; on the same network</span>
 <span class="hljs-keyword">const</span> { <span class="hljs-title class_">Pool</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;pg&#x27;</span>);
 <span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({
-  <span class="hljs-attr">host</span>: <span class="hljs-string">&#x27;db&#x27;</span>,        <span class="hljs-comment">// container name = hostname, resolved by Docker&#x27;s DNS</span>
+  <span class="hljs-attr">host</span>: <span class="hljs-string">&#x27;db&#x27;</span>,        <span class="hljs-comment">// the container name IS the hostname</span>
   <span class="hljs-attr">port</span>: <span class="hljs-number">5432</span>,
   <span class="hljs-attr">user</span>: <span class="hljs-string">&#x27;postgres&#x27;</span>,
   <span class="hljs-attr">password</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DB_PASSWORD</span>,
   <span class="hljs-attr">database</span>: <span class="hljs-string">&#x27;mydb&#x27;</span>,
 });</code></pre></div>
-<p>This is precisely the mechanism Docker Compose uses under the hood (Unit 4) — Compose auto-creates a user-defined network per project and every service is reachable by its service name.</p>
-<h3 id="25-labs"><a class="heading-anchor" href="#25-labs" aria-hidden="true">#</a>2.5 Labs</h3>
-<ol>
-<li>Create a user-defined bridge network, run two containers on it, and <code class="inline-code">ping</code> (or <code class="inline-code">curl</code>) one from the other by container name.</li>
-<li>Run a web server with <code class="inline-code">-p 8080:80</code> and confirm <code class="inline-code">curl localhost:8080</code> works from the host; then run it <em>without</em> <code class="inline-code">-p</code> and confirm it only works from another container.</li>
-<li>Compare <code class="inline-code">--network host</code> vs default bridge for a simple HTTP server — benchmark latency difference (usually negligible for most apps but worth seeing).</li>
-<li>Deliberately misconfigure two containers on <em>different</em> networks and diagnose the &quot;can&#39;t reach&quot; failure using <code class="inline-code">docker network inspect</code> and <code class="inline-code">docker exec ... ping</code>.</li>
-</ol>
+<p>This is exactly the mechanism Docker Compose uses under the hood (Unit 4) — it auto-creates a network per project and every service is reachable by its service name.</p>
+<h3 id="hands-on-walkthrough-2"><a class="heading-anchor" href="#hands-on-walkthrough-2" aria-hidden="true">#</a>Hands-On Walkthrough</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># 1. Two containers, same user-defined network, talk by name</span>
+docker network create app-net
+docker run -d --name web1 --network app-net nginx
+docker run -it --<span class="hljs-built_in">rm</span> --network app-net alpine sh
+   <span class="hljs-comment"># inside this shell:</span>
+   ping -c 3 web1        <span class="hljs-comment"># resolves! prints web1&#x27;s IP</span>
+   wget -qO- http://web1 | <span class="hljs-built_in">head</span> -3
+   <span class="hljs-built_in">exit</span>
+
+<span class="hljs-comment"># 2. Prove the default bridge does NOT give you name resolution</span>
+docker run -d --name web2 nginx                       <span class="hljs-comment"># no --network flag = default bridge</span>
+docker run -it --<span class="hljs-built_in">rm</span> alpine sh
+   ping -c 2 web2         <span class="hljs-comment"># fails — &quot;bad address&quot;</span>
+   <span class="hljs-built_in">exit</span>
+
+<span class="hljs-comment"># 3. -p vs no -p</span>
+docker run -d --name web3 --network app-net -p 8081:80 nginx
+curl localhost:8081 | <span class="hljs-built_in">head</span> -3          <span class="hljs-comment"># works — you published the port</span>
+docker run -d --name web4 --network app-net nginx
+curl localhost:8082 2&gt;&amp;1 | <span class="hljs-built_in">head</span> -1     <span class="hljs-comment"># nothing published, nothing to curl on host</span>
+
+<span class="hljs-comment"># 4. host networking, for comparison</span>
+docker run -d --name web5 --network host nginx
+curl localhost:80 | <span class="hljs-built_in">head</span> -3            <span class="hljs-comment"># container&#x27;s port 80 IS the host&#x27;s port 80, no mapping needed</span>
+
+<span class="hljs-comment"># cleanup</span>
+docker <span class="hljs-built_in">rm</span> -f web1 web2 web3 web4 web5
+docker network <span class="hljs-built_in">rm</span> app-net</code></pre></div>
+<h3 id="practical-takeaway-2"><a class="heading-anchor" href="#practical-takeaway-2" aria-hidden="true">#</a>Practical Takeaway</h3>
+<p>If a Node app in one container can&#39;t reach a database in another, the first two things to check are: (1) are they on the <em>same</em> user-defined network (not just both running), and (2) are you using the container <em>name</em> as the hostname, not <code class="inline-code">localhost</code> (a very common mistake — <code class="inline-code">localhost</code> inside a container means that container, not the host machine or a sibling container).</p>
+<h3 id="try-it-yourself-2"><a class="heading-anchor" href="#try-it-yourself-2" aria-hidden="true">#</a>Try It Yourself</h3>
+<ul>
+<li>Put two containers on <em>different</em> networks on purpose, then diagnose the failure using <code class="inline-code">docker network inspect</code> and <code class="inline-code">docker exec ... ping</code> before fixing it.</li>
+<li>Benchmark request latency for the same simple HTTP server under <code class="inline-code">bridge</code> vs. <code class="inline-code">host</code> mode — see for yourself how small the real difference usually is.</li>
+</ul>
 <hr>
 <h2 id="unit-3--docker-storage-amp-volumes"><a class="heading-anchor" href="#unit-3--docker-storage-amp-volumes" aria-hidden="true">#</a>Unit 3 — Docker Storage &amp; Volumes</h2>
-<h3 id="31-named-volumes-vs-bind-mounts-vs-tmpfs"><a class="heading-anchor" href="#31-named-volumes-vs-bind-mounts-vs-tmpfs" aria-hidden="true">#</a>3.1 Named Volumes vs Bind Mounts vs tmpfs</h3>
+<h3 id="concept-named-volumes-vs-bind-mounts-vs-tmpfs"><a class="heading-anchor" href="#concept-named-volumes-vs-bind-mounts-vs-tmpfs" aria-hidden="true">#</a>Concept: Named volumes vs. bind mounts vs. tmpfs</h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Type</th>
 <th>Managed by</th>
-<th>Location</th>
-<th>Use case</th>
+<th>Lives at</th>
+<th>Best for</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>Named volume</strong></td>
 <td>Docker</td>
-<td><code class="inline-code">/var/lib/docker/volumes/...</code> (Docker-managed)</td>
-<td>Persistent app data (DB files) — portable, backed up easily</td>
+<td><code class="inline-code">/var/lib/docker/volumes/...</code></td>
+<td>Persistent app data (DB files) — portable, easy to back up</td>
 </tr>
 <tr>
 <td><strong>Bind mount</strong></td>
 <td>You</td>
-<td>Any host path you specify</td>
-<td>Local dev — live-reload source code into a container</td>
+<td>Any host path you choose</td>
+<td>Local dev — live-reloading source code into a container</td>
 </tr>
 <tr>
 <td><strong>tmpfs mount</strong></td>
-<td>Docker (in-memory)</td>
-<td>RAM only, never touches disk</td>
+<td>Docker (RAM)</td>
+<td>Never touches disk</td>
 <td>Secrets/temp data that must never persist</td>
 </tr>
 </tbody>
 </table></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Named volume</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># named volume</span>
 docker run -d -v pgdata:/var/lib/postgresql/data postgres:16
 
-<span class="hljs-comment"># Bind mount (absolute host path required)</span>
+<span class="hljs-comment"># bind mount (needs an absolute host path)</span>
 docker run -d -v $(<span class="hljs-built_in">pwd</span>)/src:/app/src -p 3000:3000 my-node-app
 
 <span class="hljs-comment"># tmpfs</span>
 docker run -d --tmpfs /app/tmp my-node-app</code></pre></div>
-<p>Modern, more explicit syntax (<code class="inline-code">--mount</code>, recommended for clarity in production Dockerfiles/scripts):</p>
+<p>More explicit modern syntax, worth using in scripts for clarity:</p>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker run -d \
   --mount <span class="hljs-built_in">type</span>=volume,<span class="hljs-built_in">source</span>=pgdata,target=/var/lib/postgresql/data \
   postgres:16</code></pre></div>
-<h3 id="32-volume-lifecycle"><a class="heading-anchor" href="#32-volume-lifecycle" aria-hidden="true">#</a>3.2 Volume Lifecycle</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker volume create pgdata          <span class="hljs-comment"># create explicitly (optional — auto-created on first use)</span>
-docker volume <span class="hljs-built_in">ls</span>                     <span class="hljs-comment"># list all volumes</span>
-docker volume inspect pgdata         <span class="hljs-comment"># see mountpoint, driver, labels</span>
-docker volume prune                  <span class="hljs-comment"># remove ALL unused (unmounted) volumes — careful!</span>
-docker volume <span class="hljs-built_in">rm</span> pgdata              <span class="hljs-comment"># remove a specific one (must not be in use)</span></code></pre></div>
-<p><strong>Key fact</strong>: data in a named volume <strong>survives</strong> <code class="inline-code">docker rm &lt;container&gt;</code> — the volume is a separate object from the container. It&#39;s only deleted if you explicitly <code class="inline-code">docker volume rm</code> it, or run <code class="inline-code">docker rm -v</code> combined with the volume having no other references.</p>
-<h3 id="33-sharing-data-between-containers"><a class="heading-anchor" href="#33-sharing-data-between-containers" aria-hidden="true">#</a>3.3 Sharing Data Between Containers</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker volume create shared-data
+<h3 id="concept-why-volumes-outlive-containers"><a class="heading-anchor" href="#concept-why-volumes-outlive-containers" aria-hidden="true">#</a>Concept: Why volumes outlive containers</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker volume create pgdata
+docker volume <span class="hljs-built_in">ls</span>
+docker volume inspect pgdata     <span class="hljs-comment"># mountpoint, driver, labels</span>
+docker volume prune              <span class="hljs-comment"># removes ALL unused volumes — be careful</span>
+docker volume <span class="hljs-built_in">rm</span> pgdata          <span class="hljs-comment"># removes one specific volume (must not be in use)</span></code></pre></div>
+<p>The key fact from Unit 0 comes back here: a container&#39;s writable layer dies with the container, but a <strong>volume is a separate object entirely</strong> — it&#39;s only deleted if you explicitly <code class="inline-code">docker volume rm</code> it (or <code class="inline-code">docker rm -v</code> when nothing else references it).</p>
+<h3 id="hands-on-walkthrough-3"><a class="heading-anchor" href="#hands-on-walkthrough-3" aria-hidden="true">#</a>Hands-On Walkthrough</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># 1. Prove data survives container removal</span>
+docker volume create pgdata
+docker run -d --name pg1 -e POSTGRES_PASSWORD=pw -v pgdata:/var/lib/postgresql/data postgres:16
+<span class="hljs-built_in">sleep</span> 5
+docker <span class="hljs-built_in">exec</span> -it pg1 psql -U postgres -c <span class="hljs-string">&quot;CREATE TABLE t(x int); INSERT INTO t VALUES (42);&quot;</span>
+docker <span class="hljs-built_in">rm</span> -f pg1                                    <span class="hljs-comment"># container gone</span>
+docker run -d --name pg2 -e POSTGRES_PASSWORD=pw -v pgdata:/var/lib/postgresql/data postgres:16
+<span class="hljs-built_in">sleep</span> 5
+docker <span class="hljs-built_in">exec</span> -it pg2 psql -U postgres -c <span class="hljs-string">&quot;SELECT * FROM t;&quot;</span>   <span class="hljs-comment"># 42 is still there</span>
 
-docker run -d --name writer -v shared-data:/data alpine sh -c <span class="hljs-string">&quot;while true; do date &gt;&gt; /data/log.txt; sleep 5; done&quot;</span>
-docker run -d --name reader -v shared-data:/data alpine sh -c <span class="hljs-string">&quot;tail -f /data/log.txt&quot;</span></code></pre></div>
-<p>Both containers mount the same volume — Docker handles concurrent access at the filesystem level (your application is still responsible for handling concurrent writes safely, e.g., file locks, if that matters for your use case).</p>
-<h3 id="34-backup-amp-restore"><a class="heading-anchor" href="#34-backup-amp-restore" aria-hidden="true">#</a>3.4 Backup &amp; Restore</h3>
-<p>The standard pattern: spin up a throwaway container that mounts the volume plus a host directory, and use <code class="inline-code">tar</code>.</p>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># Backup: tar the volume&#x27;s contents to a file on the host</span>
-docker run --<span class="hljs-built_in">rm</span> \
-  -v pgdata:/data \
-  -v $(<span class="hljs-built_in">pwd</span>)/backup:/backup \
-  alpine tar czf /backup/pgdata-backup.tar.gz -C /data .
+<span class="hljs-comment"># 2. Bind mount for live reload</span>
+<span class="hljs-built_in">mkdir</span> -p bindlab/src &amp;&amp; <span class="hljs-built_in">cd</span> bindlab
+<span class="hljs-built_in">cat</span> &gt; src/index.js &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+console.log(<span class="hljs-string">&quot;version 1&quot;</span>);
+EOF
+docker run --<span class="hljs-built_in">rm</span> -v $(<span class="hljs-built_in">pwd</span>)/src:/app/src -w /app node:20-alpine node src/index.js   <span class="hljs-comment"># prints &quot;version 1&quot;</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;console.log(&quot;version 2&quot;);&#x27;</span> &gt; src/index.js
+docker run --<span class="hljs-built_in">rm</span> -v $(<span class="hljs-built_in">pwd</span>)/src:/app/src -w /app node:20-alpine node src/index.js   <span class="hljs-comment"># prints &quot;version 2&quot; — no rebuild needed</span>
+<span class="hljs-built_in">cd</span> ..
 
-<span class="hljs-comment"># Restore: untar into a (new) volume</span>
+<span class="hljs-comment"># 3. Backup and restore</span>
+<span class="hljs-built_in">mkdir</span> -p backup
+docker run --<span class="hljs-built_in">rm</span> -v pgdata:/data -v $(<span class="hljs-built_in">pwd</span>)/backup:/backup alpine \
+  tar czf /backup/pgdata-backup.tar.gz -C /data .
 docker volume create pgdata-restored
-docker run --<span class="hljs-built_in">rm</span> \
-  -v pgdata-restored:/data \
-  -v $(<span class="hljs-built_in">pwd</span>)/backup:/backup \
-  alpine tar xzf /backup/pgdata-backup.tar.gz -C /data</code></pre></div>
-<h3 id="35-labs"><a class="heading-anchor" href="#35-labs" aria-hidden="true">#</a>3.5 Labs</h3>
-<ol>
-<li>Run Postgres with a named volume, insert data, <code class="inline-code">docker rm -f</code> the container, start a <em>new</em> container with the same volume, and confirm the data is still there.</li>
-<li>Bind-mount your local <code class="inline-code">src/</code> folder into a Node container running with <code class="inline-code">nodemon</code>, edit a file on the host, and observe the live reload.</li>
-<li>Back up a volume to a <code class="inline-code">.tar.gz</code>, then restore it into a freshly created volume and verify data integrity.</li>
-<li>Deliberately forget to attach a volume to a stateful container, remove the container, and confirm the data loss — then fix it.</li>
-</ol>
+docker run --<span class="hljs-built_in">rm</span> -v pgdata-restored:/data -v $(<span class="hljs-built_in">pwd</span>)/backup:/backup alpine \
+  tar xzf /backup/pgdata-backup.tar.gz -C /data
+docker run -d --name pg3 -e POSTGRES_PASSWORD=pw -v pgdata-restored:/var/lib/postgresql/data postgres:16
+<span class="hljs-built_in">sleep</span> 5
+docker <span class="hljs-built_in">exec</span> -it pg3 psql -U postgres -c <span class="hljs-string">&quot;SELECT * FROM t;&quot;</span>   <span class="hljs-comment"># 42 should be there too</span>
+
+<span class="hljs-comment"># cleanup</span>
+docker <span class="hljs-built_in">rm</span> -f pg2 pg3
+docker volume <span class="hljs-built_in">rm</span> pgdata pgdata-restored</code></pre></div>
+<h3 id="practical-takeaway-3"><a class="heading-anchor" href="#practical-takeaway-3" aria-hidden="true">#</a>Practical Takeaway</h3>
+<p>If you ever see &quot;my container restarted and all my data is gone,&quot; the fix is almost always: the container was writing to its own writable layer instead of a mounted volume. Check <code class="inline-code">docker inspect &lt;container&gt;</code> under <code class="inline-code">&quot;Mounts&quot;</code> — if it&#39;s empty for a stateful service, that&#39;s the bug.</p>
+<h3 id="try-it-yourself-3"><a class="heading-anchor" href="#try-it-yourself-3" aria-hidden="true">#</a>Try It Yourself</h3>
+<ul>
+<li>Deliberately run a stateful container <em>without</em> a volume, remove it, and confirm the data loss for yourself before fixing it — seeing the failure makes the fix stick better than reading about it.</li>
+</ul>
 <hr>
 <h2 id="unit-4--docker-compose-for-multi-container-apps"><a class="heading-anchor" href="#unit-4--docker-compose-for-multi-container-apps" aria-hidden="true">#</a>Unit 4 — Docker Compose for Multi-Container Apps</h2>
-<h3 id="41-compose-file-structure"><a class="heading-anchor" href="#41-compose-file-structure" aria-hidden="true">#</a>4.1 Compose File Structure</h3>
+<h3 id="concept-what-compose-actually-automates"><a class="heading-anchor" href="#concept-what-compose-actually-automates" aria-hidden="true">#</a>Concept: What Compose actually automates</h3>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># docker-compose.yml</span>
 <span class="hljs-attr">services:</span>
   <span class="hljs-attr">api:</span>
-    <span class="hljs-attr">build:</span> <span class="hljs-string">.</span>                      <span class="hljs-comment"># build from local Dockerfile</span>
+    <span class="hljs-attr">build:</span> <span class="hljs-string">.</span>
     <span class="hljs-attr">ports:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;3000:3000&quot;</span>
     <span class="hljs-attr">environment:</span>
@@ -964,24 +1012,20 @@ docker run --<span class="hljs-built_in">rm</span> \
 <span class="hljs-attr">networks:</span>
   <span class="hljs-attr">app-net:</span>
     <span class="hljs-attr">driver:</span> <span class="hljs-string">bridge</span></code></pre></div>
-<p>Compose does three things for you automatically that you&#39;d otherwise do manually: creates a dedicated network (so <code class="inline-code">db</code> and <code class="inline-code">cache</code> resolve by name, per Unit 2), creates named volumes as declared, and builds/starts everything with one command.</p>
+<p>Compose is doing three things you&#39;d otherwise wire up by hand: creating a dedicated network (so <code class="inline-code">db</code>/<code class="inline-code">cache</code> resolve by name — Unit 2), creating named volumes (Unit 3), and building/starting everything with one command.</p>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker compose up -d          <span class="hljs-comment"># build (if needed) + start everything, detached</span>
-docker compose ps             <span class="hljs-comment"># status of all services</span>
-docker compose logs -f api    <span class="hljs-comment"># follow logs for one service</span>
-docker compose down           <span class="hljs-comment"># stop and remove containers + network (NOT volumes, by default)</span>
-docker compose down -v        <span class="hljs-comment"># also remove volumes — destructive!</span></code></pre></div>
-<h3 id="42-depends_on-healthchecks-amp-startup-ordering"><a class="heading-anchor" href="#42-depends_on-healthchecks-amp-startup-ordering" aria-hidden="true">#</a>4.2 depends_on, Healthchecks &amp; Startup Ordering</h3>
-<p>A common Node.js pitfall: <code class="inline-code">depends_on</code> (without <code class="inline-code">condition</code>) only waits for the dependency <strong>container to start</strong>, not for the database inside it to be <em>ready to accept connections</em>. Postgres, for example, takes a moment after container-start before it accepts connections.</p>
+docker compose ps             <span class="hljs-comment"># status of every service</span>
+docker compose logs -f api    <span class="hljs-comment"># follow one service&#x27;s logs</span>
+docker compose down           <span class="hljs-comment"># stop + remove containers and the network (keeps volumes)</span>
+docker compose down -v        <span class="hljs-comment"># also removes volumes — destructive, be deliberate about this</span></code></pre></div>
+<h3 id="concept-the-depends_on-trap"><a class="heading-anchor" href="#concept-the-depends_on-trap" aria-hidden="true">#</a>Concept: The <code class="inline-code">depends_on</code> trap</h3>
+<p>A very common Node.js pitfall: plain <code class="inline-code">depends_on</code> (no <code class="inline-code">condition</code>) only waits for the dependency&#39;s <strong>container to start</strong>, not for the database <em>inside it</em> to actually accept connections. Postgres takes a moment after container-start before it&#39;s ready.</p>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-attr">depends_on:</span>
   <span class="hljs-attr">db:</span>
     <span class="hljs-attr">condition:</span> <span class="hljs-string">service_healthy</span>   <span class="hljs-comment"># waits for the healthcheck to pass, not just container start</span></code></pre></div>
-<p>Without this, your Node app may crash-loop on boot trying to connect to a DB that technically &quot;started&quot; but isn&#39;t accepting connections yet. Two common fixes:</p>
-<ol>
-<li>Use <code class="inline-code">condition: service_healthy</code> with a proper <code class="inline-code">healthcheck:</code> (shown above) — the Compose-native solution.</li>
-<li>Add retry/backoff logic in your Node app&#39;s DB connection code regardless (recommended even in production, since Compose ordering guarantees don&#39;t exist in real orchestrators like Kubernetes).</li>
-</ol>
-<h3 id="43-environment-variables-amp-env-files"><a class="heading-anchor" href="#43-environment-variables-amp-env-files" aria-hidden="true">#</a>4.3 Environment Variables &amp; .env Files</h3>
-<p>Compose automatically loads a <code class="inline-code">.env</code> file from the same directory for <strong>variable substitution</strong> inside <code class="inline-code">docker-compose.yml</code>:</p>
+<p>Without this, your Node app can crash-loop on boot trying to connect to a DB that technically &quot;started&quot; but isn&#39;t accepting connections yet. Two real fixes: use <code class="inline-code">condition: service_healthy</code> with a real <code class="inline-code">healthcheck:</code> (shown above), and/or add retry/backoff logic in your app&#39;s DB connection code regardless — Compose&#39;s ordering guarantees don&#39;t exist in real orchestrators like Kubernetes, so the app-level fix is the one that actually matters long-term.</p>
+<h3 id="concept-environment-variables-env-and-multi-environment-setups"><a class="heading-anchor" href="#concept-environment-variables-env-and-multi-environment-setups" aria-hidden="true">#</a>Concept: Environment variables, <code class="inline-code">.env</code>, and multi-environment setups</h3>
+<p>Compose auto-loads a <code class="inline-code">.env</code> file from the same directory for variable substitution inside <code class="inline-code">docker-compose.yml</code>:</p>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># .env</span>
 DB_PASSWORD=supersecret
 APP_PORT=3000</code></pre></div>
@@ -991,42 +1035,97 @@ APP_PORT=3000</code></pre></div>
       <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;${APP_PORT}:3000&quot;</span>
     <span class="hljs-attr">environment:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">DB_PASSWORD=${DB_PASSWORD}</span></code></pre></div>
-<p>For multiple environments, use override files instead of duplicating the whole file:</p>
+<p>For dev vs. prod, use an override file instead of duplicating the whole thing:</p>
 <div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker compose -f docker-compose.yml -f docker-compose.dev.yml up</code></pre></div>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># docker-compose.dev.yml — only the overrides for local dev</span>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-yaml"><span class="hljs-comment"># docker-compose.dev.yml — only the overrides</span>
 <span class="hljs-attr">services:</span>
   <span class="hljs-attr">api:</span>
     <span class="hljs-attr">build:</span>
-      <span class="hljs-attr">target:</span> <span class="hljs-string">builder</span>            <span class="hljs-comment"># use the builder stage, not the slim runtime</span>
+      <span class="hljs-attr">target:</span> <span class="hljs-string">builder</span>
     <span class="hljs-attr">volumes:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">./src:/app/src</span>           <span class="hljs-comment"># bind mount for live reload</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./src:/app/src</span>
     <span class="hljs-attr">command:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">dev</span></code></pre></div>
-<h3 id="44-scaling-services-locally"><a class="heading-anchor" href="#44-scaling-services-locally" aria-hidden="true">#</a>4.4 Scaling Services Locally</h3>
-<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">docker compose up -d --scale api=3</code></pre></div>
-<p>Note: this only works cleanly when the service <strong>doesn&#39;t</strong> have a fixed host port mapping like <code class="inline-code">&quot;3000:3000&quot;</code> (three containers can&#39;t all bind host port 3000). For local scaling experiments, either omit the <code class="inline-code">ports:</code> mapping (access via the internal network only) or map to a range, and put something like Nginx/Traefik in front to load-balance.</p>
-<h3 id="45-labs"><a class="heading-anchor" href="#45-labs" aria-hidden="true">#</a>4.5 Labs</h3>
-<ol>
-<li>Write a <code class="inline-code">docker-compose.yml</code> for a Node API + Postgres + Redis; bring it all up with one command.</li>
-<li>Add a <code class="inline-code">healthcheck</code> to the Postgres service and set <code class="inline-code">depends_on.condition: service_healthy</code> on the API; verify the API no longer crash-loops on cold start.</li>
-<li>Split into <code class="inline-code">docker-compose.yml</code> (base) + <code class="inline-code">docker-compose.dev.yml</code> (bind mount + dev command), and run both merged for local development.</li>
-<li>Scale the API service to 3 replicas (no fixed host port) and verify with <code class="inline-code">docker compose ps</code> that 3 containers are running.</li>
-</ol>
+<h3 id="hands-on-walkthrough-4"><a class="heading-anchor" href="#hands-on-walkthrough-4" aria-hidden="true">#</a>Hands-On Walkthrough</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-built_in">mkdir</span> compose-lab &amp;&amp; <span class="hljs-built_in">cd</span> compose-lab
+npm init -y &amp;&amp; npm install express pg redis
+<span class="hljs-built_in">cat</span> &gt; server.js &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+const express = require(<span class="hljs-string">&#x27;express&#x27;</span>);
+const app = express();
+app.get(<span class="hljs-string">&#x27;/&#x27;</span>, (req, res) =&gt; res.send(<span class="hljs-string">&#x27;api is up&#x27;</span>));
+app.listen(3000, () =&gt; console.log(<span class="hljs-string">&#x27;listening on 3000&#x27;</span>));
+EOF
+<span class="hljs-built_in">cat</span> &gt; Dockerfile &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+CMD [<span class="hljs-string">&quot;node&quot;</span>, <span class="hljs-string">&quot;server.js&quot;</span>]
+EOF
+
+<span class="hljs-built_in">cat</span> &gt; docker-compose.yml &lt;&lt;<span class="hljs-string">&#x27;EOF&#x27;</span>
+services:
+  api:
+    build: .
+    ports:
+      - <span class="hljs-string">&quot;3000:3000&quot;</span>
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [app-net]
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      <span class="hljs-built_in">test</span>: [<span class="hljs-string">&quot;CMD-SHELL&quot;</span>, <span class="hljs-string">&quot;pg_isready -U postgres&quot;</span>]
+      interval: 5s
+      <span class="hljs-built_in">timeout</span>: 3s
+      retries: 5
+    networks: [app-net]
+volumes:
+  pgdata:
+networks:
+  app-net:
+EOF
+
+docker compose up -d
+docker compose ps                    <span class="hljs-comment"># confirm both services are &quot;running&quot; / &quot;healthy&quot;</span>
+curl localhost:3000                  <span class="hljs-comment"># &quot;api is up&quot;</span>
+docker compose logs api | <span class="hljs-built_in">tail</span> -10
+
+<span class="hljs-comment"># prove the depends_on/healthcheck actually matters</span>
+docker compose down
+sed -i <span class="hljs-string">&#x27;&#x27;</span> -e <span class="hljs-string">&#x27;/condition: service_healthy/d&#x27;</span> -e <span class="hljs-string">&#x27;/depends_on:/,+1{/db:/d}&#x27;</span> docker-compose.yml 2&gt;/dev/null || <span class="hljs-literal">true</span>
+<span class="hljs-comment"># (if the sed above doesn&#x27;t apply cleanly on your OS, just manually delete the depends_on</span>
+<span class="hljs-comment">#  block and rerun — watch api&#x27;s logs for connection-refused errors on a cold start)</span>
+
+docker compose down -v   <span class="hljs-comment"># cleanup, including volumes</span></code></pre></div>
+<h3 id="practical-takeaway-4"><a class="heading-anchor" href="#practical-takeaway-4" aria-hidden="true">#</a>Practical Takeaway</h3>
+<p>Compose is the fastest way to reason locally about the exact same networking/volume concepts from Units 2 and 3 — it&#39;s not new knowledge, it&#39;s automation on top of what you already understand. If Compose behavior ever confuses you, drop back to plain <code class="inline-code">docker network inspect</code> / <code class="inline-code">docker volume inspect</code> on the containers it created — they&#39;re ordinary Docker objects underneath.</p>
+<h3 id="try-it-yourself-4"><a class="heading-anchor" href="#try-it-yourself-4" aria-hidden="true">#</a>Try It Yourself</h3>
+<ul>
+<li>Split into <code class="inline-code">docker-compose.yml</code> (base) + <code class="inline-code">docker-compose.dev.yml</code> (bind mount + dev command) and run both merged.</li>
+<li>Scale the API service to 3 replicas with <code class="inline-code">docker compose up -d --scale api=3</code> (drop the fixed host port first, or it&#39;ll conflict).</li>
+</ul>
 <hr>
 <h2 id="phase-1-checklist"><a class="heading-anchor" href="#phase-1-checklist" aria-hidden="true">#</a>Phase 1 Checklist</h2>
-<p>Before moving to Phase 2 (Docker Advanced &amp; Production), you should be able to, without looking anything up:</p>
+<p>Before moving to Phase 2 (Docker Advanced &amp; Production), you should be able to do each of these <strong>from memory, at a terminal, without looking anything up</strong>:</p>
 <ul>
-<li><input disabled="" type="checkbox"> Explain containers vs VMs in terms of namespaces/cgroups vs hypervisors</li>
+<li><input disabled="" type="checkbox"> Explain containers vs. VMs in terms of namespaces/cgroups vs. hypervisors</li>
 <li><input disabled="" type="checkbox"> Draw and explain the CLI → dockerd → containerd → runc flow</li>
 <li><input disabled="" type="checkbox"> Explain why data written to a container&#39;s writable layer disappears on <code class="inline-code">docker rm</code></li>
 <li><input disabled="" type="checkbox"> Write a Dockerfile with correct instruction ordering for optimal layer caching</li>
 <li><input disabled="" type="checkbox"> Write a multi-stage Dockerfile that excludes build-time tooling from the final image</li>
-<li><input disabled="" type="checkbox"> Explain CMD vs ENTRYPOINT precisely, with an example of overriding each</li>
+<li><input disabled="" type="checkbox"> Explain CMD vs. ENTRYPOINT with a working example of overriding each</li>
 <li><input disabled="" type="checkbox"> Explain the difference between <code class="inline-code">EXPOSE</code> and <code class="inline-code">-p</code></li>
-<li><input disabled="" type="checkbox"> Set up a user-defined bridge network and explain why it enables DNS-based service discovery</li>
-<li><input disabled="" type="checkbox"> Explain named volumes vs bind mounts vs tmpfs and pick the right one per scenario</li>
-<li><input disabled="" type="checkbox"> Back up and restore a Docker volume via the tar-container pattern</li>
+<li><input disabled="" type="checkbox"> Set up a user-defined bridge network and explain why it enables name-based DNS</li>
+<li><input disabled="" type="checkbox"> Explain named volumes vs. bind mounts vs. tmpfs and pick the right one per scenario</li>
+<li><input disabled="" type="checkbox"> Back up and restore a Docker volume using the tar-container pattern</li>
 <li><input disabled="" type="checkbox"> Write a <code class="inline-code">docker-compose.yml</code> with healthchecks and correct <code class="inline-code">depends_on</code> conditions</li>
-<li><input disabled="" type="checkbox"> Explain why <code class="inline-code">depends_on</code> alone isn&#39;t sufficient for &quot;wait until DB is ready&quot;</li>
+<li><input disabled="" type="checkbox"> Explain why <code class="inline-code">depends_on</code> alone isn&#39;t sufficient for &quot;wait until the DB is ready&quot;</li>
 </ul>
 <hr>
 <h2 id="quick-reference-cheatsheet"><a class="heading-anchor" href="#quick-reference-cheatsheet" aria-hidden="true">#</a>Quick-Reference Cheatsheet</h2>
