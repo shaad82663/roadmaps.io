@@ -454,6 +454,16 @@
         <!-- Dynamically filled -->
       </div>
 
+      <!-- Projects Grid (shown conditionally via showPorject=true) -->
+      <div id="projects-section" style="display: none;">
+        <div class="grid-title" style="margin-top: 3rem;">
+          <i class="ti ti-folder" aria-hidden="true"></i> Featured Projects
+        </div>
+        <div class="roadmaps-grid" id="projects-list">
+          <!-- Dynamically filled -->
+        </div>
+      </div>
+
       <footer>
         <p>Created by <strong>Mohd Shadab</strong> &nbsp;·&nbsp; 
           <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;·&nbsp;
@@ -529,6 +539,23 @@
             labs: 0
           },
           tags: ['JavaScript', 'Node.js', 'Backend', 'System Design']
+        }
+      ];
+
+      const projects = [
+        {
+          id: 'legaldocs',
+          type: 'project',
+          title: 'LegalDocs — AI Contract Analysis',
+          description: 'Interactive AI agent for legal document analysis, risk profiling, and automated clause compliance verification. Built with LangChain & LangGraph.',
+          icon: 'ti-scale',
+          path: 'projects/legaldocs/index.html',
+          stats: {
+            phases: 10,
+            steps: 12,
+            deliverables: 9
+          },
+          tags: ['LangChain', 'LangGraph', 'AI Agent', 'LegalTech']
         }
       ];
 
@@ -621,6 +648,51 @@
             </div>
           `;
         }).join('');
+
+        // 3. Render Projects conditionally
+        const urlParams = new URLSearchParams(window.location.search);
+        const showProject = urlParams.get('showPorject') === 'true' || urlParams.get('showProject') === 'true';
+        const projSection = document.getElementById('projects-section');
+
+        if (showProject && projSection) {
+          projSection.style.display = 'block';
+          const projGrid = document.getElementById('projects-list');
+          projGrid.innerHTML = projects.map((p) => {
+            return `
+              <div class="roadmap-card" onclick="window.location.href='${p.path}'">
+                <div class="card-header">
+                  <div class="subject-logo">
+                    <i class="ti ${p.icon || 'ti-folder'}" style="font-size: 1.6rem;"></i>
+                  </div>
+                  <div class="subject-title">${p.title}</div>
+                </div>
+                <div class="subject-desc">${p.description}</div>
+                <div class="card-stats">
+                  <div class="card-stat-item">
+                    <span class="card-stat-val">${p.stats.phases}</span>
+                    <span class="card-stat-label">Phases</span>
+                  </div>
+                  <div class="card-stat-item">
+                    <span class="card-stat-val">${p.stats.steps}</span>
+                    <span class="card-stat-label">Steps</span>
+                  </div>
+                  <div class="card-stat-item">
+                    <span class="card-stat-val">${p.stats.deliverables}</span>
+                    <span class="card-stat-label">Deliverables</span>
+                  </div>
+                </div>
+                <div class="tags-row">
+                  ${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                </div>
+                <button class="enter-btn">
+                  <i class="ti ti-arrow-right"></i> Enter Project
+                </button>
+              </div>
+            `;
+          }).join('');
+        } else if (projSection) {
+          projSection.style.display = 'none';
+        }
       }
 
       function toggleTheme() {
