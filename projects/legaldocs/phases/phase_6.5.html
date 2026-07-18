@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 6.5: Multi-Agent Supervisor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 6.5: Multi-Agent Supervisor</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-65-multi-agent-supervisor"><a class="heading-anchor" href="#legaldocs--phase-65-multi-agent-supervisor" aria-hidden="true">#</a>LegalDocs — Phase 6.5: Multi-Agent Supervisor</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL (Phase 0/1), LangGraph.js (<code class="inline-code">StateGraph</code>, <strong><code class="inline-code">Command</code> for dynamic handoff routing — first real use in the project</strong>), <code class="inline-code">@langchain/langgraph-checkpoint-postgres</code>, Zod
+<strong>Depends on:</strong> Phase 4 (the risk analysis <code class="inline-code">StateGraph</code>, invoked as a whole), Phase 4.5 (the legal research <code class="inline-code">createReactAgent</code>, invoked ad hoc rather than only automatically per HIGH-risk clause), Phase 5 (the report-generation <code class="inline-code">entrypoint</code> workflow), Phase 6 (the conversational chat agent, and the closure-scoping / checkpointer-namespacing discipline this phase generalizes)
+<strong>Feeds into:</strong> Phase 7 (streaming/async progress — a Supervisor run that hands off through several specialists is exactly the kind of longer-running request that benefits from streaming intermediate updates back to the client rather than one blocking response)</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>Every capability this project has built so far is reached through its own dedicated endpoint, and the <em>client</em> has to know which one to call, in what order, with what IDs: start an analysis here, generate a report there, open a chat session somewhere else. This phase builds a single entry point — a <strong>Supervisor</strong> — that a user (or a frontend) can talk to in plain language, which itself figures out what&#39;s actually being asked and routes the work to whichever specialist can do it: the risk analyzer (Phase 4), the legal research agent (Phase 4.5), the conversational assistant (Phase 6), or the report generator (Phase 5). &quot;Analyze this contract, then get me case law for the indemnification clause, then give me a report&quot; becomes one conversation with one entry point, not four separate API calls the client has to sequence correctly.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>Up through Phase 6, this project has been a well-organized <em>collection</em> of capabilities. This phase is where it becomes a <em>system</em> — something that behaves like a single assistant rather than four separate tools that happen to share a database. That distinction matters for two concrete reasons:</p>
+<ol>
+<li><strong>It&#39;s the natural product shape.</strong> A real user doesn&#39;t think in terms of &quot;call the analysis endpoint, then the report endpoint&quot; — they think &quot;help me understand this contract.&quot; A Supervisor is what lets the product actually match that mental model, and it&#39;s the direct payoff of every earlier phase&#39;s discipline about giving each capability a clean, well-scoped interface (Phase 4&#39;s checkpointed graph, Phase 4.5&#39;s tool-using agent, Phase 5&#39;s <code class="inline-code">entrypoint</code> workflow, Phase 6&#39;s per-session chat agent) — none of that had to be rebuilt to be composed here; it only had to be <em>callable</em>.</li>
+<li><strong>It&#39;s where &quot;multi-agent,&quot; a term you&#39;ve likely heard used loosely, gets a precise, working definition.</strong> A single agent (Phase 4.5&#39;s research agent, Phase 6&#39;s chat agent) reasons in a loop and calls tools. A <strong>multi-agent system</strong> is a step up from that: multiple <em>independent</em> agents (or agent-like components), each genuinely capable of running on its own, coordinated by something that decides which one should act next. This phase is where you build that coordination layer for real, on top of components you&#39;ve already built and already trust individually.</li>
+</ol>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">                       User: &quot;Analyze this contract, then find case law
+                       for the indemnification clause, then send me a report.&quot;
+                              │
+                              ▼
+              ┌─────────────────────────────────────┐
+              │         PHASE 6.5 — Supervisor          │
+              │         (StateGraph + Command)           │
+              │                                            │
+              │   ┌──────────┐   Command(goto, update)      │
+              │   │supervisor │◄──────────────┬─────────────┤
+              │   │  (LLM      │               │             │
+              │   │  routing    │  Command      │  Command    │
+              │   │  decision)   │  (goto=next)  │ (goto=      │
+              │   └─────┬──────┘               │ supervisor)  │
+              │         │                       │             │
+              │    ┌────┴─────┬───────────┬─────┴──────┐      │
+              │    ▼           ▼           ▼            ▼      │
+              │ risk_analyzer research_ chat_       report_    │
+              │ (invokes     agent      assistant   generator  │
+              │  Phase 4&#x27;s   (invokes   (invokes    (invokes    │
+              │  analysisGraph Phase4.5&#x27;s Phase 6&#x27;s  Phase 5&#x27;s   │
+              │  as a whole)  reactAgent) chat agent) entrypoint) │
+              └─────────────────────────────────────┘
+                              │
+                        Phase 7: streaming/
+                        async progress over
+                        a multi-hop Supervisor run</code></pre></div>
+<p>This phase&#39;s deliverables are: an <code class="inline-code">assistant_sessions</code> table, a <code class="inline-code">SupervisorState</code> graph with one routing node and four specialist nodes wired via <code class="inline-code">Command</code>-based handoffs, and two endpoints (create a session, send a message) that are now the single front door to everything Phases 4 through 6 built.</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-what-a-supervisor-actually-does--and-just-as-importantly-what-it-doesn39t"><a class="heading-anchor" href="#21-what-a-supervisor-actually-does--and-just-as-importantly-what-it-doesn39t" aria-hidden="true">#</a>2.1 What a Supervisor actually does — and, just as importantly, what it doesn&#39;t</h3>
+<p>A <strong>Supervisor</strong>, in the multi-agent sense this phase uses, has exactly two jobs: read the conversation so far, and decide which specialist should act next (or that the conversation is done and it&#39;s time to reply directly). It does not do any of the domain work itself — it doesn&#39;t score risk, it doesn&#39;t search case law, it doesn&#39;t write report prose. Think of it like a skilled receptionist at a professional services firm: they don&#39;t do the accounting or the legal work themselves, but they know the practice well enough to send you to the right person, and they follow up once that person is done to see if anything else is needed.</p>
+<p>This separation is deliberate, not incidental. Every specialist this phase routes to is a component you already built, tested, and trust <em>in isolation</em> — Phase 4&#39;s graph already knows how to run a full risk analysis correctly; Phase 6&#39;s chat agent already knows how to answer questions grounded in one run&#39;s findings. The Supervisor&#39;s entire value is in <strong>not re-implementing any of that</strong>, only in deciding, per turn, which of those already-correct components is the right one to invoke.</p>
+<h3 id="22-two-competing-shapes-for-quotsub-agentsquot-and-why-this-phase-picks-one"><a class="heading-anchor" href="#22-two-competing-shapes-for-quotsub-agentsquot-and-why-this-phase-picks-one" aria-hidden="true">#</a>2.2 Two competing shapes for &quot;sub-agents,&quot; and why this phase picks one</h3>
+<p>There are two common ways to structure a Supervisor&#39;s relationship to its specialists, and it&#39;s worth understanding both, because they solve slightly different problems:</p>
+<p><strong>Shape A — specialists as tools.</strong> The Supervisor is itself a single <code class="inline-code">createReactAgent</code>-style loop (exactly like Phase 4.5&#39;s or Phase 6&#39;s), and each specialist is wrapped as a <code class="inline-code">tool()</code> the Supervisor&#39;s own model can call. This is simple — you already know exactly how to build it, it&#39;s the same mechanism from Phase 4.5 — but it has a real limitation here: a tool&#39;s result is typically just a string (or a small JSON blob) handed back into the calling agent&#39;s context. That&#39;s fine when a specialist&#39;s output <em>is</em> naturally a short string (&quot;here&#39;s what I found&quot;). It&#39;s a worse fit when a specialist&#39;s outcome needs to update several distinct, structured pieces of shared context at once — for example, after running a full analysis, the Supervisor needs to durably remember <em>which</em> <code class="inline-code">analysisRunId</code> is now active, not just receive a sentence describing that an analysis happened.</p>
+<p><strong>Shape B — specialists as peer graph nodes, coordinated via handoffs.</strong> The Supervisor and every specialist are all nodes in the <em>same</em> <code class="inline-code">StateGraph</code>, and control passes between them via an explicit <strong>handoff</strong>: a node&#39;s own return value says both &quot;here&#39;s what changed&quot; and &quot;here&#39;s who should act next.&quot; This is a better fit for this phase specifically because the shared context genuinely has multiple structured fields that need to flow precisely between specialists (<code class="inline-code">contractId</code>, <code class="inline-code">analysisRunId</code>, <code class="inline-code">chatSessionId</code>) — not just a conversational transcript.</p>
+<p><strong>This phase uses Shape B.</strong> Section 2.3 covers the exact mechanism (<code class="inline-code">Command</code>) that makes a handoff work.</p>
+<h3 id="23-command--finally-cashing-in-on-phase-439s-foreshadowing"><a class="heading-anchor" href="#23-command--finally-cashing-in-on-phase-439s-foreshadowing" aria-hidden="true">#</a>2.3 <code class="inline-code">Command</code> — finally cashing in on Phase 4&#39;s foreshadowing</h3>
+<p>Phase 4&#39;s Concept Learning introduced <code class="inline-code">Command</code> and then deliberately set it aside: <em>&quot;<code class="inline-code">Command</code> becomes more valuable once a node&#39;s own internal logic is what determines routing dynamically... which you&#39;ll see more of once Phase 6.5&#39;s Supervisor needs to decide routing based on more complex internal reasoning.&quot;</em> This is that moment.</p>
+<p>Recall the two things a graph node could do up through Phase 4: return a plain partial-state object (just an update, with routing handled separately by <code class="inline-code">addConditionalEdges</code>), or — this phase&#39;s mechanism — return a <code class="inline-code">Command</code>, which bundles a state update <em>and</em> a routing decision into one object, returned from inside the node&#39;s own logic:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+  <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;risk_analyzer&quot;</span>,       <span class="hljs-comment">// which node runs next</span>
+  <span class="hljs-attr">update</span>: { <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-string">&quot;Run a full risk analysis on this contract.&quot;</span> },
+});</code></pre></div>
+<p><strong>Why this fits the Supervisor specifically, where <code class="inline-code">routeByRisk</code> (Phase 4) didn&#39;t need it:</strong> <code class="inline-code">routeByRisk</code> was a two-way, simple, <em>fixed</em> decision — HIGH or not-HIGH, always computed the same way from one field. The Supervisor&#39;s routing decision is genuinely more involved: it&#39;s the direct output of an LLM&#39;s reasoning about an open-ended conversation, among four-plus possible destinations, and that reasoning naturally also wants to say <em>what it wants the next specialist to do</em> (an instruction), not just <em>which</em> specialist. Splitting &quot;what the LLM decided&quot; (inside the node) from &quot;where that sends execution&quot; (in a separate <code class="inline-code">addConditionalEdges</code> function that would have to re-derive the same decision) would mean either recomputing the LLM&#39;s reasoning twice or awkwardly stashing it in a state field just to hand it to a separate router function. <code class="inline-code">Command</code> lets the node that actually made the decision be the same place that acts on it.</p>
+<p>A <code class="inline-code">Command</code> can send execution to <code class="inline-code">END</code> (finish the graph run) just as easily as to another named node:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+  <span class="hljs-attr">goto</span>: <span class="hljs-variable constant_">END</span>,
+  <span class="hljs-attr">update</span>: { <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(<span class="hljs-string">&quot;Here&#x27;s your risk summary...&quot;</span>)] },
+});</code></pre></div>
+<p>And critically, <strong>specialist nodes use <code class="inline-code">Command</code> too</strong>, to hand control back: once <code class="inline-code">risk_analyzer</code> finishes running Phase 4&#39;s graph, it returns <code class="inline-code">Command({ goto: &quot;supervisor&quot;, update: {...} })</code> — handing off, not just &quot;finishing&quot; the way a node in a fixed pipeline would. This is what makes the graph a genuine loop between coordinator and specialists, rather than a one-way dispatch.</p>
+<h3 id="24-the-routing-decision-itself--one-more-structured-output-classification"><a class="heading-anchor" href="#24-the-routing-decision-itself--one-more-structured-output-classification" aria-hidden="true">#</a>2.4 The routing decision itself — one more structured-output classification</h3>
+<p>Underneath the <code class="inline-code">Command</code> mechanism, the Supervisor still needs to actually <em>decide</em> where to go, and that decision is, at its core, the same kind of thing you&#39;ve built since Phase 2: a <code class="inline-code">withStructuredOutput()</code> call that classifies the situation into one of a fixed set of outcomes.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> <span class="hljs-title class_">RoutingDecisionSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">next</span>: z.<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;risk_analyzer&quot;</span>, <span class="hljs-string">&quot;research_agent&quot;</span>, <span class="hljs-string">&quot;chat_assistant&quot;</span>, <span class="hljs-string">&quot;report_generator&quot;</span>, <span class="hljs-string">&quot;FINISH&quot;</span>]),
+  <span class="hljs-attr">instructionForAgent</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A short, specific instruction for the chosen specialist&quot;</span>),
+  <span class="hljs-attr">responseIfFinished</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">nullable</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;If next is FINISH, the reply to send now. Null otherwise.&quot;</span>),
+});</code></pre></div>
+<p>What makes this a <em>routing</em> classification rather than, say, Phase 2&#39;s contract-type classification, is simply what it&#39;s classifying: not &quot;what kind of document is this&quot; but &quot;what does this conversation need next, given everything that&#39;s happened so far.&quot; The mechanism — one model call, one schema, one guaranteed-shaped answer — is identical.</p>
+<h3 id="25-revisiting-quotcall-the-compiled-unit-from-a-plain-nodequot-vs-true-subgraph-nesting--now-with-an-actual-supervisor-to-test-it-against"><a class="heading-anchor" href="#25-revisiting-quotcall-the-compiled-unit-from-a-plain-nodequot-vs-true-subgraph-nesting--now-with-an-actual-supervisor-to-test-it-against" aria-hidden="true">#</a>2.5 Revisiting &quot;call the compiled unit from a plain node&quot; vs. true subgraph nesting — now with an actual Supervisor to test it against</h3>
+<p>Phase 4.5 made a deliberate, explicitly deferred choice: call Phase 4&#39;s compiled <code class="inline-code">analysisGraph</code> from <em>inside</em> a plain node function (<code class="inline-code">await analysisGraph.invoke(...)</code>), rather than nesting it as a true LangGraph subgraph sharing the outer graph&#39;s state and checkpointer — and named &quot;once there&#39;s a Supervisor architecture to nest it inside&quot; as the right point to revisit that decision. Here it is, revisited honestly:</p>
+<p><strong>True subgraph nesting</strong> requires the inner graph&#39;s state schema to either match the outer graph&#39;s, or be reconciled by an explicit transformation function at the boundary. Phase 4&#39;s <code class="inline-code">AnalysisState</code> has fields — <code class="inline-code">currentClause</code>, <code class="inline-code">currentFinding</code>, the <code class="inline-code">Send()</code>-driven fan-out over an entire clause list — that exist <em>only</em> to support that graph&#39;s own internal parallel dispatch. None of that has any meaningful counterpart in the Supervisor&#39;s state, which just needs to know &quot;an analysis is running, scoped to this <code class="inline-code">contractId</code>, and here&#39;s the <code class="inline-code">analysisRunId</code> once it&#39;s done.&quot; Building a transformation function to bridge these two shapes would mean writing an adapter that ends up doing almost exactly what &quot;just invoke the compiled graph and read its return value&quot; already does for you — except with more ceremony, and a second thing (the transformation logic) to keep correct as either state schema evolves.</p>
+<p><strong>The actual conclusion, now that it&#39;s been tested against a real case:</strong> invoking an already-compiled, independently useful unit (a graph, an agent, a workflow) from inside a plain node function is the right <em>general</em> pattern for composing this project&#39;s specialists — not a stopgap. True subgraph nesting remains the right tool specifically when two graphs share the same fundamental state shape (for instance, if a future phase needed to nest one message-based agent inside another message-based agent) — that&#39;s not the situation here, and forcing it wouldn&#39;t have bought anything Phase 4.5&#39;s original choice didn&#39;t already deliver.</p>
+<h3 id="26-a-federated-state-the-supervisor-tracks-references-not-full-internal-state"><a class="heading-anchor" href="#26-a-federated-state-the-supervisor-tracks-references-not-full-internal-state" aria-hidden="true">#</a>2.6 A federated state: the Supervisor tracks references, not full internal state</h3>
+<p>Each specialist this phase routes to is <em>already</em> independently durable: Phase 4&#39;s <code class="inline-code">analysisGraph</code> has its own checkpointer and its own <code class="inline-code">thread_id</code> per run; Phase 6&#39;s chat agent has its own checkpointer and its own <code class="inline-code">thread_id</code> per session. The Supervisor&#39;s own state doesn&#39;t need to — and shouldn&#39;t — duplicate any of that internal detail. It only needs to carry the <strong>references</strong> that let it (or a specialist) find the right underlying data: which <code class="inline-code">contractId</code> this conversation is about, which <code class="inline-code">analysisRunId</code> is currently active (if any), which <code class="inline-code">chatSessionId</code> is currently active (if any).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">SupervisorState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">messages</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">BaseMessage</span>[]&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">e, i</span>) =&gt;</span> e.<span class="hljs-title function_">concat</span>(i), <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> [] }),
+  <span class="hljs-attr">contractId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_e, i</span>) =&gt;</span> i, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span> }),
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_e, i</span>) =&gt;</span> i, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span> }),
+  <span class="hljs-attr">chatSessionId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_e, i</span>) =&gt;</span> i, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span> }),
+  <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_e, i</span>) =&gt;</span> i, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span> }),
+});</code></pre></div>
+<p>This is the same principle a microservice architecture follows when passing an order ID between services instead of the order&#39;s entire internal state — each specialist remains the sole owner and authority over its own detailed internal history; the Supervisor just needs to know <em>which</em> instance of each to point at.</p>
+<p><strong>A sharp, easy-to-miss correctness detail this creates:</strong> because LangGraph only updates a state field when a node&#39;s return value <em>includes</em> that key at all (an omitted key means &quot;no change,&quot; not &quot;clear it to null&quot;), a client sending a follow-up message must never resend <code class="inline-code">contractId</code>/<code class="inline-code">analysisRunId</code>/<code class="inline-code">chatSessionId</code> as part of that turn&#39;s input unless it actually wants to <em>change</em> them — sending <code class="inline-code">analysisRunId: null</code> on turn two would overwrite the value Phase 4&#39;s specialist worked hard to set on turn one. The correct client behavior is: send only <code class="inline-code">{ messages: [...] }</code> on every turn after the first; let the checkpointer be the sole source of truth for everything else.</p>
+<h3 id="27-the-supervisor39s-own-memory"><a class="heading-anchor" href="#27-the-supervisor39s-own-memory" aria-hidden="true">#</a>2.7 The Supervisor&#39;s own memory</h3>
+<p>The Supervisor conversation itself needs the exact same durable, multi-turn memory Phase 6 built for chat — a user&#39;s &quot;analyze this, then get me case law, then send a report&quot; conversation can span several separate HTTP requests, and the Supervisor needs to remember, on request three, that request one already produced an <code class="inline-code">analysisRunId</code>. This reuses the identical <code class="inline-code">PostgresSaver</code> checkpointer backend already running in this project, with its own namespaced <code class="inline-code">thread_id</code> prefix (<code class="inline-code">supervisor-&lt;uuid&gt;</code>) — the same &quot;share the infrastructure, keep the ID namespace distinct&quot; discipline Phase 6 established for chat threads, now applied one layer up.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-sub-agent-coordination-specialists-as-tools-vs-specialists-as-peer-nodes-with-command-handoffs"><a class="heading-anchor" href="#31-sub-agent-coordination-specialists-as-tools-vs-specialists-as-peer-nodes-with-command-handoffs" aria-hidden="true">#</a>3.1 Sub-agent coordination: specialists as tools vs. specialists as peer nodes with <code class="inline-code">Command</code> handoffs</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Specialists as tools on one <code class="inline-code">createReactAgent</code></strong></td>
+<td>Reuses a mechanism you already know exactly how to build (Phase 4.5, Phase 6); less new API surface</td>
+<td>A tool&#39;s result is naturally a string/small blob returned into the calling agent&#39;s context — an awkward fit when a specialist&#39;s outcome needs to durably update several distinct structured fields (an active <code class="inline-code">analysisRunId</code>, a <code class="inline-code">chatSessionId</code>) rather than just add a sentence to context</td>
+<td>A Supervisor whose specialists&#39; outcomes really are just &quot;a short answer to hand back,&quot; with no structured state to track between them</td>
+</tr>
+<tr>
+<td><strong>B. Specialists as peer <code class="inline-code">StateGraph</code> nodes, coordinated via <code class="inline-code">Command</code> handoffs (recommended)</strong></td>
+<td>Each specialist&#39;s node return can precisely update the exact structured fields the rest of the system needs (<code class="inline-code">analysisRunId</code>, <code class="inline-code">chatSessionId</code>), not just append to a transcript; the routing decision and its accompanying instruction live in one place, made by whichever node&#39;s logic actually decided it</td>
+<td>A second coordination mechanism (<code class="inline-code">Command</code>) to learn, on top of tool-calling</td>
+<td><strong>Recommended</strong> — this phase&#39;s shared context is genuinely structured (multiple distinct IDs that must flow precisely), which is exactly where Approach B&#39;s precision earns its keep over Approach A&#39;s string-shaped tool results</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, as reasoned through in Concept Learning 2.2–2.3.</p>
+<h3 id="32-routing-decision-mechanism-fixed-keywordintent-rules-vs-llm-structured-output"><a class="heading-anchor" href="#32-routing-decision-mechanism-fixed-keywordintent-rules-vs-llm-structured-output" aria-hidden="true">#</a>3.2 Routing decision mechanism: fixed keyword/intent rules vs. LLM structured output</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Fixed keyword/intent rules</strong> (e.g., &quot;contains &#39;report&#39;&quot; → report_generator)</td>
+<td>Free, instant, fully deterministic</td>
+<td>Brittle against real phrasing variety (&quot;can you write this up for me&quot; never says the word &quot;report&quot;); can&#39;t handle a single message that implies multiple steps</td>
+<td>A narrow, tightly-controlled command interface where users only ever issue a small set of known exact phrasings</td>
+</tr>
+<tr>
+<td><strong>B. LLM structured-output classification (recommended)</strong></td>
+<td>Handles the actual variety of how people phrase requests; can reason about <em>sequencing</em> (&quot;analyze, then find case law, then report&quot; implies three sequential routing decisions across three turns of the loop, not one)</td>
+<td>One more LLM call per routing decision (though a cheap one — this is a short classification, not a long generation)</td>
+<td><strong>Recommended</strong> — the entire point of a natural-language Supervisor is not requiring the user to phrase things in a way a keyword rule would recognize</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, as specified.</p>
+<h3 id="33-composing-existing-specialists-plain-node-invocation-vs-true-subgraph-nesting"><a class="heading-anchor" href="#33-composing-existing-specialists-plain-node-invocation-vs-true-subgraph-nesting" aria-hidden="true">#</a>3.3 Composing existing specialists: plain-node invocation vs. true subgraph nesting</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Invoke each specialist&#39;s already-compiled graph/agent/workflow from inside a plain Supervisor node function (recommended)</strong></td>
+<td>Each specialist keeps its own independently-correct state schema and checkpointing; no adapter/transformation code to write or maintain; matches the pattern Phase 4.5 already established</td>
+<td>The specialist&#39;s own internal steps aren&#39;t checkpointed as part of the Supervisor&#39;s own state history (though each specialist remains independently checkpointed and auditable on its own terms — Phase 4&#39;s audit endpoints, for instance, are completely unaffected)</td>
+<td>Composing genuinely independent units whose internal state shapes don&#39;t naturally align — true of every specialist in this phase</td>
+</tr>
+<tr>
+<td><strong>B. True subgraph nesting</strong>, reconciling each specialist&#39;s state schema with the Supervisor&#39;s via a boundary transformation function</td>
+<td>Every specialist&#39;s internal steps would also appear in the Supervisor&#39;s own checkpoint history</td>
+<td>Requires a real transformation function per specialist, reconciling state shapes that have little in common by design (Concept Learning 2.5); the adapter code ends up duplicating most of what Approach A already gives you</td>
+<td>Two graphs that already share a fundamentally similar state shape (e.g., nesting one message-based agent inside another)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach A, as the now-confirmed general pattern for this project — see Concept Learning 2.5 for the full reasoning, revisited from Phase 4.5&#39;s original deferral.</p>
+<h3 id="34-shared-state-full-internal-detail-vs-federated-references-only"><a class="heading-anchor" href="#34-shared-state-full-internal-detail-vs-federated-references-only" aria-hidden="true">#</a>3.4 Shared state: full internal detail vs. federated references only</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Supervisor state carries full internal detail from every specialist</strong> (e.g., the entire <code class="inline-code">findings</code> array inline)</td>
+<td>Everything visible in one place</td>
+<td>Duplicates data every specialist already stores and owns durably; grows the Supervisor&#39;s state (and therefore every checkpoint of it) without bound as more specialists produce more data</td>
+<td>Never really, for this architecture — it fights the whole reason each specialist has its own storage</td>
+</tr>
+<tr>
+<td><strong>B. Supervisor state carries only references (<code class="inline-code">analysisRunId</code>, <code class="inline-code">chatSessionId</code>) (recommended)</strong></td>
+<td>Small, stable state regardless of how much detail a specialist&#39;s own domain produces; each specialist remains the sole source of truth for its own data</td>
+<td>A specialist node has to do one lookup (by ID) to get its own detail back, rather than finding it already sitting in shared state</td>
+<td><strong>Recommended</strong> — matches this project&#39;s established pattern (every phase since Phase 4 has stored its own detailed data in its own table, referenced by ID)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, as specified in Concept Learning 2.6.</p>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--database-schema-for-assistant-sessions"><a class="heading-anchor" href="#step-1--database-schema-for-assistant-sessions" aria-hidden="true">#</a>Step 1 — Database schema for assistant sessions</h3>
+<p><strong>What:</strong> An <code class="inline-code">assistant_sessions</code> table — one row per Supervisor conversation, scoped to a <code class="inline-code">contractId</code>, with its own namespaced <code class="inline-code">thread_id</code>.</p>
+<p><strong>Why:</strong> The same reasoning as Phase 6&#39;s <code class="inline-code">chat_sessions</code> — a stable row the routes look up to resolve which checkpointed conversation a given session ID refers to.</p>
+<h3 id="step-2--extracting-a-reusable-analysis-trigger-helper"><a class="heading-anchor" href="#step-2--extracting-a-reusable-analysis-trigger-helper" aria-hidden="true">#</a>Step 2 — Extracting a reusable analysis-trigger helper</h3>
+<p><strong>What:</strong> Pull the &quot;load clauses, generate a <code class="inline-code">thread_id</code>, invoke <code class="inline-code">analysisGraph</code>&quot; logic currently inline in Phase 4&#39;s <code class="inline-code">POST /analysis/start</code> route out into its own function, <code class="inline-code">runAnalysisForContract(contractId)</code>, returning <code class="inline-code">{ analysisRunId, findings }</code>. Update Phase 4&#39;s route to call this same helper.</p>
+<p><strong>Why:</strong> The Supervisor&#39;s <code class="inline-code">risk_analyzer</code> node needs to do exactly this, and duplicating the logic inline would mean two places that could silently drift out of sync. This is a small, low-risk refactor — Phase 4&#39;s route&#39;s <em>behavior</em> doesn&#39;t change at all, only where the logic physically lives.</p>
+<p><strong>Best practice:</strong> Whenever a second caller needs logic that currently lives inline in a route handler, that&#39;s the concrete signal to extract it — not a violation of &quot;don&#39;t build for hypothetical future needs,&quot; since the second caller already exists by the time you&#39;re extracting it.</p>
+<h3 id="step-3--supervisor-state-schema"><a class="heading-anchor" href="#step-3--supervisor-state-schema" aria-hidden="true">#</a>Step 3 — Supervisor state schema</h3>
+<p><strong>What:</strong> <code class="inline-code">SupervisorState</code> (Annotation.Root) — <code class="inline-code">messages</code> (concatenating), <code class="inline-code">contractId</code>, <code class="inline-code">analysisRunId</code>, <code class="inline-code">chatSessionId</code>, <code class="inline-code">pendingInstruction</code> (all replace-reducer).</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.6.</p>
+<h3 id="step-4--routing-schema-and-the-supervisor-node"><a class="heading-anchor" href="#step-4--routing-schema-and-the-supervisor-node" aria-hidden="true">#</a>Step 4 — Routing schema and the <code class="inline-code">supervisor</code> node</h3>
+<p><strong>What:</strong> <code class="inline-code">RoutingDecisionSchema</code> and the <code class="inline-code">supervisor</code> node function, which runs the classification chain and returns a <code class="inline-code">Command</code> — either handing off to a named specialist (with <code class="inline-code">pendingInstruction</code> set) or finishing with <code class="inline-code">goto: END</code>.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.3–2.4.</p>
+<p><strong>Common mistake to avoid:</strong> Having the <code class="inline-code">supervisor</code> node append a <em>user-facing</em> message on every intermediate handoff (e.g., &quot;Routing you to the risk analyzer...&quot;). Keep intermediate routing silent from the user&#39;s perspective — carry the decision via <code class="inline-code">pendingInstruction</code> in state, and only add a message to <code class="inline-code">messages</code> when there&#39;s something actually worth showing the user (a specialist&#39;s result, or the final <code class="inline-code">FINISH</code> reply).</p>
+<h3 id="step-5--the-four-specialist-nodes"><a class="heading-anchor" href="#step-5--the-four-specialist-nodes" aria-hidden="true">#</a>Step 5 — The four specialist nodes</h3>
+<p><strong>What:</strong> <code class="inline-code">risk_analyzer</code>, <code class="inline-code">research_agent</code>, <code class="inline-code">chat_assistant</code>, <code class="inline-code">report_generator</code> — each a plain node function that reads what it needs from state (<code class="inline-code">contractId</code>, <code class="inline-code">pendingInstruction</code>, the latest human message), invokes its already-built compiled unit (Step 2&#39;s helper, Phase 4.5&#39;s <code class="inline-code">runResearchReactAgent</code>, Phase 6&#39;s <code class="inline-code">sendChatMessage</code>, Phase 5&#39;s <code class="inline-code">generateReportWorkflow</code>), and returns <code class="inline-code">Command({ goto: &quot;supervisor&quot;, update: {...} })</code>.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.5.</p>
+<p><strong>Common mistake to avoid:</strong> Letting a specialist node silently do nothing (and return an unhelpful generic message) when a precondition isn&#39;t met — e.g., <code class="inline-code">chat_assistant</code> being routed to before any analysis has run. Each specialist should explicitly check its own preconditions and hand back a clear, honest message (&quot;I don&#39;t have a completed analysis to discuss yet&quot;) rather than erroring or guessing.</p>
+<h3 id="step-6--graph-construction"><a class="heading-anchor" href="#step-6--graph-construction" aria-hidden="true">#</a>Step 6 — Graph construction</h3>
+<p><strong>What:</strong> Wire all five nodes into one <code class="inline-code">StateGraph(SupervisorState)</code>, with a single fixed edge from <code class="inline-code">START</code> to <code class="inline-code">supervisor</code> — every other transition is handled dynamically via each node&#39;s own <code class="inline-code">Command</code>.</p>
+<p><strong>Why:</strong> Since every routing decision is made by the node&#39;s own logic at runtime (Concept Learning 2.3), there&#39;s no fixed edge to declare between <code class="inline-code">supervisor</code> and any specialist, or back — <code class="inline-code">Command</code> supplies that at runtime.</p>
+<p><strong>Best practice:</strong> Set an explicit <code class="inline-code">recursionLimit</code> on every <code class="inline-code">.invoke()</code> call — a Supervisor bouncing between itself and specialists is, structurally, exactly the same &quot;the model&#39;s own decisions control how many steps happen&quot; situation Phase 4.5 flagged for agent loops, just one level up.</p>
+<h3 id="step-7--session-persistence-and-endpoints"><a class="heading-anchor" href="#step-7--session-persistence-and-endpoints" aria-hidden="true">#</a>Step 7 — Session persistence and endpoints</h3>
+<p><strong>What:</strong> <code class="inline-code">assistant_sessions</code> storage functions, and <code class="inline-code">POST /api/assistant/sessions</code> (create, scoped to a <code class="inline-code">contractId</code>) / <code class="inline-code">POST /api/assistant/sessions/:id/messages</code> (send a message, get the latest reply).</p>
+<p><strong>Why/How:</strong> Same pattern as Phase 6&#39;s chat endpoints, one layer up.</p>
+<p><strong>Common mistake to avoid:</strong> Passing <code class="inline-code">contractId</code>/<code class="inline-code">analysisRunId</code>/<code class="inline-code">chatSessionId</code> explicitly in the request body on every message. Per Concept Learning 2.6&#39;s sharp correctness note, only the <em>first</em> message of a session should ever set <code class="inline-code">contractId</code>; every later message should send only the new text and let the checkpointer supply everything else.</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<ol>
+<li><strong>Run the migration</strong> below to create <code class="inline-code">assistant_sessions</code>.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/runAnalysis.ts</code></strong> — extract <code class="inline-code">runAnalysisForContract()</code> from Phase 4&#39;s route, and update that route to call it.</li>
+<li><strong>Implement <code class="inline-code">src/supervisor/state.ts</code></strong> — <code class="inline-code">SupervisorState</code>.</li>
+<li><strong>Implement <code class="inline-code">src/supervisor/routingSchema.ts</code></strong> and <strong><code class="inline-code">src/supervisor/nodes/supervisorNode.ts</code></strong>.</li>
+<li><strong>Implement <code class="inline-code">src/supervisor/nodes/riskAnalyzerNode.ts</code></strong>.</li>
+<li><strong>Implement <code class="inline-code">src/supervisor/nodes/researchAgentNode.ts</code></strong>.</li>
+<li><strong>Implement <code class="inline-code">src/supervisor/nodes/chatAssistantNode.ts</code></strong>.</li>
+<li><strong>Implement <code class="inline-code">src/supervisor/nodes/reportGeneratorNode.ts</code></strong>.</li>
+<li><strong>Implement <code class="inline-code">src/supervisor/graph.ts</code></strong> — wire all five nodes, compile with the shared checkpointer.</li>
+<li><strong>Implement <code class="inline-code">src/supervisor/sessions.ts</code></strong> and <strong><code class="inline-code">src/routes/assistant.ts</code></strong>, and wire the router into your Express app.</li>
+<li><strong>Test single-specialist routing</strong>: create a session for a contract with no analysis yet, send &quot;please analyze this contract,&quot; and confirm the graph routes to <code class="inline-code">risk_analyzer</code>, an <code class="inline-code">analysisRunId</code> gets set in state, and the reply summarizes the result.</li>
+<li><strong>Test multi-hop routing in one turn&#39;s worth of graph execution</strong>: send a message that plausibly implies two steps (&quot;analyze this contract and then give me a downloadable report&quot;) and confirm the graph loops <code class="inline-code">supervisor → risk_analyzer → supervisor → report_generator → supervisor → END</code> within one <code class="inline-code">.invoke()</code> call, without exceeding your <code class="inline-code">recursionLimit</code>.</li>
+<li><strong>Test the chat handoff across separate requests</strong>: after an analysis has run (state now has <code class="inline-code">analysisRunId</code>), send &quot;can I ask some questions about the findings?&quot; on a new turn, confirm it routes to <code class="inline-code">chat_assistant</code>, and confirm a <code class="inline-code">chatSessionId</code> is set and reused on subsequent chat-routed turns rather than a new session being created every time.</li>
+<li><strong>Test a precondition failure</strong>: on a brand-new session with no <code class="inline-code">contractId</code>/<code class="inline-code">analysisRunId</code> set, send &quot;tell me about the termination clause&quot; and confirm <code class="inline-code">chat_assistant</code> (or the supervisor itself) responds honestly that there&#39;s no completed analysis yet, rather than erroring or fabricating an answer.</li>
+<li><strong>Confirm each specialist&#39;s own audit/history features still work unchanged</strong> — after Task 11, call Phase 4&#39;s <code class="inline-code">GET /api/analysis/:threadId/history</code> on the <code class="inline-code">analysisRunId</code> the Supervisor produced, and confirm it behaves exactly as it did when triggered directly, unaffected by having been triggered through the Supervisor.</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<h3 id="61-environment-variables-append-to-env"><a class="heading-anchor" href="#61-environment-variables-append-to-env" aria-hidden="true">#</a>6.1 Environment variables (append to <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">SUPERVISOR_MODEL=gpt-4o-mini
+SUPERVISOR_RECURSION_LIMIT=12</code></pre></div>
+<h3 id="62-database-migration"><a class="heading-anchor" href="#62-database-migration" aria-hidden="true">#</a>6.2 Database migration</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">sql</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-sql"><span class="hljs-comment">-- migrations/009_assistant_sessions.sql</span>
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> assistant_sessions (
+    id            UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    contract_id   UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> contracts(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    thread_id     TEXT <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">UNIQUE</span>,   <span class="hljs-comment">-- namespaced, e.g. &quot;supervisor-&lt;uuid&gt;&quot;</span>
+    created_at    TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_assistant_sessions_contract_id <span class="hljs-keyword">ON</span> assistant_sessions (contract_id);</code></pre></div>
+<h3 id="63-extracting-the-reusable-analysis-trigger-helper"><a class="heading-anchor" href="#63-extracting-the-reusable-analysis-trigger-helper" aria-hidden="true">#</a>6.3 Extracting the reusable analysis-trigger helper</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/runAnalysis.ts</span>
+<span class="hljs-keyword">import</span> { randomUUID } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;crypto&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { analysisGraph } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./graph&quot;</span>;
+<span class="hljs-keyword">import</span> { getFindingsForRun } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./storage&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-comment">/**
+ * Extracted from Phase 4&#x27;s POST /analysis/start route so the Supervisor&#x27;s
+ * risk_analyzer node can trigger the exact same behavior without
+ * duplicating this logic - Phase 4&#x27;s route now calls this too, so there is
+ * exactly one place this logic lives.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">runAnalysisForContract</span>(<span class="hljs-params"><span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT id, clause_type, title, full_text FROM clauses WHERE contract_id = $1`</span>,
+    [contractId]
+  );
+  <span class="hljs-keyword">if</span> (rows.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`No extracted clauses found for contract <span class="hljs-subst">${contractId}</span>.`</span>);
+  }
+
+  <span class="hljs-keyword">const</span> analysisRunId = <span class="hljs-title function_">randomUUID</span>();
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: analysisRunId } };
+
+  <span class="hljs-keyword">await</span> analysisGraph.<span class="hljs-title function_">invoke</span>(
+    {
+      contractId,
+      analysisRunId,
+      <span class="hljs-attr">clauses</span>: rows.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> ({
+        <span class="hljs-attr">id</span>: r.<span class="hljs-property">id</span>,
+        <span class="hljs-attr">clauseType</span>: r.<span class="hljs-property">clause_type</span>,
+        <span class="hljs-attr">title</span>: r.<span class="hljs-property">title</span>,
+        <span class="hljs-attr">fullText</span>: r.<span class="hljs-property">full_text</span>,
+        <span class="hljs-attr">docGroups</span>: [],
+      })),
+    },
+    config
+  );
+
+  <span class="hljs-keyword">const</span> findings = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getFindingsForRun</span>(analysisRunId);
+  <span class="hljs-keyword">return</span> { analysisRunId, findings };
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/routes/analysis.ts (excerpt - the existing route now delegates)</span>
+<span class="hljs-keyword">import</span> { runAnalysisForContract } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../analysis/runAnalysis&quot;</span>;
+
+analysisRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/contracts/:id/analysis/start&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> { analysisRunId, findings } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">runAnalysisForContract</span>(req.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">201</span>).<span class="hljs-title function_">json</span>({ analysisRunId, findings });
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Risk analysis failed:&quot;</span>, err);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: (err <span class="hljs-keyword">as</span> <span class="hljs-title class_">Error</span>).<span class="hljs-property">message</span> });
+  }
+});</code></pre></div>
+<h3 id="64-supervisor-state-schema"><a class="heading-anchor" href="#64-supervisor-state-schema" aria-hidden="true">#</a>6.4 Supervisor state schema</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/state.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Annotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">BaseMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+
+<span class="hljs-comment">/**
+ * A federated state: the Supervisor tracks REFERENCES to each specialist&#x27;s
+ * own durable data (analysisRunId, chatSessionId), not the detailed data
+ * itself - every specialist already owns and persists its own detail
+ * (Concept Learning 2.6). Every field below except `messages` uses a
+ * replace reducer; an omitted key on any given update leaves it untouched,
+ * which is what lets a client send only new message text on later turns
+ * without accidentally clearing a previously-set analysisRunId.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">SupervisorState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">messages</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">BaseMessage</span>[]&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">existing, incoming</span>) =&gt;</span> existing.<span class="hljs-title function_">concat</span>(incoming),
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> [],
+  }),
+  <span class="hljs-attr">contractId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_e, i</span>) =&gt;</span> i, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span> }),
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_e, i</span>) =&gt;</span> i, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span> }),
+  <span class="hljs-attr">chatSessionId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_e, i</span>) =&gt;</span> i, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span> }),
+  <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt;({ <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_e, i</span>) =&gt;</span> i, <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span> }),
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">SupervisorStateType</span> = <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">SupervisorState</span>.<span class="hljs-property">State</span>;</code></pre></div>
+<h3 id="65-routing-schema-and-the-supervisor-node"><a class="heading-anchor" href="#65-routing-schema-and-the-supervisor-node" aria-hidden="true">#</a>6.5 Routing schema and the <code class="inline-code">supervisor</code> node</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/routingSchema.ts</span>
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">RoutingDecisionSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">next</span>: z
+    .<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;risk_analyzer&quot;</span>, <span class="hljs-string">&quot;research_agent&quot;</span>, <span class="hljs-string">&quot;chat_assistant&quot;</span>, <span class="hljs-string">&quot;report_generator&quot;</span>, <span class="hljs-string">&quot;FINISH&quot;</span>])
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Which specialist should act next, or FINISH if nothing further is needed right now&quot;</span>),
+  <span class="hljs-attr">instructionForAgent</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A short, specific instruction for the chosen specialist, based on the conversation so far&quot;</span>),
+  <span class="hljs-attr">responseIfFinished</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">nullable</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;If next is FINISH, the direct reply to send the user now. Null otherwise.&quot;</span>),
+});
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">RoutingDecision</span> = z.<span class="hljs-property">infer</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">RoutingDecisionSchema</span>&gt;;</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/nodes/supervisorNode.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span>, <span class="hljs-title class_">MessagesPlaceholder</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Command</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">RoutingDecisionSchema</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../routingSchema&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">SupervisorStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">SUPERVISOR_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> routingPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;You coordinate a team of contract-analysis specialists:\n&quot;</span> +
+      <span class="hljs-string">&quot;- risk_analyzer: runs a full risk analysis on the contract (use when &quot;</span> +
+      <span class="hljs-string">&quot;  none has run yet, or the user explicitly asks to (re-)analyze).\n&quot;</span> +
+      <span class="hljs-string">&quot;- research_agent: looks up legal grounding (case law/precedent) for a &quot;</span> +
+      <span class="hljs-string">&quot;  specific clause or concern the user describes, on demand.\n&quot;</span> +
+      <span class="hljs-string">&quot;- chat_assistant: answers questions about an ALREADY-COMPLETED &quot;</span> +
+      <span class="hljs-string">&quot;  analysis&#x27;s findings. Requires an analysis to already exist.\n&quot;</span> +
+      <span class="hljs-string">&quot;- report_generator: produces a downloadable report from an &quot;</span> +
+      <span class="hljs-string">&quot;  ALREADY-COMPLETED analysis. Requires an analysis to already exist.\n&quot;</span> +
+      <span class="hljs-string">&quot;- FINISH: nothing further is needed right now; reply directly.\n\n&quot;</span> +
+      <span class="hljs-string">&quot;Current state: analysis {analysisStatus}; chat session {chatStatus}.\n&quot;</span> +
+      <span class="hljs-string">&quot;Choose exactly one next step based on the conversation.&quot;</span>,
+  ],
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessagesPlaceholder</span>(<span class="hljs-string">&quot;messages&quot;</span>),
+]);
+
+<span class="hljs-keyword">const</span> routingChain = routingPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">RoutingDecisionSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;route_request&quot;</span> })
+);
+
+<span class="hljs-comment">/**
+ * The Supervisor&#x27;s only two jobs: read the conversation, decide who acts
+ * next. It never does domain work itself. Returns a Command so the routing
+ * decision and its accompanying instruction are produced and applied in
+ * one place (Concept Learning 2.3), rather than split between this node&#x27;s
+ * return value and a separate conditional-edge function.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">supervisorNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">SupervisorStateType</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Command</span>&gt; {
+  <span class="hljs-keyword">const</span> decision = <span class="hljs-keyword">await</span> routingChain.<span class="hljs-title function_">invoke</span>({
+    <span class="hljs-attr">messages</span>: state.<span class="hljs-property">messages</span>,
+    <span class="hljs-attr">analysisStatus</span>: state.<span class="hljs-property">analysisRunId</span> ? <span class="hljs-string">`active (<span class="hljs-subst">${state.analysisRunId}</span>)`</span> : <span class="hljs-string">&quot;none yet&quot;</span>,
+    <span class="hljs-attr">chatStatus</span>: state.<span class="hljs-property">chatSessionId</span> ? <span class="hljs-string">`active (<span class="hljs-subst">${state.chatSessionId}</span>)`</span> : <span class="hljs-string">&quot;none yet&quot;</span>,
+  });
+
+  <span class="hljs-keyword">if</span> (decision.<span class="hljs-property">next</span> === <span class="hljs-string">&quot;FINISH&quot;</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+      <span class="hljs-attr">goto</span>: <span class="hljs-variable constant_">END</span>,
+      <span class="hljs-attr">update</span>: {
+        <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(decision.<span class="hljs-property">responseIfFinished</span> ?? <span class="hljs-string">&quot;Let me know how else I can help.&quot;</span>)],
+      },
+    });
+  }
+
+  <span class="hljs-comment">// Intermediate handoffs stay silent to the user - the instruction is</span>
+  <span class="hljs-comment">// carried via pendingInstruction, not appended as a visible message.</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+    <span class="hljs-attr">goto</span>: decision.<span class="hljs-property">next</span>,
+    <span class="hljs-attr">update</span>: { <span class="hljs-attr">pendingInstruction</span>: decision.<span class="hljs-property">instructionForAgent</span> },
+  });
+}</code></pre></div>
+<h3 id="66-specialist-nodes"><a class="heading-anchor" href="#66-specialist-nodes" aria-hidden="true">#</a>6.6 Specialist nodes</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/nodes/riskAnalyzerNode.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Command</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { runAnalysisForContract } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../../analysis/runAnalysis&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">SupervisorStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">riskAnalyzerNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">SupervisorStateType</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Command</span>&gt; {
+  <span class="hljs-keyword">if</span> (!state.<span class="hljs-property">contractId</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+      <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;supervisor&quot;</span>,
+      <span class="hljs-attr">update</span>: {
+        <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-literal">null</span>,
+        <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(<span class="hljs-string">&quot;I don&#x27;t have a contract to analyze in this session yet.&quot;</span>)],
+      },
+    });
+  }
+
+  <span class="hljs-keyword">const</span> { analysisRunId, findings } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">runAnalysisForContract</span>(state.<span class="hljs-property">contractId</span>);
+  <span class="hljs-keyword">const</span> highCount = findings.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">f</span>: <span class="hljs-built_in">any</span></span>) =&gt;</span> f.<span class="hljs-property">risk_level</span> === <span class="hljs-string">&quot;HIGH&quot;</span>).<span class="hljs-property">length</span>;
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+    <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;supervisor&quot;</span>,
+    <span class="hljs-attr">update</span>: {
+      analysisRunId,
+      <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-literal">null</span>,
+      <span class="hljs-attr">messages</span>: [
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(
+          <span class="hljs-string">`I&#x27;ve completed the risk analysis - <span class="hljs-subst">${findings.length}</span> clauses reviewed, `</span> +
+            <span class="hljs-string">`<span class="hljs-subst">${highCount}</span> flagged HIGH risk. Want a summary, a downloadable report, or to ask follow-up questions?`</span>
+        ),
+      ],
+    },
+  });
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/nodes/researchAgentNode.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Command</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { runResearchReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../../research/reactAgentVersion&quot;</span>;
+<span class="hljs-keyword">import</span> { distillAgentOutcome } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../../research/outcomeParsing&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">SupervisorStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">lastHumanText</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">SupervisorStateType</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">const</span> lastHuman = [...state.<span class="hljs-property">messages</span>].<span class="hljs-title function_">reverse</span>().<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> m.<span class="hljs-title function_">getType</span>() === <span class="hljs-string">&quot;human&quot;</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> lastHuman?.<span class="hljs-property">content</span> === <span class="hljs-string">&quot;string&quot;</span> ? lastHuman.<span class="hljs-property">content</span> : <span class="hljs-string">&quot;&quot;</span>;
+}
+
+<span class="hljs-comment">/**
+ * Invokes Phase 4.5&#x27;s research agent AD HOC - on demand, for whatever
+ * clause/concern the user just described - rather than only automatically
+ * per HIGH-risk clause during a full analysis run.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">researchAgentNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">SupervisorStateType</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Command</span>&gt; {
+  <span class="hljs-keyword">const</span> concern = state.<span class="hljs-property">pendingInstruction</span> || <span class="hljs-title function_">lastHumanText</span>(state);
+
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">runResearchReactAgent</span>(concern, <span class="hljs-string">&quot;The user is asking for legal research assistance directly.&quot;</span>);
+  <span class="hljs-keyword">const</span> outcome = <span class="hljs-keyword">await</span> <span class="hljs-title function_">distillAgentOutcome</span>(result.<span class="hljs-property">messages</span>);
+
+  <span class="hljs-keyword">const</span> summary = outcome.<span class="hljs-property">reviewFlagged</span>
+    ? <span class="hljs-string">`I couldn&#x27;t find sufficient legal grounding for this: <span class="hljs-subst">${outcome.reviewReason}</span>`</span>
+    : <span class="hljs-string">`Here&#x27;s what I found: <span class="hljs-subst">${outcome.references.map((r) =&gt; <span class="hljs-string">`<span class="hljs-subst">${r.sourceDocument}</span> — <span class="hljs-subst">${r.excerpt}</span>`</span>).join(<span class="hljs-string">&quot;; &quot;</span>)}</span>`</span>;
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+    <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;supervisor&quot;</span>,
+    <span class="hljs-attr">update</span>: { <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-literal">null</span>, <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(summary)] },
+  });
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/nodes/chatAssistantNode.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Command</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { createChatSession, getChatSession } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../../chat/sessions&quot;</span>;
+<span class="hljs-keyword">import</span> { sendChatMessage } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../../chat/agent&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">SupervisorStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">lastHumanText</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">SupervisorStateType</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">const</span> lastHuman = [...state.<span class="hljs-property">messages</span>].<span class="hljs-title function_">reverse</span>().<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> m.<span class="hljs-title function_">getType</span>() === <span class="hljs-string">&quot;human&quot;</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> lastHuman?.<span class="hljs-property">content</span> === <span class="hljs-string">&quot;string&quot;</span> ? lastHuman.<span class="hljs-property">content</span> : <span class="hljs-string">&quot;&quot;</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">chatAssistantNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">SupervisorStateType</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Command</span>&gt; {
+  <span class="hljs-keyword">if</span> (!state.<span class="hljs-property">analysisRunId</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+      <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;supervisor&quot;</span>,
+      <span class="hljs-attr">update</span>: {
+        <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-literal">null</span>,
+        <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(<span class="hljs-string">&quot;I don&#x27;t have a completed analysis to discuss yet - want me to run one first?&quot;</span>)],
+      },
+    });
+  }
+
+  <span class="hljs-comment">// Reuses Phase 6&#x27;s chat session per Supervisor conversation - created</span>
+  <span class="hljs-comment">// once, then reused on every later chat-routed turn rather than starting</span>
+  <span class="hljs-comment">// a fresh, memory-less session each time.</span>
+  <span class="hljs-keyword">let</span> chatSessionId = state.<span class="hljs-property">chatSessionId</span>;
+  <span class="hljs-keyword">if</span> (!chatSessionId) {
+    <span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> <span class="hljs-title function_">createChatSession</span>(state.<span class="hljs-property">analysisRunId</span>, state.<span class="hljs-property">contractId</span>!);
+    chatSessionId = session.<span class="hljs-property">id</span>;
+  }
+
+  <span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getChatSession</span>(chatSessionId);
+  <span class="hljs-keyword">const</span> reply = <span class="hljs-keyword">await</span> <span class="hljs-title function_">sendChatMessage</span>(session.<span class="hljs-property">thread_id</span>, session.<span class="hljs-property">analysis_run_id</span>, <span class="hljs-title function_">lastHumanText</span>(state));
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+    <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;supervisor&quot;</span>,
+    <span class="hljs-attr">update</span>: { chatSessionId, <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-literal">null</span>, <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(reply)] },
+  });
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/nodes/reportGeneratorNode.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Command</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { generateReportWorkflow } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../../reports/workflow&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">SupervisorStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">reportGeneratorNode</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">SupervisorStateType</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Command</span>&gt; {
+  <span class="hljs-keyword">if</span> (!state.<span class="hljs-property">analysisRunId</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+      <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;supervisor&quot;</span>,
+      <span class="hljs-attr">update</span>: {
+        <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-literal">null</span>,
+        <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(<span class="hljs-string">&quot;I don&#x27;t have a completed analysis to build a report from yet.&quot;</span>)],
+      },
+    });
+  }
+
+  <span class="hljs-keyword">const</span> record = <span class="hljs-keyword">await</span> generateReportWorkflow.<span class="hljs-title function_">invoke</span>(
+    { <span class="hljs-attr">analysisRunId</span>: state.<span class="hljs-property">analysisRunId</span> },
+    { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">`report-<span class="hljs-subst">${state.analysisRunId}</span>`</span> } }
+  );
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Command</span>({
+    <span class="hljs-attr">goto</span>: <span class="hljs-string">&quot;supervisor&quot;</span>,
+    <span class="hljs-attr">update</span>: {
+      <span class="hljs-attr">pendingInstruction</span>: <span class="hljs-literal">null</span>,
+      <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(<span class="hljs-string">`Your report is ready: /api/reports/<span class="hljs-subst">${record.id}</span>/download`</span>)],
+    },
+  });
+}</code></pre></div>
+<h3 id="67-graph-construction"><a class="heading-anchor" href="#67-graph-construction" aria-hidden="true">#</a>6.7 Graph construction</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/graph.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-variable constant_">START</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">PostgresSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-postgres&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">SupervisorState</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./state&quot;</span>;
+<span class="hljs-keyword">import</span> { supervisorNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/supervisorNode&quot;</span>;
+<span class="hljs-keyword">import</span> { riskAnalyzerNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/riskAnalyzerNode&quot;</span>;
+<span class="hljs-keyword">import</span> { researchAgentNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/researchAgentNode&quot;</span>;
+<span class="hljs-keyword">import</span> { chatAssistantNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/chatAssistantNode&quot;</span>;
+<span class="hljs-keyword">import</span> { reportGeneratorNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/reportGeneratorNode&quot;</span>;
+
+<span class="hljs-comment">// The same checkpointer backend already running for Phase 4/5/6 - the</span>
+<span class="hljs-comment">// Supervisor&#x27;s own thread IDs are namespaced (&quot;supervisor-&lt;uuid&gt;&quot;) when</span>
+<span class="hljs-comment">// created, so they never collide with analysis-run or chat-session IDs in</span>
+<span class="hljs-comment">// these shared tables.</span>
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-title class_">PostgresSaver</span>.<span class="hljs-title function_">fromConnString</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span>!);
+
+<span class="hljs-comment">/**
+ * Only ONE fixed edge (START -&gt; supervisor). Every other transition is
+ * decided at runtime by each node&#x27;s own Command return value - there is
+ * nothing to declare between &quot;supervisor&quot; and any specialist, or back,
+ * because that decision only exists once the node&#x27;s own logic has run.
+ */</span>
+<span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">SupervisorState</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;supervisor&quot;</span>, supervisorNode, {
+    <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;risk_analyzer&quot;</span>, <span class="hljs-string">&quot;research_agent&quot;</span>, <span class="hljs-string">&quot;chat_assistant&quot;</span>, <span class="hljs-string">&quot;report_generator&quot;</span>, <span class="hljs-string">&quot;__end__&quot;</span>],
+  })
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;risk_analyzer&quot;</span>, riskAnalyzerNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;supervisor&quot;</span>] })
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;research_agent&quot;</span>, researchAgentNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;supervisor&quot;</span>] })
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;chat_assistant&quot;</span>, chatAssistantNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;supervisor&quot;</span>] })
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;report_generator&quot;</span>, reportGeneratorNode, { <span class="hljs-attr">ends</span>: [<span class="hljs-string">&quot;supervisor&quot;</span>] })
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;supervisor&quot;</span>);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> supervisorGraph = graph.<span class="hljs-title function_">compile</span>({ checkpointer });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">SUPERVISOR_RECURSION_LIMIT</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">SUPERVISOR_RECURSION_LIMIT</span> ?? <span class="hljs-number">12</span>);</code></pre></div>
+<h3 id="68-session-persistence-and-routes"><a class="heading-anchor" href="#68-session-persistence-and-routes" aria-hidden="true">#</a>6.8 Session persistence and routes</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/supervisor/sessions.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { randomUUID } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;crypto&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">createAssistantSession</span>(<span class="hljs-params"><span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> threadId = <span class="hljs-string">`supervisor-<span class="hljs-subst">${randomUUID()}</span>`</span>;
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`INSERT INTO assistant_sessions (contract_id, thread_id) VALUES ($1, $2) RETURNING *`</span>,
+    [contractId, threadId]
+  );
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>];
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getAssistantSession</span>(<span class="hljs-params"><span class="hljs-attr">sessionId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(<span class="hljs-string">`SELECT * FROM assistant_sessions WHERE id = $1`</span>, [sessionId]);
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>] ?? <span class="hljs-literal">null</span>;
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/routes/assistant.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Router</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;express&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { supervisorGraph, <span class="hljs-variable constant_">SUPERVISOR_RECURSION_LIMIT</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../supervisor/graph&quot;</span>;
+<span class="hljs-keyword">import</span> { createAssistantSession, getAssistantSession } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../supervisor/sessions&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> assistantRouter = <span class="hljs-title class_">Router</span>();
+
+assistantRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/assistant/sessions&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { contractId } = req.<span class="hljs-property">body</span>;
+  <span class="hljs-keyword">if</span> (!contractId) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">400</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;contractId is required.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> <span class="hljs-title function_">createAssistantSession</span>(contractId);
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">201</span>).<span class="hljs-title function_">json</span>({ session });
+});
+
+assistantRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/assistant/sessions/:sessionId/messages&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { sessionId } = req.<span class="hljs-property">params</span>;
+  <span class="hljs-keyword">const</span> { message } = req.<span class="hljs-property">body</span>;
+
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> message !== <span class="hljs-string">&quot;string&quot;</span> || message.<span class="hljs-title function_">trim</span>().<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">400</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;message is required.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getAssistantSession</span>(sessionId);
+  <span class="hljs-keyword">if</span> (!session) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Assistant session not found.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> config = {
+    <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: session.<span class="hljs-property">thread_id</span> },
+    <span class="hljs-attr">recursionLimit</span>: <span class="hljs-variable constant_">SUPERVISOR_RECURSION_LIMIT</span>,
+  };
+
+  <span class="hljs-comment">// Only the FIRST message of a session needs to set contractId - every</span>
+  <span class="hljs-comment">// later turn sends only new message text, per Concept Learning 2.6&#x27;s</span>
+  <span class="hljs-comment">// correctness note: an omitted key leaves the checkpointed value</span>
+  <span class="hljs-comment">// untouched, but an explicitly-included null would overwrite it.</span>
+  <span class="hljs-keyword">const</span> priorState = <span class="hljs-keyword">await</span> supervisorGraph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-keyword">const</span> input = priorState.<span class="hljs-property">values</span>?.<span class="hljs-property">contractId</span>
+    ? { <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(message)] }
+    : { <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(message)], <span class="hljs-attr">contractId</span>: session.<span class="hljs-property">contract_id</span> };
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> supervisorGraph.<span class="hljs-title function_">invoke</span>(input, config);
+    <span class="hljs-keyword">const</span> lastMessage = result.<span class="hljs-property">messages</span>[result.<span class="hljs-property">messages</span>.<span class="hljs-property">length</span> - <span class="hljs-number">1</span>];
+    <span class="hljs-keyword">const</span> reply = <span class="hljs-keyword">typeof</span> lastMessage.<span class="hljs-property">content</span> === <span class="hljs-string">&quot;string&quot;</span> ? lastMessage.<span class="hljs-property">content</span> : <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(lastMessage.<span class="hljs-property">content</span>);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ reply });
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Assistant message failed:&quot;</span>, err);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Failed to process message.&quot;</span> });
+  }
+});</code></pre></div>
+<p>Wire it in:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/app.ts (excerpt)</span>
+<span class="hljs-keyword">import</span> { assistantRouter } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./routes/assistant&quot;</span>;
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api&quot;</span>, assistantRouter);</code></pre></div>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── src/
+│   ├── analysis/
+│   │   ├── runAnalysis.ts        (new - extracted helper)
+│   │   └── ...                    (Phase 4, unchanged otherwise)
+│   ├── supervisor/
+│   │   ├── state.ts
+│   │   ├── routingSchema.ts
+│   │   ├── sessions.ts
+│   │   ├── graph.ts
+│   │   └── nodes/
+│   │       ├── supervisorNode.ts
+│   │       ├── riskAnalyzerNode.ts
+│   │       ├── researchAgentNode.ts
+│   │       ├── chatAssistantNode.ts
+│   │       └── reportGeneratorNode.ts
+│   ├── routes/
+│   │   └── assistant.ts
+│   └── app.ts
+├── migrations/
+│   └── 009_assistant_sessions.sql</code></pre></div>
+<h3 id="request-flow--one-multi-hop-turn"><a class="heading-anchor" href="#request-flow--one-multi-hop-turn" aria-hidden="true">#</a>Request flow — one multi-hop turn</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">POST /api/assistant/sessions/:id/messages   { message: &quot;Analyze this contract and send me a report.&quot; }
+  │
+  ▼
+supervisorGraph.invoke({ messages: [HumanMessage] }, { thread_id, recursionLimit })
+  │
+  ├─ supervisor    — LLM routing decision → Command(goto: &quot;risk_analyzer&quot;)
+  ├─ risk_analyzer — runs Phase 4&#x27;s full graph → Command(goto: &quot;supervisor&quot;, update: { analysisRunId })
+  ├─ supervisor    — sees analysisRunId is now set → Command(goto: &quot;report_generator&quot;)
+  ├─ report_generator — runs Phase 5&#x27;s workflow → Command(goto: &quot;supervisor&quot;, update: { messages: [download link] })
+  ├─ supervisor    — nothing further needed → Command(goto: END, update: { messages: [final reply] })
+  ▼
+HTTP 200 { reply: &quot;Your report is ready: /api/reports/.../download&quot; }</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong><code class="inline-code">Command</code>-based peer nodes over tool-wrapped specialists:</strong> the shared context here is genuinely structured (multiple IDs that must flow precisely between specialists), which <code class="inline-code">Command</code>&#39;s combined update-and-route return handles more precisely than a tool call&#39;s string result — see Concept Learning 2.2–2.3.</li>
+<li><strong>Plain-node invocation over true subgraph nesting:</strong> every specialist&#39;s state shape exists to serve that specialist&#39;s own internal needs and has little in common with any other specialist&#39;s — forcing a shared schema would cost more in adapter code than it would return in checkpoint-visibility benefit, a conclusion reached by actually testing it against this phase&#39;s real specialists rather than assumed upfront (Concept Learning 2.5).</li>
+<li><strong>Federated state (IDs only) over centralizing all detail in the Supervisor:</strong> keeps the Supervisor&#39;s own state — and therefore every checkpoint of it — small and stable regardless of how much detailed data any one specialist produces, consistent with every specialist already owning its own durable storage.</li>
+<li><strong>A single fixed edge (<code class="inline-code">START → supervisor</code>) with everything else dynamic:</strong> accurately reflects that no other transition in this graph is actually knowable ahead of time — it&#39;s a genuine runtime decision, not something a fixed edge could correctly express.</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Keep the Supervisor&#39;s own logic limited to routing — the moment a Supervisor starts doing domain work itself (rather than delegating), you&#39;ve lost the clean separation that makes each specialist independently testable and independently correct.</li>
+<li>Set an explicit <code class="inline-code">recursionLimit</code> on every Supervisor invocation — the same required-not-optional reasoning as any agent loop, now one level up, since a Supervisor bouncing between itself and specialists is exactly that shape of risk.</li>
+<li>Keep intermediate routing decisions invisible to the end user (Step 4&#39;s best practice) — only surface messages that are genuinely worth the user reading.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li>Each specialist remains independently scalable exactly as it was before this phase — Phase 4&#39;s <code class="inline-code">Send()</code>-based fan-out, Phase 6&#39;s per-session agent construction — since the Supervisor only ever calls into them, never replaces their internals.</li>
+<li>A conversation that legitimately needs many hops (several analyses, several report regenerations) is still bounded by <code class="inline-code">recursionLimit</code>; if real usage ever needs more hops than feels safe to allow in one blocking request, that&#39;s a concrete signal for Phase 7&#39;s streaming/async work rather than simply raising the limit.</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Validate that the requesting user owns the <code class="inline-code">contractId</code> a session is created for, once auth exists — the same open item carried forward from every prior phase, now consolidated at a single front door rather than scattered across four.</li>
+<li>Because the Supervisor is now the primary way users reach every specialist, this is also the single most important place to eventually add rate limiting and request validation — one well-guarded entry point is easier to secure than four separate ones.</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li>Specialist nodes do no redundant work — <code class="inline-code">risk_analyzer</code> calls the exact same <code class="inline-code">runAnalysisForContract</code> helper Phase 4&#39;s own route calls, so there&#39;s no separate, slower &quot;Supervisor version&quot; of any capability to maintain or that could drift in performance characteristics from the direct-call path.</li>
+<li><code class="inline-code">chat_assistant</code>&#39;s session reuse (create once, reuse on every later chat-routed turn) avoids the cost and memory-loss of starting a fresh chat session on every single routed message.</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Adding a fifth specialist later is: write one node function following the same <code class="inline-code">Command</code>-return shape, add it to the graph, add its name to the routing schema&#39;s enum and the supervisor prompt&#39;s specialist list. No other node changes — the same &quot;extend the enum, add the array entry&quot; pattern every prior phase has followed for its own extensibility points.</li>
+<li>Because Phase 4&#39;s route now calls the same helper the Supervisor calls, any future improvement to how analysis is triggered (e.g., adding a progress callback) benefits both call paths automatically.</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test the <code class="inline-code">supervisor</code> node&#39;s routing logic directly against constructed message-history fixtures (no real specialists involved) — assert it routes to <code class="inline-code">risk_analyzer</code> when no analysis exists yet and the user asks to analyze, and to <code class="inline-code">chat_assistant</code> once <code class="inline-code">analysisRunId</code> is set and the user asks a findings question.</li>
+<li>Integration test a full multi-hop conversation against a fixture contract, asserting the final <code class="inline-code">assistant_sessions</code>-scoped conversation ends with both an <code class="inline-code">analysisRunId</code> and (if requested) a <code class="inline-code">generated_reports</code> row, exactly as if each step had been triggered directly through its own Phase 4/5/6 endpoint.</li>
+<li>Explicitly test the &quot;omitted key vs. explicit null&quot; behavior from Concept Learning 2.6 — send a second turn that does NOT include <code class="inline-code">contractId</code> and assert the checkpointed value survives; this is exactly the kind of subtle correctness bug that&#39;s easy to reintroduce during a future refactor.</li>
+<li>Re-run Phase 4&#39;s, Phase 5&#39;s, and Phase 6&#39;s own existing tests unchanged after this phase — confirm every specialist&#39;s direct-call behavior (and audit endpoints) is completely unaffected by also being reachable through the Supervisor.</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>What a Supervisor actually does (route) and deliberately does not do (any domain work), and why that separation is what makes a multi-agent system meaningfully different from one larger agent with more tools.</li>
+<li><code class="inline-code">Command</code> as the mechanism for a node to bundle its own state update with its own routing decision — finally putting to use the concept Phase 4 introduced and deliberately deferred, once there was a genuinely dynamic, LLM-driven routing decision that needed it.</li>
+<li>A real, tested answer to &quot;plain-node invocation vs. true subgraph nesting,&quot; reached by actually examining what reconciling this phase&#39;s specific specialists&#39; state shapes would cost, rather than assuming the answer in the abstract.</li>
+<li>Why a Supervisor&#39;s own state should be federated — carrying references to each specialist&#39;s independently durable data, not duplicating that data — and the sharp, easy-to-miss correctness implication that follows from LangGraph&#39;s &quot;omitted key means no change&quot; update semantics.</li>
+<li>How every specialist this project already built (Phase 4&#39;s graph, Phase 4.5&#39;s agent, Phase 5&#39;s workflow, Phase 6&#39;s chat agent) turned out to be composable into a larger system with zero changes to their own internals — the direct payoff of each of those phases having been given a clean, well-scoped interface in the first place.</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li><code class="inline-code">assistant_sessions</code> table and storage layer.</li>
+<li>A reusable <code class="inline-code">runAnalysisForContract()</code> helper, shared between Phase 4&#39;s direct route and this phase&#39;s <code class="inline-code">risk_analyzer</code> specialist.</li>
+<li><code class="inline-code">SupervisorState</code>, a <code class="inline-code">Command</code>-driven routing node, and four specialist nodes, each invoking an already-built, already-correct component from Phases 4 through 6.</li>
+<li>A compiled, checkpointed Supervisor graph, and the session-creation/message-send endpoints that make it the single front door to the whole project&#39;s capabilities.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Running the hands-on tasks against real multi-turn, multi-hop conversations and validating routing correctness, session reuse, and precondition-handling (tasks 11-15 — yours to execute).</li>
+<li>Everything from Phase 7 onward, which builds on a Supervisor that currently returns one blocking response per request even when several specialists ran in sequence to produce it.</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+Phase 7 (streaming/async progress) is the natural next step precisely because this phase can now produce genuinely multi-hop responses — &quot;analyze, then report&quot; might take real, noticeable time, all inside one blocking HTTP request with nothing shown to the user until it&#39;s completely finished. Phase 7 builds on this phase&#39;s graph structure directly: LangGraph&#39;s <code class="inline-code">.stream()</code> interface (the streaming counterpart to the <code class="inline-code">.invoke()</code> calls used throughout this phase) can emit an update after each node completes — meaning a client could see &quot;analysis complete, 3 HIGH risk clauses found&quot; the moment <code class="inline-code">risk_analyzer</code> hands back to <code class="inline-code">supervisor</code>, well before <code class="inline-code">report_generator</code> finishes. Nothing about this phase&#39;s graph structure needs to change for that; only how the client receives updates from it does.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

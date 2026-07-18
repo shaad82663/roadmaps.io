@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 4.5: Legal Research Agent</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 4.5: Legal Research Agent</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-45-legal-research-agent"><a class="heading-anchor" href="#legaldocs--phase-45-legal-research-agent" aria-hidden="true">#</a>LegalDocs — Phase 4.5: Legal Research Agent</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL (Phase 0/1), LangChain.js (<code class="inline-code">langchain/agents</code>), <strong>LangGraph.js prebuilt agents (<code class="inline-code">createReactAgent</code>, <code class="inline-code">ToolNode</code>)</strong>, Zod
+<strong>Depends on:</strong> Phase 1 (<code class="inline-code">legal_reference_chunks</code> — one of the tools this agent can call), Phase 4 (the <code class="inline-code">judgment_lookup</code> stub node this phase replaces, and the graph/checkpointer/audit infrastructure it slots back into unchanged)
+<strong>Feeds into:</strong> Phase 5 (the Report Generator surfaces this agent&#39;s case-law references and human-review flags in the final report); Phase 6.5 (this agent becomes one of the specialist sub-agents under the Supervisor)</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>Replace Phase 4&#39;s <code class="inline-code">judgment_lookup</code> stub — which always ran the exact same fixed similarity search for every HIGH-risk clause — with a real <strong>agent</strong>: a component that, given a HIGH-risk clause and the reasoning behind its risk score, decides for itself what to do next. Sometimes that means searching Indian Kanoon for a relevant judgment. Sometimes it means a broader search for general case precedent. Sometimes — when nothing turns up sufficient grounding — it means honestly flagging the clause for human review rather than fabricating a citation just to fill the field.</p>
+<p>You&#39;ll build this twice, deliberately: first as a hand-rolled LangChain <code class="inline-code">AgentExecutor</code> running a raw ReAct loop (so you see exactly what &quot;an agent&quot; mechanically is, one reasoning step at a time), and then again using LangGraph&#39;s <code class="inline-code">createReactAgent()</code> prebuilt (so you can directly compare how much of that mechanism a well-designed abstraction can absorb for you). The second version is what actually plugs into Phase 4&#39;s graph.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>Every LLM-powered step you&#39;ve built so far — classification, extraction, risk scoring — has followed a <strong>fixed procedure</strong>: given this specific input, always run these specific steps, in this specific order. That&#39;s appropriate for those tasks, because the <em>right thing to do</em> didn&#39;t depend on what was discovered partway through. Legal research is different. Whether Indian Kanoon has something relevant, whether a general precedent search is more fruitful, or whether nothing usable exists at all — none of that is knowable in advance. A <strong>fixed</strong> node (Phase 4&#39;s stub) can only ever do the one thing it was written to do; an <strong>agentic</strong> node can look at what it just found, decide that it isn&#39;t good enough, and try something else — or decide, honestly, that nothing is good enough and say so.</p>
+<p>This is also the point where &quot;agents and tools,&quot; one of the more talked-about and most-often-misunderstood ideas in modern LLM application development, gets a real, grounded home in your project rather than an abstract definition. Building the same behavior twice — once by hand, once with a framework abstraction — is what turns &quot;an agent is an LLM that can call tools in a loop&quot; from a phrase you&#39;ve heard into something you&#39;ve actually watched happen, one iteration at a time.</p>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">                     Phase 4&#x27;s graph, unchanged in structure:
+                     ... → score_clause → routeByRisk ─┐
+                                                        │ HIGH
+                                                        ▼
+                                            ┌───────────────────────┐
+                                            │   judgment_lookup       │
+                                            │   (this phase replaces  │
+                                            │    the stub body here)  │
+                                            └───────────┬───────────┘
+                                                        │
+                     ┌──────────────────────────────────┼───────────────────┐
+                     │        PHASE 4.5 — Legal Research Agent (internal)     │
+                     │                                                        │
+                     │   agent reasons about the clause + risk finding         │
+                     │        │                                                │
+                     │   ┌────▼─────┐   decides which tool, if any, to call     │
+                     │   │  ReAct    │──────────────┬─────────────┬──────────┐ │
+                     │   │  loop     │              │             │          │ │
+                     │   └────┬─────┘   search_indian_kanoon  search_case   flag_for_   │
+                     │        │              (tool)          _precedent   human_review │
+                     │        │                                (tool)        (tool)    │
+                     │        ▼                                                        │
+                     │   final structured outcome: references[] + reviewFlagged         │
+                     └────────┬───────────────────────────────────────────────────────┘
+                              │
+                     ┌────────▼───────────┐
+                     │  back into Phase 4&#x27;s │
+                     │  currentFinding, then │
+                     │  store_finding as before │
+                     └────────────────────┘</code></pre></div>
+<p>This phase produces no new database tables and adds no new API endpoints — it is purely an internal upgrade to one node&#39;s implementation inside Phase 4&#39;s existing graph. Everything Phase 4 built (state schema, checkpointing, audit trail, the surrounding graph edges) is completely untouched.</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-what-actually-makes-something-quotan-agentquot-as-opposed-to-a-chain-or-a-fixed-graph-node"><a class="heading-anchor" href="#21-what-actually-makes-something-quotan-agentquot-as-opposed-to-a-chain-or-a-fixed-graph-node" aria-hidden="true">#</a>2.1 What actually makes something &quot;an agent,&quot; as opposed to a chain or a fixed graph node</h3>
+<p>Every LLM call you&#39;ve written so far has had the model produce <strong>one final answer to one specific question</strong>, in one shot (<code class="inline-code">withStructuredOutput()</code> calls in Phases 2, 3, and 4 are all this shape — even when wrapped in a bigger pipeline, each individual LLM call is &quot;here&#39;s your input, give me your one output&quot;). An <strong>agent</strong> is structurally different: the model is given a <strong>goal</strong> and a <strong>set of tools it&#39;s allowed to use</strong>, and it is put in a loop where, on each turn, it can either (a) call one of its tools to gather more information, or (b) decide it has enough and produce a final answer. The defining feature isn&#39;t that it uses tools — Phase 4.5&#39;s <code class="inline-code">judgment_lookup</code> stub also technically &quot;used a tool&quot; (a fixed database query) — it&#39;s that <strong>the model itself decides, at runtime, whether and which tool to use, and can change its mind based on what a previous tool call returned.</strong></p>
+<p>Concretely, contrast the stub from Phase 4 with what this phase builds:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Phase 4&#39;s stub</th>
+<th>This phase&#39;s agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What it does for every HIGH-risk clause</td>
+<td>Exactly the same fixed similarity search, always</td>
+<td>Reasons about the specific clause and risk reasoning, then decides</td>
+</tr>
+<tr>
+<td>Can it try something else if the first attempt comes up empty?</td>
+<td>No — one query, whatever it returns is what you get</td>
+<td>Yes — if <code class="inline-code">search_indian_kanoon</code> returns nothing useful, it can try <code class="inline-code">search_case_precedent</code> next</td>
+</tr>
+<tr>
+<td>What happens when nothing relevant exists?</td>
+<td>Silently returns whatever the query matched best, however weak</td>
+<td>Can call <code class="inline-code">flag_for_human_review()</code> and say so honestly</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="22-tools--giving-a-model-a-menu-of-actions-not-just-a-menu-of-words"><a class="heading-anchor" href="#22-tools--giving-a-model-a-menu-of-actions-not-just-a-menu-of-words" aria-hidden="true">#</a>2.2 Tools — giving a model a menu of actions, not just a menu of words</h3>
+<p>A <strong>tool</strong> is a function the model can choose to invoke, described to the model via a name, a natural-language description of what it does, and a schema (built with Zod, exactly like your structured-output schemas from earlier phases) describing what arguments it takes. The model never actually executes the function itself — it only ever outputs a <em>request</em> to call a specific tool with specific arguments; your code is the one that actually runs the function and feeds the result back.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> searchIndianKanoon = <span class="hljs-title function_">tool</span>(
+  <span class="hljs-title function_">async</span> ({ query }: { <span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span> }) =&gt; {
+    <span class="hljs-comment">// ... your code, not the model&#x27;s, actually performs this call</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">callIndianKanoonApi</span>(query);
+  },
+  {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;search_indian_kanoon&quot;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&quot;Search Indian Kanoon for judgments relevant to a specific legal question or clause concern.&quot;</span>,
+    <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({ <span class="hljs-attr">query</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The legal question or concept to search for&quot;</span>) }),
+  }
+);</code></pre></div>
+<p>This is the exact same underlying mechanism as <code class="inline-code">withStructuredOutput()</code> from Phase 2 (constrained, schema-validated output via the model provider&#39;s function-calling API) — the difference is purely how you <em>use</em> the mechanism. <code class="inline-code">withStructuredOutput()</code> uses it to force one final answer into one fixed shape. A tool uses the identical mechanism to let the model request an <em>action</em>, mid-reasoning, whose result it will then see and react to.</p>
+<p>This phase gives the agent three tools:</p>
+<ul>
+<li><strong><code class="inline-code">search_indian_kanoon(query)</code></strong> — searches India&#39;s primary free case-law/statute repository for judgments relevant to the clause&#39;s legal concern.</li>
+<li><strong><code class="inline-code">search_case_precedent(query)</code></strong> — a broader search (general legal databases/web) for relevant precedent when Indian Kanoon specifically doesn&#39;t surface anything useful, or when the concern is more general/commercial than statute-specific.</li>
+<li><strong><code class="inline-code">flag_for_human_review()</code></strong> — takes no meaningful arguments; its entire purpose is to give the agent an honest way out when it genuinely cannot find sufficient grounding, rather than forcing it to fabricate a citation to satisfy the output schema.</li>
+</ul>
+<p><strong>Why <code class="inline-code">flag_for_human_review</code> matters as much as the search tools:</strong> an agent that only ever has &quot;search tools&quot; available will, under pressure to produce <em>some</em> answer, sometimes cite something tenuous rather than admit it found nothing solid. Giving it an explicit, named, legitimate way to say &quot;I don&#39;t have good grounding for this&quot; is a deliberate design choice that reduces exactly that failure mode — it&#39;s cheaper and more honest to make &quot;I don&#39;t know&quot; a first-class action than to hope the model volunteers that admission in free text.</p>
+<h3 id="23-the-react-pattern--reason-act-observe-repeat"><a class="heading-anchor" href="#23-the-react-pattern--reason-act-observe-repeat" aria-hidden="true">#</a>2.3 The ReAct pattern — Reason, Act, Observe, repeat</h3>
+<p><strong>ReAct</strong> (Reasoning + Acting) is the specific loop structure this kind of agent runs:</p>
+<ol>
+<li><strong>Reason:</strong> the model looks at the goal and everything so far, and thinks about what to do next (internally, or as an explicit &quot;thought&quot; depending on prompting style).</li>
+<li><strong>Act:</strong> it either calls a tool, or decides it&#39;s done and produces a final answer.</li>
+<li><strong>Observe:</strong> if it called a tool, your code executes it and appends the <em>result</em> back into the conversation the model sees.</li>
+<li><strong>Repeat</strong> from step 1, now with that observation available — until the model produces a final answer instead of another tool call, or a safety limit (<code class="inline-code">maxIterations</code>) is hit.</li>
+</ol>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Turn 1 — Reason: &quot;This clause concerns indemnification caps under Indian contract law. Let me check Indian Kanoon first.&quot;
+         Act: search_indian_kanoon(&quot;indemnification cap enforceability India&quot;)
+         Observe: [3 results, none closely on point]
+
+Turn 2 — Reason: &quot;Indian Kanoon didn&#x27;t surface anything precise. Let me broaden the search.&quot;
+         Act: search_case_precedent(&quot;liability cap enforceability commercial contracts&quot;)
+         Observe: [1 strong match found]
+
+Turn 3 — Reason: &quot;This precedent is directly relevant and sufficient.&quot;
+         Act: (final answer — no further tool call)</code></pre></div>
+<p><strong>Why a loop, and why a hard iteration limit matters:</strong> nothing in principle stops a model from deciding to call five tools in a row, or from getting into a pattern where it keeps re-trying variations of the same unproductive search. <code class="inline-code">maxIterations</code> (or LangGraph&#39;s equivalent recursion limit) is not an edge-case safety net — it is a required, load-bearing setting on every agent you ever build, because an agent loop is the one place in this project where an LLM&#39;s own runtime decisions, not your code, control how many LLM calls happen.</p>
+<h3 id="24-agentexecutor--the-hand-rolled-version-and-what-it39s-actually-doing-for-you"><a class="heading-anchor" href="#24-agentexecutor--the-hand-rolled-version-and-what-it39s-actually-doing-for-you" aria-hidden="true">#</a>2.4 <code class="inline-code">AgentExecutor</code> — the hand-rolled version, and what it&#39;s actually doing for you</h3>
+<p><code class="inline-code">AgentExecutor</code> is LangChain&#39;s implementation of exactly the loop in 2.3. You give it: a model bound to your tools, a prompt (including a placeholder for &quot;everything that&#39;s happened in this loop so far&quot; — called the <strong>agent scratchpad</strong>), and the tool implementations themselves. It then mechanically runs the reason → act → observe cycle, calling your tool functions for you and feeding results back into the prompt, until the model stops requesting tools.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> agent = <span class="hljs-title function_">createToolCallingAgent</span>({ <span class="hljs-attr">llm</span>: model, tools, prompt });
+<span class="hljs-keyword">const</span> executor = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AgentExecutor</span>({ agent, tools, <span class="hljs-attr">maxIterations</span>: <span class="hljs-number">5</span>, <span class="hljs-attr">returnIntermediateSteps</span>: <span class="hljs-literal">true</span> });
+
+<span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> executor.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">input</span>: <span class="hljs-string">&quot;...&quot;</span> });
+<span class="hljs-comment">// result.output          -&gt; the final answer</span>
+<span class="hljs-comment">// result.intermediateSteps -&gt; every (tool call, tool result) pair along the way</span></code></pre></div>
+<p><strong>Why build this by hand at all, if a prebuilt exists?</strong> <code class="inline-code">returnIntermediateSteps: true</code> gives you direct, explicit visibility into every single reasoning/action/observation cycle — you can literally print out what the model tried, in what order, and what each attempt returned. That raw visibility is genuinely valuable the first time you build an agent: it turns &quot;the model decided to do something&quot; from a black box into something you can watch happen step by step, which makes the LangGraph version in 2.5 legible as &quot;the same mechanism, wrapped,&quot; rather than unfamiliar magic.</p>
+<h3 id="25-createreactagent-and-toolnode--the-same-loop-as-a-compiled-graph"><a class="heading-anchor" href="#25-createreactagent-and-toolnode--the-same-loop-as-a-compiled-graph" aria-hidden="true">#</a>2.5 <code class="inline-code">createReactAgent()</code> and <code class="inline-code">ToolNode</code> — the same loop, as a compiled graph</h3>
+<p>LangGraph&#39;s <code class="inline-code">createReactAgent()</code> builds the <em>identical</em> ReAct loop, but expresses it as a small, prebuilt <code class="inline-code">StateGraph</code> rather than a bespoke executor class:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">        START
+          │
+          ▼
+    ┌──────────┐   has the model requested a tool call?
+    │  agent    │──────────── no ──────────────────────► END (final answer)
+    │ (call LLM)│
+    └─────┬────┘
+          │ yes
+          ▼
+    ┌──────────┐
+    │  tools    │  (a ToolNode — executes whichever tool(s)
+    │ (ToolNode)│   the model requested, in parallel if there are several)
+    └─────┬────┘
+          │
+          └──────────────► back to &quot;agent&quot; (loop)</code></pre></div>
+<p>A <strong><code class="inline-code">ToolNode</code></strong> is a prebuilt LangGraph node that does one job: look at the most recent AI message for any tool-call requests, execute the corresponding tool function(s) — concurrently if the model requested more than one in the same turn — and append the results back into the conversation&#39;s message list as tool-result messages. It&#39;s the graph-native equivalent of the &quot;observe&quot; step <code class="inline-code">AgentExecutor</code> handles internally for you.</p>
+<p>The conditional edge after <code class="inline-code">agent</code> (&quot;has the model requested a tool call, or not?&quot;) is the exact same <em>kind</em> of routing function as Phase 4&#39;s <code class="inline-code">routeByRisk</code> — inspect the current state (here, the latest message), return the name of the next node.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> reactAgent = <span class="hljs-title function_">createReactAgent</span>({
+  <span class="hljs-attr">llm</span>: model,
+  tools,
+  <span class="hljs-attr">messageModifier</span>: systemPrompt, <span class="hljs-comment">// sets the agent&#x27;s system-level instructions</span>
+});
+
+<span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> reactAgent.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(input)] });</code></pre></div>
+<p><strong>What you get for the same underlying behavior:</strong> far less code (the loop, the conditional routing, and the tool-execution step are all already built for you), and — because it&#39;s a compiled <code class="inline-code">StateGraph</code> — it composes the same way every other graph in this project does: it can be checkpointed, traced, and (as Phase 6.5 will do) embedded as a subgraph inside a larger graph. <code class="inline-code">AgentExecutor</code> is a self-contained class with its own internal loop; <code class="inline-code">createReactAgent()</code>&#39;s output is a graph, which is why it&#39;s the version that actually plugs into Phase 4&#39;s larger graph rather than sitting beside it as a separate mechanism.</p>
+<h3 id="26-parsing-an-agent39s-run-into-a-structured-outcome"><a class="heading-anchor" href="#26-parsing-an-agent39s-run-into-a-structured-outcome" aria-hidden="true">#</a>2.6 Parsing an agent&#39;s run into a structured outcome</h3>
+<p>An agent&#39;s raw output is a <strong>list of messages</strong> — the back-and-forth of reasoning, tool calls, and tool results, ending in a final AI message. That&#39;s perfect for a human reading a trace, but Phase 4&#39;s <code class="inline-code">judgment_lookup</code> node needs to return a clean, typed update to <code class="inline-code">currentFinding</code> (specifically, additional <code class="inline-code">legalReferences</code> entries, or a review-flagged marker) — not a raw transcript.</p>
+<p>The practical approach: after the agent loop completes, run <strong>one more small, fixed, structured-output call</strong> (exactly like every prior phase&#39;s pattern) whose only job is to read the full message transcript and distill it into a typed <code class="inline-code">AgentOutcome</code>. This keeps the agentic part of the pipeline (genuinely dynamic, tool-using, multi-turn) cleanly separated from the structured-output part (fixed, one-shot, schema-guaranteed) — each piece doing the job it&#39;s actually good at.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-agentexecutor-vs-createreactagent--build-one-or-both"><a class="heading-anchor" href="#31-agentexecutor-vs-createreactagent--build-one-or-both" aria-hidden="true">#</a>3.1 <code class="inline-code">AgentExecutor</code> vs. <code class="inline-code">createReactAgent()</code> — build one, or both?</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. <code class="inline-code">AgentExecutor</code> only</strong></td>
+<td>Full manual visibility into every reasoning step via <code class="inline-code">intermediateSteps</code>; no new LangGraph-specific concepts beyond what Phase 3/4 already taught</td>
+<td>Doesn&#39;t compose with Phase 4&#39;s graph as a first-class node the way a compiled graph does; you&#39;d need extra glue code to embed it</td>
+<td>Good for a standalone research tool outside the graph, or pure learning/debugging</td>
+</tr>
+<tr>
+<td><strong>B. <code class="inline-code">createReactAgent()</code> only</strong></td>
+<td>Composes directly with the rest of the project&#39;s LangGraph-based architecture; less code</td>
+<td>Skips seeing the raw reasoning loop mechanics explicitly, which makes the abstraction feel more like magic</td>
+<td>Fine if you&#39;re already comfortable with the ReAct loop&#39;s mechanics from other experience</td>
+</tr>
+<tr>
+<td><strong>C. Build both, in sequence (roadmap&#39;s choice)</strong></td>
+<td>You see the mechanism explicitly once (<code class="inline-code">AgentExecutor</code>), then see how much of it a good abstraction absorbs (<code class="inline-code">createReactAgent</code>) — genuinely useful for building calibrated trust in the abstraction; the final code you actually ship is still just the LangGraph version</td>
+<td>More total code written, though the second version is considerably shorter once the first is understood</td>
+<td><strong>Recommended</strong> — matches your roadmap exactly, and this is a good phase to spend the extra time on since &quot;agents&quot; is a concept worth deeply understanding rather than pattern-matching</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach C. Section 6 below builds both in full; only the <code class="inline-code">createReactAgent()</code> version is what ends up wired into Phase 4&#39;s graph.</p>
+<h3 id="32-tool-implementation--real-external-apis-vs-a-mockable-interface"><a class="heading-anchor" href="#32-tool-implementation--real-external-apis-vs-a-mockable-interface" aria-hidden="true">#</a>3.2 Tool implementation — real external APIs vs. a mockable interface</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Direct hardcoded API calls</strong></td>
+<td>Simplest code</td>
+<td>Impossible to unit test the agent&#39;s <em>decision-making</em> without hitting real external APIs (slow, costly, non-deterministic responses make assertions brittle)</td>
+<td>Fine for a quick prototype only</td>
+</tr>
+<tr>
+<td><strong>B. A small interface/adapter per tool, with a real implementation and an injectable mock (recommended)</strong></td>
+<td>Unit tests can supply fixed, deterministic tool responses and assert the agent&#39;s routing behavior (e.g. &quot;when Indian Kanoon returns nothing, does it try <code class="inline-code">search_case_precedent</code> next?&quot;) without any network calls</td>
+<td>A small amount of extra structure (one interface per tool)</td>
+<td><strong>Recommended</strong> — agent behavior testing (3.4 in Best Practices) genuinely depends on this</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B. Each tool&#39;s core logic lives in a plain, injectable async function; the <code class="inline-code">tool()</code> wrapper around it is a thin adapter, not where the logic lives.</p>
+<h3 id="33-integrating-the-agent-into-phase-439s-graph"><a class="heading-anchor" href="#33-integrating-the-agent-into-phase-439s-graph" aria-hidden="true">#</a>3.3 Integrating the agent into Phase 4&#39;s graph</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Call the compiled agent graph from inside a plain Phase 4 node function</strong> (<code class="inline-code">judgmentLookupNode</code> internally does <code class="inline-code">await reactAgent.invoke(...)</code>)</td>
+<td>Minimal change to Phase 4 — the node&#39;s name, position, and the edges around it are completely unchanged; the agent is an implementation detail of one node</td>
+<td>The agent&#39;s own internal steps aren&#39;t checkpointed as part of Phase 4&#39;s outer graph&#39;s history (though they are still traceable via LangSmith)</td>
+<td><strong>Recommended for now</strong> — matches the roadmap&#39;s framing of &quot;slot the LangGraph version into the graph from Phase 4 as the judgment_retriever node&quot;</td>
+</tr>
+<tr>
+<td><strong>B. Add the agent as a true LangGraph subgraph node</strong> (nested inside Phase 4&#39;s <code class="inline-code">StateGraph</code> directly, sharing its checkpointer)</td>
+<td>Every internal agent step also becomes part of Phase 4&#39;s own checkpoint history, fully inspectable via the same audit endpoints</td>
+<td>Requires reconciling two different state schemas (Phase 4&#39;s <code class="inline-code">AnalysisState</code> vs. the agent&#39;s message-based state) — genuinely more design work than this phase needs to take on right now</td>
+<td>Phase 6.5, when the whole analysis graph itself becomes a subgraph under a Supervisor — the right point to revisit this</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach A for this phase. Phase 6.5&#39;s multi-agent refactor is the natural, already-planned point to reconsider subgraph nesting properly, once there&#39;s a Supervisor architecture to nest it inside; doing it now would be solving a problem a bit ahead of where the roadmap actually needs it solved.</p>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--tool-logic-decoupled-from-the-tool-wrapper"><a class="heading-anchor" href="#step-1--tool-logic-decoupled-from-the-tool-wrapper" aria-hidden="true">#</a>Step 1 — Tool logic, decoupled from the <code class="inline-code">tool()</code> wrapper</h3>
+<p><strong>What:</strong> Three plain async functions (<code class="inline-code">searchIndianKanoon</code>, <code class="inline-code">searchCasePrecedent</code>, <code class="inline-code">flagForHumanReview</code>) containing the actual logic, each then wrapped with LangChain&#39;s <code class="inline-code">tool()</code> helper separately.</p>
+<p><strong>Why:</strong> Keeps the core logic unit-testable and swappable (per 3.2) without needing to construct a full agent just to test one tool&#39;s behavior.</p>
+<p><strong>Best practice:</strong> Every external-API-calling tool should catch its own errors and return a <strong>string describing the failure</strong> rather than throwing — an agent can reason about &quot;the search failed, let me try a different tool,&quot; but it can&#39;t recover from an uncaught exception that crashes the whole loop.</p>
+<p><strong>Common mistake to avoid:</strong> Sending the clause&#39;s full, verbatim text (which may include real party names, specific financial terms, etc.) directly to a third-party search API. Extract just the legal <em>concept</em> being searched for (which the model itself formulates as the tool&#39;s <code class="inline-code">query</code> argument) rather than passing raw contract content externally.</p>
+<h3 id="step-2--the-hand-rolled-agentexecutor"><a class="heading-anchor" href="#step-2--the-hand-rolled-agentexecutor" aria-hidden="true">#</a>Step 2 — The hand-rolled <code class="inline-code">AgentExecutor</code></h3>
+<p><strong>What:</strong> A <code class="inline-code">createToolCallingAgent()</code> + <code class="inline-code">AgentExecutor</code> combination, with a prompt describing the agent&#39;s goal (find grounding for a HIGH-risk clause, or honestly flag if none exists) and a <code class="inline-code">MessagesPlaceholder(&quot;agent_scratchpad&quot;)</code>.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.4.</p>
+<p><strong>Best practice:</strong> Set <code class="inline-code">maxIterations</code> explicitly (this phase uses 5) and <code class="inline-code">returnIntermediateSteps: true</code> — the latter costs nothing and is exactly what you need to inspect the raw reasoning trace while validating this version.</p>
+<h3 id="step-3--the-langgraph-createreactagent-version"><a class="heading-anchor" href="#step-3--the-langgraph-createreactagent-version" aria-hidden="true">#</a>Step 3 — The LangGraph <code class="inline-code">createReactAgent()</code> version</h3>
+<p><strong>What:</strong> The same three tools, the same system prompt, wrapped with <code class="inline-code">createReactAgent()</code> instead.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.5.</p>
+<p><strong>Common mistake to avoid:</strong> Forgetting to set a recursion/iteration limit here too — <code class="inline-code">createReactAgent()</code>&#39;s underlying graph needs the same safety net <code class="inline-code">AgentExecutor</code>&#39;s <code class="inline-code">maxIterations</code> provided; LangGraph exposes this via the <code class="inline-code">recursionLimit</code> option on <code class="inline-code">.invoke()</code>.</p>
+<h3 id="step-4--comparing-the-two-on-a-real-example"><a class="heading-anchor" href="#step-4--comparing-the-two-on-a-real-example" aria-hidden="true">#</a>Step 4 — Comparing the two on a real example</h3>
+<p><strong>What:</strong> Run the exact same HIGH-risk clause + risk reasoning through both versions and compare: total code needed to set each up, and the shape/readability of each one&#39;s trace of what happened.</p>
+<p><strong>Why:</strong> This comparison is the actual point of building both — a concrete, first-hand answer to &quot;how much does this abstraction save me, and what do I give up.&quot;</p>
+<h3 id="step-5--structured-outcome-parsing"><a class="heading-anchor" href="#step-5--structured-outcome-parsing" aria-hidden="true">#</a>Step 5 — Structured outcome parsing</h3>
+<p><strong>What:</strong> <code class="inline-code">AgentOutcomeSchema</code> (Zod) and a small fixed chain that reads the agent&#39;s final message transcript and distills it into <code class="inline-code">{ references: [...], reviewFlagged: boolean }</code>.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.6 — this is the bridge back into Phase 4&#39;s typed <code class="inline-code">RiskFindingRecord</code> shape.</p>
+<h3 id="step-6--replacing-phase-439s-judgment_lookup-stub"><a class="heading-anchor" href="#step-6--replacing-phase-439s-judgment_lookup-stub" aria-hidden="true">#</a>Step 6 — Replacing Phase 4&#39;s <code class="inline-code">judgment_lookup</code> stub</h3>
+<p><strong>What:</strong> A new implementation of the <code class="inline-code">judgment_lookup</code> node (same name, same position in the graph, same input/output shape as Phase 4&#39;s stub) that internally invokes the <code class="inline-code">createReactAgent()</code> version and applies its parsed outcome to <code class="inline-code">currentFinding</code>.</p>
+<p><strong>Why:</strong> This is the entire point of the phase — a clean, drop-in replacement, per the design decision made back in Phase 4 (Approach recommendation in section 3.3 there) to give this node its own clearly-scoped identity specifically so this swap wouldn&#39;t require touching the graph&#39;s structure at all.</p>
+<p><strong>Common mistake to avoid:</strong> Changing the node&#39;s <em>return shape</em>. Phase 4&#39;s <code class="inline-code">store_finding</code> node and the <code class="inline-code">aggregate_findings</code> join both depend on <code class="inline-code">currentFinding</code> having the same shape it always has — this phase adds <em>content</em> to <code class="inline-code">legalReferences</code> (or a new <code class="inline-code">reviewFlagged</code> field), it must not change the field names or types Phase 4 already established.</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<ol>
+<li><strong>Install dependencies</strong>: none beyond what Phases 0-4 already installed — <code class="inline-code">langchain/agents</code> and <code class="inline-code">createReactAgent</code>/<code class="inline-code">ToolNode</code> both ship inside packages you already have (<code class="inline-code">langchain</code>, <code class="inline-code">@langchain/langgraph</code>).</li>
+<li><strong>Set environment variables</strong> for the external search APIs (placeholders are fine for now if you don&#39;t yet have real Indian Kanoon/precedent-search API access — Step 1&#39;s error-handling means a missing/failing API degrades gracefully to &quot;no results,&quot; which the agent can reason about).</li>
+<li><strong>Implement <code class="inline-code">src/research/tools.ts</code></strong> — the three plain tool-logic functions and their <code class="inline-code">tool()</code> wrappers.</li>
+<li><strong>Implement <code class="inline-code">src/research/agentExecutorVersion.ts</code></strong> — the hand-rolled <code class="inline-code">AgentExecutor</code>.</li>
+<li><strong>Test it directly</strong> (a small standalone script, not yet wired into Phase 4) against 2-3 constructed HIGH-risk clause scenarios: one where Indian Kanoon should plausibly have something, one where only general precedent would, and one where nothing should exist (forcing <code class="inline-code">flag_for_human_review</code>). Print <code class="inline-code">intermediateSteps</code> and read through the reasoning trace for each.</li>
+<li><strong>Implement <code class="inline-code">src/research/reactAgentVersion.ts</code></strong> — the <code class="inline-code">createReactAgent()</code> version, using the same tools and prompt.</li>
+<li><strong>Re-run the same 3 test scenarios</strong> against this version and compare its message trace to step 5&#39;s <code class="inline-code">intermediateSteps</code> output.</li>
+<li><strong>Implement <code class="inline-code">src/research/outcomeParsing.ts</code></strong> — <code class="inline-code">AgentOutcomeSchema</code> and the transcript-distillation chain.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/nodes/judgmentLookup.ts</code></strong>, replacing Phase 4&#39;s <code class="inline-code">judgmentLookupStub.ts</code> (same export name/shape, new internal implementation calling the Step 6 agent).</li>
+<li><strong>Update <code class="inline-code">src/analysis/graph.ts</code></strong>&#39;s import to point at the new node file — confirm the node name string (<code class="inline-code">&quot;judgment_lookup&quot;</code>) and its position in the graph&#39;s edges are completely unchanged.</li>
+<li><strong>Re-run a full Phase 4 analysis</strong> on a contract with at least one clause you expect to score HIGH, and confirm: the graph still completes, checkpoints are still created normally, and the resulting <code class="inline-code">risk_findings</code> row for that clause now has agent-sourced <code class="inline-code">legalReferences</code> (or a <code class="inline-code">reviewFlagged</code> marker) instead of the stub&#39;s fixed lookup result.</li>
+<li><strong>Confirm the audit trail still works unchanged</strong> — run <code class="inline-code">GET /api/analysis/:threadId/history</code> on this new run and confirm the <code class="inline-code">judgment_lookup</code> step still appears as a normal checkpoint, exactly as it did with the stub.</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<h3 id="61-environment-variables-append-to-env"><a class="heading-anchor" href="#61-environment-variables-append-to-env" aria-hidden="true">#</a>6.1 Environment variables (append to <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">RESEARCH_AGENT_MODEL=gpt-4o-mini
+RESEARCH_AGENT_MAX_ITERATIONS=5
+INDIAN_KANOON_API_KEY=
+INDIAN_KANOON_API_URL=https://api.indiankanoon.org/search
+CASE_PRECEDENT_SEARCH_API_KEY=
+CASE_PRECEDENT_SEARCH_API_URL=https://api.example-legal-search.com/search</code></pre></div>
+<h3 id="62-tool-logic-and-definitions"><a class="heading-anchor" href="#62-tool-logic-and-definitions" aria-hidden="true">#</a>6.2 Tool logic and definitions</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/research/tools.ts</span>
+<span class="hljs-keyword">import</span> { tool } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/tools&quot;</span>;
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ToolSearchResult</span> {
+  <span class="hljs-attr">source</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">excerpt</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">url</span>?: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-comment">/**
+ * Core logic kept separate from the tool() wrapper (Approach B, section 3.2)
+ * so it can be unit tested or mocked without constructing a full agent.
+ * Catches its own errors and returns a descriptive string rather than
+ * throwing - an agent can reason about a failed search and try a different
+ * tool; it cannot recover from an uncaught exception mid-loop.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">searchIndianKanoonImpl</span>(<span class="hljs-params"><span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">ToolSearchResult</span>[] | <span class="hljs-built_in">string</span>&gt; {
+  <span class="hljs-keyword">const</span> apiKey = process.<span class="hljs-property">env</span>.<span class="hljs-property">INDIAN_KANOON_API_KEY</span>;
+  <span class="hljs-keyword">if</span> (!apiKey) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Indian Kanoon API is not configured in this environment.&quot;</span>;
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">INDIAN_KANOON_API_URL</span>!, {
+      <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+      <span class="hljs-attr">headers</span>: { <span class="hljs-title class_">Authorization</span>: <span class="hljs-string">`Bearer <span class="hljs-subst">${apiKey}</span>`</span>, <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/json&quot;</span> },
+      <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({ query }),
+    });
+
+    <span class="hljs-keyword">if</span> (!response.<span class="hljs-property">ok</span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-string">`Indian Kanoon search failed with status <span class="hljs-subst">${response.status}</span>.`</span>;
+    }
+
+    <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+    <span class="hljs-keyword">return</span> (data.<span class="hljs-property">results</span> ?? []).<span class="hljs-title function_">slice</span>(<span class="hljs-number">0</span>, <span class="hljs-number">3</span>).<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">r</span>: <span class="hljs-built_in">any</span></span>) =&gt;</span> ({
+      <span class="hljs-attr">source</span>: r.<span class="hljs-property">title</span>,
+      <span class="hljs-attr">excerpt</span>: r.<span class="hljs-property">snippet</span>,
+      <span class="hljs-attr">url</span>: r.<span class="hljs-property">url</span>,
+    }));
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`Indian Kanoon search failed: <span class="hljs-subst">${(err <span class="hljs-keyword">as</span> <span class="hljs-built_in">Error</span>).message}</span>`</span>;
+  }
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">searchCasePrecedentImpl</span>(<span class="hljs-params"><span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">ToolSearchResult</span>[] | <span class="hljs-built_in">string</span>&gt; {
+  <span class="hljs-keyword">const</span> apiKey = process.<span class="hljs-property">env</span>.<span class="hljs-property">CASE_PRECEDENT_SEARCH_API_KEY</span>;
+  <span class="hljs-keyword">if</span> (!apiKey) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Case precedent search API is not configured in this environment.&quot;</span>;
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">CASE_PRECEDENT_SEARCH_API_URL</span>!, {
+      <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+      <span class="hljs-attr">headers</span>: { <span class="hljs-title class_">Authorization</span>: <span class="hljs-string">`Bearer <span class="hljs-subst">${apiKey}</span>`</span>, <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/json&quot;</span> },
+      <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({ query }),
+    });
+
+    <span class="hljs-keyword">if</span> (!response.<span class="hljs-property">ok</span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-string">`Case precedent search failed with status <span class="hljs-subst">${response.status}</span>.`</span>;
+    }
+
+    <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+    <span class="hljs-keyword">return</span> (data.<span class="hljs-property">results</span> ?? []).<span class="hljs-title function_">slice</span>(<span class="hljs-number">0</span>, <span class="hljs-number">3</span>).<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">r</span>: <span class="hljs-built_in">any</span></span>) =&gt;</span> ({
+      <span class="hljs-attr">source</span>: r.<span class="hljs-property">title</span>,
+      <span class="hljs-attr">excerpt</span>: r.<span class="hljs-property">snippet</span>,
+      <span class="hljs-attr">url</span>: r.<span class="hljs-property">url</span>,
+    }));
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`Case precedent search failed: <span class="hljs-subst">${(err <span class="hljs-keyword">as</span> <span class="hljs-built_in">Error</span>).message}</span>`</span>;
+  }
+}
+
+<span class="hljs-comment">/**
+ * Deliberately takes no meaningful arguments - its entire purpose is to
+ * give the agent a legitimate, named way to say &quot;I don&#x27;t have sufficient
+ * grounding for this&quot; rather than fabricating a citation under pressure to
+ * produce SOME answer.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">flagForHumanReviewImpl</span>(<span class="hljs-params"><span class="hljs-attr">reason</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`Flagged for human review: <span class="hljs-subst">${reason}</span>`</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> searchIndianKanoonTool = <span class="hljs-title function_">tool</span>(
+  <span class="hljs-title function_">async</span> ({ query }: { <span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span> }) =&gt; <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(<span class="hljs-keyword">await</span> <span class="hljs-title function_">searchIndianKanoonImpl</span>(query)),
+  {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;search_indian_kanoon&quot;</span>,
+    <span class="hljs-attr">description</span>:
+      <span class="hljs-string">&quot;Search Indian Kanoon for judgments or statutes relevant to a specific legal question or &quot;</span> +
+      <span class="hljs-string">&quot;contract clause concern. Use a focused legal query, not the raw clause text.&quot;</span>,
+    <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({
+      <span class="hljs-attr">query</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A focused legal question or concept, e.g. &#x27;enforceability of liquidated damages clauses India&#x27;&quot;</span>),
+    }),
+  }
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> searchCasePrecedentTool = <span class="hljs-title function_">tool</span>(
+  <span class="hljs-title function_">async</span> ({ query }: { <span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span> }) =&gt; <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(<span class="hljs-keyword">await</span> <span class="hljs-title function_">searchCasePrecedentImpl</span>(query)),
+  {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;search_case_precedent&quot;</span>,
+    <span class="hljs-attr">description</span>:
+      <span class="hljs-string">&quot;Search general legal databases for broader case precedent when Indian Kanoon specifically &quot;</span> +
+      <span class="hljs-string">&quot;does not surface sufficient grounding, or when the concern is more general/commercial in nature.&quot;</span>,
+    <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({
+      <span class="hljs-attr">query</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A focused legal question or concept to search for precedent on&quot;</span>),
+    }),
+  }
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> flagForHumanReviewTool = <span class="hljs-title function_">tool</span>(
+  <span class="hljs-title function_">async</span> ({ reason }: { <span class="hljs-attr">reason</span>: <span class="hljs-built_in">string</span> }) =&gt; <span class="hljs-title function_">flagForHumanReviewImpl</span>(reason),
+  {
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;flag_for_human_review&quot;</span>,
+    <span class="hljs-attr">description</span>:
+      <span class="hljs-string">&quot;Call this when neither search tool has produced sufficient, relevant grounding for this &quot;</span> +
+      <span class="hljs-string">&quot;clause&#x27;s risk assessment. It is better to honestly flag for human review than to cite &quot;</span> +
+      <span class="hljs-string">&quot;something tenuous or irrelevant.&quot;</span>,
+    <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({
+      <span class="hljs-attr">reason</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A brief explanation of why sufficient grounding could not be found&quot;</span>),
+    }),
+  }
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> legalResearchTools = [searchIndianKanoonTool, searchCasePrecedentTool, flagForHumanReviewTool];</code></pre></div>
+<h3 id="63-hand-rolled-agentexecutor-version"><a class="heading-anchor" href="#63-hand-rolled-agentexecutor-version" aria-hidden="true">#</a>6.3 Hand-rolled <code class="inline-code">AgentExecutor</code> version</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/research/agentExecutorVersion.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span>, <span class="hljs-title class_">MessagesPlaceholder</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AgentExecutor</span>, createToolCallingAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;langchain/agents&quot;</span>;
+<span class="hljs-keyword">import</span> { legalResearchTools } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./tools&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">RESEARCH_AGENT_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> prompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;You are a legal research assistant. You are given a contract clause that &quot;</span> +
+      <span class="hljs-string">&quot;has been assessed as HIGH risk, along with the reasoning for that &quot;</span> +
+      <span class="hljs-string">&quot;assessment. Your job is to find supporting case law or statutory &quot;</span> +
+      <span class="hljs-string">&quot;grounding for this assessment. Try search_indian_kanoon first for &quot;</span> +
+      <span class="hljs-string">&quot;India-specific grounding. If that doesn&#x27;t surface anything sufficiently &quot;</span> +
+      <span class="hljs-string">&quot;relevant, try search_case_precedent for broader precedent. If neither &quot;</span> +
+      <span class="hljs-string">&quot;produces sufficient grounding, call flag_for_human_review rather than &quot;</span> +
+      <span class="hljs-string">&quot;citing something tenuous or irrelevant. Once you have what you need (or &quot;</span> +
+      <span class="hljs-string">&quot;have determined nothing sufficient exists), give a final summary of what &quot;</span> +
+      <span class="hljs-string">&quot;you found or why you&#x27;re flagging this for review.&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;{input}&quot;</span>],
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessagesPlaceholder</span>(<span class="hljs-string">&quot;agent_scratchpad&quot;</span>),
+]);
+
+<span class="hljs-keyword">const</span> agent = <span class="hljs-title function_">createToolCallingAgent</span>({ <span class="hljs-attr">llm</span>: model, <span class="hljs-attr">tools</span>: legalResearchTools, prompt });
+
+<span class="hljs-comment">/**
+ * returnIntermediateSteps: true gives direct visibility into every
+ * (tool call, tool result) pair the loop produced - exactly what makes this
+ * version valuable to build even though createReactAgent() is what actually
+ * ships: it turns &quot;the model decided to do something&quot; into something you
+ * can print and read step by step.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> legalResearchExecutor = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AgentExecutor</span>({
+  agent,
+  <span class="hljs-attr">tools</span>: legalResearchTools,
+  <span class="hljs-attr">maxIterations</span>: <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">RESEARCH_AGENT_MAX_ITERATIONS</span> ?? <span class="hljs-number">5</span>),
+  <span class="hljs-attr">returnIntermediateSteps</span>: <span class="hljs-literal">true</span>,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">runResearchAgentExecutor</span>(<span class="hljs-params"><span class="hljs-attr">clauseText</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">riskReasoning</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">return</span> legalResearchExecutor.<span class="hljs-title function_">invoke</span>({
+    <span class="hljs-attr">input</span>: <span class="hljs-string">`Clause:\n<span class="hljs-subst">${clauseText}</span>\n\nRisk assessment reasoning:\n<span class="hljs-subst">${riskReasoning}</span>`</span>,
+  });
+}</code></pre></div>
+<h3 id="64-createreactagent-version"><a class="heading-anchor" href="#64-createreactagent-version" aria-hidden="true">#</a>6.4 <code class="inline-code">createReactAgent()</code> version</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/research/reactAgentVersion.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { createReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph/prebuilt&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { legalResearchTools } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./tools&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">RESEARCH_AGENT_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">SYSTEM_PROMPT</span> =
+  <span class="hljs-string">&quot;You are a legal research assistant. You are given a contract clause that &quot;</span> +
+  <span class="hljs-string">&quot;has been assessed as HIGH risk, along with the reasoning for that &quot;</span> +
+  <span class="hljs-string">&quot;assessment. Try search_indian_kanoon first for India-specific grounding. &quot;</span> +
+  <span class="hljs-string">&quot;If that doesn&#x27;t surface anything sufficiently relevant, try &quot;</span> +
+  <span class="hljs-string">&quot;search_case_precedent for broader precedent. If neither produces &quot;</span> +
+  <span class="hljs-string">&quot;sufficient grounding, call flag_for_human_review rather than citing &quot;</span> +
+  <span class="hljs-string">&quot;something tenuous or irrelevant.&quot;</span>;
+
+<span class="hljs-comment">/**
+ * The identical ReAct loop as the AgentExecutor version above, expressed as
+ * a compiled StateGraph instead: an &quot;agent&quot; node (calls the model), a
+ * ToolNode (executes whichever tools the model requested, built in), and a
+ * conditional edge routing back to &quot;agent&quot; until the model stops requesting
+ * tools. Far less code for the same underlying behavior - and because it&#x27;s
+ * a compiled graph, it composes with the rest of this project&#x27;s LangGraph
+ * architecture (traceable, embeddable as a subgraph later) the way
+ * AgentExecutor&#x27;s standalone class does not.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> legalResearchReactAgent = <span class="hljs-title function_">createReactAgent</span>({
+  <span class="hljs-attr">llm</span>: model,
+  <span class="hljs-attr">tools</span>: legalResearchTools,
+  <span class="hljs-attr">messageModifier</span>: <span class="hljs-variable constant_">SYSTEM_PROMPT</span>,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">runResearchReactAgent</span>(<span class="hljs-params"><span class="hljs-attr">clauseText</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">riskReasoning</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">return</span> legalResearchReactAgent.<span class="hljs-title function_">invoke</span>(
+    {
+      <span class="hljs-attr">messages</span>: [
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(<span class="hljs-string">`Clause:\n<span class="hljs-subst">${clauseText}</span>\n\nRisk assessment reasoning:\n<span class="hljs-subst">${riskReasoning}</span>`</span>),
+      ],
+    },
+    { <span class="hljs-attr">recursionLimit</span>: <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">RESEARCH_AGENT_MAX_ITERATIONS</span> ?? <span class="hljs-number">5</span>) * <span class="hljs-number">2</span> }
+    <span class="hljs-comment">// *2 because each ReAct &quot;turn&quot; is 2 graph steps (agent, then tools) -</span>
+    <span class="hljs-comment">// the recursion limit counts individual node executions, not full turns.</span>
+  );
+}</code></pre></div>
+<h3 id="65-structured-outcome-parsing"><a class="heading-anchor" href="#65-structured-outcome-parsing" aria-hidden="true">#</a>6.5 Structured outcome parsing</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/research/outcomeParsing.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">BaseMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">RESEARCH_AGENT_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">AgentOutcomeSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">references</span>: z
+    .<span class="hljs-title function_">array</span>(
+      z.<span class="hljs-title function_">object</span>({
+        <span class="hljs-attr">sourceDocument</span>: z.<span class="hljs-title function_">string</span>(),
+        <span class="hljs-attr">excerpt</span>: z.<span class="hljs-title function_">string</span>(),
+      })
+    )
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Legal references the agent found sufficient grounding in, if any&quot;</span>),
+  <span class="hljs-attr">reviewFlagged</span>: z.<span class="hljs-title function_">boolean</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;True if the agent could not find sufficient grounding and flagged for human review&quot;</span>),
+  <span class="hljs-attr">reviewReason</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">nullable</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;If reviewFlagged is true, the reason given&quot;</span>),
+});
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">AgentOutcome</span> = z.<span class="hljs-property">infer</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">AgentOutcomeSchema</span>&gt;;
+
+<span class="hljs-keyword">const</span> distillPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;Read the following legal research agent transcript (its reasoning, tool &quot;</span> +
+      <span class="hljs-string">&quot;calls, and tool results) and distill it into a structured outcome: any &quot;</span> +
+      <span class="hljs-string">&quot;legal references it found sufficient, and whether it flagged the clause &quot;</span> +
+      <span class="hljs-string">&quot;for human review instead.&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Transcript:\n{transcript}&quot;</span>],
+]);
+
+<span class="hljs-keyword">const</span> distillChain = distillPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">AgentOutcomeSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;distill_agent_outcome&quot;</span> })
+);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">transcriptFromMessages</span>(<span class="hljs-params"><span class="hljs-attr">messages</span>: <span class="hljs-title class_">BaseMessage</span>[]</span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> messages
+    .<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> <span class="hljs-string">`[<span class="hljs-subst">${m.getType()}</span>] <span class="hljs-subst">${<span class="hljs-keyword">typeof</span> m.content === <span class="hljs-string">&quot;string&quot;</span> ? m.content : <span class="hljs-built_in">JSON</span>.stringify(m.content)}</span>`</span>)
+    .<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n\n&quot;</span>);
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">distillAgentOutcome</span>(<span class="hljs-params"><span class="hljs-attr">messages</span>: <span class="hljs-title class_">BaseMessage</span>[]</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">AgentOutcome</span>&gt; {
+  <span class="hljs-keyword">return</span> distillChain.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">transcript</span>: <span class="hljs-title function_">transcriptFromMessages</span>(messages) });
+}</code></pre></div>
+<h3 id="66-replacing-phase-439s-judgment_lookup-node"><a class="heading-anchor" href="#66-replacing-phase-439s-judgment_lookup-node" aria-hidden="true">#</a>6.6 Replacing Phase 4&#39;s <code class="inline-code">judgment_lookup</code> node</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/nodes/judgmentLookup.ts</span>
+<span class="hljs-keyword">import</span> { runResearchReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../../research/reactAgentVersion&quot;</span>;
+<span class="hljs-keyword">import</span> { distillAgentOutcome } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../../research/outcomeParsing&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalysisStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-comment">/**
+ * Replaces Phase 4&#x27;s judgment_lookup stub. Same node name, same position in
+ * the graph&#x27;s edges, same input/output shape (a partial update to
+ * currentFinding) - this file is the ONLY thing that changed. Phase 4&#x27;s
+ * graph.ts import is updated to point here instead of the old stub file;
+ * nothing about the graph&#x27;s structure, edges, or checkpointer changes.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">judgmentLookupNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisStateType</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-title class_">AnalysisStateType</span>&gt;&gt; {
+  <span class="hljs-keyword">const</span> finding = state.<span class="hljs-property">currentFinding</span>!;
+
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">runResearchReactAgent</span>(state.<span class="hljs-property">currentClause</span>!.<span class="hljs-property">fullText</span>, finding.<span class="hljs-property">reasoning</span>);
+  <span class="hljs-keyword">const</span> outcome = <span class="hljs-keyword">await</span> <span class="hljs-title function_">distillAgentOutcome</span>(result.<span class="hljs-property">messages</span>);
+
+  <span class="hljs-keyword">const</span> updatedFinding = {
+    ...finding,
+    <span class="hljs-attr">legalReferences</span>: [...finding.<span class="hljs-property">legalReferences</span>, ...outcome.<span class="hljs-property">references</span>],
+    <span class="hljs-attr">reviewFlagged</span>: outcome.<span class="hljs-property">reviewFlagged</span>,
+    <span class="hljs-attr">reviewReason</span>: outcome.<span class="hljs-property">reviewReason</span>,
+  };
+
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">currentFinding</span>: updatedFinding };
+}</code></pre></div>
+<p>Update Phase 4&#39;s graph wiring to use this instead of the stub — everything else in <code class="inline-code">graph.ts</code> is unchanged:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/graph.ts (excerpt - only this import line changes)</span>
+<span class="hljs-keyword">import</span> { judgmentLookupNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/judgmentLookup&quot;</span>; <span class="hljs-comment">// was: judgmentLookupStubNode</span>
+
+<span class="hljs-comment">// ... .addNode(&quot;judgment_lookup&quot;, judgmentLookupNode) ...</span></code></pre></div>
+<div class="callout callout-note"><div class="callout-title"><span class="callout-icon">&#128221;</span>Note</div><div class="callout-body"><p><strong>Note:</strong> <code class="inline-code">reviewFlagged</code> and <code class="inline-code">reviewReason</code> are new fields on the finding record. Add them to <code class="inline-code">RiskFindingSchema</code> (Phase 4&#39;s <code class="inline-code">schemas.ts</code>) as optional fields, and to the <code class="inline-code">risk_findings</code> table via a small migration (<code class="inline-code">ALTER TABLE risk_findings ADD COLUMN review_flagged BOOLEAN NOT NULL DEFAULT false, ADD COLUMN review_reason TEXT;</code>) — this is the one small, additive schema change this phase requires, since Phase 4 didn&#39;t yet have a concept of &quot;the agent couldn&#39;t find grounding.&quot;</p>
+</div></div>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── src/
+│   ├── research/
+│   │   ├── tools.ts
+│   │   ├── agentExecutorVersion.ts
+│   │   ├── reactAgentVersion.ts
+│   │   └── outcomeParsing.ts
+│   ├── analysis/
+│   │   ├── nodes/
+│   │   │   ├── judgmentLookup.ts        (replaces judgmentLookupStub.ts)
+│   │   │   └── ... (all other Phase 4 nodes, unchanged)
+│   │   ├── graph.ts                      (one import line changed)
+│   │   └── ... (everything else from Phase 4, unchanged)
+├── migrations/
+│   └── 006_risk_findings_review_flag.sql</code></pre></div>
+<h3 id="execution-flow-inside-the-judgment_lookup-node-per-high-risk-clause"><a class="heading-anchor" href="#execution-flow-inside-the-judgment_lookup-node-per-high-risk-clause" aria-hidden="true">#</a>Execution flow (inside the <code class="inline-code">judgment_lookup</code> node, per HIGH-risk clause)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Phase 4&#x27;s graph reaches judgment_lookup for a HIGH-risk clause
+  │
+  ▼
+runResearchReactAgent(clauseText, riskReasoning)
+  │
+  ▼
+createReactAgent&#x27;s internal graph:
+  │
+  ├─ agent (call model) ──── requested a tool? ──yes──► tools (ToolNode)
+  │        ▲                                                  │
+  │        └──────────────────── loop ─────────────────────────┘
+  │
+  no tool requested
+  │
+  ▼
+final message list returned
+  │
+  ▼
+distillAgentOutcome(messages)              — one fixed structured-output call
+  │
+  ▼
+{ references, reviewFlagged, reviewReason }
+  │
+  ▼
+merged into currentFinding, returned to Phase 4&#x27;s graph exactly as the stub did
+  │
+  ▼
+Phase 4&#x27;s existing edge: judgment_lookup → store_finding (unchanged)</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong>Two implementations, one shipped:</strong> building <code class="inline-code">AgentExecutor</code> first and discarding it in favor of <code class="inline-code">createReactAgent()</code> isn&#39;t wasted work — it&#39;s what makes the second version&#39;s brevity legible as &quot;the same mechanism, abstracted,&quot; rather than an opaque shortcut you&#39;d have to trust blindly.</li>
+<li><strong>A distillation call at the boundary, not agentic reasoning threaded through Phase 4&#39;s typed state:</strong> keeping the free-form, multi-turn agent transcript entirely inside <code class="inline-code">research/</code> and only crossing back into <code class="inline-code">analysis/</code>&#39;s strictly-typed world via one small structured-output call keeps Phase 4&#39;s state schema exactly as clean as it was before this phase — the agent is an implementation detail of one node, not a new kind of thing the rest of the graph needs to understand.</li>
+<li><strong>A one-node swap, not a graph rewrite:</strong> this is the direct payoff of Phase 4&#39;s design decision to give the stub its own clearly-scoped node in the first place — the entire upgrade in this phase touches exactly one file&#39;s internals plus one import line.</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Always set an explicit iteration/recursion limit on any agent loop — this is not optional hardening, it&#39;s a required setting given that the model&#39;s own decisions, not your code, control how many LLM calls a single request can trigger.</li>
+<li>Give an agent an explicit, legitimate &quot;I don&#39;t know&quot; action (<code class="inline-code">flag_for_human_review</code>) whenever fabricating an answer would be worse than admitting uncertainty — this is a general pattern worth carrying into any future agent you build, not specific to this phase.</li>
+<li>Keep tool logic and tool <em>wrappers</em> separate (6.2) — it pays for itself the first time you need to test agent decision-making without live external API calls.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li>Each HIGH-risk clause triggers its own independent agent loop; since Phase 4&#39;s <code class="inline-code">score_clause</code> → <code class="inline-code">judgment_lookup</code> routing already runs per-clause in parallel via <code class="inline-code">Send()</code>, multiple agents can be running concurrently for a single contract with several HIGH-risk clauses — factor this into the same OpenAI rate-limit planning noted in Phase 4&#39;s best practices, since an agent loop can itself issue several LLM calls per clause, not just one.</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Never pass full, verbatim clause text (which may contain real party names or commercial terms) directly into external search tool queries — the model formulates a focused legal <em>concept</em> as the tool argument, which is what actually gets sent externally; review your prompt to ensure it isn&#39;t implicitly encouraging the model to paste raw clause text into a query.</li>
+<li>Treat external search API keys with the same care as your OpenAI key — never log them, and rotate them if a tool&#39;s error messages are ever exposed to end users (they should not be).</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li>The <code class="inline-code">flag_for_human_review</code> tool is essentially free (no external call) — an agent that reaches for it quickly when appropriate is <em>cheaper</em>, not just more honest, than one that exhausts both search tools first. Nothing needs to be added to encourage this beyond the prompt&#39;s existing guidance; it falls out naturally once the tool exists.</li>
+<li>Cache identical tool queries within a single agent run if you notice the model re-issuing a very similar query to the same tool twice — a simple in-memory <code class="inline-code">Map</code> keyed by <code class="inline-code">(toolName, query)</code> scoped to one <code class="inline-code">judgment_lookup</code> invocation is enough; no need for persistent caching across runs given how varied real clause text is.</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Keep the system prompt (used identically by both agent versions in section 6) in one shared constant rather than duplicating it — you built both implementations to compare <em>mechanics</em>, not to maintain two different sets of instructions going forward.</li>
+<li>Adding a fourth tool later (e.g. a dedicated compliance-database lookup) is: write its logic function, wrap it with <code class="inline-code">tool()</code>, add it to the <code class="inline-code">legalResearchTools</code> array. No other file needs to change — same &quot;adding one array entry&quot; pattern as Phase 2&#39;s <code class="inline-code">RunnableBranch</code> and Phase 3&#39;s <code class="inline-code">CLAUSE_TYPES</code>.</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test each tool&#39;s logic function directly (not through the agent) with a mocked <code class="inline-code">fetch</code>, asserting both the success path and the &quot;API not configured / request failed&quot; string-returning path.</li>
+<li>Integration test the full <code class="inline-code">createReactAgent()</code> loop against constructed scenarios using mocked tool responses (per 3.2&#39;s Approach B): assert that when <code class="inline-code">search_indian_kanoon</code> is mocked to return nothing useful, the agent&#39;s next tool call is <code class="inline-code">search_case_precedent</code>, not a repeat of the same query; assert that when both searches are mocked empty, the agent calls <code class="inline-code">flag_for_human_review</code> rather than fabricating a reference.</li>
+<li>Test <code class="inline-code">distillAgentOutcome</code> against a few hand-constructed message transcripts (no live agent run needed) to confirm it reliably extracts <code class="inline-code">reviewFlagged: true</code> from a transcript ending in a <code class="inline-code">flag_for_human_review</code> tool call.</li>
+<li>Re-run Phase 4&#39;s existing integration tests (task 11/12 from Phase 4&#39;s hands-on tasks) after wiring this node in, to confirm the surrounding graph&#39;s behavior — checkpointing, the audit endpoints, the <code class="inline-code">aggregate_findings</code> join — is genuinely unaffected by this internal swap.</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>What structurally distinguishes an <em>agent</em> from a chain or a fixed graph node: the model itself deciding, at runtime and based on what it&#39;s already observed, whether and which tool to use next — not merely &quot;an LLM call that happens to use a tool.&quot;</li>
+<li>Tools as schema-described functions the model can request but never directly executes, and why giving an agent an explicit &quot;flag for human review&quot; action is a deliberate design choice that reduces fabrication under pressure to produce an answer.</li>
+<li>The ReAct loop (reason → act → observe → repeat) as the concrete mechanism underlying &quot;an agent,&quot; and why an iteration/recursion limit is a required safety setting, not optional polish.</li>
+<li><code class="inline-code">AgentExecutor</code> and <code class="inline-code">createReactAgent()</code> as two implementations of the identical loop — one a self-contained class with full manual visibility into every step, the other a compiled <code class="inline-code">StateGraph</code> that composes with the rest of this project&#39;s LangGraph architecture — and why the second is what actually ships.</li>
+<li>The value of keeping an agent&#39;s free-form, multi-turn reasoning entirely contained within its own module, crossing back into the rest of the system&#39;s strictly-typed world through exactly one small, fixed distillation call.</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li>Three tools (<code class="inline-code">search_indian_kanoon</code>, <code class="inline-code">search_case_precedent</code>, <code class="inline-code">flag_for_human_review</code>) with decoupled, individually testable logic.</li>
+<li>A hand-rolled <code class="inline-code">AgentExecutor</code> implementation, built and validated for its raw reasoning-trace visibility.</li>
+<li>A <code class="inline-code">createReactAgent()</code> implementation of the identical behavior, validated against the same test scenarios.</li>
+<li>Structured outcome distillation (<code class="inline-code">AgentOutcomeSchema</code> + <code class="inline-code">distillAgentOutcome</code>) bridging the agent&#39;s message transcript back into Phase 4&#39;s typed finding shape.</li>
+<li>Phase 4&#39;s <code class="inline-code">judgment_lookup</code> node fully replaced, in place, with zero changes to the surrounding graph&#39;s structure, edges, or checkpointing behavior.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Running the hands-on tasks against real (or realistically mocked) external search APIs and validating the agent&#39;s tool-selection behavior across genuinely varied HIGH-risk clause scenarios (tasks 5, 7, 11-12 — yours to execute).</li>
+<li>Everything from Phase 5 onward, which consumes this phase&#39;s enriched <code class="inline-code">risk_findings</code> (including the new <code class="inline-code">reviewFlagged</code> signal) alongside everything Phase 4 already produced.</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+Phase 5 (Report Generator) reads the completed <code class="inline-code">risk_findings</code> table — including, now, this phase&#39;s agent-sourced legal references and any <code class="inline-code">reviewFlagged</code> clauses — and turns it into a polished DOCX risk report. A clause flagged for human review by this phase&#39;s agent should surface distinctly in that report (e.g. &quot;grounding could not be confirmed — recommend manual legal review&quot;) rather than being presented with the same confidence as a fully-grounded finding; keep that distinction in mind as a requirement once you get to Phase 5&#39;s report-section design. Structurally, Phase 5 also introduces LangGraph&#39;s <strong>Functional API</strong> (<code class="inline-code">entrypoint</code>/<code class="inline-code">task</code>) as a second, contrasting way to build the same kind of pipeline you&#39;ve now built twice already (as an <code class="inline-code">AgentExecutor</code> vs. <code class="inline-code">createReactAgent()</code> here; as a <code class="inline-code">StateGraph</code> vs. Functional API there) — continuing this phase&#39;s theme of deliberately comparing two ways to build the same thing before settling on one.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

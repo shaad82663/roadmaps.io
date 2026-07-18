@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 2: Contract Parser + Classifier</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 2: Contract Parser + Classifier</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-2-contract-parser--classifier"><a class="heading-anchor" href="#legaldocs--phase-2-contract-parser--classifier" aria-hidden="true">#</a>LegalDocs — Phase 2: Contract Parser + Classifier</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL (from Phase 0), LangChain.js (<code class="inline-code">@langchain/core</code>, <code class="inline-code">@langchain/openai</code>), Zod, Multer
+<strong>Depends on:</strong> Phase 0 (server + DB skeleton), Phase 1 (you now know loaders — reused here for the user&#39;s uploaded contract)
+<strong>Feeds into:</strong> Phase 2.5 (conversational Q&amp;A needs the parsed/classified contract), Phase 3 (clause extraction runs on the same stored contract text), Phase 4 (risk analysis retrieves against <code class="inline-code">doc_group</code>s that align with the contract <code class="inline-code">type</code> decided here)</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>Build the entry point of the <em>user-facing</em> pipeline: a person uploads a contract (PDF/DOCX), and the system extracts its text, figures out <strong>what kind of contract it is</strong> (NDA, vendor agreement, employment contract, etc.), pulls out the <strong>key parties and basic metadata</strong>, and produces <strong>type-specific first-pass notes</strong> — all from a single, composed LCEL chain execution rather than three separate sequential LLM calls.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>Every phase after this one needs to know &quot;what am I looking at.&quot; Phase 3&#39;s clause extractor behaves differently for an NDA (extract confidentiality scope) than for an employment contract (extract compensation, notice period). Phase 4&#39;s risk analyzer decides which <code class="inline-code">doc_group</code>s of your Phase 1 knowledge base are even relevant — a vendor contract has no business being checked against labour law judgments. Getting classification right, early, and cheaply (one parallel LLM round-trip instead of several sequential ones) sets up everything downstream to be both <em>correct</em> and <em>fast</em>.</p>
+<p>This is also the phase where LCEL (LangChain Expression Language) stops being a &quot;chain = prompt.pipe(model).pipe(parser)&quot; toy example and becomes a real orchestration tool: running independent LLM calls concurrently, and branching logic declaratively based on a previous step&#39;s output — patterns you&#39;ll reuse constantly from Phase 3 onward.</p>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">                  ┌─────────────────────────────┐
+                  │  User uploads contract file  │
+                  │  (PDF / DOCX via HTTP POST)  │
+                  └───────────────┬─────────────┘
+                                  │
+                  ┌───────────────▼─────────────┐
+                  │  PHASE 2 — Parser+Classifier │
+                  │  load → preprocess →         │
+                  │  [classify ‖ extract] →      │
+                  │  branch(type) → merge         │
+                  └───────────────┬─────────────┘
+                                  │
+                  ┌───────────────▼─────────────┐
+                  │  contracts table (Postgres)  │
+                  │  raw_text, type, confidence, │
+                  │  key_parties, type_notes     │
+                  └───────────────┬─────────────┘
+                                  │
+        ┌─────────────────────────┼─────────────────────────┐
+        │                         │                          │
+ Phase 2.5: Chat with       Phase 3: Clause          Phase 4: Risk Analyzer
+ this contract              Extractor                (uses `type` to select
+ (needs raw_text +          (needs raw_text +          relevant doc_groups from
+  contract_id)               type for extraction        Phase 1&#x27;s knowledge base)
+                              strategy)</code></pre></div>
+<p>This phase&#39;s single deliverable is a populated <code class="inline-code">contracts</code> row per upload, produced by one composed chain invocation.</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-models--chatopenai"><a class="heading-anchor" href="#21-models--chatopenai" aria-hidden="true">#</a>2.1 Models — <code class="inline-code">ChatOpenAI</code></h3>
+<p>A <strong>chat model wrapper</strong> in LangChain (<code class="inline-code">ChatOpenAI</code> from <code class="inline-code">@langchain/openai</code>) is a thin, standardized interface over OpenAI&#39;s chat completions API. Why wrap it instead of calling the OpenAI SDK directly? Because everything else in LangChain — prompts, parsers, runnables, chains — is built to compose <em>around</em> this standard interface. Swap <code class="inline-code">ChatOpenAI</code> for a different provider later and the rest of your chain code doesn&#39;t change.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({ <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span> });</code></pre></div>
+<p><code class="inline-code">temperature: 0</code> matters here specifically: classification and extraction are tasks with a &quot;correct&quot; answer, not creative writing. Low temperature makes the model&#39;s output far more consistent across repeated runs on the same contract — important when you&#39;re going to trust this output to route logic downstream.</p>
+<h3 id="22-prompts--chatprompttemplate"><a class="heading-anchor" href="#22-prompts--chatprompttemplate" aria-hidden="true">#</a>2.2 Prompts — <code class="inline-code">ChatPromptTemplate</code></h3>
+<p>A prompt template is a reusable, parameterized instruction. Instead of string-concatenating contract text into a prompt by hand every time (error-prone, hard to version), you define the shape once:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> prompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [<span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;You are a contract classification expert...&quot;</span>],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Contract text:\n\n{text}&quot;</span>],
+]);</code></pre></div>
+<p>Calling <code class="inline-code">prompt.invoke({ text: &quot;...&quot; })</code> fills in <code class="inline-code">{text}</code> and returns a list of properly-typed chat messages. This separation — template now, values later — is what makes a prompt a <code class="inline-code">Runnable</code> that can be <code class="inline-code">.pipe()</code>-d to other runnables, rather than just a string.</p>
+<h3 id="23-output-parsers"><a class="heading-anchor" href="#23-output-parsers" aria-hidden="true">#</a>2.3 Output Parsers</h3>
+<p>An LLM&#39;s raw output is text. An <strong>output parser</strong> turns that text into a structured value your code can actually use (an object, not a paragraph). There are two real approaches in modern LangChain, and this phase is a good place to understand both — the second is what you&#39;ll actually use.</p>
+<p><strong>Classic approach — parser + format instructions.</strong> You describe the desired JSON shape in the prompt itself (<code class="inline-code">JsonOutputParser</code> / <code class="inline-code">StructuredOutputParser</code> can auto-generate this description via <code class="inline-code">.getFormatInstructions()</code>), the model tries to comply by writing JSON as text, and the parser then parses that string. This works with <em>any</em> model, including ones with no native structured-output support, but it&#39;s inherently a &quot;hope the model followed the format&quot; approach — malformed JSON is a real failure mode you have to catch and retry.</p>
+<p><strong>Function-calling / tool-calling approach — <code class="inline-code">withStructuredOutput()</code>.</strong> Modern OpenAI models support a mode where you give the model a schema (a Zod schema, translated to JSON Schema under the hood) and the model is <em>constrained</em> by the API itself to return data matching that schema — it&#39;s not &quot;asking nicely,&quot; it&#39;s a different API mode. LangChain exposes this as <code class="inline-code">model.withStructuredOutput(zodSchema)</code>, which returns a new runnable that outputs a already-typed, already-validated object directly — no separate parsing step needed at all.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> <span class="hljs-title class_">ClassificationSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">type</span>: z.<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;nda&quot;</span>, <span class="hljs-string">&quot;vendor&quot;</span>, <span class="hljs-string">&quot;employment&quot;</span>, <span class="hljs-string">&quot;service_agreement&quot;</span>, <span class="hljs-string">&quot;lease&quot;</span>, <span class="hljs-string">&quot;other&quot;</span>]),
+  <span class="hljs-attr">confidence</span>: z.<span class="hljs-title function_">number</span>().<span class="hljs-title function_">min</span>(<span class="hljs-number">0</span>).<span class="hljs-title function_">max</span>(<span class="hljs-number">1</span>),
+  <span class="hljs-attr">reasoning</span>: z.<span class="hljs-title function_">string</span>(),
+});
+
+<span class="hljs-keyword">const</span> classificationModel = model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">ClassificationSchema</span>);
+<span class="hljs-comment">// classificationModel.invoke(...) returns a real TypeScript object matching ClassificationSchema</span></code></pre></div>
+<p>We&#39;ll use <code class="inline-code">withStructuredOutput()</code> throughout this phase because it&#39;s more reliable and requires less error-handling code — but you should understand the classic parser approach too, since not every model/provider you might use later (in Phase 4.5&#39;s research agent, for instance, some tool/model combos) supports native structured output equally well, and knowing the fallback matters.</p>
+<h3 id="24-runnables-amp-lcel--the-real-subject-of-this-phase"><a class="heading-anchor" href="#24-runnables-amp-lcel--the-real-subject-of-this-phase" aria-hidden="true">#</a>2.4 Runnables &amp; LCEL — the real subject of this phase</h3>
+<p><strong>A <code class="inline-code">Runnable</code> is anything with a standard <code class="inline-code">.invoke()</code> (and <code class="inline-code">.batch()</code>, <code class="inline-code">.stream()</code>) interface.</strong> Prompts, models, parsers, and even your own plain functions (wrapped) are all runnables. LCEL is the small set of combinators for composing runnables together:</p>
+<p><strong><code class="inline-code">.pipe()</code> — sequence.</strong> <code class="inline-code">a.pipe(b)</code> means &quot;run <code class="inline-code">a</code>, feed its output as <code class="inline-code">b</code>&#39;s input.&quot; This is what <code class="inline-code">prompt.pipe(model)</code> has always meant — nothing new here, but it&#39;s the foundation the rest builds on.</p>
+<p><strong><code class="inline-code">RunnableLambda</code> — wrap your own function as a runnable step.</strong> Say you want to strip boilerplate headers/footers from contract text before anything else touches it. Without <code class="inline-code">RunnableLambda</code>, you&#39;d call that function <em>before</em> invoking the chain, as separate imperative code sitting outside the chain — which means it&#39;s invisible to LangSmith tracing, can&#39;t be swapped/composed with other runnables, and isn&#39;t reusable as a chain component.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> preprocess = <span class="hljs-title class_">RunnableLambda</span>.<span class="hljs-title function_">from</span>(<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">input</span>: { text: <span class="hljs-built_in">string</span> }</span>) =&gt;</span> ({
+  <span class="hljs-attr">text</span>: <span class="hljs-title function_">stripBoilerplate</span>(input.<span class="hljs-property">text</span>),
+}));</code></pre></div>
+<p>Now <code class="inline-code">preprocess</code> is a first-class step you can <code class="inline-code">.pipe()</code> just like a prompt or model — it shows up as a traced node, and slots into any chain.</p>
+<p><strong><code class="inline-code">RunnableParallel</code> — run independent steps concurrently, same input, different work.</strong> Classification (&quot;what type of contract is this&quot;) and party/keyword extraction (&quot;who are the parties, what are the key terms&quot;) are <em>independent questions about the same text</em>. There&#39;s no reason to answer them one after another. <code class="inline-code">RunnableParallel</code> takes the same input and fans it out to multiple runnables at once, then returns an object combining their outputs.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> parallelStage = <span class="hljs-title class_">RunnableParallel</span>.<span class="hljs-title function_">from</span>({
+  <span class="hljs-attr">classification</span>: classificationChain,
+  <span class="hljs-attr">extraction</span>: extractionChain,
+});
+<span class="hljs-comment">// parallelStage.invoke({ text }) → { classification: {...}, extraction: {...} }</span>
+<span class="hljs-comment">// both LLM calls happen concurrently, not sequentially</span></code></pre></div>
+<p>This literally halves (or more) your latency versus calling two chains one after another, and it costs nothing extra to write once you understand the pattern.</p>
+<p><strong><code class="inline-code">RunnableBranch</code> — declarative conditional routing.</strong> Once you know the contract <code class="inline-code">type</code>, different contract types deserve different follow-up scrutiny — an NDA&#39;s important flags (confidentiality scope, exceptions) are different from a vendor contract&#39;s (payment terms, liability caps). <code class="inline-code">RunnableBranch</code> lets you express &quot;if condition A, run chain A; else if condition B, run chain B; else run the default chain&quot; as a composable runnable, rather than an <code class="inline-code">if/else</code> block that lives outside your chain and breaks tracing/composability the same way an un-wrapped function would.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> branch = <span class="hljs-title class_">RunnableBranch</span>.<span class="hljs-title function_">from</span>([
+  [<span class="hljs-function">(<span class="hljs-params">input</span>) =&gt;</span> input.<span class="hljs-property">type</span> === <span class="hljs-string">&quot;nda&quot;</span>, ndaChain],
+  [<span class="hljs-function">(<span class="hljs-params">input</span>) =&gt;</span> input.<span class="hljs-property">type</span> === <span class="hljs-string">&quot;vendor&quot;</span>, vendorChain],
+  [<span class="hljs-function">(<span class="hljs-params">input</span>) =&gt;</span> input.<span class="hljs-property">type</span> === <span class="hljs-string">&quot;employment&quot;</span>, employmentChain],
+  defaultChain, <span class="hljs-comment">// fallback, always required as the last argument</span>
+]);</code></pre></div>
+<p><strong>Why <code class="inline-code">RunnableBranch</code> over a plain TypeScript <code class="inline-code">switch</code>?</strong> Both <em>work</em>. The difference is what you get for free: a <code class="inline-code">RunnableBranch</code> is traceable end-to-end in LangSmith (Phase 4 leans on this), composes with <code class="inline-code">.pipe()</code> like any other step so it can sit inside a larger chain without special-casing, and — because it&#39;s declarative data (an array of condition/chain pairs) rather than imperative control flow — adding a new contract type later means adding one array entry, not restructuring a function. For a chain this size either is fine; the value shows up once your pipelines get longer (Phase 4 has a much bigger graph), and building the habit now is the point of this phase.</p>
+<p><strong><code class="inline-code">RunnablePassthrough</code> — carry data forward unchanged.</strong> After the parallel classify+extract stage, you still need the <em>type-specific branch step</em> to see the original <code class="inline-code">text</code> (to reason about it) and the original <code class="inline-code">classification</code>/<code class="inline-code">extraction</code> results (to merge back into the final output) at the same time. <code class="inline-code">RunnablePassthrough</code> is a no-op runnable — &quot;just pass whatever you received straight through&quot; — used inside a <code class="inline-code">RunnableParallel</code> to preserve the current state alongside a new computed branch:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-title class_">RunnableParallel</span>.<span class="hljs-title function_">from</span>({
+  <span class="hljs-attr">previous</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">RunnablePassthrough</span>(),        <span class="hljs-comment">// { text, classification, extraction } unchanged</span>
+  <span class="hljs-attr">typeSpecific</span>: reshapeForBranch.<span class="hljs-title function_">pipe</span>(branch), <span class="hljs-comment">// new computation based on the same input</span>
+});</code></pre></div>
+<h3 id="25-chains"><a class="heading-anchor" href="#25-chains" aria-hidden="true">#</a>2.5 Chains</h3>
+<p>A &quot;chain&quot; in LangChain isn&#39;t a special class — it&#39;s just the result of piping runnables together. <code class="inline-code">promptA.pipe(model).pipe(schema)</code> <em>is</em> a chain. What your roadmap calls &quot;Chains&quot; (unit 5) is really the skill of composing the primitives above (prompts, models, parsers, <code class="inline-code">RunnableParallel</code>, <code class="inline-code">RunnableBranch</code>, <code class="inline-code">RunnableLambda</code>) into a single coherent pipeline that does real multi-step work in one <code class="inline-code">.invoke()</code> call. This phase&#39;s &quot;Detailed Implementation Plan&quot; below is, in full, the construction of exactly one such chain.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-sequential-vs-parallel-classification--extraction"><a class="heading-anchor" href="#31-sequential-vs-parallel-classification--extraction" aria-hidden="true">#</a>3.1 Sequential vs. parallel classification + extraction</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Sequential</strong> — classify first, then extract using the known type</td>
+<td>Extraction prompt can be tailored per type immediately (no generic extraction prompt needed)</td>
+<td>Two full LLM round-trips end-to-end (slower, costlier); extraction is blocked on classification even though the two questions are largely independent</td>
+<td>If extraction quality genuinely depends on knowing the type <em>before</em> you can ask the right extraction question at all</td>
+</tr>
+<tr>
+<td><strong>B. Parallel (roadmap&#39;s choice)</strong> — classify and extract concurrently from the same raw text, refine only afterward via the type-specific branch</td>
+<td>Lower latency (concurrent calls); demonstrates <code class="inline-code">RunnableParallel</code> properly; extraction of parties/keywords rarely actually needs to know the type first</td>
+<td>Extraction prompt must be generic enough to work before type is known (solvable — party/keyword extraction genuinely doesn&#39;t need type)</td>
+<td><strong>Recommended</strong> — matches your roadmap exactly, and is the correct call here because basic extraction (parties, effective date, keywords) is type-independent</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="32-output-parsing-strategy"><a class="heading-anchor" href="#32-output-parsing-strategy" aria-hidden="true">#</a>3.2 Output parsing strategy</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Classic parser + format instructions</strong> (<code class="inline-code">JsonOutputParser</code>, prompt-embedded schema description)</td>
+<td>Works with any model, including ones without native structured-output support</td>
+<td>Model can still emit malformed JSON; you need retry/repair logic; more code</td>
+<td>Non-OpenAI models, or older models without tool-calling</td>
+</tr>
+<tr>
+<td><strong>B. <code class="inline-code">withStructuredOutput()</code></strong> (function-calling constrained decoding)</td>
+<td>Guaranteed schema-conformant output from the API itself; no manual parsing/retry code; Zod schema doubles as your TypeScript type</td>
+<td>Requires a model that supports it (all current OpenAI chat models do)</td>
+<td><strong>Recommended</strong> — this project is OpenAI-only per your tech stack, so there&#39;s no reason not to use the more reliable option</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="33-file-handling--memory-buffer-vs-disk"><a class="heading-anchor" href="#33-file-handling--memory-buffer-vs-disk" aria-hidden="true">#</a>3.3 File handling — memory buffer vs. disk</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Multer memory storage</strong> — file arrives as an in-memory <code class="inline-code">Buffer</code></td>
+<td>No temp file cleanup needed; simpler code</td>
+<td>Large files consume request-handler memory directly; loaders need a file <em>path</em>, so you&#39;d need to write the buffer to a temp file anyway for <code class="inline-code">PDFLoader</code>/<code class="inline-code">DocxLoader</code></td>
+<td>Fine for small files if you don&#39;t need path-based loaders</td>
+</tr>
+<tr>
+<td><strong>B. Multer disk storage</strong> — file streamed straight to a temp path</td>
+<td>Works directly with LangChain&#39;s path-based loaders from Phase 1 with zero extra code; predictable memory usage regardless of file size</td>
+<td>You must remember to delete the temp file after processing</td>
+<td><strong>Recommended</strong> — reuses your Phase 1 loader code as-is, and contract PDFs can be large (40+ pages per your Phase 3 note)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="34-branching-mechanism"><a class="heading-anchor" href="#34-branching-mechanism" aria-hidden="true">#</a>3.4 Branching mechanism</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Plain <code class="inline-code">if/else</code> or <code class="inline-code">switch</code> in application code, chains built ad hoc</strong></td>
+<td>Fewer LangChain concepts to learn; quick to write</td>
+<td>Not traceable as part of the chain graph; not composable/reusable; roadmap explicitly wants LCEL exercised here</td>
+<td>Quick prototypes only</td>
+</tr>
+<tr>
+<td><strong>B. <code class="inline-code">RunnableBranch</code></strong></td>
+<td>Declarative, traceable, composable, easy to extend with new contract types</td>
+<td>Slightly more ceremony to set up initially</td>
+<td><strong>Recommended</strong> — this is the whole point of this phase per your roadmap</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--database-schema-for-contracts"><a class="heading-anchor" href="#step-1--database-schema-for-contracts" aria-hidden="true">#</a>Step 1 — Database schema for contracts</h3>
+<p><strong>What:</strong> A <code class="inline-code">contracts</code> table storing the raw extracted text, classification result, extracted parties/metadata, and type-specific notes.</p>
+<p><strong>Why:</strong> This is the row every later phase reads from — Phase 2.5&#39;s chat retriever, Phase 3&#39;s clause extractor, and Phase 4&#39;s risk analyzer all start from <code class="inline-code">contracts.id</code>.</p>
+<p><strong>How:</strong> One table, <code class="inline-code">contract_type</code> as free text (not a Postgres enum) so adding a new contract type later is a data change, not a schema migration.</p>
+<p><strong>Best practice:</strong> Store the <em>original filename</em> and a <em>content hash</em> (same idempotency pattern as Phase 1) so re-uploading the identical file doesn&#39;t silently create duplicate rows.</p>
+<p><strong>Common mistake to avoid:</strong> Storing <code class="inline-code">key_parties</code> and <code class="inline-code">type_specific_notes</code> as separate flat columns per field. Use <code class="inline-code">jsonb</code> — these shapes vary per contract type by design (that&#39;s the entire point of the type-specific branch), and a rigid column-per-field schema fights that.</p>
+<h3 id="step-2--file-upload-middleware"><a class="heading-anchor" href="#step-2--file-upload-middleware" aria-hidden="true">#</a>Step 2 — File upload middleware</h3>
+<p><strong>What:</strong> A Multer disk-storage configuration limiting file size and accepted MIME types/extensions, writing to a temp uploads directory.</p>
+<p><strong>Why:</strong> Validate early (reject a 50MB file or a <code class="inline-code">.exe</code> renamed to <code class="inline-code">.pdf</code> before it ever reaches your LLM pipeline) rather than discovering the problem mid-chain.</p>
+<p><strong>Best practice:</strong> Validate by both MIME type <em>and</em> file extension — a MIME type header is client-supplied and not fully trustworthy on its own, so checking both raises the bar a little further.</p>
+<p><strong>Common mistake to avoid:</strong> Forgetting to delete the temp file after processing (success <em>or</em> failure) — use a <code class="inline-code">try/finally</code>.</p>
+<h3 id="step-3--text-extraction-from-the-uploaded-file"><a class="heading-anchor" href="#step-3--text-extraction-from-the-uploaded-file" aria-hidden="true">#</a>Step 3 — Text extraction from the uploaded file</h3>
+<p><strong>What:</strong> Reuse the Phase 1 loader pattern (<code class="inline-code">PDFLoader</code>/<code class="inline-code">DocxLoader</code>) for a single uploaded file, concatenating pages into one string.</p>
+<p><strong>Why:</strong> You already solved &quot;how do I get text out of a PDF/DOCX&quot; in Phase 1 — no reason to solve it differently here. The difference: this is a single eager <code class="inline-code">load()</code> call, not a lazy directory-wide iteration, since there&#39;s exactly one file per request.</p>
+<h3 id="step-4--zod-schemas-for-every-structured-step"><a class="heading-anchor" href="#step-4--zod-schemas-for-every-structured-step" aria-hidden="true">#</a>Step 4 — Zod schemas for every structured step</h3>
+<p><strong>What:</strong> <code class="inline-code">ClassificationSchema</code>, <code class="inline-code">ExtractionSchema</code>, and one schema per contract type&#39;s refinement notes (<code class="inline-code">NdaNotesSchema</code>, <code class="inline-code">VendorNotesSchema</code>, <code class="inline-code">EmploymentNotesSchema</code>, <code class="inline-code">DefaultNotesSchema</code>).</p>
+<p><strong>Why:</strong> Each schema is both your LLM output contract <em>and</em> your TypeScript type (<code class="inline-code">z.infer&lt;typeof Schema&gt;</code>) — one source of truth instead of two things that can drift out of sync.</p>
+<p><strong>Best practice:</strong> Give every field a clear, specific description via <code class="inline-code">.describe()</code> — this text is sent to the model as part of the schema and materially affects output quality, not just documentation.</p>
+<h3 id="step-5--the-preprocessing-step-runnablelambda"><a class="heading-anchor" href="#step-5--the-preprocessing-step-runnablelambda" aria-hidden="true">#</a>Step 5 — The preprocessing step (<code class="inline-code">RunnableLambda</code>)</h3>
+<p><strong>What:</strong> A function stripping obvious boilerplate (page-number footers, repeated headers, watermark text) from the raw extracted text before it reaches any prompt, wrapped as a runnable.</p>
+<p><strong>Why:</strong> Every token of boilerplate is wasted context budget and can distract the classifier/extractor from real content.</p>
+<p><strong>Common mistake to avoid:</strong> Being too aggressive — a regex that&#39;s over-eager can accidentally strip actual contract clauses that happen to match a &quot;boilerplate-looking&quot; pattern (e.g. a clause that starts with &quot;Page&quot; as a defined term). Keep the patterns narrow and specific (page-number-only lines, a known letterhead line) rather than broad heuristics.</p>
+<h3 id="step-6--classification-and-extraction-chains-parallel-stage"><a class="heading-anchor" href="#step-6--classification-and-extraction-chains-parallel-stage" aria-hidden="true">#</a>Step 6 — Classification and extraction chains (parallel stage)</h3>
+<p><strong>What:</strong> Two independent chains, each <code class="inline-code">prompt.pipe(model.withStructuredOutput(Schema))</code>, composed via <code class="inline-code">RunnableParallel</code>.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.4 above — this is the direct implementation of that pattern.</p>
+<h3 id="step-7--type-specific-branch"><a class="heading-anchor" href="#step-7--type-specific-branch" aria-hidden="true">#</a>Step 7 — Type-specific branch</h3>
+<p><strong>What:</strong> <code class="inline-code">RunnableBranch</code> selecting one of several type-specific refinement chains based on the classification result, each using its own Zod schema and prompt tailored to that contract type&#39;s concerns.</p>
+<p><strong>Why:</strong> An NDA and an employment contract deserve genuinely different follow-up questions at this stage — this is where that specialization happens.</p>
+<p><strong>Best practice:</strong> Always include a default/fallback branch (for <code class="inline-code">type: &quot;other&quot;</code> or <code class="inline-code">type: &quot;lease&quot;</code>/<code class="inline-code">&quot;service_agreement&quot;</code> if you haven&#39;t written a bespoke branch for every enum value yet) — <code class="inline-code">RunnableBranch</code> throws if no condition matches and no default is provided.</p>
+<h3 id="step-8--merge-into-the-final-response-shape"><a class="heading-anchor" href="#step-8--merge-into-the-final-response-shape" aria-hidden="true">#</a>Step 8 — Merge into the final response shape</h3>
+<p><strong>What:</strong> A final <code class="inline-code">RunnableLambda</code> combining <code class="inline-code">classification</code> + <code class="inline-code">extraction</code> + <code class="inline-code">typeSpecific</code> into one flat response object, and a corresponding DB insert.</p>
+<p><strong>Why:</strong> Downstream consumers (the API response, the DB row) want one coherent object, not three separate nested results to reassemble themselves each time.</p>
+<h3 id="step-9--the-upload-endpoint"><a class="heading-anchor" href="#step-9--the-upload-endpoint" aria-hidden="true">#</a>Step 9 — The upload endpoint</h3>
+<p><strong>What:</strong> <code class="inline-code">POST /api/contracts/upload</code> wiring together: multer → text extraction → chain invocation → DB insert → JSON response.</p>
+<p><strong>Best practice:</strong> Wrap the chain invocation and DB write in a way that returns a clear, structured error response (with an HTTP 422, not a 500) if classification confidence is very low or extraction produced clearly incomplete results — the caller should be able to tell &quot;this contract type is unclear&quot; apart from &quot;the server broke.&quot;</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<ol>
+<li><strong>Run the migration</strong> below against your Phase-0 Postgres to create the <code class="inline-code">contracts</code> table.</li>
+<li><strong>Install dependencies</strong>: <code class="inline-code">multer</code>, <code class="inline-code">zod</code>, <code class="inline-code">@types/multer</code>.</li>
+<li><strong>Implement <code class="inline-code">src/contracts/schemas.ts</code></strong> — all Zod schemas (classification, extraction, and one per contract type).</li>
+<li><strong>Implement <code class="inline-code">src/contracts/preprocess.ts</code></strong> — boilerplate stripping + the <code class="inline-code">RunnableLambda</code> wrapper.</li>
+<li><strong>Implement <code class="inline-code">src/contracts/textExtraction.ts</code></strong> — single-file PDF/DOCX loading, reusing Phase 1 conventions.</li>
+<li><strong>Implement <code class="inline-code">src/contracts/chains/classification.ts</code></strong> and <strong><code class="inline-code">extraction.ts</code></strong> — the two parallel sub-chains.</li>
+<li><strong>Implement <code class="inline-code">src/contracts/chains/typeSpecific.ts</code></strong> — the <code class="inline-code">RunnableBranch</code> and its per-type sub-chains.</li>
+<li><strong>Implement <code class="inline-code">src/contracts/chains/index.ts</code></strong> — compose the full pipeline end to end.</li>
+<li><strong>Implement <code class="inline-code">src/contracts/storage.ts</code></strong> — insert/lookup functions against the <code class="inline-code">contracts</code> table.</li>
+<li><strong>Implement <code class="inline-code">src/contracts/upload.middleware.ts</code></strong> — the Multer config.</li>
+<li><strong>Implement <code class="inline-code">src/routes/contracts.ts</code></strong> and wire it into your Express app from Phase 0.</li>
+<li><strong>Test it</strong>: upload 3 real contracts of different types (an NDA, a vendor agreement, an employment contract) and confirm each gets a sensible <code class="inline-code">type</code>, <code class="inline-code">confidence</code>, <code class="inline-code">keyParties</code>, and type-appropriate <code class="inline-code">typeSpecificNotes</code>.</li>
+<li><strong>Test the fallback branch</strong> deliberately: upload something ambiguous or a contract type you didn&#39;t write a bespoke branch for, and confirm it lands cleanly in the default branch instead of throwing.</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<h3 id="61-dependencies"><a class="heading-anchor" href="#61-dependencies" aria-hidden="true">#</a>6.1 Dependencies</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install multer zod
+npm install -D @types/multer</code></pre></div>
+<h3 id="62-environment-variables-append-to-env"><a class="heading-anchor" href="#62-environment-variables-append-to-env" aria-hidden="true">#</a>6.2 Environment variables (append to <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">CLASSIFIER_MODEL=gpt-4o-mini
+MAX_UPLOAD_MB=15
+UPLOAD_TMP_DIR=./tmp/uploads</code></pre></div>
+<h3 id="63-database-migration"><a class="heading-anchor" href="#63-database-migration" aria-hidden="true">#</a>6.3 Database migration</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">sql</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-sql"><span class="hljs-comment">-- migrations/002_contracts.sql</span>
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> contracts (
+    id                  UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    original_filename   TEXT <span class="hljs-keyword">NOT NULL</span>,
+    content_hash        TEXT <span class="hljs-keyword">NOT NULL</span>,
+    raw_text            TEXT <span class="hljs-keyword">NOT NULL</span>,
+    contract_type       TEXT <span class="hljs-keyword">NOT NULL</span>,
+    confidence          <span class="hljs-type">REAL</span> <span class="hljs-keyword">NOT NULL</span>,
+    classification_reasoning TEXT <span class="hljs-keyword">NOT NULL</span>,
+    key_parties         JSONB <span class="hljs-keyword">NOT NULL</span>,
+    effective_date      TEXT,
+    keywords            JSONB <span class="hljs-keyword">NOT NULL</span>,
+    type_specific_notes JSONB <span class="hljs-keyword">NOT NULL</span>,
+    created_at          TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_contracts_content_hash <span class="hljs-keyword">ON</span> contracts (content_hash);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_contracts_type <span class="hljs-keyword">ON</span> contracts (contract_type);</code></pre></div>
+<h3 id="64-zod-schemas"><a class="heading-anchor" href="#64-zod-schemas" aria-hidden="true">#</a>6.4 Zod schemas</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/schemas.ts</span>
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CONTRACT_TYPES</span> = [
+  <span class="hljs-string">&quot;nda&quot;</span>,
+  <span class="hljs-string">&quot;vendor&quot;</span>,
+  <span class="hljs-string">&quot;employment&quot;</span>,
+  <span class="hljs-string">&quot;service_agreement&quot;</span>,
+  <span class="hljs-string">&quot;lease&quot;</span>,
+  <span class="hljs-string">&quot;other&quot;</span>,
+] <span class="hljs-keyword">as</span> <span class="hljs-keyword">const</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">ClassificationSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">type</span>: z.<span class="hljs-title function_">enum</span>(<span class="hljs-variable constant_">CONTRACT_TYPES</span>).<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The single best-fitting contract category&quot;</span>),
+  <span class="hljs-attr">confidence</span>: z
+    .<span class="hljs-title function_">number</span>()
+    .<span class="hljs-title function_">min</span>(<span class="hljs-number">0</span>)
+    .<span class="hljs-title function_">max</span>(<span class="hljs-number">1</span>)
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;How confident you are in this classification, from 0 to 1&quot;</span>),
+  <span class="hljs-attr">reasoning</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;One or two sentences explaining why this category was chosen&quot;</span>),
+});
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">Classification</span> = z.<span class="hljs-property">infer</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">ClassificationSchema</span>&gt;;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">ExtractionSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">keyParties</span>: z
+    .<span class="hljs-title function_">array</span>(
+      z.<span class="hljs-title function_">object</span>({
+        <span class="hljs-attr">name</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The party&#x27;s full name as written in the contract&quot;</span>),
+        <span class="hljs-attr">role</span>: z
+          .<span class="hljs-title function_">string</span>()
+          .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Their role, e.g. &#x27;Disclosing Party&#x27;, &#x27;Employer&#x27;, &#x27;Vendor&#x27;&quot;</span>),
+      })
+    )
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Every distinct named party to the contract&quot;</span>),
+  <span class="hljs-attr">effectiveDate</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">nullable</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The contract&#x27;s effective/start date if stated, else null&quot;</span>),
+  <span class="hljs-attr">keywords</span>: z
+    .<span class="hljs-title function_">array</span>(z.<span class="hljs-title function_">string</span>())
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;5-10 key legal terms or topics that appear in this contract&quot;</span>),
+});
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">Extraction</span> = z.<span class="hljs-property">infer</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">ExtractionSchema</span>&gt;;
+
+<span class="hljs-keyword">const</span> flaggedConcerns = z
+  .<span class="hljs-title function_">array</span>(z.<span class="hljs-title function_">string</span>())
+  .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Notable concerns worth a closer look in the full risk analysis phase&quot;</span>);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">NdaNotesSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">confidentialityScope</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;What information is defined as confidential, in one sentence&quot;</span>),
+  <span class="hljs-attr">survivalPeriod</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">nullable</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;How long confidentiality obligations survive after termination, if stated&quot;</span>),
+  flaggedConcerns,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">VendorNotesSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">paymentTerms</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">nullable</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Payment schedule/terms, if stated&quot;</span>),
+  <span class="hljs-attr">liabilityCapMentioned</span>: z
+    .<span class="hljs-title function_">boolean</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Whether a liability cap or limitation of liability clause is present&quot;</span>),
+  flaggedConcerns,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">EmploymentNotesSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">compensationStructure</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">nullable</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Salary/compensation structure, if stated&quot;</span>),
+  <span class="hljs-attr">noticePeriod</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">nullable</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Termination notice period, if stated&quot;</span>),
+  flaggedConcerns,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">DefaultNotesSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">summary</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A brief one-paragraph summary of what this contract governs&quot;</span>),
+  flaggedConcerns,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">AnalyzedContract</span> {
+  <span class="hljs-attr">type</span>: <span class="hljs-title class_">Classification</span>[<span class="hljs-string">&quot;type&quot;</span>];
+  <span class="hljs-attr">confidence</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">reasoning</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">keyParties</span>: <span class="hljs-title class_">Extraction</span>[<span class="hljs-string">&quot;keyParties&quot;</span>];
+  <span class="hljs-attr">effectiveDate</span>: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>;
+  <span class="hljs-attr">keywords</span>: <span class="hljs-built_in">string</span>[];
+  <span class="hljs-attr">typeSpecificNotes</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">unknown</span>&gt;;
+}</code></pre></div>
+<h3 id="65-boilerplate-preprocessing"><a class="heading-anchor" href="#65-boilerplate-preprocessing" aria-hidden="true">#</a>6.5 Boilerplate preprocessing</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/preprocess.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">RunnableLambda</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/runnables&quot;</span>;
+
+<span class="hljs-comment">/**
+ * Strips obvious non-substantive boilerplate (page-number-only lines,
+ * repeated letterhead lines) before the text reaches any prompt. Kept
+ * deliberately narrow - a broad heuristic risks stripping an actual clause
+ * that happens to start with a word like &quot;Page&quot; as a defined term.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">stripBoilerplate</span>(<span class="hljs-params"><span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> text
+    .<span class="hljs-title function_">split</span>(<span class="hljs-string">&quot;\n&quot;</span>)
+    .<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">line</span>) =&gt;</span> {
+      <span class="hljs-keyword">const</span> trimmed = line.<span class="hljs-title function_">trim</span>();
+      <span class="hljs-keyword">if</span> (trimmed.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>; <span class="hljs-comment">// keep blank lines for paragraph structure</span>
+      <span class="hljs-keyword">const</span> isPageNumberOnly = <span class="hljs-regexp">/^page\s+\d+(\s+of\s+\d+)?$/i</span>.<span class="hljs-title function_">test</span>(trimmed);
+      <span class="hljs-keyword">const</span> isBareNumber = <span class="hljs-regexp">/^\d{1,4}$/</span>.<span class="hljs-title function_">test</span>(trimmed);
+      <span class="hljs-keyword">return</span> !isPageNumberOnly &amp;&amp; !isBareNumber;
+    })
+    .<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n&quot;</span>)
+    .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\n{3,}/g</span>, <span class="hljs-string">&quot;\n\n&quot;</span>) <span class="hljs-comment">// collapse excessive blank lines left behind</span>
+    .<span class="hljs-title function_">trim</span>();
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ChainInput</span> {
+  <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> preprocessStep = <span class="hljs-title class_">RunnableLambda</span>.<span class="hljs-title function_">from</span>((<span class="hljs-attr">input</span>: <span class="hljs-title class_">ChainInput</span>): <span class="hljs-function"><span class="hljs-params">ChainInput</span> =&gt;</span> ({
+  <span class="hljs-attr">text</span>: <span class="hljs-title function_">stripBoilerplate</span>(input.<span class="hljs-property">text</span>),
+}));</code></pre></div>
+<h3 id="66-single-file-text-extraction"><a class="heading-anchor" href="#66-single-file-text-extraction" aria-hidden="true">#</a>6.6 Single-file text extraction</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/textExtraction.ts</span>
+<span class="hljs-keyword">import</span> path <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;path&quot;</span>;
+<span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;fs/promises&quot;</span>;
+<span class="hljs-keyword">import</span> { createHash } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;crypto&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">PDFLoader</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/community/document_loaders/fs/pdf&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">DocxLoader</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/community/document_loaders/fs/docx&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ExtractedFile</span> {
+  <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">contentHash</span>: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">loaderForFile</span>(<span class="hljs-params"><span class="hljs-attr">filePath</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> ext = path.<span class="hljs-title function_">extname</span>(filePath).<span class="hljs-title function_">toLowerCase</span>();
+  <span class="hljs-keyword">if</span> (ext === <span class="hljs-string">&quot;.pdf&quot;</span>) <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PDFLoader</span>(filePath, { <span class="hljs-attr">splitPages</span>: <span class="hljs-literal">true</span> });
+  <span class="hljs-keyword">if</span> (ext === <span class="hljs-string">&quot;.docx&quot;</span>) <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DocxLoader</span>(filePath);
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Unsupported file type: <span class="hljs-subst">${ext}</span>`</span>);
+}
+
+<span class="hljs-comment">/**
+ * Eager load() is correct here (unlike Phase 1&#x27;s lazyLoad()) - this handles
+ * exactly one uploaded file per request, so there&#x27;s no bulk-memory concern
+ * to guard against.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">extractTextFromUpload</span>(<span class="hljs-params"><span class="hljs-attr">filePath</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">ExtractedFile</span>&gt; {
+  <span class="hljs-keyword">const</span> rawBytes = <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(filePath);
+  <span class="hljs-keyword">const</span> contentHash = <span class="hljs-title function_">createHash</span>(<span class="hljs-string">&quot;sha256&quot;</span>).<span class="hljs-title function_">update</span>(rawBytes).<span class="hljs-title function_">digest</span>(<span class="hljs-string">&quot;hex&quot;</span>);
+
+  <span class="hljs-keyword">const</span> loader = <span class="hljs-title function_">loaderForFile</span>(filePath);
+  <span class="hljs-keyword">const</span> pages = <span class="hljs-keyword">await</span> loader.<span class="hljs-title function_">load</span>();
+  <span class="hljs-keyword">const</span> text = pages.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">p</span>) =&gt;</span> p.<span class="hljs-property">pageContent</span>).<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n\n&quot;</span>);
+
+  <span class="hljs-keyword">if</span> (text.<span class="hljs-title function_">trim</span>().<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Extracted text is empty - the file may be a scanned image without OCR text.&quot;</span>);
+  }
+
+  <span class="hljs-keyword">return</span> { text, contentHash };
+}</code></pre></div>
+<h3 id="67-classification-and-extraction-chains"><a class="heading-anchor" href="#67-classification-and-extraction-chains" aria-hidden="true">#</a>6.7 Classification and extraction chains</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/chains/classification.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ClassificationSchema</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../schemas&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CLASSIFIER_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> classificationPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;You are an expert contract classification assistant. Read the contract &quot;</span> +
+      <span class="hljs-string">&quot;text and determine which single category it best fits. Base your &quot;</span> +
+      <span class="hljs-string">&quot;answer only on the text provided, not assumptions.&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Contract text:\n\n{text}&quot;</span>],
+]);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> classificationChain = classificationPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">ClassificationSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;classify_contract&quot;</span> })
+);</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/chains/extraction.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ExtractionSchema</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../schemas&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CLASSIFIER_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> extractionPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;You extract structural metadata from contracts: the named parties and &quot;</span> +
+      <span class="hljs-string">&quot;their roles, the effective date if stated, and key legal terms. This &quot;</span> +
+      <span class="hljs-string">&quot;task does not require knowing the contract&#x27;s category - work from the &quot;</span> +
+      <span class="hljs-string">&quot;text alone.&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Contract text:\n\n{text}&quot;</span>],
+]);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> extractionChain = extractionPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">ExtractionSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;extract_metadata&quot;</span> })
+);</code></pre></div>
+<h3 id="68-type-specific-branch"><a class="heading-anchor" href="#68-type-specific-branch" aria-hidden="true">#</a>6.8 Type-specific branch</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/chains/typeSpecific.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">RunnableBranch</span>, <span class="hljs-title class_">RunnableLambda</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/runnables&quot;</span>;
+<span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">NdaNotesSchema</span>,
+  <span class="hljs-title class_">VendorNotesSchema</span>,
+  <span class="hljs-title class_">EmploymentNotesSchema</span>,
+  <span class="hljs-title class_">DefaultNotesSchema</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../schemas&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CLASSIFIER_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">typeChain</span>(<span class="hljs-params"><span class="hljs-attr">systemInstruction</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">schema</span>: <span class="hljs-built_in">any</span>, <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> prompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+    [<span class="hljs-string">&quot;system&quot;</span>, systemInstruction],
+    [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Contract text:\n\n{text}&quot;</span>],
+  ]);
+  <span class="hljs-keyword">return</span> prompt.<span class="hljs-title function_">pipe</span>(model.<span class="hljs-title function_">withStructuredOutput</span>(schema, { name }));
+}
+
+<span class="hljs-keyword">const</span> ndaChain = <span class="hljs-title function_">typeChain</span>(
+  <span class="hljs-string">&quot;This is a Non-Disclosure Agreement. Identify the scope of confidential &quot;</span> +
+    <span class="hljs-string">&quot;information, how long confidentiality survives after termination, and &quot;</span> +
+    <span class="hljs-string">&quot;any concerning or unusually one-sided terms.&quot;</span>,
+  <span class="hljs-title class_">NdaNotesSchema</span>,
+  <span class="hljs-string">&quot;nda_notes&quot;</span>
+);
+
+<span class="hljs-keyword">const</span> vendorChain = <span class="hljs-title function_">typeChain</span>(
+  <span class="hljs-string">&quot;This is a vendor/service supply contract. Identify the payment terms, &quot;</span> +
+    <span class="hljs-string">&quot;whether a liability cap is present, and any concerning terms.&quot;</span>,
+  <span class="hljs-title class_">VendorNotesSchema</span>,
+  <span class="hljs-string">&quot;vendor_notes&quot;</span>
+);
+
+<span class="hljs-keyword">const</span> employmentChain = <span class="hljs-title function_">typeChain</span>(
+  <span class="hljs-string">&quot;This is an employment contract. Identify the compensation structure, &quot;</span> +
+    <span class="hljs-string">&quot;the termination notice period, and any concerning terms.&quot;</span>,
+  <span class="hljs-title class_">EmploymentNotesSchema</span>,
+  <span class="hljs-string">&quot;employment_notes&quot;</span>
+);
+
+<span class="hljs-keyword">const</span> defaultChain = <span class="hljs-title function_">typeChain</span>(
+  <span class="hljs-string">&quot;Summarize what this contract governs in one paragraph and flag any &quot;</span> +
+    <span class="hljs-string">&quot;concerning or unusually one-sided terms you notice.&quot;</span>,
+  <span class="hljs-title class_">DefaultNotesSchema</span>,
+  <span class="hljs-string">&quot;default_notes&quot;</span>
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">BranchInput</span> {
+  <span class="hljs-attr">type</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-comment">/**
+ * RunnableBranch over a plain if/else: this reads as data (condition, chain)
+ * pairs rather than control flow, which means it&#x27;s traced end-to-end like
+ * any other chain step, and adding a new contract type later is a one-line
+ * addition here rather than a change to imperative branching logic.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> typeSpecificBranch = <span class="hljs-title class_">RunnableBranch</span>.<span class="hljs-title function_">from</span>([
+  [<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">input</span>: <span class="hljs-title class_">BranchInput</span></span>) =&gt;</span> input.<span class="hljs-property">type</span> === <span class="hljs-string">&quot;nda&quot;</span>, ndaChain],
+  [<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">input</span>: <span class="hljs-title class_">BranchInput</span></span>) =&gt;</span> input.<span class="hljs-property">type</span> === <span class="hljs-string">&quot;vendor&quot;</span>, vendorChain],
+  [<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">input</span>: <span class="hljs-title class_">BranchInput</span></span>) =&gt;</span> input.<span class="hljs-property">type</span> === <span class="hljs-string">&quot;employment&quot;</span>, employmentChain],
+  defaultChain, <span class="hljs-comment">// required fallback - covers service_agreement, lease, other</span>
+]);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> reshapeForBranch = <span class="hljs-title class_">RunnableLambda</span>.<span class="hljs-title function_">from</span>(
+  (<span class="hljs-attr">input</span>: { <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">classification</span>: { <span class="hljs-attr">type</span>: <span class="hljs-built_in">string</span> } }): <span class="hljs-function"><span class="hljs-params">BranchInput</span> =&gt;</span> ({
+    <span class="hljs-attr">type</span>: input.<span class="hljs-property">classification</span>.<span class="hljs-property">type</span>,
+    <span class="hljs-attr">text</span>: input.<span class="hljs-property">text</span>,
+  })
+);</code></pre></div>
+<h3 id="69-full-composed-chain"><a class="heading-anchor" href="#69-full-composed-chain" aria-hidden="true">#</a>6.9 Full composed chain</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/chains/index.ts</span>
+<span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">RunnableParallel</span>,
+  <span class="hljs-title class_">RunnablePassthrough</span>,
+  <span class="hljs-title class_">RunnableLambda</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/runnables&quot;</span>;
+<span class="hljs-keyword">import</span> { preprocessStep, <span class="hljs-keyword">type</span> <span class="hljs-title class_">ChainInput</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../preprocess&quot;</span>;
+<span class="hljs-keyword">import</span> { classificationChain } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./classification&quot;</span>;
+<span class="hljs-keyword">import</span> { extractionChain } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./extraction&quot;</span>;
+<span class="hljs-keyword">import</span> { typeSpecificBranch, reshapeForBranch } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./typeSpecific&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalyzedContract</span>, <span class="hljs-title class_">Classification</span>, <span class="hljs-title class_">Extraction</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../schemas&quot;</span>;
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">ParallelStageOutput</span> {
+  <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">classification</span>: <span class="hljs-title class_">Classification</span>;
+  <span class="hljs-attr">extraction</span>: <span class="hljs-title class_">Extraction</span>;
+}
+
+<span class="hljs-comment">// Stage 1: classify + extract concurrently from the same preprocessed text.</span>
+<span class="hljs-comment">// `text` is carried forward alongside both LLM results so later steps don&#x27;t</span>
+<span class="hljs-comment">// need to re-thread the original input by hand.</span>
+<span class="hljs-keyword">const</span> parallelStage = <span class="hljs-title class_">RunnableParallel</span>.<span class="hljs-title function_">from</span>({
+  <span class="hljs-attr">text</span>: <span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">input</span>: <span class="hljs-title class_">ChainInput</span></span>) =&gt;</span> input.<span class="hljs-property">text</span>,
+  <span class="hljs-attr">classification</span>: classificationChain,
+  <span class="hljs-attr">extraction</span>: extractionChain,
+});
+
+<span class="hljs-comment">// Stage 2: keep the stage-1 output intact (&quot;previous&quot;) while computing the</span>
+<span class="hljs-comment">// type-specific notes (&quot;typeSpecific&quot;) from that same output.</span>
+<span class="hljs-keyword">const</span> withTypeSpecific = <span class="hljs-title class_">RunnableParallel</span>.<span class="hljs-title function_">from</span>({
+  <span class="hljs-attr">previous</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">RunnablePassthrough</span>&lt;<span class="hljs-title class_">ParallelStageOutput</span>&gt;(),
+  <span class="hljs-attr">typeSpecific</span>: reshapeForBranch.<span class="hljs-title function_">pipe</span>(typeSpecificBranch),
+});
+
+<span class="hljs-comment">// Stage 3: flatten everything into the final response/storage shape.</span>
+<span class="hljs-keyword">const</span> mergeStep = <span class="hljs-title class_">RunnableLambda</span>.<span class="hljs-title function_">from</span>(
+  ({
+    previous,
+    typeSpecific,
+  }: {
+    <span class="hljs-attr">previous</span>: <span class="hljs-title class_">ParallelStageOutput</span>;
+    <span class="hljs-attr">typeSpecific</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">unknown</span>&gt;;
+  }): <span class="hljs-function"><span class="hljs-params">AnalyzedContract</span> =&gt;</span> ({
+    <span class="hljs-attr">type</span>: previous.<span class="hljs-property">classification</span>.<span class="hljs-property">type</span>,
+    <span class="hljs-attr">confidence</span>: previous.<span class="hljs-property">classification</span>.<span class="hljs-property">confidence</span>,
+    <span class="hljs-attr">reasoning</span>: previous.<span class="hljs-property">classification</span>.<span class="hljs-property">reasoning</span>,
+    <span class="hljs-attr">keyParties</span>: previous.<span class="hljs-property">extraction</span>.<span class="hljs-property">keyParties</span>,
+    <span class="hljs-attr">effectiveDate</span>: previous.<span class="hljs-property">extraction</span>.<span class="hljs-property">effectiveDate</span>,
+    <span class="hljs-attr">keywords</span>: previous.<span class="hljs-property">extraction</span>.<span class="hljs-property">keywords</span>,
+    <span class="hljs-attr">typeSpecificNotes</span>: typeSpecific,
+  })
+);
+
+<span class="hljs-comment">/**
+ * The full Phase 2 pipeline in one composed runnable:
+ *   preprocess -&gt; [classify ‖ extract] -&gt; type-specific branch -&gt; merge
+ * One .invoke({ text }) call runs the entire analysis.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> contractAnalysisChain = preprocessStep
+  .<span class="hljs-title function_">pipe</span>(parallelStage)
+  .<span class="hljs-title function_">pipe</span>(withTypeSpecific)
+  .<span class="hljs-title function_">pipe</span>(mergeStep);</code></pre></div>
+<h3 id="610-storage-layer"><a class="heading-anchor" href="#610-storage-layer" aria-hidden="true">#</a>6.10 Storage layer</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/storage.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalyzedContract</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./schemas&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">findContractByHash</span>(<span class="hljs-params"><span class="hljs-attr">contentHash</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(<span class="hljs-string">`SELECT * FROM contracts WHERE content_hash = $1`</span>, [
+    contentHash,
+  ]);
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>] ?? <span class="hljs-literal">null</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">insertContract</span>(<span class="hljs-params">
+  <span class="hljs-attr">originalFilename</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">contentHash</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">rawText</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">analysis</span>: <span class="hljs-title class_">AnalyzedContract</span>
+</span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`INSERT INTO contracts
+       (original_filename, content_hash, raw_text, contract_type, confidence,
+        classification_reasoning, key_parties, effective_date, keywords, type_specific_notes)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+     RETURNING *`</span>,
+    [
+      originalFilename,
+      contentHash,
+      rawText,
+      analysis.<span class="hljs-property">type</span>,
+      analysis.<span class="hljs-property">confidence</span>,
+      analysis.<span class="hljs-property">reasoning</span>,
+      <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(analysis.<span class="hljs-property">keyParties</span>),
+      analysis.<span class="hljs-property">effectiveDate</span>,
+      <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(analysis.<span class="hljs-property">keywords</span>),
+      <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(analysis.<span class="hljs-property">typeSpecificNotes</span>),
+    ]
+  );
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>];
+}</code></pre></div>
+<h3 id="611-upload-middleware"><a class="heading-anchor" href="#611-upload-middleware" aria-hidden="true">#</a>6.11 Upload middleware</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/contracts/upload.middleware.ts</span>
+<span class="hljs-keyword">import</span> multer <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;multer&quot;</span>;
+<span class="hljs-keyword">import</span> path <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;path&quot;</span>;
+<span class="hljs-keyword">import</span> { randomUUID } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;crypto&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">UPLOAD_DIR</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">UPLOAD_TMP_DIR</span> ?? <span class="hljs-string">&quot;./tmp/uploads&quot;</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">MAX_BYTES</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">MAX_UPLOAD_MB</span> ?? <span class="hljs-number">15</span>) * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">ALLOWED_EXTENSIONS</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>([<span class="hljs-string">&quot;.pdf&quot;</span>, <span class="hljs-string">&quot;.docx&quot;</span>]);
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">ALLOWED_MIME_TYPES</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>([
+  <span class="hljs-string">&quot;application/pdf&quot;</span>,
+  <span class="hljs-string">&quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&quot;</span>,
+]);
+
+<span class="hljs-keyword">const</span> storage = multer.<span class="hljs-title function_">diskStorage</span>({
+  <span class="hljs-attr">destination</span>: <span class="hljs-function">(<span class="hljs-params">_req, _file, cb</span>) =&gt;</span> <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, <span class="hljs-variable constant_">UPLOAD_DIR</span>),
+  <span class="hljs-attr">filename</span>: <span class="hljs-function">(<span class="hljs-params">_req, file, cb</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> ext = path.<span class="hljs-title function_">extname</span>(file.<span class="hljs-property">originalname</span>).<span class="hljs-title function_">toLowerCase</span>();
+    <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">`<span class="hljs-subst">${randomUUID()}</span><span class="hljs-subst">${ext}</span>`</span>);
+  },
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> uploadContractFile = <span class="hljs-title function_">multer</span>({
+  storage,
+  <span class="hljs-attr">limits</span>: { <span class="hljs-attr">fileSize</span>: <span class="hljs-variable constant_">MAX_BYTES</span> },
+  <span class="hljs-attr">fileFilter</span>: <span class="hljs-function">(<span class="hljs-params">_req, file, cb</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> ext = path.<span class="hljs-title function_">extname</span>(file.<span class="hljs-property">originalname</span>).<span class="hljs-title function_">toLowerCase</span>();
+    <span class="hljs-keyword">const</span> extOk = <span class="hljs-variable constant_">ALLOWED_EXTENSIONS</span>.<span class="hljs-title function_">has</span>(ext);
+    <span class="hljs-keyword">const</span> mimeOk = <span class="hljs-variable constant_">ALLOWED_MIME_TYPES</span>.<span class="hljs-title function_">has</span>(file.<span class="hljs-property">mimetype</span>);
+    <span class="hljs-keyword">if</span> (!extOk || !mimeOk) {
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">cb</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Only .pdf and .docx files are accepted.&quot;</span>));
+    }
+    <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>);
+  },
+}).<span class="hljs-title function_">single</span>(<span class="hljs-string">&quot;contract&quot;</span>);</code></pre></div>
+<h3 id="612-route"><a class="heading-anchor" href="#612-route" aria-hidden="true">#</a>6.12 Route</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/routes/contracts.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Router</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;express&quot;</span>;
+<span class="hljs-keyword">import</span> { unlink } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;fs/promises&quot;</span>;
+<span class="hljs-keyword">import</span> { uploadContractFile } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../contracts/upload.middleware&quot;</span>;
+<span class="hljs-keyword">import</span> { extractTextFromUpload } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../contracts/textExtraction&quot;</span>;
+<span class="hljs-keyword">import</span> { contractAnalysisChain } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../contracts/chains&quot;</span>;
+<span class="hljs-keyword">import</span> { findContractByHash, insertContract } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../contracts/storage&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> contractsRouter = <span class="hljs-title class_">Router</span>();
+
+contractsRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/upload&quot;</span>, uploadContractFile, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">file</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">400</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;No file uploaded under field name &#x27;contract&#x27;.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> filePath = req.<span class="hljs-property">file</span>.<span class="hljs-property">path</span>;
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> { text, contentHash } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">extractTextFromUpload</span>(filePath);
+
+    <span class="hljs-keyword">const</span> existing = <span class="hljs-keyword">await</span> <span class="hljs-title function_">findContractByHash</span>(contentHash);
+    <span class="hljs-keyword">if</span> (existing) {
+      <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">reused</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">contract</span>: existing });
+    }
+
+    <span class="hljs-keyword">const</span> analysis = <span class="hljs-keyword">await</span> contractAnalysisChain.<span class="hljs-title function_">invoke</span>({ text });
+
+    <span class="hljs-keyword">if</span> (analysis.<span class="hljs-property">confidence</span> &lt; <span class="hljs-number">0.5</span>) {
+      <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">422</span>).<span class="hljs-title function_">json</span>({
+        <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Contract type could not be confidently determined.&quot;</span>,
+        analysis,
+      });
+    }
+
+    <span class="hljs-keyword">const</span> stored = <span class="hljs-keyword">await</span> <span class="hljs-title function_">insertContract</span>(
+      req.<span class="hljs-property">file</span>.<span class="hljs-property">originalname</span>,
+      contentHash,
+      text,
+      analysis
+    );
+
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">201</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">reused</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">contract</span>: stored });
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Contract analysis failed:&quot;</span>, err);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Failed to analyze contract.&quot;</span> });
+  } <span class="hljs-keyword">finally</span> {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">unlink</span>(filePath).<span class="hljs-title function_">catch</span>(<span class="hljs-function">() =&gt;</span> {
+      <span class="hljs-comment">/* best-effort cleanup - do not fail the request over this */</span>
+    });
+  }
+});</code></pre></div>
+<p>Wire it in your Phase 0 Express app:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/app.ts (excerpt)</span>
+<span class="hljs-keyword">import</span> { contractsRouter } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./routes/contracts&quot;</span>;
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/contracts&quot;</span>, contractsRouter);</code></pre></div>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── src/
+│   ├── contracts/
+│   │   ├── schemas.ts
+│   │   ├── preprocess.ts
+│   │   ├── textExtraction.ts
+│   │   ├── storage.ts
+│   │   ├── upload.middleware.ts
+│   │   └── chains/
+│   │       ├── classification.ts
+│   │       ├── extraction.ts
+│   │       ├── typeSpecific.ts
+│   │       └── index.ts
+│   ├── routes/
+│   │   └── contracts.ts
+│   └── app.ts
+├── migrations/
+│   └── 002_contracts.sql
+└── tmp/uploads/           (gitignored)</code></pre></div>
+<h3 id="request-flow"><a class="heading-anchor" href="#request-flow" aria-hidden="true">#</a>Request flow</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">POST /api/contracts/upload (multipart, field &quot;contract&quot;)
+  │
+  ▼
+uploadContractFile (multer)         — validates size/type, writes temp file
+  │
+  ▼
+extractTextFromUpload(filePath)     — PDF/DOCX → raw text + content hash
+  │
+  ▼
+findContractByHash(hash)            — idempotency check
+  │  (found → return existing, done)
+  ▼
+contractAnalysisChain.invoke({text})
+  │
+  ├─ preprocessStep                 — strip boilerplate
+  ├─ parallelStage                  — classify ‖ extract (concurrent)
+  ├─ withTypeSpecific               — branch by type, keep previous results
+  └─ mergeStep                      — flatten to AnalyzedContract
+  │
+  ▼
+insertContract(...)                 — persist row
+  │
+  ▼
+HTTP 201 { contract }</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong>Idempotency check before the (expensive) chain runs</strong>, not after: re-uploading an unchanged file costs zero LLM calls, not just zero DB writes.</li>
+<li><strong><code class="inline-code">finally</code>-based temp file cleanup</strong>: guarantees the uploads directory doesn&#39;t slowly accumulate orphaned files across failed requests over time.</li>
+<li><strong>Low-confidence classification returns 422, not 201 with a note buried in the payload</strong>: callers (eventually your frontend in Phase 7) can branch on HTTP status instead of parsing response bodies to detect &quot;this needs human attention.&quot;</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Treat Zod schemas as the single source of truth for both LLM output contracts and TypeScript types (<code class="inline-code">z.infer</code>) — never hand-maintain a parallel <code class="inline-code">interface</code>.</li>
+<li>Keep <code class="inline-code">temperature: 0</code> for any classification/extraction task where consistency matters more than variety.</li>
+<li>Use named schemas (<code class="inline-code">{ name: &quot;classify_contract&quot; }</code> in <code class="inline-code">withStructuredOutput</code>) — this name appears in tool-calling traces and API logs, making debugging far easier once you add LangSmith tracing in Phase 4/9.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li><code class="inline-code">RunnableParallel</code> here already buys you the main scalability win for this phase (concurrent, not sequential, LLM calls). At higher upload volume, put this endpoint behind a queue (BullMQ, planned for Phase 9) rather than blocking the HTTP request on LLM latency.</li>
+<li>Disk-based multer storage keeps memory flat regardless of file size, which matters once uploads happen concurrently from multiple users.</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Validate both file extension and MIME type — never trust either alone.</li>
+<li>Enforce a hard file size limit at the multer layer, before any parsing work happens, to prevent a trivial denial-of-service via oversized uploads.</li>
+<li>Never log full contract text to your application logs — legal documents are often confidential; log metadata (filename, hash, type) only.</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li>Concurrent classify+extract via <code class="inline-code">RunnableParallel</code> roughly halves this phase&#39;s LLM-bound latency versus sequential calls.</li>
+<li>Content-hash idempotency avoids repeat LLM cost entirely for duplicate uploads.</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Adding a new contract type is: add it to <code class="inline-code">CONTRACT_TYPES</code>, write its notes schema, write its <code class="inline-code">typeChain(...)</code> call, add one line to the <code class="inline-code">RunnableBranch.from([...])</code> array. No other file changes.</li>
+<li>Keep every prompt&#39;s system instruction short, specific, and focused on one job — resist the temptation to make the classification prompt also do extraction &quot;since it&#39;s already looking at the text.&quot;</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test <code class="inline-code">stripBoilerplate()</code> against fixtures with known page-number footers and letterhead lines — assert real content survives untouched.</li>
+<li>Unit test the <code class="inline-code">RunnableBranch</code> routing logic directly with mock classification inputs (<code class="inline-code">{ type: &quot;nda&quot; }</code>, <code class="inline-code">{ type: &quot;lease&quot; }</code>) — assert the correct chain is selected without needing a real LLM call.</li>
+<li>Integration test the full <code class="inline-code">contractAnalysisChain</code> against 3-5 real sample contracts covering different types, asserting <code class="inline-code">confidence</code> is reasonably high and <code class="inline-code">typeSpecificNotes</code> matches the expected schema shape for that type.</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>How <code class="inline-code">ChatOpenAI</code>, <code class="inline-code">ChatPromptTemplate</code>, and <code class="inline-code">withStructuredOutput()</code> fit together to turn &quot;ask an LLM a question&quot; into &quot;get a guaranteed-shaped TypeScript object back.&quot;</li>
+<li>The two real approaches to output parsing (classic format-instructions parsing vs. function-calling constrained decoding) and why the latter is the right default when you&#39;re OpenAI-only.</li>
+<li>How <code class="inline-code">RunnableParallel</code> turns independent LLM calls into concurrent ones, cutting latency without changing what&#39;s being asked.</li>
+<li>How <code class="inline-code">RunnableLambda</code> lets your own preprocessing functions become traceable, composable chain steps instead of invisible code sitting outside the pipeline.</li>
+<li>How <code class="inline-code">RunnableBranch</code> expresses conditional routing declaratively, and why that&#39;s more maintainable and traceable than an equivalent <code class="inline-code">if/else</code>.</li>
+<li>How <code class="inline-code">RunnablePassthrough</code> lets you carry earlier pipeline state forward alongside a newly-computed branch result, so a final merge step has everything it needs.</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li><code class="inline-code">contracts</code> table schema with idempotency support.</li>
+<li>Multer-based upload handling with validation.</li>
+<li>Reusable single-file PDF/DOCX text extraction.</li>
+<li>A complete, composed LCEL chain: preprocess → parallel classify+extract → type-specific branch → merge.</li>
+<li>The <code class="inline-code">POST /api/contracts/upload</code> endpoint, fully wired end to end.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Running this against real contracts of each type and confirming output quality (hands-on tasks 12-13 — yours to execute).</li>
+<li>Everything from Phase 2.5 onward, which consumes the <code class="inline-code">contracts</code> row this phase produces.</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+Phase 2.5 (Conversational Contract Q&amp;A) reads the same <code class="inline-code">raw_text</code> this phase stored, chunks and embeds it into a contract-scoped vector store (the same embedding technique from Phase 1, applied to one contract instead of your static reference corpus), and adds LangChain&#39;s Memory classes on top so a user can ask follow-up questions before committing to a full risk analysis. The <code class="inline-code">contract_type</code> decided in this phase will later inform Phase 4&#39;s retrieval strategy — the exact question of &quot;which <code class="inline-code">doc_group</code>s from the Phase 1 knowledge base are even relevant to this contract&quot; is answered directly by the classification you just built.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

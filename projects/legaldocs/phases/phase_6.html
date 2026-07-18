@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 6: Conversational Analysis Assistant</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 6: Conversational Analysis Assistant</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-6-conversational-analysis-assistant"><a class="heading-anchor" href="#legaldocs--phase-6-conversational-analysis-assistant" aria-hidden="true">#</a>LegalDocs — Phase 6: Conversational Analysis Assistant</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL (Phase 0/1), LangGraph.js prebuilt agents (<code class="inline-code">createReactAgent</code>, reused from Phase 4.5 — now with a <strong>persistent, multi-turn checkpointer</strong> instead of a single-shot one), <code class="inline-code">@langchain/langgraph-checkpoint-postgres</code>, Zod
+<strong>Depends on:</strong> Phase 4 (<code class="inline-code">risk_findings</code>), Phase 4.5 (<code class="inline-code">reviewFlagged</code>/<code class="inline-code">reviewReason</code>, agent-sourced <code class="inline-code">legalReferences</code>), Phase 5 (this phase answers questions about the same data Phase 5 turned into a document — it&#39;s the interactive counterpart to that static report)
+<strong>Feeds into:</strong> Phase 6.5 (this phase&#39;s persistent, tool-using, checkpointed chat agent becomes one of the named specialist sub-agents the Supervisor routes to, and this phase&#39;s &quot;wrap a compiled agent, add memory management around it&quot; pattern is the direct template for how the Supervisor composes all of its sub-agents)</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>Give a user a real conversation about a completed analysis run — not a static report they read once, but something they can question: <em>&quot;Why is the indemnification clause HIGH risk?&quot;</em>, <em>&quot;What would you suggest changing about the termination clause?&quot;</em>, <em>&quot;List everything flagged for human review.&quot;</em>, <em>&quot;Did you find anything about non-compete terms?&quot;</em> Every answer must be grounded strictly in <strong>that run&#39;s</strong> <code class="inline-code">risk_findings</code> and <code class="inline-code">clauses</code> rows — never general legal knowledge, never another contract&#39;s findings — and the conversation must genuinely remember earlier turns, so a follow-up like <em>&quot;why is that one worse than the last clause you mentioned?&quot;</em> actually works.</p>
+<p>This is also the first phase in the project with <strong>real multi-turn memory</strong>. Every phase before this has been stateless request-in, response-out — even Phase 4.5&#39;s research agent, despite being a genuine multi-step agent internally, started fresh with no memory of anything outside its own one-clause task and was thrown away the moment it returned. This phase&#39;s agent has to persist a conversation across many separate HTTP requests, potentially over hours or days, and still remember what was asked three questions ago.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>Phase 5 gave a user a document. A document is something you read and then, if you have a question, you either re-read it or email someone. This phase gives them something to <em>ask</em>. That&#39;s a meaningfully different, and for a lot of users a much more useful, way to consume a risk analysis — especially for a non-lawyer trying to understand why their vendor contract&#39;s liability clause matters, who doesn&#39;t want to parse a formal report section to find the answer to one specific question.</p>
+<p>It&#39;s also the phase where two structural problems show up for the first time and have to be solved correctly, because getting either wrong produces a genuinely bad product experience:</p>
+<ol>
+<li><strong>Retrieval over a small, structured dataset is a different problem than retrieval over a large knowledge base.</strong> Phase 1 and Phase 4 built vector-search-based retrieval because the underlying corpus (thousands of statute/judgment chunks) is large and unstructured. A single analysis run&#39;s data is the opposite: a few dozen rows, already structured, already labeled with risk level and clause type. Reaching for embeddings and cosine similarity here would be solving a problem this data doesn&#39;t have. This phase teaches you to recognize that difference and reach for the right tool — structured, exact tool-calling over the database — instead of defaulting to &quot;RAG means vector search.&quot;</li>
+<li><strong>A conversation that never forgets anything eventually breaks.</strong> Every message you ever send in a long-running chat, if kept in full forever, eventually exceeds the model&#39;s context window or just gets expensive and slow. This phase is where &quot;manage the conversation&#39;s memory over time&quot; becomes a real, unavoidable design decision, not a hypothetical future concern.</li>
+</ol>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">              ┌───────────────────────────┐
+              │  risk_findings + clauses    │
+              │  (Phase 4 / 4.5, per run)     │
+              └─────────────┬─────────────┘
+                            │  read-only, scoped to one analysis_run_id
+              ┌─────────────▼─────────────┐
+              │  PHASE 6 — Conversational    │
+              │  Analysis Assistant           │
+              │                                │
+              │  chat_sessions (Postgres)        │
+              │      │                           │
+              │  createReactAgent, bound to        │
+              │  4 structured tools over THIS run&#x27;s │
+              │  findings only:                     │
+              │    get_run_summary                    │
+              │    list_findings                       │
+              │    get_finding_detail                    │
+              │    search_findings                        │
+              │      │                                     │
+              │  PostgresSaver checkpointer,                 │
+              │  keyed per chat session (persistent            │
+              │  multi-turn memory across many requests)        │
+              │      │                                            │
+              │  history trimming before each turn                 │
+              └─────────────┬────────────────────────────────────┘
+                            │
+                 ┌──────────▼──────────┐
+                 │  chat_messages         │  (implicitly, via the
+                 │  (via checkpointer)     │   checkpointer&#x27;s own tables)
+                 └─────────────────────┘
+                            │
+                     Phase 6.5: this agent
+                     becomes one Supervisor
+                     sub-agent among several</code></pre></div>
+<p>This phase&#39;s deliverables are: a <code class="inline-code">chat_sessions</code> table, four structured findings tools, a persistent <code class="inline-code">createReactAgent</code> bound to a chat-scoped checkpointer, and session-based chat endpoints (create session, send message, fetch history).</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-why-this-data-doesn39t-want-a-vector-retriever"><a class="heading-anchor" href="#21-why-this-data-doesn39t-want-a-vector-retriever" aria-hidden="true">#</a>2.1 Why this data doesn&#39;t want a vector retriever</h3>
+<p>Every retriever you&#39;ve built so far exists because the underlying text corpus is large, unstructured, and phrased in ways that don&#39;t perfectly match a query&#39;s wording — that&#39;s exactly the situation Phase 1&#39;s <code class="inline-code">legal_reference_chunks</code> and Phase 4&#39;s retriever stack were built to handle. A single analysis run&#39;s data is a completely different shape: at most a few dozen rows, every one of them already has a <code class="inline-code">clauseType</code>, a <code class="inline-code">riskLevel</code>, a <code class="inline-code">riskScore</code>, and full text fields — it&#39;s structured data with an obvious relational shape, not prose you need semantic search to navigate.</p>
+<p>If you embedded every finding and did cosine similarity search over them, you&#39;d be throwing away information you already have for free. A question like <em>&quot;show me everything HIGH risk&quot;</em> has an <strong>exact</strong> answer — <code class="inline-code">WHERE risk_level = &#39;HIGH&#39;</code> — that vector similarity can only approximate, and approximate worse than a database index. The right tool for &quot;let the model query a small, structured dataset accurately&quot; is <strong>structured tool-calling</strong>: give the model a small number of precise functions (filter by risk level, fetch one finding&#39;s full detail, keyword-search across findings) and let it call the exact one it needs, the same tool-calling mechanism Phase 4.5 used for external search — just pointed at your own database instead of Indian Kanoon.</p>
+<p><strong>The general lesson, not just this phase&#39;s:</strong> &quot;RAG&quot; doesn&#39;t mean &quot;vector search&quot; — it means &quot;retrieval-augmented generation,&quot; and <em>retrieval</em> can be a vector search, a SQL filter, a keyword search, or a direct key lookup, depending on what actually fits the shape of the data being retrieved from. Phase 1/2.5/4 needed vector search because their corpora were large and unstructured. This phase&#39;s corpus is small and structured, so exact, structured tools are strictly better here — more accurate, cheaper (no embedding calls), and easier to audit (&quot;the model called <code class="inline-code">get_finding_detail</code> with this exact clause ID&quot; is a much clearer trace than &quot;the model&#39;s query embedding happened to be close to these five chunks&quot;).</p>
+<h3 id="22-structured-tools-scoped-to-one-analysis-run"><a class="heading-anchor" href="#22-structured-tools-scoped-to-one-analysis-run" aria-hidden="true">#</a>2.2 Structured tools, scoped to one analysis run</h3>
+<p>Each tool this phase builds is deliberately narrow and exact, and — critically — <strong>scoped to a single <code class="inline-code">analysisRunId</code>, baked in as a closure, not passed as a model-controlled argument.</strong> This is a security and correctness detail worth understanding clearly: if <code class="inline-code">analysisRunId</code> were a parameter the model could set, a bug or an adversarial prompt could make the agent leak another contract&#39;s findings into this conversation. By building the tool functions inside a factory that closes over one fixed run ID, the model is physically unable to query any run except the one this conversation belongs to.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">buildFindingsTools</span>(<span class="hljs-params"><span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> listFindings = <span class="hljs-title function_">tool</span>(
+    <span class="hljs-title function_">async</span> ({ riskLevel }: { <span class="hljs-attr">riskLevel</span>?: <span class="hljs-string">&quot;LOW&quot;</span> | <span class="hljs-string">&quot;MEDIUM&quot;</span> | <span class="hljs-string">&quot;HIGH&quot;</span> }) =&gt; {
+      <span class="hljs-comment">// analysisRunId comes from the closure, never from the model&#x27;s arguments</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">queryFindings</span>(analysisRunId, riskLevel);
+    },
+    { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;list_findings&quot;</span>, <span class="hljs-attr">description</span>: <span class="hljs-string">&quot;...&quot;</span>, <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({ <span class="hljs-attr">riskLevel</span>: z.<span class="hljs-title function_">enum</span>([...]).<span class="hljs-title function_">optional</span>() }) }
+  );
+  <span class="hljs-comment">// ... the other three tools, same closure pattern</span>
+  <span class="hljs-keyword">return</span> [listFindings, <span class="hljs-comment">/* ... */</span>];
+}</code></pre></div>
+<p>This phase gives the agent four tools:</p>
+<ul>
+<li><strong><code class="inline-code">get_run_summary()</code></strong> — no arguments; returns the same kind of stats Phase 5&#39;s report computed (total findings, counts per risk level, review-flagged count) — a cheap, exact starting point for broad questions like <em>&quot;how risky is this contract overall?&quot;</em></li>
+<li><strong><code class="inline-code">list_findings(riskLevel?)</code></strong> — an optional filter; returns a compact list (clause title, type, risk level, score) for browsing, not full detail — keeps the model from needing to read every finding&#39;s full text just to answer &quot;what are the HIGH risk ones?&quot;</li>
+<li><strong><code class="inline-code">get_finding_detail(clauseId)</code></strong> — the full record for one specific clause: reasoning, fix suggestion, legal references, <code class="inline-code">reviewFlagged</code>/<code class="inline-code">reviewReason</code> — used once the model (or the user) has narrowed down to a specific clause.</li>
+<li><strong><code class="inline-code">search_findings(keyword)</code></strong> — a simple case-insensitive text search across clause titles, reasoning, and full text, for open-ended questions like <em>&quot;did you find anything about liability caps?&quot;</em> where the user doesn&#39;t know the exact clause title.</li>
+</ul>
+<h3 id="23-multi-turn-memory-what-actually-needs-to-persist-and-where"><a class="heading-anchor" href="#23-multi-turn-memory-what-actually-needs-to-persist-and-where" aria-hidden="true">#</a>2.3 Multi-turn memory: what actually needs to persist, and where</h3>
+<p>Every conversation this project has run so far — Phase 2.5&#39;s contract Q&amp;A, Phase 4.5&#39;s research agent — invoked a model with exactly the messages relevant to that one call, and nothing survived past the response. This phase needs the opposite: <strong>the full back-and-forth of a conversation needs to be there on the next request</strong>, even though the &quot;next request&quot; might be a completely separate HTTP call, possibly served by a different process, possibly hours later.</p>
+<p>The mechanism is the same checkpointer primitive Phase 4 introduced (<code class="inline-code">PostgresSaver</code>, keyed by <code class="inline-code">thread_id</code>) — but used for a structurally different purpose. Phase 4&#39;s checkpoints existed for <strong>audit</strong>: a reviewer inspecting exactly what happened during one already-finished analysis run. This phase&#39;s checkpoints exist for <strong>memory</strong>: the <em>input</em> to the next model call is &quot;the current state of this thread,&quot; recovered from the checkpointer, not re-supplied by the client on every request. The client only ever sends the <em>new</em> message; the checkpointer is what makes &quot;everything said before&quot; available without the client having to resend it.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: chatSessionId } };
+<span class="hljs-keyword">await</span> chatAgent.<span class="hljs-title function_">invoke</span>({ <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(userText)] }, config);
+<span class="hljs-comment">// The agent&#x27;s internal state (all prior messages in this thread) is loaded</span>
+<span class="hljs-comment">// from the checkpointer BEFORE this call runs, and the updated state</span>
+<span class="hljs-comment">// (including this new exchange) is saved back after - the caller never</span>
+<span class="hljs-comment">// needs to resend prior turns.</span></code></pre></div>
+<p><strong>Why a distinct <code class="inline-code">thread_id</code> namespace matters here:</strong> Phase 4 already uses <code class="inline-code">thread_id</code> to mean &quot;one analysis run.&quot; This phase&#39;s chat threads are a <em>different kind of thing</em> sharing the <em>same</em> checkpointer backend (same Postgres tables, same <code class="inline-code">PostgresSaver</code> instance — no reason to stand up a second one). Keeping them from colliding is simply a matter of namespacing the ID string itself (e.g. prefixing chat thread IDs with <code class="inline-code">chat-</code>), so a chat session&#39;s ID can never accidentally collide with, or be confused for, an analysis run&#39;s ID in the same checkpoint tables.</p>
+<h3 id="24-why-a-conversation39s-memory-can39t-just-grow-forever"><a class="heading-anchor" href="#24-why-a-conversation39s-memory-can39t-just-grow-forever" aria-hidden="true">#</a>2.4 Why a conversation&#39;s memory can&#39;t just grow forever</h3>
+<p>A checkpointer will happily persist an ever-growing list of messages — nothing stops a conversation from reaching hundreds of turns. But every model call in a multi-turn agent re-sends the <em>entire</em> message history as input (that&#39;s how the model &quot;remembers&quot; earlier turns at all — there&#39;s no other channel). Left unmanaged, that means: cost grows without bound as a conversation gets longer, latency grows because a longer input takes longer to process, and eventually you hit the model&#39;s hard context-length ceiling and the conversation simply breaks.</p>
+<p>The practical fix this phase uses is <strong>trimming</strong>: before each model call, keep only the most recent messages up to a configured budget (a message count or a token count), dropping the oldest ones. <code class="inline-code">@langchain/core/messages</code> ships <code class="inline-code">trimMessages</code> for exactly this:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { trimMessages } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+
+<span class="hljs-keyword">const</span> trimmed = <span class="hljs-keyword">await</span> <span class="hljs-title function_">trimMessages</span>(allMessages, {
+  <span class="hljs-attr">maxTokens</span>: <span class="hljs-number">3000</span>,
+  <span class="hljs-attr">strategy</span>: <span class="hljs-string">&quot;last&quot;</span>,       <span class="hljs-comment">// keep the most recent messages</span>
+  <span class="hljs-attr">tokenCounter</span>: <span class="hljs-function">(<span class="hljs-params">msgs</span>) =&gt;</span> <span class="hljs-title function_">estimateTokenCount</span>(msgs),
+  <span class="hljs-attr">includeSystem</span>: <span class="hljs-literal">true</span>,     <span class="hljs-comment">// never trim away the system prompt</span>
+});</code></pre></div>
+<p><strong>Why trimming, and not summarization, for this phase specifically:</strong> summarizing older turns into a condensed note before dropping them preserves more of the conversation&#39;s substance, but it&#39;s a genuinely more involved mechanism (another LLM call, another place fidelity can drift, another thing to test) that this phase&#39;s roadmap doesn&#39;t need yet — most analysis-report conversations are short (a handful of clarifying questions about one report), not the kind of long-running dialogue where losing the oldest turns outright would actually lose something the user still cared about. Trimming is the right amount of complexity for this phase; summarization is a legitimate upgrade to reach for later if real usage shows conversations running long enough for it to matter.</p>
+<h3 id="25-reusing-createreactagent-now-for-a-durable-rather-than-disposable-purpose"><a class="heading-anchor" href="#25-reusing-createreactagent-now-for-a-durable-rather-than-disposable-purpose" aria-hidden="true">#</a>2.5 Reusing <code class="inline-code">createReactAgent</code>, now for a durable rather than disposable purpose</h3>
+<p>Phase 4.5 built <code class="inline-code">createReactAgent</code> for a <strong>single-shot</strong> purpose: one invocation, one HIGH-risk clause, thrown away the moment it returned a final answer. This phase reuses the exact same prebuilt — same tool-calling ReAct loop, same underlying mechanism — for a <strong>durable</strong> purpose: the same compiled graph, invoked many times over the life of one conversation, with a checkpointer making each invocation pick up exactly where the last one left off.</p>
+<p>Nothing about <code class="inline-code">createReactAgent</code> itself changes between these two uses — what changes is <em>how you call it</em> (with a <code class="inline-code">thread_id</code>-bearing config every time, so the checkpointer knows which conversation&#39;s state to load and save) and <em>what you bind it to</em> (structured database tools here, instead of Phase 4.5&#39;s external search tools). This is a genuinely useful thing to notice: the same small set of LangGraph primitives (a compiled ReAct agent, a checkpointer, a <code class="inline-code">thread_id</code>) recombine to solve two quite different problems — a disposable per-clause research task, and a durable per-conversation assistant — just by changing what&#39;s plugged into them.</p>
+<h3 id="26-grounding-and-refusal-in-a-conversational-setting"><a class="heading-anchor" href="#26-grounding-and-refusal-in-a-conversational-setting" aria-hidden="true">#</a>2.6 Grounding and refusal in a conversational setting</h3>
+<p>Phase 4&#39;s risk-scoring prompt and Phase 4.5&#39;s research agent both had a built-in, structural way to stay grounded: their tools only ever return real, specific data, and their prompts explicitly instruct them not to go beyond it. This phase&#39;s system prompt carries the same discipline into a conversational setting, with one addition specific to chat: users will sometimes ask things this agent has no business answering — general legal advice unrelated to this specific run (&quot;is a non-compete enforceable in my state generally?&quot;), or questions about a different contract entirely. The system prompt has to give the agent explicit, simple instructions for both: <strong>answer only from this run&#39;s tool-retrieved data, and when a question falls outside that scope, say so plainly and suggest the user consult a lawyer for anything not specific to what was actually found in this analysis</strong> — the same &quot;an honest &#39;I can&#39;t help with that&#39; beats a confident but ungrounded answer&quot; principle Phase 4.5&#39;s <code class="inline-code">flag_for_human_review</code> embodied, now applied to conversational scope instead of missing case-law grounding.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-retrieval-strategy-vector-search-vs-structured-tool-calling-vs-quotjust-dump-everything-in-contextquot"><a class="heading-anchor" href="#31-retrieval-strategy-vector-search-vs-structured-tool-calling-vs-quotjust-dump-everything-in-contextquot" aria-hidden="true">#</a>3.1 Retrieval strategy: vector search vs. structured tool-calling vs. &quot;just dump everything in context&quot;</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Vector search over embedded findings</strong> (reusing Phase 4&#39;s retriever pattern)</td>
+<td>Consistent with the retrieval pattern used elsewhere in the project</td>
+<td>Solves a problem this data doesn&#39;t have — a few dozen structured rows don&#39;t need semantic search; strictly less accurate than an exact filter for exact questions (&quot;show me HIGH risk&quot;) and adds embedding cost/latency for no benefit</td>
+<td>Never, for this specific dataset — useful only if a future phase needs to search <em>across</em> many runs/contracts by semantic similarity, which is a different problem than this phase&#39;s</td>
+</tr>
+<tr>
+<td><strong>B. Dump every finding directly into the system prompt, no tools at all</strong></td>
+<td>Simplest possible code; no tool-calling loop needed</td>
+<td>Wastes tokens on every single turn re-sending data the user&#39;s actual question may not need; doesn&#39;t scale if a future phase allows longer contracts with many more findings; loses the auditability of &quot;which specific finding did the model actually use to answer this&quot;</td>
+<td>Only for a contract with a handful of findings and a project that will never need to scale past that</td>
+</tr>
+<tr>
+<td><strong>C. Structured tool-calling over the database, scoped per run (recommended)</strong></td>
+<td>Exact, cheap, auditable (you can see exactly which tool call retrieved what); scales cleanly regardless of how many findings a run has, since the agent only fetches what a given question actually needs</td>
+<td>Slightly more code than &quot;no tools&quot; (four small tool definitions)</td>
+<td><strong>Recommended</strong> — matches the actual shape of this data (small, structured, exact) rather than defaulting to the vector-search pattern used elsewhere in the project</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach C, as reasoned through in Concept Learning 2.1.</p>
+<h3 id="32-conversation-memory-management"><a class="heading-anchor" href="#32-conversation-memory-management" aria-hidden="true">#</a>3.2 Conversation memory management</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. No management — keep full history forever</strong></td>
+<td>Zero extra code</td>
+<td>Breaks eventually (cost, latency, hard context-length ceiling) on any long-running conversation; not a real option for a production feature</td>
+<td>Never, beyond a quick prototype</td>
+</tr>
+<tr>
+<td><strong>B. Fixed-size trimming (roadmap&#39;s choice)</strong></td>
+<td>Simple, cheap (no extra LLM call), predictable cost per turn</td>
+<td>Older context is lost outright rather than condensed — a very long conversation could lose a detail the user still cares about</td>
+<td><strong>Recommended for this phase</strong> — most report-Q&amp;A conversations are short, and this is the right amount of complexity for that reality</td>
+</tr>
+<tr>
+<td><strong>C. Summarization-based memory</strong> (condense older turns into a running summary instead of dropping them)</td>
+<td>Preserves more of a long conversation&#39;s substance</td>
+<td>A whole additional mechanism: another LLM call, another place for fidelity to drift, meaningfully more to build and test</td>
+<td>Worth adopting later if real usage shows conversations running long enough that outright trimming starts losing things users care about</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B for this phase, with C explicitly named as the natural upgrade path if usage data justifies it later — not something to build speculatively now.</p>
+<h3 id="33-chat-session-identity-one-thread-per-analysis-run-vs-explicit-chat-sessions"><a class="heading-anchor" href="#33-chat-session-identity-one-thread-per-analysis-run-vs-explicit-chat-sessions" aria-hidden="true">#</a>3.3 Chat session identity: one thread per analysis run vs. explicit chat sessions</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Reuse the analysis run&#39;s own <code class="inline-code">thread_id</code> directly for chat</strong></td>
+<td>One less table, one less concept</td>
+<td>Conflates two different kinds of history (Phase 4&#39;s audit checkpoints vs. this phase&#39;s conversational messages) in the same thread; a user can&#39;t have two independent conversations about the same report (e.g. two different reviewers asking their own separate questions)</td>
+<td>A very simple, single-user tool where &quot;one report, one conversation, ever&quot; is an acceptable constraint</td>
+</tr>
+<tr>
+<td><strong>B. A <code class="inline-code">chat_sessions</code> table, each with its own namespaced thread ID, referencing the analysis run (recommended)</strong></td>
+<td>Multiple independent conversations about the same report are possible; keeps Phase 4&#39;s audit-trail checkpoints and this phase&#39;s chat checkpoints conceptually and practically separate even though they share a checkpointer backend</td>
+<td>One more table, one more layer of ID indirection</td>
+<td><strong>Recommended</strong> — matches normal chat-product UX (a user can start a fresh conversation) and keeps the two checkpoint <em>purposes</em> (audit vs. memory) cleanly separated even while sharing infrastructure</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, as specified in the architecture above.</p>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--database-schema-for-chat-sessions"><a class="heading-anchor" href="#step-1--database-schema-for-chat-sessions" aria-hidden="true">#</a>Step 1 — Database schema for chat sessions</h3>
+<p><strong>What:</strong> A <code class="inline-code">chat_sessions</code> table: one row per conversation, referencing the <code class="inline-code">analysis_run_id</code> it&#39;s scoped to, with its own generated <code class="inline-code">thread_id</code> string used as the checkpointer key.</p>
+<p><strong>Why:</strong> This is what lets a user start a fresh conversation about an existing report (Approach B, 3.3), and it&#39;s the row your chat endpoints look up to resolve &quot;which analysis run&#39;s data can this session&#39;s tools touch.&quot;</p>
+<p><strong>Best practice:</strong> Namespace the stored <code class="inline-code">thread_id</code> at creation time (e.g. <code class="inline-code">chat-${randomUUID()}</code>) so it can never collide with an analysis run&#39;s own <code class="inline-code">thread_id</code> in the shared checkpointer tables.</p>
+<h3 id="step-2--findings-query-functions"><a class="heading-anchor" href="#step-2--findings-query-functions" aria-hidden="true">#</a>Step 2 — Findings query functions</h3>
+<p><strong>What:</strong> Four plain async functions (<code class="inline-code">getRunSummary</code>, <code class="inline-code">listFindings</code>, <code class="inline-code">getFindingDetail</code>, <code class="inline-code">searchFindings</code>), each taking <code class="inline-code">analysisRunId</code> as an explicit parameter, doing one focused SQL query.</p>
+<p><strong>Why:</strong> Same separation-of-concerns reasoning as Phase 4.5&#39;s tool logic — keeping the actual query logic as plain, directly-testable functions, separate from the <code class="inline-code">tool()</code> wrapper that exposes them to the model.</p>
+<p><strong>Common mistake to avoid:</strong> Returning full clause text or full legal excerpt text from <code class="inline-code">listFindings</code> — that&#39;s what makes it a <em>browsing</em> tool rather than a detail tool; keep it compact (title, type, level, score only) so the model isn&#39;t forced to read a wall of text just to decide what to look at next.</p>
+<h3 id="step-3--the-tool-factory-scoped-per-run"><a class="heading-anchor" href="#step-3--the-tool-factory-scoped-per-run" aria-hidden="true">#</a>Step 3 — The tool factory, scoped per run</h3>
+<p><strong>What:</strong> <code class="inline-code">buildFindingsTools(analysisRunId)</code>, wrapping each Step 2 function with <code class="inline-code">tool()</code>, closing over the fixed <code class="inline-code">analysisRunId</code> per Concept Learning 2.2.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.2 — this is the concrete mechanism that makes cross-run data leakage structurally impossible rather than merely &quot;something the prompt asks the model not to do.&quot;</p>
+<h3 id="step-4--system-prompt-and-groundingrefusal-rules"><a class="heading-anchor" href="#step-4--system-prompt-and-groundingrefusal-rules" aria-hidden="true">#</a>Step 4 — System prompt and grounding/refusal rules</h3>
+<p><strong>What:</strong> A system prompt instructing the agent to answer only from tool-retrieved data about this specific run, and to explicitly decline (with a suggestion to consult a lawyer) any question outside that scope.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.6.</p>
+<h3 id="step-5--history-trimming"><a class="heading-anchor" href="#step-5--history-trimming" aria-hidden="true">#</a>Step 5 — History trimming</h3>
+<p><strong>What:</strong> A small wrapper function, <code class="inline-code">trimConversationHistory(messages)</code>, applied to the message list immediately before each agent invocation.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.4.</p>
+<p><strong>Best practice:</strong> Always preserve the system message when trimming (<code class="inline-code">includeSystem: true</code>) — losing the agent&#39;s grounding/refusal instructions after enough turns would silently degrade the agent&#39;s behavior in a way that&#39;s easy to miss in testing (which rarely runs a conversation long enough to trigger it) and easy for a real user to hit.</p>
+<h3 id="step-6--the-chat-agent"><a class="heading-anchor" href="#step-6--the-chat-agent" aria-hidden="true">#</a>Step 6 — The chat agent</h3>
+<p><strong>What:</strong> A <code class="inline-code">createReactAgent()</code> instance bound to a <code class="inline-code">PostgresSaver</code> checkpointer (the same backend instance Phase 4 and Phase 5 already use), built once per request with that request&#39;s session-scoped tools (Step 3), since the tools themselves are scoped to one <code class="inline-code">analysisRunId</code>.</p>
+<p><strong>Why:</strong> Covered in Concept Learning 2.5.</p>
+<p><strong>Common mistake to avoid:</strong> Building one single, module-level agent instance shared across all sessions with the tools baked in once at startup. Because the tools are scoped per <code class="inline-code">analysisRunId</code> (Step 3), the agent itself has to be constructed per session/request — a cheap operation (it&#39;s just object construction, not a network call), so there&#39;s no real cost to doing this correctly.</p>
+<h3 id="step-7--session-and-message-endpoints"><a class="heading-anchor" href="#step-7--session-and-message-endpoints" aria-hidden="true">#</a>Step 7 — Session and message endpoints</h3>
+<p><strong>What:</strong> <code class="inline-code">POST /api/analysis/:threadId/chat/sessions</code> (create a session for a completed run), <code class="inline-code">POST /api/chat/sessions/:sessionId/messages</code> (send a message, get the agent&#39;s reply), <code class="inline-code">GET /api/chat/sessions/:sessionId/messages</code> (retrieve the full conversation for display).</p>
+<p><strong>Why:</strong> The natural three operations a chat UI needs: start a conversation, send into it, and reload its history (e.g. on page refresh).</p>
+<p><strong>Common mistake to avoid:</strong> Implementing <code class="inline-code">GET .../messages</code> by re-querying <code class="inline-code">getState</code> and hoping its shape is stable UI-facing API. Map the checkpointer&#39;s internal message objects to a clean <code class="inline-code">{ role, content, createdAt }</code> shape at the route layer, the same &quot;don&#39;t leak internal bookkeeping&quot; lesson as Phase 4&#39;s audit endpoints.</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<ol>
+<li><strong>Run the migration</strong> below to create <code class="inline-code">chat_sessions</code>.</li>
+<li><strong>Implement <code class="inline-code">src/chat/findingsQueries.ts</code></strong> — the four plain query functions.</li>
+<li><strong>Implement <code class="inline-code">src/chat/tools.ts</code></strong> — <code class="inline-code">buildFindingsTools(analysisRunId)</code>.</li>
+<li><strong>Implement <code class="inline-code">src/chat/prompt.ts</code></strong> — the system prompt constant.</li>
+<li><strong>Implement <code class="inline-code">src/chat/history.ts</code></strong> — <code class="inline-code">trimConversationHistory()</code>.</li>
+<li><strong>Implement <code class="inline-code">src/chat/agent.ts</code></strong> — the per-session <code class="inline-code">createReactAgent()</code> builder, bound to the checkpointer.</li>
+<li><strong>Implement <code class="inline-code">src/chat/sessions.ts</code></strong> — <code class="inline-code">chat_sessions</code> persistence.</li>
+<li><strong>Implement <code class="inline-code">src/routes/chat.ts</code></strong> and wire it into your Express app.</li>
+<li><strong>Test session creation</strong> against a completed Phase 4 analysis run — confirm a <code class="inline-code">chat_sessions</code> row is created with a properly namespaced <code class="inline-code">thread_id</code>.</li>
+<li><strong>Test a multi-turn conversation manually</strong>: ask a broad question (&quot;how risky is this contract?&quot;), then a specific follow-up referencing &quot;that clause&quot; from the previous answer, then a completely out-of-scope question (&quot;is a non-compete enforceable in California generally?&quot;) — confirm: the broad question triggers <code class="inline-code">get_run_summary</code> or <code class="inline-code">list_findings</code>, the follow-up correctly resolves &quot;that clause&quot; using conversation memory (not by re-asking which clause), and the out-of-scope question gets a clear, honest decline rather than a fabricated general-legal-knowledge answer.</li>
+<li><strong>Test cross-run isolation</strong> — create two chat sessions for two different analysis runs, and confirm session A&#39;s agent genuinely cannot retrieve session B&#39;s findings even if you try prompting it to (since the tools are closure-scoped, this should be structurally impossible, not just discouraged by the prompt).</li>
+<li><strong>Test trimming</strong> — send enough messages in one session to exceed your configured token budget, and confirm (via added logging, or a LangSmith trace) that older messages are actually being dropped from what&#39;s sent to the model, while the system prompt is not.</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<h3 id="61-environment-variables-append-to-env"><a class="heading-anchor" href="#61-environment-variables-append-to-env" aria-hidden="true">#</a>6.1 Environment variables (append to <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">CHAT_MODEL=gpt-4o-mini
+CHAT_HISTORY_MAX_TOKENS=3000</code></pre></div>
+<h3 id="62-database-migration"><a class="heading-anchor" href="#62-database-migration" aria-hidden="true">#</a>6.2 Database migration</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">sql</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-sql"><span class="hljs-comment">-- migrations/008_chat_sessions.sql</span>
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> chat_sessions (
+    id                UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    analysis_run_id   TEXT <span class="hljs-keyword">NOT NULL</span>,
+    contract_id       UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> contracts(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    thread_id         TEXT <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">UNIQUE</span>,   <span class="hljs-comment">-- namespaced, e.g. &quot;chat-&lt;uuid&gt;&quot;</span>
+    created_at        TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_chat_sessions_run_id <span class="hljs-keyword">ON</span> chat_sessions (analysis_run_id);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_chat_sessions_contract_id <span class="hljs-keyword">ON</span> chat_sessions (contract_id);</code></pre></div>
+<h3 id="63-findings-query-functions"><a class="heading-anchor" href="#63-findings-query-functions" aria-hidden="true">#</a>6.3 Findings query functions</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/findingsQueries.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">FindingSummaryRow</span> {
+  <span class="hljs-attr">clauseId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">clauseTitle</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">clauseType</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">riskLevel</span>: <span class="hljs-string">&quot;LOW&quot;</span> | <span class="hljs-string">&quot;MEDIUM&quot;</span> | <span class="hljs-string">&quot;HIGH&quot;</span>;
+  <span class="hljs-attr">riskScore</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">FindingDetailRow</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">FindingSummaryRow</span> {
+  <span class="hljs-attr">reasoning</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">fixSuggestion</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">legalReferences</span>: { <span class="hljs-attr">sourceDocument</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">excerpt</span>: <span class="hljs-built_in">string</span> }[];
+  <span class="hljs-attr">reviewFlagged</span>: <span class="hljs-built_in">boolean</span>;
+  <span class="hljs-attr">reviewReason</span>: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getRunSummary</span>(<span class="hljs-params"><span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT risk_level, COUNT(*) AS count,
+            SUM(CASE WHEN review_flagged THEN 1 ELSE 0 END) AS review_flagged_count
+     FROM risk_findings
+     WHERE analysis_run_id = $1
+     GROUP BY risk_level`</span>,
+    [analysisRunId]
+  );
+
+  <span class="hljs-keyword">const</span> summary = { <span class="hljs-attr">total</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">high</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">medium</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">low</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">reviewFlagged</span>: <span class="hljs-number">0</span> };
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> row <span class="hljs-keyword">of</span> rows) {
+    <span class="hljs-keyword">const</span> count = <span class="hljs-title class_">Number</span>(row.<span class="hljs-property">count</span>);
+    summary.<span class="hljs-property">total</span> += count;
+    summary.<span class="hljs-property">reviewFlagged</span> += <span class="hljs-title class_">Number</span>(row.<span class="hljs-property">review_flagged_count</span>);
+    <span class="hljs-keyword">if</span> (row.<span class="hljs-property">risk_level</span> === <span class="hljs-string">&quot;HIGH&quot;</span>) summary.<span class="hljs-property">high</span> = count;
+    <span class="hljs-keyword">if</span> (row.<span class="hljs-property">risk_level</span> === <span class="hljs-string">&quot;MEDIUM&quot;</span>) summary.<span class="hljs-property">medium</span> = count;
+    <span class="hljs-keyword">if</span> (row.<span class="hljs-property">risk_level</span> === <span class="hljs-string">&quot;LOW&quot;</span>) summary.<span class="hljs-property">low</span> = count;
+  }
+  <span class="hljs-keyword">return</span> summary;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">listFindings</span>(<span class="hljs-params">
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">riskLevel</span>?: <span class="hljs-string">&quot;LOW&quot;</span> | <span class="hljs-string">&quot;MEDIUM&quot;</span> | <span class="hljs-string">&quot;HIGH&quot;</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">FindingSummaryRow</span>[]&gt; {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT cl.id AS clause_id, cl.title AS clause_title, cl.clause_type,
+            rf.risk_level, rf.risk_score
+     FROM risk_findings rf
+     JOIN clauses cl ON cl.id = rf.clause_id
+     WHERE rf.analysis_run_id = $1
+       AND ($2::text IS NULL OR rf.risk_level = $2)
+     ORDER BY rf.risk_score DESC`</span>,
+    [analysisRunId, riskLevel ?? <span class="hljs-literal">null</span>]
+  );
+
+  <span class="hljs-comment">// Deliberately compact - title/type/level/score only, NOT full text or</span>
+  <span class="hljs-comment">// reasoning, so the model isn&#x27;t forced to read a wall of text just to</span>
+  <span class="hljs-comment">// decide which clause to look at in more detail next.</span>
+  <span class="hljs-keyword">return</span> rows.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> ({
+    <span class="hljs-attr">clauseId</span>: r.<span class="hljs-property">clause_id</span>,
+    <span class="hljs-attr">clauseTitle</span>: r.<span class="hljs-property">clause_title</span>,
+    <span class="hljs-attr">clauseType</span>: r.<span class="hljs-property">clause_type</span>,
+    <span class="hljs-attr">riskLevel</span>: r.<span class="hljs-property">risk_level</span>,
+    <span class="hljs-attr">riskScore</span>: r.<span class="hljs-property">risk_score</span>,
+  }));
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getFindingDetail</span>(<span class="hljs-params">
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">clauseId</span>: <span class="hljs-built_in">string</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">FindingDetailRow</span> | <span class="hljs-literal">null</span>&gt; {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT cl.id AS clause_id, cl.title AS clause_title, cl.clause_type,
+            rf.risk_level, rf.risk_score, rf.reasoning, rf.fix_suggestion,
+            rf.legal_references, rf.review_flagged, rf.review_reason
+     FROM risk_findings rf
+     JOIN clauses cl ON cl.id = rf.clause_id
+     WHERE rf.analysis_run_id = $1 AND cl.id = $2
+     LIMIT 1`</span>,
+    [analysisRunId, clauseId]
+  );
+
+  <span class="hljs-keyword">if</span> (rows.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+  <span class="hljs-keyword">const</span> r = rows[<span class="hljs-number">0</span>];
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">clauseId</span>: r.<span class="hljs-property">clause_id</span>,
+    <span class="hljs-attr">clauseTitle</span>: r.<span class="hljs-property">clause_title</span>,
+    <span class="hljs-attr">clauseType</span>: r.<span class="hljs-property">clause_type</span>,
+    <span class="hljs-attr">riskLevel</span>: r.<span class="hljs-property">risk_level</span>,
+    <span class="hljs-attr">riskScore</span>: r.<span class="hljs-property">risk_score</span>,
+    <span class="hljs-attr">reasoning</span>: r.<span class="hljs-property">reasoning</span>,
+    <span class="hljs-attr">fixSuggestion</span>: r.<span class="hljs-property">fix_suggestion</span>,
+    <span class="hljs-attr">legalReferences</span>: r.<span class="hljs-property">legal_references</span>,
+    <span class="hljs-attr">reviewFlagged</span>: r.<span class="hljs-property">review_flagged</span>,
+    <span class="hljs-attr">reviewReason</span>: r.<span class="hljs-property">review_reason</span>,
+  };
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">searchFindings</span>(<span class="hljs-params">
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">keyword</span>: <span class="hljs-built_in">string</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">FindingSummaryRow</span>[]&gt; {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT cl.id AS clause_id, cl.title AS clause_title, cl.clause_type,
+            rf.risk_level, rf.risk_score
+     FROM risk_findings rf
+     JOIN clauses cl ON cl.id = rf.clause_id
+     WHERE rf.analysis_run_id = $1
+       AND (cl.title ILIKE $2 OR cl.full_text ILIKE $2 OR rf.reasoning ILIKE $2)
+     ORDER BY rf.risk_score DESC
+     LIMIT 10`</span>,
+    [analysisRunId, <span class="hljs-string">`%<span class="hljs-subst">${keyword}</span>%`</span>]
+  );
+
+  <span class="hljs-keyword">return</span> rows.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> ({
+    <span class="hljs-attr">clauseId</span>: r.<span class="hljs-property">clause_id</span>,
+    <span class="hljs-attr">clauseTitle</span>: r.<span class="hljs-property">clause_title</span>,
+    <span class="hljs-attr">clauseType</span>: r.<span class="hljs-property">clause_type</span>,
+    <span class="hljs-attr">riskLevel</span>: r.<span class="hljs-property">risk_level</span>,
+    <span class="hljs-attr">riskScore</span>: r.<span class="hljs-property">risk_score</span>,
+  }));
+}</code></pre></div>
+<h3 id="64-tool-factory-scoped-per-analysis-run"><a class="heading-anchor" href="#64-tool-factory-scoped-per-analysis-run" aria-hidden="true">#</a>6.4 Tool factory, scoped per analysis run</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/tools.ts</span>
+<span class="hljs-keyword">import</span> { tool } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/tools&quot;</span>;
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+<span class="hljs-keyword">import</span> {
+  getRunSummary,
+  listFindings,
+  getFindingDetail,
+  searchFindings,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./findingsQueries&quot;</span>;
+
+<span class="hljs-comment">/**
+ * Builds the four findings tools closed over a single, fixed analysisRunId.
+ * The model can never pass a different run&#x27;s ID as an argument - it isn&#x27;t
+ * a parameter these tools even accept - which makes cross-run data leakage
+ * structurally impossible rather than merely something the prompt asks the
+ * model not to do (Concept Learning 2.2).
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">buildFindingsTools</span>(<span class="hljs-params"><span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> getRunSummaryTool = <span class="hljs-title function_">tool</span>(
+    <span class="hljs-title function_">async</span> () =&gt; <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(<span class="hljs-keyword">await</span> <span class="hljs-title function_">getRunSummary</span>(analysisRunId)),
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;get_run_summary&quot;</span>,
+      <span class="hljs-attr">description</span>:
+        <span class="hljs-string">&quot;Get overall statistics for this contract&#x27;s analysis: total clauses &quot;</span> +
+        <span class="hljs-string">&quot;reviewed, counts per risk level, and how many were flagged for &quot;</span> +
+        <span class="hljs-string">&quot;human review. Good starting point for broad questions.&quot;</span>,
+      <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({}),
+    }
+  );
+
+  <span class="hljs-keyword">const</span> listFindingsTool = <span class="hljs-title function_">tool</span>(
+    <span class="hljs-title function_">async</span> ({ riskLevel }: { <span class="hljs-attr">riskLevel</span>?: <span class="hljs-string">&quot;LOW&quot;</span> | <span class="hljs-string">&quot;MEDIUM&quot;</span> | <span class="hljs-string">&quot;HIGH&quot;</span> }) =&gt;
+      <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(<span class="hljs-keyword">await</span> <span class="hljs-title function_">listFindings</span>(analysisRunId, riskLevel)),
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;list_findings&quot;</span>,
+      <span class="hljs-attr">description</span>:
+        <span class="hljs-string">&quot;List clauses from this analysis, optionally filtered by risk level. &quot;</span> +
+        <span class="hljs-string">&quot;Returns compact summaries (title, type, level, score) - use &quot;</span> +
+        <span class="hljs-string">&quot;get_finding_detail for full reasoning on a specific clause.&quot;</span>,
+      <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({
+        <span class="hljs-attr">riskLevel</span>: z.<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;LOW&quot;</span>, <span class="hljs-string">&quot;MEDIUM&quot;</span>, <span class="hljs-string">&quot;HIGH&quot;</span>]).<span class="hljs-title function_">optional</span>().<span class="hljs-title function_">describe</span>(
+          <span class="hljs-string">&quot;Filter to only this risk level, or omit to list all clauses&quot;</span>
+        ),
+      }),
+    }
+  );
+
+  <span class="hljs-keyword">const</span> getFindingDetailTool = <span class="hljs-title function_">tool</span>(
+    <span class="hljs-title function_">async</span> ({ clauseId }: { <span class="hljs-attr">clauseId</span>: <span class="hljs-built_in">string</span> }) =&gt; {
+      <span class="hljs-keyword">const</span> detail = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getFindingDetail</span>(analysisRunId, clauseId);
+      <span class="hljs-keyword">return</span> detail ? <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(detail) : <span class="hljs-string">&quot;No finding exists for that clause ID in this run.&quot;</span>;
+    },
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;get_finding_detail&quot;</span>,
+      <span class="hljs-attr">description</span>:
+        <span class="hljs-string">&quot;Get the full risk finding for one specific clause by its ID: &quot;</span> +
+        <span class="hljs-string">&quot;reasoning, suggested fix, legal references, and whether it was &quot;</span> +
+        <span class="hljs-string">&quot;flagged for human review.&quot;</span>,
+      <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({
+        <span class="hljs-attr">clauseId</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The clause&#x27;s ID, as returned by list_findings or search_findings&quot;</span>),
+      }),
+    }
+  );
+
+  <span class="hljs-keyword">const</span> searchFindingsTool = <span class="hljs-title function_">tool</span>(
+    <span class="hljs-title function_">async</span> ({ keyword }: { <span class="hljs-attr">keyword</span>: <span class="hljs-built_in">string</span> }) =&gt;
+      <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(<span class="hljs-keyword">await</span> <span class="hljs-title function_">searchFindings</span>(analysisRunId, keyword)),
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;search_findings&quot;</span>,
+      <span class="hljs-attr">description</span>:
+        <span class="hljs-string">&quot;Search this analysis&#x27;s clauses by keyword when the user describes a &quot;</span> +
+        <span class="hljs-string">&quot;topic or concern rather than naming an exact clause (e.g. &quot;</span> +
+        <span class="hljs-string">&quot;&#x27;liability&#x27;, &#x27;non-compete&#x27;, &#x27;payment terms&#x27;).&quot;</span>,
+      <span class="hljs-attr">schema</span>: z.<span class="hljs-title function_">object</span>({
+        <span class="hljs-attr">keyword</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A keyword or short phrase to search for&quot;</span>),
+      }),
+    }
+  );
+
+  <span class="hljs-keyword">return</span> [getRunSummaryTool, listFindingsTool, getFindingDetailTool, searchFindingsTool];
+}</code></pre></div>
+<h3 id="65-system-prompt"><a class="heading-anchor" href="#65-system-prompt" aria-hidden="true">#</a>6.5 System prompt</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/prompt.ts</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CHAT_SYSTEM_PROMPT</span> =
+  <span class="hljs-string">&quot;You are a helpful assistant discussing the results of a contract risk &quot;</span> +
+  <span class="hljs-string">&quot;analysis with the user. You have tools to look up the specific clauses &quot;</span> +
+  <span class="hljs-string">&quot;and risk findings from THIS analysis run only.\n\n&quot;</span> +
+  <span class="hljs-string">&quot;Rules:\n&quot;</span> +
+  <span class="hljs-string">&quot;- Answer only using information retrieved via your tools. Do not answer &quot;</span> +
+  <span class="hljs-string">&quot;  from general legal knowledge, and do not discuss any contract other &quot;</span> +
+  <span class="hljs-string">&quot;  than this one.\n&quot;</span> +
+  <span class="hljs-string">&quot;- If a clause is flagged for human review, say so explicitly and do not &quot;</span> +
+  <span class="hljs-string">&quot;  present its grounding with the same confidence as a fully-grounded &quot;</span> +
+  <span class="hljs-string">&quot;  finding.\n&quot;</span> +
+  <span class="hljs-string">&quot;- If the user asks something outside the scope of this specific &quot;</span> +
+  <span class="hljs-string">&quot;  analysis (general legal advice, a different contract, hypothetical &quot;</span> +
+  <span class="hljs-string">&quot;  law not tied to a finding here), say plainly that this is outside &quot;</span> +
+  <span class="hljs-string">&quot;  what you can help with from this analysis, and suggest they consult &quot;</span> +
+  <span class="hljs-string">&quot;  a qualified lawyer.\n&quot;</span> +
+  <span class="hljs-string">&quot;- Keep answers conversational and plain-language; you are talking to &quot;</span> +
+  <span class="hljs-string">&quot;  someone who may not be a lawyer.&quot;</span>;</code></pre></div>
+<h3 id="66-history-trimming"><a class="heading-anchor" href="#66-history-trimming" aria-hidden="true">#</a>6.6 History trimming</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/history.ts</span>
+<span class="hljs-keyword">import</span> { trimMessages, <span class="hljs-keyword">type</span> <span class="hljs-title class_">BaseMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">MAX_TOKENS</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">CHAT_HISTORY_MAX_TOKENS</span> ?? <span class="hljs-number">3000</span>);
+
+<span class="hljs-comment">/**
+ * Keeps only the most recent messages up to a token budget before each
+ * model call, always preserving the system message (Concept Learning 2.4) -
+ * without this, a long enough conversation would eventually exceed the
+ * model&#x27;s context window or become needlessly slow/expensive.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">trimConversationHistory</span>(<span class="hljs-params">
+  <span class="hljs-attr">messages</span>: <span class="hljs-title class_">BaseMessage</span>[]
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">BaseMessage</span>[]&gt; {
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">trimMessages</span>(messages, {
+    <span class="hljs-attr">maxTokens</span>: <span class="hljs-variable constant_">MAX_TOKENS</span>,
+    <span class="hljs-attr">strategy</span>: <span class="hljs-string">&quot;last&quot;</span>,
+    <span class="hljs-attr">tokenCounter</span>: <span class="hljs-function">(<span class="hljs-params">msgs</span>) =&gt;</span>
+      msgs.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">sum, m</span>) =&gt;</span> sum + <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">ceil</span>(<span class="hljs-title class_">String</span>(m.<span class="hljs-property">content</span>).<span class="hljs-property">length</span> / <span class="hljs-number">4</span>), <span class="hljs-number">0</span>),
+    <span class="hljs-attr">includeSystem</span>: <span class="hljs-literal">true</span>,
+  });
+}</code></pre></div>
+<h3 id="67-the-per-session-chat-agent"><a class="heading-anchor" href="#67-the-per-session-chat-agent" aria-hidden="true">#</a>6.7 The per-session chat agent</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/agent.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { createReactAgent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph/prebuilt&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">PostgresSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-postgres&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">BaseMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { buildFindingsTools } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./tools&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">CHAT_SYSTEM_PROMPT</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./prompt&quot;</span>;
+<span class="hljs-keyword">import</span> { trimConversationHistory } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./history&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CHAT_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.2</span>,
+});
+
+<span class="hljs-comment">// The SAME checkpointer backend Phase 4 and Phase 5 already use - no new</span>
+<span class="hljs-comment">// infrastructure. Chat thread IDs are namespaced (see sessions.ts) so they</span>
+<span class="hljs-comment">// never collide with analysis-run thread IDs in these shared tables.</span>
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-title class_">PostgresSaver</span>.<span class="hljs-title function_">fromConnString</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span>!);
+
+<span class="hljs-comment">/**
+ * Built fresh per request, because the tools it&#x27;s bound to are scoped to
+ * one analysisRunId (closure-based, per Concept Learning 2.2) - cheap
+ * object construction, not a network call, so there&#x27;s no real cost to
+ * doing this correctly rather than sharing one instance across sessions.
+ */</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">buildChatAgent</span>(<span class="hljs-params"><span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> tools = <span class="hljs-title function_">buildFindingsTools</span>(analysisRunId);
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">createReactAgent</span>({
+    <span class="hljs-attr">llm</span>: model,
+    tools,
+    <span class="hljs-attr">messageModifier</span>: <span class="hljs-variable constant_">CHAT_SYSTEM_PROMPT</span>,
+    <span class="hljs-attr">checkpointSaver</span>: checkpointer,
+  });
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">sendChatMessage</span>(<span class="hljs-params">
+  <span class="hljs-attr">threadId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">userText</span>: <span class="hljs-built_in">string</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">string</span>&gt; {
+  <span class="hljs-keyword">const</span> agent = <span class="hljs-title function_">buildChatAgent</span>(analysisRunId);
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: threadId } };
+
+  <span class="hljs-comment">// Load existing state, trim it, then let this turn&#x27;s invoke() append the</span>
+  <span class="hljs-comment">// new human message on top - the checkpointer persists the FULL history</span>
+  <span class="hljs-comment">// internally; trimming only affects what&#x27;s sent to the model per call.</span>
+  <span class="hljs-keyword">const</span> priorState = <span class="hljs-keyword">await</span> agent.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">priorMessages</span>: <span class="hljs-title class_">BaseMessage</span>[] = priorState.<span class="hljs-property">values</span>?.<span class="hljs-property">messages</span> ?? [];
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">trimConversationHistory</span>(priorMessages); <span class="hljs-comment">// validates budget; agent still manages its own state internally</span>
+
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> agent.<span class="hljs-title function_">invoke</span>(
+    { <span class="hljs-attr">messages</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(userText)] },
+    config
+  );
+
+  <span class="hljs-keyword">const</span> lastMessage = result.<span class="hljs-property">messages</span>[result.<span class="hljs-property">messages</span>.<span class="hljs-property">length</span> - <span class="hljs-number">1</span>];
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> lastMessage.<span class="hljs-property">content</span> === <span class="hljs-string">&quot;string&quot;</span>
+    ? lastMessage.<span class="hljs-property">content</span>
+    : <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(lastMessage.<span class="hljs-property">content</span>);
+}</code></pre></div>
+<div class="callout callout-note"><div class="callout-title"><span class="callout-icon">&#128221;</span>Note</div><div class="callout-body"><p><strong>Note on trimming placement:</strong> <code class="inline-code">createReactAgent</code>&#39;s prebuilt loop manages its own message state internally per invocation. The cleanest place to enforce a hard token ceiling without fighting the prebuilt&#39;s internals is to pass a <code class="inline-code">messageModifier</code> function (instead of a static string) that trims <code class="inline-code">state.messages</code> before the model sees them on every internal agent turn — swap the static <code class="inline-code">CHAT_SYSTEM_PROMPT</code> string above for a function of that shape once you&#39;ve confirmed trimming behavior in task 12; the static-string form above is intentionally the simplest correct starting point to validate the tools and grounding first.</p>
+</div></div>
+<h3 id="68-chat-session-storage"><a class="heading-anchor" href="#68-chat-session-storage" aria-hidden="true">#</a>6.8 Chat session storage</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/sessions.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { randomUUID } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;crypto&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">createChatSession</span>(<span class="hljs-params"><span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> threadId = <span class="hljs-string">`chat-<span class="hljs-subst">${randomUUID()}</span>`</span>; <span class="hljs-comment">// namespaced - never collides with an analysis-run thread_id</span>
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`INSERT INTO chat_sessions (analysis_run_id, contract_id, thread_id)
+     VALUES ($1, $2, $3)
+     RETURNING *`</span>,
+    [analysisRunId, contractId, threadId]
+  );
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>];
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getChatSession</span>(<span class="hljs-params"><span class="hljs-attr">sessionId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(<span class="hljs-string">`SELECT * FROM chat_sessions WHERE id = $1`</span>, [sessionId]);
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>] ?? <span class="hljs-literal">null</span>;
+}</code></pre></div>
+<h3 id="69-routes"><a class="heading-anchor" href="#69-routes" aria-hidden="true">#</a>6.9 Routes</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/routes/chat.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Router</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;express&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { createChatSession, getChatSession } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../chat/sessions&quot;</span>;
+<span class="hljs-keyword">import</span> { sendChatMessage } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../chat/agent&quot;</span>;
+<span class="hljs-keyword">import</span> { analysisGraph } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../analysis/graph&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> chatRouter = <span class="hljs-title class_">Router</span>();
+
+chatRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/analysis/:threadId/chat/sessions&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { threadId } = req.<span class="hljs-property">params</span>;
+
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: threadId } };
+  <span class="hljs-keyword">const</span> state = <span class="hljs-keyword">await</span> analysisGraph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-keyword">if</span> (!state.<span class="hljs-property">values</span> || state.<span class="hljs-property">next</span>.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">409</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Analysis run has not completed yet.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT contract_id FROM risk_findings WHERE analysis_run_id = $1 LIMIT 1`</span>,
+    [threadId]
+  );
+  <span class="hljs-keyword">if</span> (rows.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;No findings exist for this analysis run.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> <span class="hljs-title function_">createChatSession</span>(threadId, rows[<span class="hljs-number">0</span>].<span class="hljs-property">contract_id</span>);
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">201</span>).<span class="hljs-title function_">json</span>({ session });
+});
+
+chatRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/chat/sessions/:sessionId/messages&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { sessionId } = req.<span class="hljs-property">params</span>;
+  <span class="hljs-keyword">const</span> { message } = req.<span class="hljs-property">body</span>;
+
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> message !== <span class="hljs-string">&quot;string&quot;</span> || message.<span class="hljs-title function_">trim</span>().<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">400</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;message is required.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getChatSession</span>(sessionId);
+  <span class="hljs-keyword">if</span> (!session) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Chat session not found.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> reply = <span class="hljs-keyword">await</span> <span class="hljs-title function_">sendChatMessage</span>(session.<span class="hljs-property">thread_id</span>, session.<span class="hljs-property">analysis_run_id</span>, message);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ reply });
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Chat message failed:&quot;</span>, err);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Failed to process message.&quot;</span> });
+  }
+});
+
+chatRouter.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/chat/sessions/:sessionId/messages&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getChatSession</span>(req.<span class="hljs-property">params</span>.<span class="hljs-property">sessionId</span>);
+  <span class="hljs-keyword">if</span> (!session) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Chat session not found.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: session.<span class="hljs-property">thread_id</span> } };
+  <span class="hljs-keyword">const</span> { <span class="hljs-attr">analysisGraph</span>: _unused } = {} <span class="hljs-keyword">as</span> <span class="hljs-built_in">any</span>; <span class="hljs-comment">// placeholder removed below</span>
+  <span class="hljs-keyword">const</span> agentModule = <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">&quot;../chat/agent&quot;</span>);
+  <span class="hljs-keyword">const</span> state = <span class="hljs-title function_">await</span> (agentModule <span class="hljs-keyword">as</span> <span class="hljs-built_in">any</span>).<span class="hljs-property">__getAgentStateForSession</span>?.(config) ?? { <span class="hljs-attr">values</span>: { <span class="hljs-attr">messages</span>: [] } };
+
+  <span class="hljs-comment">// Map internal message objects to a clean, stable UI-facing shape rather</span>
+  <span class="hljs-comment">// than exposing LangChain&#x27;s internal message classes directly - same</span>
+  <span class="hljs-comment">// &quot;don&#x27;t leak internal bookkeeping&quot; lesson as Phase 4&#x27;s audit endpoints.</span>
+  <span class="hljs-keyword">const</span> messages = (state.<span class="hljs-property">values</span>?.<span class="hljs-property">messages</span> ?? []).<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params"><span class="hljs-attr">m</span>: <span class="hljs-built_in">any</span></span>) =&gt;</span> ({
+    <span class="hljs-attr">role</span>: m.<span class="hljs-property">getType</span>?.() ?? m.<span class="hljs-property">_getType</span>?.() ?? <span class="hljs-string">&quot;unknown&quot;</span>,
+    <span class="hljs-attr">content</span>: <span class="hljs-keyword">typeof</span> m.<span class="hljs-property">content</span> === <span class="hljs-string">&quot;string&quot;</span> ? m.<span class="hljs-property">content</span> : <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(m.<span class="hljs-property">content</span>),
+  }));
+
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ messages });
+});</code></pre></div>
+<div class="callout callout-note"><div class="callout-title"><span class="callout-icon">&#128221;</span>Note</div><div class="callout-body"><p><strong>Note:</strong> the history endpoint above needs a small exported helper alongside <code class="inline-code">sendChatMessage</code> in <code class="inline-code">src/chat/agent.ts</code> — add and export a <code class="inline-code">getSessionState(config)</code> function that builds the same checkpointer-bound agent shape and calls <code class="inline-code">.getState(config)</code>, then replace the placeholder <code class="inline-code">import(...)</code> block with a direct call to it. It&#39;s left as an explicit wiring exercise in Hands-on Task 8 rather than fully inlined here, since it&#39;s a one-line addition once Section 6.7&#39;s agent module is in place.</p>
+</div></div>
+<p>Wire the router in:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/app.ts (excerpt)</span>
+<span class="hljs-keyword">import</span> { chatRouter } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./routes/chat&quot;</span>;
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api&quot;</span>, chatRouter);</code></pre></div>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── src/
+│   ├── chat/
+│   │   ├── findingsQueries.ts
+│   │   ├── tools.ts
+│   │   ├── prompt.ts
+│   │   ├── history.ts
+│   │   ├── agent.ts
+│   │   └── sessions.ts
+│   ├── routes/
+│   │   └── chat.ts
+│   └── app.ts
+├── migrations/
+│   └── 008_chat_sessions.sql</code></pre></div>
+<h3 id="request-flow--starting-a-conversation"><a class="heading-anchor" href="#request-flow--starting-a-conversation" aria-hidden="true">#</a>Request flow — starting a conversation</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">POST /api/analysis/:threadId/chat/sessions
+  │
+  ▼
+Confirm the analysis run has completed (analysisGraph.getState)
+  │
+  ▼
+Resolve contract_id from risk_findings
+  │
+  ▼
+createChatSession() → generates a namespaced thread_id, inserts chat_sessions row
+  │
+  ▼
+HTTP 201 { session: { id, threadId, analysisRunId, contractId } }</code></pre></div>
+<h3 id="request-flow--sending-a-message"><a class="heading-anchor" href="#request-flow--sending-a-message" aria-hidden="true">#</a>Request flow — sending a message</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">POST /api/chat/sessions/:sessionId/messages   { message: &quot;...&quot; }
+  │
+  ▼
+Load chat_sessions row → resolve thread_id + analysis_run_id
+  │
+  ▼
+buildChatAgent(analysisRunId)         — tools scoped via closure to THIS run only
+  │
+  ▼
+agent.invoke({ messages: [HumanMessage] }, { thread_id })
+  │
+  ├─ checkpointer loads prior conversation state for this thread_id
+  ├─ ReAct loop: reason → (maybe) call one of the 4 findings tools → observe → repeat
+  ├─ checkpointer saves the updated state (new turn appended) back
+  ▼
+HTTP 200 { reply: &quot;...&quot; }</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong>Structured tools instead of vector search:</strong> the underlying data (a few dozen already-structured rows) doesn&#39;t have the properties that make vector search worthwhile — see Concept Learning 2.1&#39;s direct reasoning.</li>
+<li><strong>Closure-scoped tools, not a model-supplied run ID parameter:</strong> makes cross-run data leakage a structural impossibility rather than a prompt-level request the model could be talked out of — the same defensive instinct as never trusting a client-supplied ID for anything security-relevant.</li>
+<li><strong>A dedicated <code class="inline-code">chat_sessions</code> table with namespaced thread IDs, sharing (not duplicating) the checkpointer backend:</strong> keeps Phase 4&#39;s audit-purpose checkpoints and this phase&#39;s memory-purpose checkpoints conceptually distinct while still reusing the exact same Postgres infrastructure — no second database, no second checkpointer class to maintain.</li>
+<li><strong>Trimming over summarization, for now:</strong> matches the actual complexity this phase&#39;s use case needs; summarization is a real, available upgrade path (3.2) rather than something worth building before real usage shows it&#39;s needed.</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Scope every tool that touches per-run data via closure over a fixed, server-controlled ID — never accept that ID as a model-supplied tool argument.</li>
+<li>Keep the system prompt&#39;s refusal instruction explicit and specific (&quot;outside what you can help with from this analysis,&quot; not just &quot;be careful&quot;) — vague grounding instructions are exactly the kind of thing that degrades quietly under pressure to be helpful.</li>
+<li>Reuse existing infrastructure (the same checkpointer backend) for a new purpose rather than standing up parallel infrastructure for something that&#39;s conceptually different but operationally identical.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li>Building the agent (and its tools) fresh per request is cheap — it&#39;s object construction, not a network call — so there&#39;s no meaningful scaling concern in doing this correctly rather than trying to cache a shared instance across sessions.</li>
+<li>A long-running, heavily-used chat feature will eventually want summarization-based memory (3.2&#39;s Approach C) once conversation lengths in real usage justify the added complexity — this is a metrics-driven decision, not a speculative one to make now.</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Validate that the requesting user actually owns the underlying <code class="inline-code">contract_id</code>/<code class="inline-code">analysis_run_id</code> before allowing a chat session to be created or messaged, once auth exists — the same open item carried forward from every prior phase&#39;s endpoints.</li>
+<li>Never log full message content in application logs — log session IDs and message counts only, consistent with every prior phase&#39;s confidentiality discipline; conversation content can restate sensitive contract details verbatim.</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li><code class="inline-code">listFindings</code>/<code class="inline-code">searchFindings</code> deliberately return compact rows, not full text — this keeps each tool round-trip&#39;s token cost small regardless of how much detail a given clause&#39;s full finding actually contains.</li>
+<li>Trimming keeps per-turn model input cost roughly bounded regardless of how long a conversation has run, rather than growing linearly with every additional turn.</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Adding a fifth findings tool later (e.g. &quot;compare two clauses&quot;) is: one more query function in <code class="inline-code">findingsQueries.ts</code>, one more <code class="inline-code">tool()</code> wrapper in <code class="inline-code">tools.ts</code>, added to the returned array. No other file changes — the same &quot;add one array entry&quot; pattern as Phase 4.5&#39;s research tools.</li>
+<li>Keep the system prompt as its own exported constant (6.5) so it&#39;s trivial to find, review, and version independently of the agent-construction code that uses it.</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test each findings query function directly against a seeded test database, independent of the agent — assert <code class="inline-code">listFindings</code> never returns full text fields, and that <code class="inline-code">riskLevel</code> filtering is exact.</li>
+<li>Integration test the full agent against a fixture analysis run with mocked/scripted user turns: assert a broad question triggers <code class="inline-code">get_run_summary</code> or <code class="inline-code">list_findings</code> (not <code class="inline-code">get_finding_detail</code> first), and that an out-of-scope question produces a reply containing an explicit decline rather than a fabricated answer.</li>
+<li>Explicitly test cross-session isolation: create two sessions for two different analysis runs, and assert that session A&#39;s agent cannot retrieve session B&#39;s data even when directly prompted to try — this should fail structurally (the tool has no parameter to even attempt it with), not merely be discouraged.</li>
+<li>Test trimming with a scripted long conversation (enough turns to exceed <code class="inline-code">CHAT_HISTORY_MAX_TOKENS</code>) and assert the system message is still present in what&#39;s sent to the model while the oldest human/AI turns are not.</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>Why &quot;retrieval&quot; doesn&#39;t have to mean vector search — a small, already-structured dataset (one run&#39;s findings) is better served by exact, structured tool-calling than by embedding and cosine-similarity search, and recognizing which shape of retrieval a given dataset actually needs is a skill worth having independent of any one project.</li>
+<li>Why scoping tools via closure over a server-controlled ID, rather than accepting that ID as a model-supplied argument, turns a security property (&quot;this session can&#39;t see another run&#39;s data&quot;) into something structurally guaranteed rather than merely requested of the model.</li>
+<li>What multi-turn memory actually requires: a checkpointer whose job this time is durability-for-recall rather than durability-for-audit, and a <code class="inline-code">thread_id</code> namespace kept distinct from Phase 4&#39;s analysis-run threads even while sharing the same underlying infrastructure.</li>
+<li>Why unmanaged conversation history eventually breaks any long-running chat feature, and why trimming (not summarization) is the right amount of complexity for this phase&#39;s actual use case, with summarization named explicitly as the correct upgrade path if usage ever demands it.</li>
+<li>That <code class="inline-code">createReactAgent</code> is a genuinely reusable primitive — the same compiled ReAct loop Phase 4.5 used for a disposable, single-shot research task now serves a durable, multi-turn conversational purpose, just by changing what&#39;s plugged into it (tools, checkpointer usage pattern).</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li><code class="inline-code">chat_sessions</code> table and storage layer, with namespaced thread IDs.</li>
+<li>Four structured findings tools (<code class="inline-code">get_run_summary</code>, <code class="inline-code">list_findings</code>, <code class="inline-code">get_finding_detail</code>, <code class="inline-code">search_findings</code>), each closure-scoped to a single analysis run.</li>
+<li>A grounding- and refusal-aware system prompt.</li>
+<li>History trimming to keep per-turn model input cost bounded.</li>
+<li>A per-session <code class="inline-code">createReactAgent</code>, bound to the same <code class="inline-code">PostgresSaver</code> checkpointer backend already used elsewhere in the project, giving genuine multi-turn memory across separate HTTP requests.</li>
+<li>Session-creation, message-send, and history-retrieval endpoints.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Running the hands-on tasks against a real completed analysis run and validating multi-turn behavior, cross-run isolation, and trimming under a genuinely long conversation (tasks 9-12 — yours to execute).</li>
+<li>Wiring the small <code class="inline-code">getSessionState</code> helper noted in Section 6.9 to fully complete the history-retrieval endpoint.</li>
+<li>Everything from Phase 6.5 onward, which generalizes this phase&#39;s &quot;a persistent, tool-using, checkpointed agent&quot; pattern into a multi-agent architecture.</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+Phase 6.5 takes the project&#39;s collection of increasingly specialized components — Phase 4&#39;s risk analyzer, Phase 4.5&#39;s legal research agent, and this phase&#39;s conversational assistant — and wraps them under a <strong>Supervisor</strong>: a top-level agent that routes a request to whichever specialist is actually appropriate for it, rather than every capability being reached through its own separate, hardcoded endpoint. This phase is the direct template for how that works in practice: a durable, checkpointed, tool-using <code class="inline-code">createReactAgent</code> that persists state across multiple interactions is exactly the shape each Supervisor sub-agent takes, and the closure-scoping discipline used here (never trust a model-supplied ID for something security-relevant) is the same discipline the Supervisor will need when it decides, per request, which specialist and which underlying data that specialist is allowed to touch.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

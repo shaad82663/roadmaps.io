@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 1: Knowledge Base Ingestion</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 1: Knowledge Base Ingestion</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-1-knowledge-base-ingestion"><a class="heading-anchor" href="#legaldocs--phase-1-knowledge-base-ingestion" aria-hidden="true">#</a>LegalDocs — Phase 1: Knowledge Base Ingestion</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL + pgvector (from Phase 0), LangChain.js (loaders, splitters, embeddings wrapper)
+<strong>Depends on:</strong> Phase 0 (Docker Compose with Postgres+pgvector, Redis, Express+TS skeleton — already done)
+<strong>Feeds into:</strong> Phase 2.5 (Conversational Q&amp;A retriever), Phase 4 (Risk Analyzer retriever stack), Phase 4.5 (Legal Research Agent)</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>Take your ~30 curated legal reference documents (Indian statutes, case judgments, regulatory circulars — PDFs and DOCX files) and turn them into a <strong>queryable vector knowledge base</strong> stored in pgvector. By the end of this phase, you should be able to run a semantic query like <em>&quot;what are the notice period requirements for termination without cause&quot;</em> and get back the actual relevant chunks of statute/judgment text, ranked by relevance.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>Every AI feature you build after this phase is a form of <strong>RAG (Retrieval-Augmented Generation)</strong> — the LLM&#39;s answer is only as good as the text you retrieve and hand it. Concretely:</p>
+<ul>
+<li>Phase 4&#39;s Risk Analyzer will retrieve statute/judgment excerpts to justify <em>why</em> a clause is risky.</li>
+<li>Phase 4.5&#39;s Legal Research Agent will search this same knowledge base as one of its tools.</li>
+<li>Phase 2.5&#39;s conversational Q&amp;A retrieves from a <em>different</em> set of vectors (the user&#39;s own uploaded contract), but uses the exact same chunking/embedding techniques you build here.</li>
+</ul>
+<p>If this phase is sloppy — chunks that cut a legal provision in half, no useful metadata to filter by, embeddings of noisy OCR text — then no amount of clever prompting later can fix it. This is the foundation phase for every retrieval feature in the app. Get it right once, reuse the pattern everywhere.</p>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">                     ┌────────────────────────────────┐
+                     │   /data/legal-docs/*.pdf,.docx  │   (~30 curated reference docs)
+                     └───────────────┬────────────────┘
+                                     │
+                     ┌───────────────▼────────────────┐
+                     │   PHASE 1 — Ingestion Pipeline  │
+                     │  Load → Split → Embed → Store   │
+                     └───────────────┬────────────────┘
+                                     │
+                     ┌───────────────▼────────────────┐
+                     │  Postgres + pgvector            │
+                     │  legal_reference_chunks table   │
+                     └───────────────┬────────────────┘
+                                     │
+              ┌──────────────────────┼───────────────────────┐
+              │                      │                        │
+     Phase 4: Risk Analyzer   Phase 4.5: Research Agent   Phase 9: Evals
+     (retrieves grounding     (search_indian_kanoon /     (retrieval quality
+      text per clause)         search_case_precedent)      regression tests)</code></pre></div>
+<p>This phase produces <strong>one artifact</strong>: a well-populated, well-indexed <code class="inline-code">legal_reference_chunks</code> table. Everything else in the roadmap consumes it.</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-document-loaders"><a class="heading-anchor" href="#21-document-loaders" aria-hidden="true">#</a>2.1 Document Loaders</h3>
+<p>A <strong>document loader</strong> converts a raw file (PDF, DOCX, TXT, HTML) into a standardized in-memory shape that the rest of your pipeline can work with regardless of original format:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Document</span> {
+  <span class="hljs-attr">pageContent</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">metadata</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">any</span>&gt;;
+}</code></pre></div>
+<p>Why not just <code class="inline-code">fs.readFile()</code>? Because a PDF or DOCX is a binary container format — layout, fonts, embedded images, page breaks. A loader wraps a parsing library (<code class="inline-code">pdf-parse</code> for PDFs, <code class="inline-code">mammoth</code> for DOCX) and gives you back plain text plus metadata (e.g. <code class="inline-code">{ source: &#39;filename.pdf&#39;, pdf: { totalPages: 12 } }</code>), so the splitter and embedder downstream never need to know or care what the original file type was.</p>
+<p><strong><code class="inline-code">load()</code> vs <code class="inline-code">lazyLoad()</code></strong></p>
+<ul>
+<li><code class="inline-code">load()</code> reads and parses the <em>entire</em> file and returns the full array of <code class="inline-code">Document</code> objects in memory at once. For a directory loader wrapping many files, this means every file is loaded before you get anything back.</li>
+<li><code class="inline-code">lazyLoad()</code> returns an <code class="inline-code">AsyncIterable&lt;Document&gt;</code> — it yields documents one at a time as they become available, so you can process (split → embed → insert) document 1 completely, let it be garbage-collected, then move to document 2.</li>
+</ul>
+<p>Analogy: <code class="inline-code">load()</code> is &quot;cook all 30 meals, then bring them all to the table.&quot; <code class="inline-code">lazyLoad()</code> is &quot;cook one meal, serve it, then start the next.&quot; For 30 documents this isn&#39;t strictly necessary to avoid crashing — but it&#39;s the correct default habit for any real ingestion pipeline, because &quot;how many reference documents will this system eventually hold&quot; is a number that only grows, and building it lazy from day one means you never have to rewrite this later.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// Eager — all 30 documents fully parsed into memory before processing starts</span>
+<span class="hljs-keyword">const</span> docs = <span class="hljs-keyword">await</span> directoryLoader.<span class="hljs-title function_">load</span>();
+
+<span class="hljs-comment">// Lazy — process and free each document one at a time</span>
+<span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> doc <span class="hljs-keyword">of</span> directoryLoader.<span class="hljs-title function_">lazyLoad</span>()) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">processDocument</span>(doc);
+}</code></pre></div>
+<h3 id="22-text-splitters"><a class="heading-anchor" href="#22-text-splitters" aria-hidden="true">#</a>2.2 Text Splitters</h3>
+<p>LLMs and embedding models work best on modestly sized, semantically coherent pieces of text — not whole 100-page documents. Two reasons:</p>
+<ol>
+<li><strong>Context limits.</strong> Embedding models have a maximum input length; if you exceed it the text gets silently truncated.</li>
+<li><strong>Embedding quality.</strong> A vector embedding is a <em>single point</em> that has to represent the &quot;meaning&quot; of everything you feed it. Embed one paragraph about termination clauses → you get a vector that means &quot;termination clause.&quot; Embed an entire 100-page judgment → you get a vector that means, roughly, &quot;average of everything in this document,&quot; which matches almost nothing well. Precise retrieval needs precise, small, single-topic chunks.</li>
+</ol>
+<p><strong><code class="inline-code">RecursiveCharacterTextSplitter</code> (length-based)</strong></p>
+<p>You configure a <code class="inline-code">chunkSize</code> (e.g. 1000 characters) and <code class="inline-code">chunkOverlap</code> (e.g. 150 characters). It tries a hierarchy of separators — first <code class="inline-code">\n\n</code> (paragraph breaks), then <code class="inline-code">\n</code>, then <code class="inline-code">. </code>, then a space — always preferring to cut at the highest-priority separator it can find near the target size, so it avoids cutting mid-word or mid-sentence when possible. It has <strong>no understanding of document structure</strong> — it doesn&#39;t know what a &quot;section&quot; is, it just knows &quot;roughly N characters, break at a natural point if you can.&quot;</p>
+<p><code class="inline-code">chunkOverlap</code> exists because a hard cutoff might separate a sentence&#39;s subject from its conclusion. Overlapping the tail of chunk N into the head of chunk N+1 means a query is less likely to miss context that straddled a boundary.</p>
+<p><strong>Structure-aware splitting</strong></p>
+<p>Instead of &quot;every N characters,&quot; you split on the document&#39;s own structure — e.g. numbered sections in a statute (<code class="inline-code">&quot;Section 5:&quot;</code>, <code class="inline-code">&quot;Section 6:&quot;</code>) or paragraph numbers in a judgment. You do this by writing a splitter that detects these markers with a regex and cuts exactly there, regardless of resulting chunk length.</p>
+<p>Why this can be better for legal text specifically: a statute section is a <strong>complete, self-contained legal unit</strong> — the &quot;notice period&quot; section is one indivisible rule. If a character-based splitter cuts that section in half at char #1000, you might retrieve only the first half of the rule and miss the crucial exception clause that came right after. Structure-aware splitting guarantees each chunk is exactly one complete provision.</p>
+<p>The tradeoff: chunk sizes become wildly uneven (one section might be a single sentence, another three pages), which can hurt embedding quality at extremes, and it only works if the document actually has clean, consistently-formatted headings — a badly-OCR&#39;d 1960s judgment might not.</p>
+<p>This is why the roadmap has you build <strong>both</strong> for section-structured documents (statutes, judgments) and compare retrieval quality empirically — there&#39;s no universal right answer, only what performs best for a given document type.</p>
+<h3 id="23-embeddings-amp-vector-stores"><a class="heading-anchor" href="#23-embeddings-amp-vector-stores" aria-hidden="true">#</a>2.3 Embeddings &amp; Vector Stores</h3>
+<p>An <strong>embedding model</strong> maps a piece of text to a fixed-length vector of numbers (OpenAI&#39;s <code class="inline-code">text-embedding-3-small</code> → 1536 numbers) such that texts with similar <em>meaning</em> map to vectors that are close together in that 1536-dimensional space. &quot;Close together&quot; is measured with a distance metric — cosine similarity (angle between vectors) or L2/Euclidean distance (straight-line distance) are the common choices.</p>
+<p>A <strong>vector store</strong> is a database purpose-built to answer: <em>&quot;given this query vector, give me the top-K stored vectors closest to it — fast, even across millions of rows.&quot;</em> A naive approach (compute distance to every single row, one by one) works fine for a few thousand rows, but doesn&#39;t scale — vector indexes (like HNSW) organize the vectors so nearest-neighbor search is approximate but very fast, trading a small amount of accuracy for massive speed.</p>
+<p><strong>pgvector</strong> is a PostgreSQL extension that adds:</p>
+<ul>
+<li>A <code class="inline-code">vector(n)</code> column type to store embeddings directly in a normal table.</li>
+<li>Distance operators (<code class="inline-code">&lt;-&gt;</code> for L2, <code class="inline-code">&lt;=&gt;</code> for cosine distance, <code class="inline-code">&lt;#&gt;</code> for inner product).</li>
+<li>Index types (<code class="inline-code">ivfflat</code>, <code class="inline-code">hnsw</code>) for fast approximate nearest-neighbor search at scale.</li>
+</ul>
+<p><strong>Why pgvector instead of a dedicated vector database</strong> (Pinecone, Weaviate, Qdrant) for this project:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Reason</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One database to operate</td>
+<td>You already run Postgres (Phase 0). No second system to provision, secure, back up, and monitor.</td>
+</tr>
+<tr>
+<td>Relational + vector in one query</td>
+<td>You can <code class="inline-code">JOIN</code> a vector similarity search with a normal <code class="inline-code">WHERE doc_group = &#39;labour_law&#39; AND jurisdiction = &#39;ontario&#39;</code> filter, in a single SQL statement — critical for legal documents where &quot;is this even the right act/jurisdiction&quot; often matters as much as semantic closeness.</td>
+</tr>
+<tr>
+<td>Transactional consistency</td>
+<td>Inserting a document&#39;s chunks and its metadata row happens in the same transaction — no risk of the vector store and the relational store drifting out of sync.</td>
+</tr>
+<tr>
+<td>Scale fit</td>
+<td>At dozens to low-thousands of documents (your current and near-future scale), pgvector&#39;s HNSW index is more than fast enough. A dedicated vector DB solves a scale problem (tens of millions of vectors, distributed sharding) that this project doesn&#39;t have.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="24-chunk-metadata--filtering-is-half-of-retrieval"><a class="heading-anchor" href="#24-chunk-metadata--filtering-is-half-of-retrieval" aria-hidden="true">#</a>2.4 Chunk Metadata — filtering is half of retrieval</h3>
+<p>A vector search alone answers &quot;what&#39;s semantically similar.&quot; It cannot answer &quot;...but only from the Ontario Employment Standards Act, not the Indian Contract Act.&quot; That&#39;s what metadata columns are for. Every chunk you store should carry, alongside its vector:</p>
+<ul>
+<li><code class="inline-code">source_document</code> — original filename, for citation/traceability.</li>
+<li><code class="inline-code">doc_type</code> — <code class="inline-code">statute</code> | <code class="inline-code">judgment</code> | <code class="inline-code">regulation</code> | <code class="inline-code">circular</code>.</li>
+<li><code class="inline-code">doc_group</code> — a logical bucket used for filtering during retrieval (e.g. <code class="inline-code">labour_law</code>, <code class="inline-code">contract_law</code>, <code class="inline-code">data_protection</code>). This is what Phase 4&#39;s retriever filters on.</li>
+<li><code class="inline-code">jurisdiction</code> — e.g. <code class="inline-code">india_central</code>, <code class="inline-code">ontario</code>, <code class="inline-code">federal_canada</code> (your roadmap spans Indian legal reference material and Canadian/OPS-context resume work is a separate business, but the LegalDocs app itself targets Indian contracts per your project brief — keep this field generic so it scales to any jurisdiction you add later).</li>
+<li><code class="inline-code">section_title</code> — if structure-aware splitting was used, the actual heading/section number, e.g. <code class="inline-code">&quot;Section 73 - Compensation for breach&quot;</code>.</li>
+<li><code class="inline-code">chunk_index</code> — position of this chunk within its source document, for reconstructing order or debugging.</li>
+<li><code class="inline-code">split_strategy</code> — <code class="inline-code">&#39;recursive&#39;</code> or <code class="inline-code">&#39;structure_aware&#39;</code> — so you can literally query &quot;show me only the recursive chunks&quot; vs &quot;only structure-aware chunks&quot; during your comparison step.</li>
+</ul>
+<h3 id="25-idempotency-and-re-ingestion"><a class="heading-anchor" href="#25-idempotency-and-re-ingestion" aria-hidden="true">#</a>2.5 Idempotency and re-ingestion</h3>
+<p>Legal reference documents get updated (an act is amended, a new judgment matters more). Your ingestion pipeline needs to be <strong>safe to re-run</strong>: if you run it twice on the same file, you should not get duplicate chunks. The standard approach: compute a content hash (e.g. SHA-256) of the source file, store it, and skip re-processing (or delete-then-reinsert) if the hash hasn&#39;t changed. We&#39;ll build this in.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-splitting-strategy"><a class="heading-anchor" href="#31-splitting-strategy" aria-hidden="true">#</a>3.1 Splitting strategy</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Recursive character splitting only</strong></td>
+<td>Simple, one code path, works on any document regardless of formatting quality</td>
+<td>Can cut legal provisions mid-rule; ignores document structure entirely</td>
+<td>Documents with no clean heading structure (poorly OCR&#39;d, unstructured circulars)</td>
+</tr>
+<tr>
+<td><strong>B. Structure-aware splitting only</strong></td>
+<td>Chunks are always complete legal provisions; best possible retrieval precision for well-structured docs</td>
+<td>Fails silently (falls back to one giant chunk) on documents without clean headings; uneven chunk sizes</td>
+<td>Statutes and judgments with consistent numbered sections</td>
+</tr>
+<tr>
+<td><strong>C. Both, per document type, and compare (roadmap&#39;s choice)</strong></td>
+<td>Best of both worlds; empirically informed decision instead of a guess; you build real intuition for <em>when</em> structure-aware wins</td>
+<td>More code, more storage (two chunk sets during comparison), more upfront work</td>
+<td>Recommended for this phase — you have a small, curated (~30 doc) corpus, so the extra cost is trivial and the learning value is high</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach C, exactly as your roadmap specifies. Implement both splitters as pluggable strategies, run both on statute/judgment documents, tag each chunk with <code class="inline-code">split_strategy</code>, and produce a short comparison note. For document types where structure-aware detection finds no matches (e.g. a poorly formatted circular), silently fall back to recursive-only rather than failing.</p>
+<h3 id="32-loader-implementation"><a class="heading-anchor" href="#32-loader-implementation" aria-hidden="true">#</a>3.2 Loader implementation</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. LangChain&#39;s built-in loaders</strong> (<code class="inline-code">PDFLoader</code>, <code class="inline-code">DocxLoader</code>, <code class="inline-code">DirectoryLoader</code>)</td>
+<td>Battle-tested, consistent <code class="inline-code">Document</code> output shape, direct <code class="inline-code">lazyLoad()</code> support, less code to maintain</td>
+<td>Slight abstraction overhead; DOCX loader depends on <code class="inline-code">mammoth</code> under the hood which you don&#39;t control directly</td>
+<td><strong>Recommended</strong> — you&#39;re learning the LangChain curriculum, and this is exactly unit 7&#39;s intended use</td>
+</tr>
+<tr>
+<td><strong>B. Hand-rolled parsing</strong> (raw <code class="inline-code">pdf-parse</code> / <code class="inline-code">mammoth</code> calls)</td>
+<td>Full control over parsing options</td>
+<td>You reinvent <code class="inline-code">Document</code>/metadata conventions that the rest of LangChain (splitters, retrievers) expects; more code for no real benefit here</td>
+<td>Only if you hit a specific limitation LangChain&#39;s loader doesn&#39;t support</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach A — use LangChain&#39;s loaders. This is also literally what unit 7 of your curriculum is meant to teach you hands-on.</p>
+<h3 id="33-embedding--storage-integration"><a class="heading-anchor" href="#33-embedding--storage-integration" aria-hidden="true">#</a>3.3 Embedding + storage integration</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. LangChain&#39;s <code class="inline-code">PGVectorStore</code> wrapper</strong> (<code class="inline-code">@langchain/community</code>)</td>
+<td>Handles embedding calls + SQL insert + similarity search behind one API; less boilerplate; integrates directly with LangChain retrievers in Phase 4</td>
+<td>Less visibility into the exact SQL being run; you still need raw SQL for metadata-rich schema (your custom columns) so you end up mixing both anyway</td>
+<td>Good for the <em>retrieval</em> side in later phases</td>
+</tr>
+<tr>
+<td><strong>B. Raw <code class="inline-code">pg</code> + manual <code class="inline-code">OpenAIEmbeddings</code> calls</strong></td>
+<td>Full control over batching, retries, custom columns, hash-based idempotency logic; easier to reason about exactly what&#39;s happening for a learning project</td>
+<td>More code to write yourself</td>
+<td><strong>Recommended for the ingestion side</strong> — ingestion is where your custom metadata schema and idempotency logic live, and writing it explicitly is genuinely useful for understanding what a vector store wrapper is doing for you underneath</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> A hybrid — use raw <code class="inline-code">pg</code> + explicit <code class="inline-code">OpenAIEmbeddings().embedDocuments()</code> calls for the <strong>ingestion pipeline</strong> (this phase), so you fully understand and control chunking → embedding → storage. In Phase 4, you can additionally construct a LangChain <code class="inline-code">PGVectorStore</code> instance pointed at the <em>same</em> table for the retriever side, since by then the table already has consistent structure. This also directly matches your roadmap&#39;s phrasing: &quot;<code class="inline-code">PGVectorStore.asRetriever()</code>&quot; is a <em>Phase 4</em> task, not a Phase 1 task.</p>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--database-schema-for-the-knowledge-base"><a class="heading-anchor" href="#step-1--database-schema-for-the-knowledge-base" aria-hidden="true">#</a>Step 1 — Database schema for the knowledge base</h3>
+<p><strong>What:</strong> A <code class="inline-code">legal_reference_chunks</code> table plus a <code class="inline-code">legal_reference_documents</code> table to track ingested source files (for idempotency and re-ingestion).</p>
+<p><strong>Why:</strong> Separating &quot;documents&quot; (one row per source file, tracks hash/ingestion status) from &quot;chunks&quot; (many rows per document, holds the actual vectors) lets you answer &quot;has this file changed since I last ingested it&quot; cheaply, without scanning thousands of chunk rows.</p>
+<p><strong>How:</strong> SQL migration adding the <code class="inline-code">vector</code> extension, both tables, and an HNSW index on the embedding column.</p>
+<p><strong>Best practice:</strong> Always create the vector index <em>after</em> bulk-loading data for the first time (index build is faster on data already in the table, and for a 30-document corpus this is nearly instant either way, but it&#39;s the right habit at scale). Store <code class="inline-code">embedding_model</code> and <code class="inline-code">embedding_dims</code> alongside the vector so a future model upgrade doesn&#39;t silently mix incompatible vector spaces in one table.</p>
+<p><strong>Common mistake to avoid:</strong> Forgetting to <code class="inline-code">CREATE EXTENSION vector;</code> before creating a <code class="inline-code">vector</code> column — Postgres will error immediately with &quot;type vector does not exist.&quot;</p>
+<h3 id="step-2--document-loader-module"><a class="heading-anchor" href="#step-2--document-loader-module" aria-hidden="true">#</a>Step 2 — Document loader module</h3>
+<p><strong>What:</strong> A module that, given a directory path, lazily yields <code class="inline-code">{ document, sourceFile, docType, docGroup, jurisdiction }</code> for every PDF/DOCX in it, using file-path-derived metadata (or a small <code class="inline-code">manifest.json</code> you maintain per folder).</p>
+<p><strong>Why:</strong> Centralizing &quot;how do we know a file&#39;s <code class="inline-code">doc_type</code>/<code class="inline-code">doc_group</code>/<code class="inline-code">jurisdiction</code>&quot; in one place means the rest of the pipeline never has to guess.</p>
+<p><strong>How:</strong> A <code class="inline-code">manifest.json</code> sitting next to your source files, mapping filename → metadata. This is simpler and more reliable for ~30 curated documents than trying to auto-detect jurisdiction from file content.</p>
+<p><strong>Best practice:</strong> Fail loudly (throw, don&#39;t skip silently) if a file exists in the folder but has no manifest entry — an un-tagged legal document silently ingested with <code class="inline-code">doc_group: null</code> will quietly break every filtered retrieval later.</p>
+<h3 id="step-3--text-splitting-module-dual-strategy"><a class="heading-anchor" href="#step-3--text-splitting-module-dual-strategy" aria-hidden="true">#</a>Step 3 — Text splitting module (dual strategy)</h3>
+<p><strong>What:</strong> Two splitter functions: <code class="inline-code">splitRecursive(doc)</code> and <code class="inline-code">splitByStructure(doc)</code>, both returning arrays of <code class="inline-code">{ content, metadata }</code>.</p>
+<p><strong>Why:</strong> Pluggable, independently testable, and directly comparable — exactly what the roadmap&#39;s comparison deliverable needs.</p>
+<p><strong>How:</strong> <code class="inline-code">RecursiveCharacterTextSplitter</code> from <code class="inline-code">langchain/text_splitter</code> for the first; a custom regex-based splitter for the second, matching patterns like <code class="inline-code">/^(Section|Article|Clause)\s+\d+[A-Za-z]?\.?/gm</code>.</p>
+<p><strong>Best practice:</strong> Always attach <code class="inline-code">chunk_index</code> and <code class="inline-code">split_strategy</code> to metadata at split time, not later — it&#39;s cheap to lose track of ordering once chunks are shuffled into a Promise.all batch.</p>
+<p><strong>Common mistake to avoid:</strong> Using the same <code class="inline-code">chunkSize</code> for every document type. A dense statute section and a conversational judgment paragraph read very differently — start with one sane default (1000 chars / 150 overlap) and only tune per-type if your comparison step shows a real problem.</p>
+<h3 id="step-4--embedding-module"><a class="heading-anchor" href="#step-4--embedding-module" aria-hidden="true">#</a>Step 4 — Embedding module</h3>
+<p><strong>What:</strong> A thin wrapper around <code class="inline-code">OpenAIEmbeddings</code> that batches chunk text into groups (OpenAI&#39;s embedding endpoint accepts arrays), with retry-on-rate-limit logic.</p>
+<p><strong>Why:</strong> Embedding 30 documents&#39; worth of chunks one-at-a-time is slow and wasteful; embedding all of them in one giant array risks a token-limit-per-request error. Batching in groups of ~100 is the practical middle ground.</p>
+<p><strong>How:</strong> <code class="inline-code">embeddings.embedDocuments(texts: string[])</code> called in <code class="inline-code">chunk()</code>-ed batches.</p>
+<p><strong>Best practice:</strong> Log token usage and cost per document during ingestion — for a curated, infrequently-re-run pipeline like this, visibility into cost matters more than raw speed.</p>
+<h3 id="step-5--storage-module"><a class="heading-anchor" href="#step-5--storage-module" aria-hidden="true">#</a>Step 5 — Storage module</h3>
+<p><strong>What:</strong> Functions to upsert a document record (with content hash) and bulk-insert its chunk rows with embeddings.</p>
+<p><strong>Why:</strong> Wrapping this in a transaction per document means a crash halfway through embedding document #14 doesn&#39;t leave a half-ingested document #14 permanently corrupting your knowledge base.</p>
+<p><strong>How:</strong> <code class="inline-code">pg</code> <code class="inline-code">Pool</code>, a transaction per document: delete old chunks for this document (if re-ingesting), insert new ones, update the document&#39;s hash/status, commit.</p>
+<p><strong>Common mistake to avoid:</strong> Inserting chunks one row at a time in a loop of individual <code class="inline-code">INSERT</code> statements — use a single multi-row <code class="inline-code">INSERT ... VALUES (...), (...), (...)</code> (or <code class="inline-code">pg-format</code>/<code class="inline-code">unnest</code>) for performance, even at this small scale; it&#39;s the right habit and costs nothing extra to build correctly now.</p>
+<h3 id="step-6--orchestration-pipeline"><a class="heading-anchor" href="#step-6--orchestration-pipeline" aria-hidden="true">#</a>Step 6 — Orchestration pipeline</h3>
+<p><strong>What:</strong> <code class="inline-code">ingest.ts</code> — the script that ties loader → splitter → embedder → storage together, iterating documents with <code class="inline-code">lazyLoad()</code>.</p>
+<p><strong>Why:</strong> This is the actual &quot;run this to (re)build the knowledge base&quot; entrypoint you&#39;ll invoke via <code class="inline-code">npm run ingest</code>.</p>
+<p><strong>How:</strong> For each document: check hash against DB, skip if unchanged; otherwise split with both strategies (if structure-aware detects zero sections, fall back to recursive-only and log it); embed all chunks; store in one transaction.</p>
+<h3 id="step-7--retrieval-comparison-script"><a class="heading-anchor" href="#step-7--retrieval-comparison-script" aria-hidden="true">#</a>Step 7 — Retrieval comparison script</h3>
+<p><strong>What:</strong> A small script that takes 3 sample legal queries, runs a similarity search against <code class="inline-code">split_strategy = &#39;recursive&#39;</code> chunks and separately against <code class="inline-code">split_strategy = &#39;structure_aware&#39;</code> chunks, and prints both result sets side by side.</p>
+<p><strong>Why:</strong> This <em>is</em> the roadmap&#39;s explicit Phase 1 deliverable — the internal note on which strategy retrieved better.</p>
+<p><strong>How:</strong> Embed each query once, run two SQL queries differing only in the <code class="inline-code">WHERE split_strategy = ...</code> filter, print top-5 each with their distance score.</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<p>Work through these in order. Each builds on the previous.</p>
+<ol>
+<li><strong>Prepare your source folder.</strong> Create <code class="inline-code">/data/legal-docs/</code> in your project root. Drop in your ~30 PDFs/DOCX files. Create <code class="inline-code">/data/legal-docs/manifest.json</code> mapping every filename to <code class="inline-code">{ docType, docGroup, jurisdiction, sectionPattern? }</code>.</li>
+<li><strong>Run the SQL migration</strong> (Step 1 below) against your Phase-0 Postgres container to create <code class="inline-code">legal_reference_documents</code> and <code class="inline-code">legal_reference_chunks</code>.</li>
+<li><strong>Install dependencies</strong>: <code class="inline-code">langchain</code>, <code class="inline-code">@langchain/openai</code>, <code class="inline-code">@langchain/community</code>, <code class="inline-code">pdf-parse</code>, <code class="inline-code">mammoth</code>, <code class="inline-code">pg</code>, <code class="inline-code">crypto</code> (built-in), <code class="inline-code">dotenv</code>.</li>
+<li><strong>Implement <code class="inline-code">src/ingestion/manifest.ts</code></strong> — load and validate the manifest.</li>
+<li><strong>Implement <code class="inline-code">src/ingestion/loader.ts</code></strong> — lazy directory loading with metadata attachment.</li>
+<li><strong>Implement <code class="inline-code">src/ingestion/splitters.ts</code></strong> — both splitting strategies.</li>
+<li><strong>Implement <code class="inline-code">src/ingestion/embeddings.ts</code></strong> — batched embedding calls.</li>
+<li><strong>Implement <code class="inline-code">src/ingestion/storage.ts</code></strong> — document + chunk persistence with idempotency.</li>
+<li><strong>Implement <code class="inline-code">src/ingestion/pipeline.ts</code></strong> and <code class="inline-code">scripts/ingest.ts</code>** — wire it all together, run it against your real 30 documents.</li>
+<li><strong>Verify</strong>: query the DB directly (<code class="inline-code">SELECT source_document, split_strategy, count(*) FROM legal_reference_chunks GROUP BY 1,2;</code>) and confirm every document produced chunks under both strategies (or a logged fallback).</li>
+<li><strong>Implement <code class="inline-code">scripts/compare-retrieval.ts</code></strong> with 3 real legal queries relevant to your corpus (e.g. termination notice periods, indemnification limits, confidentiality survival period).</li>
+<li><strong>Run the comparison, write your internal note</strong> (a short markdown file: <code class="inline-code">notes/phase1-retrieval-comparison.md</code>) recording which strategy won for each query and why you think so.</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<p>Below is the complete working implementation for each step. Read the explanation above each file before the code — don&#39;t just copy-paste without understanding what each piece does.</p>
+<h3 id="61-dependencies"><a class="heading-anchor" href="#61-dependencies" aria-hidden="true">#</a>6.1 Dependencies</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install langchain @langchain/openai @langchain/community pdf-parse mammoth pg dotenv
+npm install -D @types/pg</code></pre></div>
+<h3 id="62-environment-variables-add-to-your-phase-0-env"><a class="heading-anchor" href="#62-environment-variables-add-to-your-phase-0-env" aria-hidden="true">#</a>6.2 Environment variables (add to your Phase-0 <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash"><span class="hljs-comment"># .env</span>
+OPENAI_API_KEY=sk-...
+EMBEDDING_MODEL=text-embedding-3-small
+EMBEDDING_DIMS=1536
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/legaldocs
+LEGAL_DOCS_DIR=./data/legal-docs</code></pre></div>
+<h3 id="63-sql-migration"><a class="heading-anchor" href="#63-sql-migration" aria-hidden="true">#</a>6.3 SQL migration</h3>
+<p>This creates the vector extension and both tables. Run it via <code class="inline-code">psql</code> or your migration tool of choice from Phase 0.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">sql</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-sql"><span class="hljs-comment">-- migrations/001_legal_reference_knowledge_base.sql</span>
+
+<span class="hljs-keyword">CREATE</span> EXTENSION IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> vector;
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> legal_reference_documents (
+    id              UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    source_file     TEXT <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">UNIQUE</span>,
+    doc_type        TEXT <span class="hljs-keyword">NOT NULL</span>,        <span class="hljs-comment">-- statute | judgment | regulation | circular</span>
+    doc_group       TEXT <span class="hljs-keyword">NOT NULL</span>,        <span class="hljs-comment">-- e.g. labour_law, contract_law, data_protection</span>
+    jurisdiction    TEXT <span class="hljs-keyword">NOT NULL</span>,        <span class="hljs-comment">-- e.g. india_central, maharashtra</span>
+    content_hash    TEXT <span class="hljs-keyword">NOT NULL</span>,        <span class="hljs-comment">-- sha256 of raw file bytes, for idempotent re-ingestion</span>
+    embedding_model TEXT <span class="hljs-keyword">NOT NULL</span>,
+    ingested_at     TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now(),
+    updated_at      TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> legal_reference_chunks (
+    id              UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    document_id     UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> legal_reference_documents(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    source_document TEXT <span class="hljs-keyword">NOT NULL</span>,
+    doc_type        TEXT <span class="hljs-keyword">NOT NULL</span>,
+    doc_group       TEXT <span class="hljs-keyword">NOT NULL</span>,
+    jurisdiction    TEXT <span class="hljs-keyword">NOT NULL</span>,
+    section_title   TEXT,                 <span class="hljs-comment">-- populated for structure_aware chunks</span>
+    chunk_index     <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">NOT NULL</span>,
+    split_strategy  TEXT <span class="hljs-keyword">NOT NULL</span>,        <span class="hljs-comment">-- &#x27;recursive&#x27; | &#x27;structure_aware&#x27;</span>
+    content         TEXT <span class="hljs-keyword">NOT NULL</span>,
+    embedding       vector(<span class="hljs-number">1536</span>) <span class="hljs-keyword">NOT NULL</span>,
+    created_at      TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-comment">-- Filtering columns used constantly by every retriever downstream</span>
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_chunks_doc_group <span class="hljs-keyword">ON</span> legal_reference_chunks (doc_group);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_chunks_jurisdiction <span class="hljs-keyword">ON</span> legal_reference_chunks (jurisdiction);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_chunks_split_strategy <span class="hljs-keyword">ON</span> legal_reference_chunks (split_strategy);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_chunks_document_id <span class="hljs-keyword">ON</span> legal_reference_chunks (document_id);
+
+<span class="hljs-comment">-- Approximate nearest-neighbor index for fast similarity search.</span>
+<span class="hljs-comment">-- Build this AFTER your first bulk ingest for best clustering quality.</span>
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_chunks_embedding_hnsw
+    <span class="hljs-keyword">ON</span> legal_reference_chunks
+    <span class="hljs-keyword">USING</span> hnsw (embedding vector_cosine_ops);</code></pre></div>
+<h3 id="64-manifest-schema-and-loader"><a class="heading-anchor" href="#64-manifest-schema-and-loader" aria-hidden="true">#</a>6.4 Manifest schema and loader</h3>
+<p>The manifest is the single source of truth for what each source file <em>is</em>. This avoids fragile content-sniffing logic to guess jurisdiction or doc type.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-comment">// data/legal-docs/manifest.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;indian_contract_act_1872.pdf&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;docType&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;statute&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;docGroup&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;contract_law&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;jurisdiction&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;india_central&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;sectionPattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;section&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;it_act_2000.pdf&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;docType&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;statute&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;docGroup&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;data_protection&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;jurisdiction&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;india_central&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;sectionPattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;section&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;sc_judgment_breach_damages_2019.pdf&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;docType&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;judgment&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;docGroup&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;contract_law&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;jurisdiction&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;india_central&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;sectionPattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;paragraph&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/ingestion/manifest.ts</span>
+<span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;fs/promises&quot;</span>;
+<span class="hljs-keyword">import</span> path <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;path&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">SectionPatternKey</span> = <span class="hljs-string">&quot;section&quot;</span> | <span class="hljs-string">&quot;paragraph&quot;</span> | <span class="hljs-string">&quot;article&quot;</span> | <span class="hljs-string">&quot;clause&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">DocManifestEntry</span> {
+  <span class="hljs-attr">docType</span>: <span class="hljs-string">&quot;statute&quot;</span> | <span class="hljs-string">&quot;judgment&quot;</span> | <span class="hljs-string">&quot;regulation&quot;</span> | <span class="hljs-string">&quot;circular&quot;</span>;
+  <span class="hljs-attr">docGroup</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">jurisdiction</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-comment">/** Which heading style this document uses for structure-aware splitting */</span>
+  <span class="hljs-attr">sectionPattern</span>?: <span class="hljs-title class_">SectionPatternKey</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">Manifest</span> = <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-title class_">DocManifestEntry</span>&gt;;
+
+<span class="hljs-comment">/**
+ * Loads and validates the manifest.json describing every legal reference
+ * document. Fails loudly if a required field is missing - an un-tagged
+ * document silently ingested with null metadata breaks every filtered
+ * retrieval query downstream, so we refuse to proceed instead.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadManifest</span>(<span class="hljs-params"><span class="hljs-attr">dir</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Manifest</span>&gt; {
+  <span class="hljs-keyword">const</span> manifestPath = path.<span class="hljs-title function_">join</span>(dir, <span class="hljs-string">&quot;manifest.json&quot;</span>);
+  <span class="hljs-keyword">const</span> raw = <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(manifestPath, <span class="hljs-string">&quot;utf-8&quot;</span>);
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">manifest</span>: <span class="hljs-title class_">Manifest</span> = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(raw);
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> [file, entry] <span class="hljs-keyword">of</span> <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">entries</span>(manifest)) {
+    <span class="hljs-keyword">if</span> (!entry.<span class="hljs-property">docType</span> || !entry.<span class="hljs-property">docGroup</span> || !entry.<span class="hljs-property">jurisdiction</span>) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(
+        <span class="hljs-string">`Manifest entry for &quot;<span class="hljs-subst">${file}</span>&quot; is missing required fields `</span> +
+          <span class="hljs-string">`(docType, docGroup, jurisdiction). Every source document must be tagged.`</span>
+      );
+    }
+  }
+
+  <span class="hljs-keyword">return</span> manifest;
+}</code></pre></div>
+<h3 id="65-lazy-document-loader"><a class="heading-anchor" href="#65-lazy-document-loader" aria-hidden="true">#</a>6.5 Lazy document loader</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/ingestion/loader.ts</span>
+<span class="hljs-keyword">import</span> path <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;path&quot;</span>;
+<span class="hljs-keyword">import</span> { readdir, readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;fs/promises&quot;</span>;
+<span class="hljs-keyword">import</span> { createHash } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;crypto&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">PDFLoader</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/community/document_loaders/fs/pdf&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">DocxLoader</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/community/document_loaders/fs/docx&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">Document</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/documents&quot;</span>;
+<span class="hljs-keyword">import</span> { loadManifest, <span class="hljs-keyword">type</span> <span class="hljs-title class_">Manifest</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">DocManifestEntry</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./manifest&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">LoadedDocument</span> {
+  <span class="hljs-attr">sourceFile</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">filePath</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">contentHash</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">manifestEntry</span>: <span class="hljs-title class_">DocManifestEntry</span>;
+  <span class="hljs-comment">/** Full concatenated text of the document (pages joined) */</span>
+  <span class="hljs-attr">fullText</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">pageCount</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">hashBuffer</span>(<span class="hljs-params"><span class="hljs-attr">buf</span>: <span class="hljs-title class_">Buffer</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">createHash</span>(<span class="hljs-string">&quot;sha256&quot;</span>).<span class="hljs-title function_">update</span>(buf).<span class="hljs-title function_">digest</span>(<span class="hljs-string">&quot;hex&quot;</span>);
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">loaderForFile</span>(<span class="hljs-params"><span class="hljs-attr">filePath</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> ext = path.<span class="hljs-title function_">extname</span>(filePath).<span class="hljs-title function_">toLowerCase</span>();
+  <span class="hljs-keyword">if</span> (ext === <span class="hljs-string">&quot;.pdf&quot;</span>) <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PDFLoader</span>(filePath, { <span class="hljs-attr">splitPages</span>: <span class="hljs-literal">true</span> });
+  <span class="hljs-keyword">if</span> (ext === <span class="hljs-string">&quot;.docx&quot;</span>) <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DocxLoader</span>(filePath);
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Unsupported file extension: <span class="hljs-subst">${ext}</span> (<span class="hljs-subst">${filePath}</span>)`</span>);
+}
+
+<span class="hljs-comment">/**
+ * Lazily yields one fully-loaded document at a time. Using lazyLoad()
+ * (rather than eagerly loading every file up front) means each document&#x27;s
+ * pages are parsed, joined, hashed, and handed off to the caller before the
+ * next file is even opened - important habit once this corpus grows well
+ * past 30 documents.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>* <span class="hljs-title function_">lazyLoadLegalDocuments</span>(
+  <span class="hljs-attr">dir</span>: <span class="hljs-built_in">string</span>
+): <span class="hljs-title class_">AsyncGenerator</span>&lt;<span class="hljs-title class_">LoadedDocument</span>&gt; {
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">manifest</span>: <span class="hljs-title class_">Manifest</span> = <span class="hljs-keyword">await</span> <span class="hljs-title function_">loadManifest</span>(dir);
+  <span class="hljs-keyword">const</span> files = (<span class="hljs-keyword">await</span> <span class="hljs-title function_">readdir</span>(dir)).<span class="hljs-title function_">filter</span>(
+    <span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-title function_">endsWith</span>(<span class="hljs-string">&quot;.pdf&quot;</span>) || f.<span class="hljs-title function_">endsWith</span>(<span class="hljs-string">&quot;.docx&quot;</span>)
+  );
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> file <span class="hljs-keyword">of</span> files) {
+    <span class="hljs-keyword">const</span> manifestEntry = manifest[file];
+    <span class="hljs-keyword">if</span> (!manifestEntry) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(
+        <span class="hljs-string">`File &quot;<span class="hljs-subst">${file}</span>&quot; found in <span class="hljs-subst">${dir}</span> but has no manifest.json entry. `</span> +
+          <span class="hljs-string">`Add one before ingesting.`</span>
+      );
+    }
+
+    <span class="hljs-keyword">const</span> filePath = path.<span class="hljs-title function_">join</span>(dir, file);
+    <span class="hljs-keyword">const</span> rawBytes = <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(filePath);
+    <span class="hljs-keyword">const</span> contentHash = <span class="hljs-title function_">hashBuffer</span>(rawBytes);
+
+    <span class="hljs-keyword">const</span> loader = <span class="hljs-title function_">loaderForFile</span>(filePath);
+    <span class="hljs-keyword">const</span> <span class="hljs-attr">pages</span>: <span class="hljs-title class_">Document</span>[] = [];
+    <span class="hljs-comment">// Loader-level lazyLoad(): stream pages of THIS file one at a time too.</span>
+    <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> page <span class="hljs-keyword">of</span> loader.<span class="hljs-title function_">lazyLoad</span>()) {
+      pages.<span class="hljs-title function_">push</span>(page);
+    }
+
+    <span class="hljs-keyword">yield</span> {
+      <span class="hljs-attr">sourceFile</span>: file,
+      filePath,
+      contentHash,
+      manifestEntry,
+      <span class="hljs-attr">fullText</span>: pages.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">p</span>) =&gt;</span> p.<span class="hljs-property">pageContent</span>).<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n\n&quot;</span>),
+      <span class="hljs-attr">pageCount</span>: pages.<span class="hljs-property">length</span>,
+    };
+  }
+}</code></pre></div>
+<h3 id="66-dual-splitting-strategy"><a class="heading-anchor" href="#66-dual-splitting-strategy" aria-hidden="true">#</a>6.6 Dual splitting strategy</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/ingestion/splitters.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">RecursiveCharacterTextSplitter</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;langchain/text_splitter&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">SectionPatternKey</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./manifest&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">SplitChunk</span> {
+  <span class="hljs-attr">content</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">chunkIndex</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">splitStrategy</span>: <span class="hljs-string">&quot;recursive&quot;</span> | <span class="hljs-string">&quot;structure_aware&quot;</span>;
+  <span class="hljs-attr">sectionTitle</span>: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>;
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">RECURSIVE_CHUNK_SIZE</span> = <span class="hljs-number">1000</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">RECURSIVE_CHUNK_OVERLAP</span> = <span class="hljs-number">150</span>;
+
+<span class="hljs-comment">/**
+ * Length-based splitting. No knowledge of document structure - just tries
+ * to break on paragraph/sentence boundaries near the target chunk size.
+ * This is the safe fallback that works on any document.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">splitRecursive</span>(<span class="hljs-params"><span class="hljs-attr">fullText</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">SplitChunk</span>[]&gt; {
+  <span class="hljs-keyword">const</span> splitter = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RecursiveCharacterTextSplitter</span>({
+    <span class="hljs-attr">chunkSize</span>: <span class="hljs-variable constant_">RECURSIVE_CHUNK_SIZE</span>,
+    <span class="hljs-attr">chunkOverlap</span>: <span class="hljs-variable constant_">RECURSIVE_CHUNK_OVERLAP</span>,
+  });
+
+  <span class="hljs-keyword">const</span> pieces = <span class="hljs-keyword">await</span> splitter.<span class="hljs-title function_">splitText</span>(fullText);
+
+  <span class="hljs-keyword">return</span> pieces.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">content, i</span>) =&gt;</span> ({
+    content,
+    <span class="hljs-attr">chunkIndex</span>: i,
+    <span class="hljs-attr">splitStrategy</span>: <span class="hljs-string">&quot;recursive&quot;</span> <span class="hljs-keyword">as</span> <span class="hljs-keyword">const</span>,
+    <span class="hljs-attr">sectionTitle</span>: <span class="hljs-literal">null</span>,
+  }));
+}
+
+<span class="hljs-comment">// One regex per heading style a source document might use.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-attr">SECTION_PATTERNS</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-title class_">SectionPatternKey</span>, <span class="hljs-title class_">RegExp</span>&gt; = {
+  <span class="hljs-attr">section</span>: <span class="hljs-regexp">/^(?:Section|Sec\.)\s+\d+[A-Za-z]*\.?\s*[-–:]?/gim</span>,
+  <span class="hljs-attr">article</span>: <span class="hljs-regexp">/^Article\s+\d+[A-Za-z]*\.?\s*[-–:]?/gim</span>,
+  <span class="hljs-attr">clause</span>: <span class="hljs-regexp">/^Clause\s+\d+[A-Za-z]*\.?\s*[-–:]?/gim</span>,
+  <span class="hljs-attr">paragraph</span>: <span class="hljs-regexp">/^(?:Para(?:graph)?\.?)\s+\d+[A-Za-z]*\.?\s*[-–:]?/gim</span>,
+};
+
+<span class="hljs-comment">/**
+ * Splits on the document&#x27;s own structural headings (e.g. &quot;Section 73.&quot;),
+ * so each chunk is exactly one complete legal provision rather than an
+ * arbitrary character-count slice that might cut a rule in half.
+ *
+ * Returns an empty array (rather than throwing) if the pattern finds no
+ * matches, signalling to the caller that this document has no detectable
+ * structure and should fall back to recursive-only splitting.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">splitByStructure</span>(<span class="hljs-params">
+  <span class="hljs-attr">fullText</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">patternKey</span>: <span class="hljs-title class_">SectionPatternKey</span> | <span class="hljs-literal">undefined</span>
+</span>): <span class="hljs-title class_">SplitChunk</span>[] {
+  <span class="hljs-keyword">if</span> (!patternKey) <span class="hljs-keyword">return</span> [];
+
+  <span class="hljs-keyword">const</span> pattern = <span class="hljs-variable constant_">SECTION_PATTERNS</span>[patternKey];
+  <span class="hljs-keyword">const</span> matches = [...fullText.<span class="hljs-title function_">matchAll</span>(pattern)];
+  <span class="hljs-keyword">if</span> (matches.<span class="hljs-property">length</span> &lt; <span class="hljs-number">2</span>) {
+    <span class="hljs-comment">// Fewer than 2 headings found - not enough real structure to split on.</span>
+    <span class="hljs-keyword">return</span> [];
+  }
+
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">chunks</span>: <span class="hljs-title class_">SplitChunk</span>[] = [];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; matches.<span class="hljs-property">length</span>; i++) {
+    <span class="hljs-keyword">const</span> start = matches[i].<span class="hljs-property">index</span>!;
+    <span class="hljs-keyword">const</span> end = i + <span class="hljs-number">1</span> &lt; matches.<span class="hljs-property">length</span> ? matches[i + <span class="hljs-number">1</span>].<span class="hljs-property">index</span>! : fullText.<span class="hljs-property">length</span>;
+    <span class="hljs-keyword">const</span> rawChunk = fullText.<span class="hljs-title function_">slice</span>(start, end).<span class="hljs-title function_">trim</span>();
+    <span class="hljs-keyword">if</span> (!rawChunk) <span class="hljs-keyword">continue</span>;
+
+    <span class="hljs-keyword">const</span> heading = matches[i][<span class="hljs-number">0</span>].<span class="hljs-title function_">trim</span>();
+
+    chunks.<span class="hljs-title function_">push</span>({
+      <span class="hljs-attr">content</span>: rawChunk,
+      <span class="hljs-attr">chunkIndex</span>: i,
+      <span class="hljs-attr">splitStrategy</span>: <span class="hljs-string">&quot;structure_aware&quot;</span>,
+      <span class="hljs-attr">sectionTitle</span>: heading,
+    });
+  }
+
+  <span class="hljs-keyword">return</span> chunks;
+}</code></pre></div>
+<h3 id="67-batched-embeddings"><a class="heading-anchor" href="#67-batched-embeddings" aria-hidden="true">#</a>6.7 Batched embeddings</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/ingestion/embeddings.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">BATCH_SIZE</span> = <span class="hljs-number">100</span>;
+
+<span class="hljs-keyword">const</span> embeddingsClient = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIEmbeddings</span>({
+  <span class="hljs-attr">apiKey</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">OPENAI_API_KEY</span>,
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">EMBEDDING_MODEL</span> ?? <span class="hljs-string">&quot;text-embedding-3-small&quot;</span>,
+});
+
+<span class="hljs-keyword">function</span> chunkArray&lt;T&gt;(<span class="hljs-attr">arr</span>: T[], <span class="hljs-attr">size</span>: <span class="hljs-built_in">number</span>): T[][] {
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">out</span>: T[][] = [];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; arr.<span class="hljs-property">length</span>; i += size) out.<span class="hljs-title function_">push</span>(arr.<span class="hljs-title function_">slice</span>(i, i + size));
+  <span class="hljs-keyword">return</span> out;
+}
+
+<span class="hljs-comment">/**
+ * Embeds an array of chunk texts in batches to stay well under OpenAI&#x27;s
+ * per-request token limits, and to make retrying a single failed batch
+ * cheap instead of re-embedding the whole document on any transient error.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">embedTexts</span>(<span class="hljs-params"><span class="hljs-attr">texts</span>: <span class="hljs-built_in">string</span>[]</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">number</span>[][]&gt; {
+  <span class="hljs-keyword">const</span> batches = <span class="hljs-title function_">chunkArray</span>(texts, <span class="hljs-variable constant_">BATCH_SIZE</span>);
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">allVectors</span>: <span class="hljs-built_in">number</span>[][] = [];
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> [i, batch] <span class="hljs-keyword">of</span> batches.<span class="hljs-title function_">entries</span>()) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">const</span> vectors = <span class="hljs-keyword">await</span> embeddingsClient.<span class="hljs-title function_">embedDocuments</span>(batch);
+      allVectors.<span class="hljs-title function_">push</span>(...vectors);
+    } <span class="hljs-keyword">catch</span> (err) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`Embedding batch <span class="hljs-subst">${i + <span class="hljs-number">1</span>}</span>/<span class="hljs-subst">${batches.length}</span> failed:`</span>, err);
+      <span class="hljs-keyword">throw</span> err;
+    }
+  }
+
+  <span class="hljs-keyword">return</span> allVectors;
+}</code></pre></div>
+<h3 id="68-storage-with-idempotency"><a class="heading-anchor" href="#68-storage-with-idempotency" aria-hidden="true">#</a>6.8 Storage with idempotency</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/ingestion/storage.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">PoolClient</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> format <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg-format&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">LoadedDocument</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./loader&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">SplitChunk</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./splitters&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-comment">/**
+ * Returns the stored content_hash for a source file, or null if it has
+ * never been ingested. Used to skip re-processing unchanged files.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getStoredHash</span>(<span class="hljs-params"><span class="hljs-attr">sourceFile</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>&gt; {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT content_hash FROM legal_reference_documents WHERE source_file = $1`</span>,
+    [sourceFile]
+  );
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>]?.<span class="hljs-property">content_hash</span> ?? <span class="hljs-literal">null</span>;
+}
+
+<span class="hljs-comment">/**
+ * Upserts the document row and replaces all of its chunks in a single
+ * transaction. If the process crashes mid-way, the transaction rolls back
+ * and the document is left exactly as it was before this run - never in a
+ * half-ingested state.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">storeDocumentChunks</span>(<span class="hljs-params">
+  <span class="hljs-attr">doc</span>: <span class="hljs-title class_">LoadedDocument</span>,
+  <span class="hljs-attr">chunks</span>: <span class="hljs-title class_">SplitChunk</span>[],
+  <span class="hljs-attr">embeddings</span>: <span class="hljs-built_in">number</span>[][],
+  <span class="hljs-attr">embeddingModel</span>: <span class="hljs-built_in">string</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">client</span>: <span class="hljs-title class_">PoolClient</span> = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">connect</span>();
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(<span class="hljs-string">&quot;BEGIN&quot;</span>);
+
+    <span class="hljs-keyword">const</span> upsertResult = <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(
+      <span class="hljs-string">`INSERT INTO legal_reference_documents
+         (source_file, doc_type, doc_group, jurisdiction, content_hash, embedding_model, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, now())
+       ON CONFLICT (source_file) DO UPDATE SET
+         content_hash = EXCLUDED.content_hash,
+         embedding_model = EXCLUDED.embedding_model,
+         updated_at = now()
+       RETURNING id`</span>,
+      [
+        doc.<span class="hljs-property">sourceFile</span>,
+        doc.<span class="hljs-property">manifestEntry</span>.<span class="hljs-property">docType</span>,
+        doc.<span class="hljs-property">manifestEntry</span>.<span class="hljs-property">docGroup</span>,
+        doc.<span class="hljs-property">manifestEntry</span>.<span class="hljs-property">jurisdiction</span>,
+        doc.<span class="hljs-property">contentHash</span>,
+        embeddingModel,
+      ]
+    );
+    <span class="hljs-keyword">const</span> <span class="hljs-attr">documentId</span>: <span class="hljs-built_in">string</span> = upsertResult.<span class="hljs-property">rows</span>[<span class="hljs-number">0</span>].<span class="hljs-property">id</span>;
+
+    <span class="hljs-comment">// Clear old chunks for this document before inserting the new set -</span>
+    <span class="hljs-comment">// this makes re-ingestion idempotent instead of appending duplicates.</span>
+    <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(<span class="hljs-string">`DELETE FROM legal_reference_chunks WHERE document_id = $1`</span>, [
+      documentId,
+    ]);
+
+    <span class="hljs-keyword">if</span> (chunks.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">const</span> values = chunks.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">chunk, i</span>) =&gt;</span> [
+        documentId,
+        doc.<span class="hljs-property">sourceFile</span>,
+        doc.<span class="hljs-property">manifestEntry</span>.<span class="hljs-property">docType</span>,
+        doc.<span class="hljs-property">manifestEntry</span>.<span class="hljs-property">docGroup</span>,
+        doc.<span class="hljs-property">manifestEntry</span>.<span class="hljs-property">jurisdiction</span>,
+        chunk.<span class="hljs-property">sectionTitle</span>,
+        chunk.<span class="hljs-property">chunkIndex</span>,
+        chunk.<span class="hljs-property">splitStrategy</span>,
+        chunk.<span class="hljs-property">content</span>,
+        <span class="hljs-string">`[<span class="hljs-subst">${embeddings[i].join(<span class="hljs-string">&quot;,&quot;</span>)}</span>]`</span>, <span class="hljs-comment">// pgvector literal format</span>
+      ]);
+
+      <span class="hljs-keyword">const</span> insertSql = <span class="hljs-title function_">format</span>(
+        <span class="hljs-string">`INSERT INTO legal_reference_chunks
+           (document_id, source_document, doc_type, doc_group, jurisdiction,
+            section_title, chunk_index, split_strategy, content, embedding)
+         VALUES %L`</span>,
+        values
+      );
+      <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(insertSql);
+    }
+
+    <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(<span class="hljs-string">&quot;COMMIT&quot;</span>);
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(<span class="hljs-string">&quot;ROLLBACK&quot;</span>);
+    <span class="hljs-keyword">throw</span> err;
+  } <span class="hljs-keyword">finally</span> {
+    client.<span class="hljs-title function_">release</span>();
+  }
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">closePool</span>(<span class="hljs-params"></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">end</span>();
+}</code></pre></div>
+<div class="callout callout-note"><div class="callout-title"><span class="callout-icon">&#128221;</span>Note</div><div class="callout-body"><p><strong>Note:</strong> install <code class="inline-code">pg-format</code> (<code class="inline-code">npm install pg-format @types/pg-format</code>) — it safely builds the multi-row <code class="inline-code">VALUES</code> list, which is both faster and safer than looping individual <code class="inline-code">INSERT</code>s.</p>
+</div></div>
+<h3 id="69-pipeline-orchestration"><a class="heading-anchor" href="#69-pipeline-orchestration" aria-hidden="true">#</a>6.9 Pipeline orchestration</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/ingestion/pipeline.ts</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> { lazyLoadLegalDocuments } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./loader&quot;</span>;
+<span class="hljs-keyword">import</span> { splitRecursive, splitByStructure, <span class="hljs-keyword">type</span> <span class="hljs-title class_">SplitChunk</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./splitters&quot;</span>;
+<span class="hljs-keyword">import</span> { embedTexts } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./embeddings&quot;</span>;
+<span class="hljs-keyword">import</span> { getStoredHash, storeDocumentChunks, closePool } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./storage&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">EMBEDDING_MODEL</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">EMBEDDING_MODEL</span> ?? <span class="hljs-string">&quot;text-embedding-3-small&quot;</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">LEGAL_DOCS_DIR</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">LEGAL_DOCS_DIR</span> ?? <span class="hljs-string">&quot;./data/legal-docs&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">runIngestion</span>(<span class="hljs-params"></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">let</span> processed = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">let</span> skipped = <span class="hljs-number">0</span>;
+
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> doc <span class="hljs-keyword">of</span> <span class="hljs-title function_">lazyLoadLegalDocuments</span>(<span class="hljs-variable constant_">LEGAL_DOCS_DIR</span>)) {
+    <span class="hljs-keyword">const</span> existingHash = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getStoredHash</span>(doc.<span class="hljs-property">sourceFile</span>);
+    <span class="hljs-keyword">if</span> (existingHash === doc.<span class="hljs-property">contentHash</span>) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[skip] <span class="hljs-subst">${doc.sourceFile}</span> - unchanged since last ingest`</span>);
+      skipped++;
+      <span class="hljs-keyword">continue</span>;
+    }
+
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[ingest] <span class="hljs-subst">${doc.sourceFile}</span> (<span class="hljs-subst">${doc.pageCount}</span> pages)`</span>);
+
+    <span class="hljs-comment">// Always produce the recursive chunks - the safe universal baseline.</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-attr">recursiveChunks</span>: <span class="hljs-title class_">SplitChunk</span>[] = <span class="hljs-keyword">await</span> <span class="hljs-title function_">splitRecursive</span>(doc.<span class="hljs-property">fullText</span>);
+
+    <span class="hljs-comment">// Attempt structure-aware chunks; fall back silently if no structure found.</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-attr">structureChunks</span>: <span class="hljs-title class_">SplitChunk</span>[] = <span class="hljs-title function_">splitByStructure</span>(
+      doc.<span class="hljs-property">fullText</span>,
+      doc.<span class="hljs-property">manifestEntry</span>.<span class="hljs-property">sectionPattern</span>
+    );
+    <span class="hljs-keyword">if</span> (structureChunks.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+        <span class="hljs-string">`  [info] no structural headings detected for <span class="hljs-subst">${doc.sourceFile}</span>, `</span> +
+          <span class="hljs-string">`storing recursive chunks only`</span>
+      );
+    }
+
+    <span class="hljs-keyword">const</span> allChunks = [...recursiveChunks, ...structureChunks];
+    <span class="hljs-keyword">const</span> embeddings = <span class="hljs-keyword">await</span> <span class="hljs-title function_">embedTexts</span>(allChunks.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">c</span>) =&gt;</span> c.<span class="hljs-property">content</span>));
+
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">storeDocumentChunks</span>(doc, allChunks, embeddings, <span class="hljs-variable constant_">EMBEDDING_MODEL</span>);
+
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+      <span class="hljs-string">`  -&gt; stored <span class="hljs-subst">${recursiveChunks.length}</span> recursive + `</span> +
+        <span class="hljs-string">`<span class="hljs-subst">${structureChunks.length}</span> structure_aware chunks`</span>
+    );
+    processed++;
+  }
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`\nDone. Processed <span class="hljs-subst">${processed}</span> document(s), skipped <span class="hljs-subst">${skipped}</span> unchanged.`</span>);
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">closePool</span>();
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// scripts/ingest.ts</span>
+<span class="hljs-keyword">import</span> { runIngestion } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../src/ingestion/pipeline&quot;</span>;
+
+<span class="hljs-title function_">runIngestion</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Ingestion failed:&quot;</span>, err);
+  process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
+});</code></pre></div>
+<p>Add to <code class="inline-code">package.json</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;ingest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ts-node scripts/ingest.ts&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<h3 id="610-retrieval-comparison-script"><a class="heading-anchor" href="#610-retrieval-comparison-script" aria-hidden="true">#</a>6.10 Retrieval comparison script</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// scripts/compare-retrieval.ts</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;dotenv/config&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+<span class="hljs-keyword">const</span> embeddingsClient = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIEmbeddings</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">EMBEDDING_MODEL</span> ?? <span class="hljs-string">&quot;text-embedding-3-small&quot;</span>,
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">SAMPLE_QUERIES</span> = [
+  <span class="hljs-string">&quot;What is the required notice period for termination without cause?&quot;</span>,
+  <span class="hljs-string">&quot;What are the limits on indemnification liability?&quot;</span>,
+  <span class="hljs-string">&quot;How long does a confidentiality obligation survive after contract termination?&quot;</span>,
+];
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">searchByStrategy</span>(<span class="hljs-params"><span class="hljs-attr">queryVector</span>: <span class="hljs-built_in">number</span>[], <span class="hljs-attr">strategy</span>: <span class="hljs-built_in">string</span>, limit = <span class="hljs-number">5</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT source_document, section_title, chunk_index,
+            left(content, 200) AS preview,
+            embedding &lt;=&gt; $1 AS distance
+     FROM legal_reference_chunks
+     WHERE split_strategy = $2
+     ORDER BY embedding &lt;=&gt; $1
+     LIMIT $3`</span>,
+    [<span class="hljs-string">`[<span class="hljs-subst">${queryVector.join(<span class="hljs-string">&quot;,&quot;</span>)}</span>]`</span>, strategy, limit]
+  );
+  <span class="hljs-keyword">return</span> rows;
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> query <span class="hljs-keyword">of</span> <span class="hljs-variable constant_">SAMPLE_QUERIES</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`\n=== Query: &quot;<span class="hljs-subst">${query}</span>&quot; ===`</span>);
+    <span class="hljs-keyword">const</span> [queryVector] = <span class="hljs-keyword">await</span> embeddingsClient.<span class="hljs-title function_">embedDocuments</span>([query]);
+
+    <span class="hljs-keyword">const</span> recursiveResults = <span class="hljs-keyword">await</span> <span class="hljs-title function_">searchByStrategy</span>(queryVector, <span class="hljs-string">&quot;recursive&quot;</span>);
+    <span class="hljs-keyword">const</span> structureResults = <span class="hljs-keyword">await</span> <span class="hljs-title function_">searchByStrategy</span>(queryVector, <span class="hljs-string">&quot;structure_aware&quot;</span>);
+
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n-- recursive --&quot;</span>);
+    recursiveResults.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">r, i</span>) =&gt;</span>
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+        <span class="hljs-string">`<span class="hljs-subst">${i + <span class="hljs-number">1</span>}</span>. [<span class="hljs-subst">${r.distance.toFixed(<span class="hljs-number">4</span>)}</span>] <span class="hljs-subst">${r.source_document}</span> #<span class="hljs-subst">${r.chunk_index}</span>\n   <span class="hljs-subst">${r.preview}</span>...`</span>
+      )
+    );
+
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;\n-- structure_aware --&quot;</span>);
+    structureResults.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">r, i</span>) =&gt;</span>
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+        <span class="hljs-string">`<span class="hljs-subst">${i + <span class="hljs-number">1</span>}</span>. [<span class="hljs-subst">${r.distance.toFixed(<span class="hljs-number">4</span>)}</span>] <span class="hljs-subst">${r.source_document}</span> (<span class="hljs-subst">${r.section_title ?? <span class="hljs-string">&quot;n/a&quot;</span>}</span>)\n   <span class="hljs-subst">${r.preview}</span>...`</span>
+      )
+    );
+  }
+
+  <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">end</span>();
+}
+
+<span class="hljs-title function_">main</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);
+  process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
+});</code></pre></div>
+<p>Add to <code class="inline-code">package.json</code>:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;compare-retrieval&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ts-node scripts/compare-retrieval.ts&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre></div>
+<p>Lower cosine distance = more similar. Read through the printed previews for each query and judge, subjectively but concretely, which strategy returned a more <em>complete, self-contained</em> answer to the question — that judgment is exactly the internal note the roadmap asks for.</p>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── data/
+│   └── legal-docs/
+│       ├── manifest.json
+│       ├── indian_contract_act_1872.pdf
+│       ├── it_act_2000.pdf
+│       └── ... (~30 files)
+├── migrations/
+│   └── 001_legal_reference_knowledge_base.sql
+├── src/
+│   └── ingestion/
+│       ├── manifest.ts
+│       ├── loader.ts
+│       ├── splitters.ts
+│       ├── embeddings.ts
+│       ├── storage.ts
+│       └── pipeline.ts
+├── scripts/
+│   ├── ingest.ts
+│   └── compare-retrieval.ts
+├── notes/
+│   └── phase1-retrieval-comparison.md   (your written comparison)
+├── .env
+└── package.json</code></pre></div>
+<h3 id="data-flow"><a class="heading-anchor" href="#data-flow" aria-hidden="true">#</a>Data flow</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">manifest.json ──► lazyLoadLegalDocuments()
+                       │  yields one LoadedDocument at a time
+                       ▼
+              content-hash check against DB
+                       │  (unchanged → skip)
+                       ▼
+         splitRecursive() + splitByStructure()
+                       │  → SplitChunk[]
+                       ▼
+              embedTexts() (batched, 100/req)
+                       │  → number[][]
+                       ▼
+         storeDocumentChunks() (single transaction:
+         upsert document row, delete old chunks,
+         bulk-insert new chunks + embeddings)
+                       ▼
+        legal_reference_chunks table (pgvector)
+                       ▲
+                       │  cosine similarity search
+        compare-retrieval.ts / (later) Phase 4 retriever</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong>Per-document transaction, not one giant transaction for all 30 documents:</strong> a failure on document #22 (a malformed PDF, an API timeout) shouldn&#39;t force you to re-embed and re-insert documents 1-21 that already succeeded.</li>
+<li><strong>Hash-based idempotency at the document level, not the chunk level:</strong> far cheaper to check (&quot;has this file changed at all?&quot;) than diffing individual chunks, and matches how you&#39;ll actually update this corpus in practice — you&#39;ll replace an entire statute PDF with an amended version, not hand-edit one paragraph of stored text.</li>
+<li><strong>Manifest-driven metadata over content-sniffing:</strong> for a small, curated, high-stakes corpus (legal reference material feeding a risk analyzer), explicit and auditable beats &quot;clever&quot; auto-detection that might mis-tag a document&#39;s jurisdiction.</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Version your embedding model in the schema (<code class="inline-code">embedding_model</code> column) so a future upgrade to a new embedding model doesn&#39;t silently mix incompatible vector spaces in similarity search.</li>
+<li>Keep ingestion idempotent and re-runnable — treat <code class="inline-code">npm run ingest</code> as safe to run any time, not a one-shot script.</li>
+<li>Separate &quot;documents&quot; metadata from &quot;chunks&quot; data — this is standard RAG system design and makes auditing/debugging far easier.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li><code class="inline-code">lazyLoad()</code> throughout keeps memory flat regardless of corpus size.</li>
+<li>HNSW index scales to millions of rows; for now (few thousand chunks), even a sequential scan would be fast, but building the index now costs nothing and means Phase 4 never needs to revisit this.</li>
+<li>Batch embedding calls (100 at a time) balance API round-trip overhead against per-request token limits.</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Never commit <code class="inline-code">.env</code> / API keys. Add <code class="inline-code">data/legal-docs/*.pdf</code> and <code class="inline-code">.docx</code> to <code class="inline-code">.gitignore</code> if these documents are proprietary/licensed, not just secrets.</li>
+<li>Sanitize file names before using them in any file-system path construction if this pipeline is ever exposed to non-trusted uploads (not a concern for this curated Phase 1 corpus, but worth remembering before Phase 2&#39;s user-uploaded contracts).</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li>Multi-row <code class="inline-code">INSERT ... VALUES</code> instead of per-row inserts.</li>
+<li>Batch embedding requests instead of one call per chunk.</li>
+<li>Build the HNSW index once after bulk load, not incrementally per document during a big initial ingest (drop and recreate if doing a very large one-time backfill; for 30 documents this is a non-issue).</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Keep <code class="inline-code">SECTION_PATTERNS</code> centralized and named — as your corpus grows to include Acts with different numbering conventions, you add a pattern key, not new branching logic.</li>
+<li>Log every skip/fallback decision (<code class="inline-code">[skip]</code>, <code class="inline-code">[info] no structural headings detected</code>) — six months from now, an ingestion log is how you&#39;ll debug &quot;why does this document have zero structure_aware chunks.&quot;</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test <code class="inline-code">splitByStructure()</code> against a small fixture string with known section markers — assert exact chunk boundaries and count.</li>
+<li>Unit test the hash-based skip logic with a mocked DB layer — assert an unchanged file is never re-embedded (this directly protects your OpenAI API cost).</li>
+<li>Integration test: run the full pipeline against 1-2 real sample documents in a test schema, then assert row counts and that both split strategies produced non-overlapping, order-preserving chunk indices.</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>How document loaders normalize different file formats into a common <code class="inline-code">Document</code> shape, and why <code class="inline-code">lazyLoad()</code> is the correct default for any pipeline that might scale.</li>
+<li>The difference between length-based (<code class="inline-code">RecursiveCharacterTextSplitter</code>) and structure-aware text splitting, and why legal text specifically benefits from comparing both rather than picking one blindly.</li>
+<li>What embeddings and vector similarity actually measure, and why pgvector — living inside the Postgres you already run — is the right choice at this project&#39;s scale, over a dedicated vector database.</li>
+<li>Why metadata (doc_group, jurisdiction, split_strategy) is not an afterthought but half of what makes retrieval useful, since vector similarity alone can&#39;t express &quot;only from this jurisdiction.&quot;</li>
+<li>How to design an ingestion pipeline that&#39;s safe to re-run (idempotent via content hashing) and safe to partially fail (per-document transactions).</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li>Database schema for the legal reference knowledge base (<code class="inline-code">legal_reference_documents</code>, <code class="inline-code">legal_reference_chunks</code>).</li>
+<li>A manifest-driven, lazily-loading document loader for PDF/DOCX.</li>
+<li>Two independent, comparable text-splitting strategies.</li>
+<li>Batched OpenAI embedding generation.</li>
+<li>Idempotent, transactional storage into pgvector.</li>
+<li>A full orchestration pipeline (<code class="inline-code">npm run ingest</code>) you can run against your real ~30 documents.</li>
+<li>A retrieval comparison script producing the internal note the roadmap asks for.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Actually running ingestion against your full real corpus and writing the comparison note (hands-on tasks 1-12 above — these are yours to execute).</li>
+<li>Everything from Phase 2 onward, which <em>consumes</em> this knowledge base but doesn&#39;t modify it further within this phase&#39;s scope.</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+Phase 2 (Contract Parser + Classifier) works on a completely different set of documents — the user&#39;s <em>uploaded</em> contract, not this reference corpus — but reuses the exact same conceptual toolkit (loaders, LCEL chains, structured output). The knowledge base you just built stays dormant until Phase 2.5 (contract-specific conversational RAG, which will actually build its <em>own</em> small per-contract vector store using the same patterns) and, more centrally, Phase 4, where the Risk Analyzer&#39;s retriever stack queries directly into <code class="inline-code">legal_reference_chunks</code> — starting with the plain similarity search you just validated in <code class="inline-code">compare-retrieval.ts</code>, then layering MMR, Multi-Query, and Contextual Compression on top of it.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

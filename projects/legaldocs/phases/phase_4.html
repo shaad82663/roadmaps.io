@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 4: RAG Risk Analyser (Core Phase)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 4: RAG Risk Analyser (Core Phase)</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-4-rag-risk-analyser-core-phase"><a class="heading-anchor" href="#legaldocs--phase-4-rag-risk-analyser-core-phase" aria-hidden="true">#</a>LegalDocs — Phase 4: RAG Risk Analyser (Core Phase)</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL + pgvector (Phase 0/1), LangChain.js, <strong>LangGraph.js — advanced usage (conditional edges, <code class="inline-code">Send</code>, checkpointers, time travel)</strong>, <code class="inline-code">@langchain/langgraph-checkpoint-postgres</code>
+<strong>Depends on:</strong> Phase 1 (<code class="inline-code">legal_reference_chunks</code> — the knowledge base this phase retrieves from), Phase 2 (<code class="inline-code">contract_type</code>), Phase 3 (the <code class="inline-code">clauses</code> table — this phase&#39;s unit of work)
+<strong>Feeds into:</strong> Phase 4.5 (the <code class="inline-code">judgment_lookup</code> stub built here becomes the Legal Research Agent&#39;s home); Phase 5 (the Report Generator reads <code class="inline-code">risk_findings</code>); Phase 6.5 (this entire graph gets wrapped as a subgraph under a Supervisor)</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>For every clause Phase 3 extracted, produce a <strong>risk finding</strong>: a risk level (LOW/MEDIUM/HIGH), a numeric score, a plain-language explanation grounded in your Phase 1 legal knowledge base, a concrete fix suggestion, and references to the specific statute/judgment excerpts that justify the assessment. All of this must happen <strong>in parallel across every clause of a contract</strong>, not one at a time, and every run must be <strong>checkpointed</strong> — persisted step by step — so a compliance reviewer can later inspect exactly how a finding was reached, and correct it without re-running the entire analysis from scratch.</p>
+<p>This is the phase where the project stops being &quot;a few LLM calls chained together&quot; and becomes a real orchestrated system: a graph with conditional branching, dynamic parallel fan-out over a runtime-determined list of clauses, and durable, inspectable state.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>This is your product&#39;s core value proposition — everything before it (parsing, classification, clause extraction) exists to feed this phase, and everything after it (the research agent, the report, the multi-agent refactor) exists to enrich or present this phase&#39;s output. Two things make it disproportionately harder than everything so far, and both get solved here:</p>
+<ol>
+<li><strong>Retrieval quality directly determines answer quality.</strong> A risk finding is only as trustworthy as the legal text it&#39;s grounded in. Phase 2.5&#39;s plain similarity search was good enough for quick contract Q&amp;A, but a risk assessment feeding a real compliance decision deserves better: diverse, non-redundant context (MMR), robustness to a vaguely-worded clause not matching the knowledge base&#39;s phrasing (Multi-Query), and a final context window that isn&#39;t padded with irrelevant boilerplate the model has to wade through (Contextual Compression).</li>
+<li><strong>A sequential loop over clauses doesn&#39;t scale, and a plain LCEL chain has no way to express &quot;run N independent things, then converge, and remember exactly what happened.&quot;</strong> This phase is where LangGraph&#39;s more advanced primitives — <code class="inline-code">Send()</code>-based dynamic fan-out, conditional edges, and checkpointers — stop being nice-to-know and become the only reasonable way to build the feature at all.</li>
+</ol>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">              ┌──────────────────────────┐   ┌──────────────────────────┐
+              │  clauses table (Phase 3)  │   │ legal_reference_chunks    │
+              │  one row per clause        │   │ (Phase 1 knowledge base)  │
+              └─────────────┬────────────┘   └─────────────┬────────────┘
+                            │                               │
+                            ▼                               │
+              ┌───────────────────────────────────────────┐ │
+              │       PHASE 4 — RAG Risk Analyser graph     │ │
+              │                                             │ │
+              │  resolve_doc_groups                          │ │
+              │        │                                     │ │
+              │  Send() ──► score_clause (× N, parallel) ◄────┘
+              │        │        │
+              │        │   retriever stack: base → MMR →
+              │        │   Multi-Query → Contextual Compression
+              │        │        │
+              │        │   conditional edge: risk level
+              │        │    ├── HIGH   → judgment_lookup (stub)
+              │        │    └── other  → store_finding
+              │        │        │
+              │        └────► aggregate_findings (reduce/join)
+              │                       │
+              └───────────────────────┼─────────────────────┘
+                                       ▼
+                          ┌─────────────────────────┐
+                          │  risk_findings table      │
+                          │  + checkpoint tables       │
+                          │  (Postgres, via saver)     │
+                          └────────────┬─────────────┘
+                                       │
+                ┌──────────────────────┴──────────────────────┐
+                │                                              │
+      Phase 4.5: Legal Research Agent               Phase 5: Report Generator
+      (replaces the judgment_lookup stub)            (reads risk_findings)</code></pre></div>
+<p>This phase&#39;s deliverables are: a compiled, checkpointed LangGraph graph; a populated <code class="inline-code">risk_findings</code> table; and audit endpoints for inspecting and correcting a run&#39;s history.</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-retrievers-part-two-from-quotsimilarquot-to-quotgoodquot"><a class="heading-anchor" href="#21-retrievers-part-two-from-quotsimilarquot-to-quotgoodquot" aria-hidden="true">#</a>2.1 Retrievers, part two: from &quot;similar&quot; to &quot;good&quot;</h3>
+<p>Phase 2.5 built the simplest possible retriever: embed the query, return the top-k nearest chunks by cosine distance. That&#39;s a fine starting point, but it has three real weaknesses once the stakes are &quot;justify a legal risk assessment&quot; rather than &quot;answer a quick question&quot;:</p>
+<p><strong>Weakness 1 — near-duplicate results.</strong> A statute is often paraphrased across multiple chunks (an amendment, a commentary, a related section) — plain similarity search can return five chunks that are all <em>slightly different phrasings of the same point</em>, wasting your top-k budget instead of surfacing genuinely different, complementary information.</p>
+<p><strong>Weakness 2 — vocabulary mismatch.</strong> A clause might say &quot;the Vendor shall not be held responsible for indirect losses,&quot; while the relevant statute uses &quot;consequential damages&quot; and &quot;limitation of liability.&quot; A single embedding of the clause&#39;s exact wording can under-retrieve the right statute simply because the phrasing doesn&#39;t overlap much in vector space, even though the <em>legal concept</em> is identical.</p>
+<p><strong>Weakness 3 — noisy context.</strong> Even a well-retrieved chunk might be 80% preamble/definitions and 20% the actually relevant sentence. Stuffing the full chunk into the risk-scoring prompt wastes tokens and can dilute the model&#39;s attention away from the part that matters.</p>
+<p>Each of the three retriever upgrades below solves exactly one of these three weaknesses, and — this is the important design idea — they <strong>compose</strong>, each one wrapping the previous as a decorator, so by the end you have one retriever object that solves all three at once without any single piece being complicated on its own.</p>
+<h3 id="22-mmr-maximal-marginal-relevance--solving-weakness-1"><a class="heading-anchor" href="#22-mmr-maximal-marginal-relevance--solving-weakness-1" aria-hidden="true">#</a>2.2 MMR (Maximal Marginal Relevance) — solving weakness 1</h3>
+<p>Plain similarity search asks one question: &quot;which candidates are closest to the query?&quot; MMR asks a second question at the same time: &quot;...and which of <em>those</em> candidates are meaningfully different from each other?&quot;</p>
+<p>The algorithm: fetch a larger candidate pool than you actually need (say, <code class="inline-code">fetchK = 20</code> candidates for a final <code class="inline-code">k = 5</code>), then select iteratively. At each step, pick the candidate that maximizes:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">MMR_score(doc) = λ × similarity(doc, query) − (1 − λ) × max(similarity(doc, already_selected))</code></pre></div>
+<p>In plain language: &quot;prefer documents that are relevant to the query, but penalize a document for being too similar to something you&#39;ve already picked.&quot; <code class="inline-code">λ</code> (lambda) controls the trade-off — <code class="inline-code">λ = 1</code> is plain similarity search (no diversity penalty at all), <code class="inline-code">λ = 0</code> maximizes diversity regardless of relevance. A <code class="inline-code">λ</code> around <code class="inline-code">0.5–0.7</code> is a reasonable default: still clearly relevance-driven, but no longer willing to return five near-identical restatements of the same point.</p>
+<p><strong>Concrete example:</strong> a query about &quot;limitation of liability&quot; might have its top-5 nearest neighbors <em>all</em> be paragraphs from the same Indian Contract Act section, each slightly reworded across different chunking passes. MMR would keep the single best one and use its remaining slots on the genuinely distinct related material (a relevant judgment, a different but related statute section) instead of four more near-copies.</p>
+<h3 id="23-multi-query-retriever--solving-weakness-2"><a class="heading-anchor" href="#23-multi-query-retriever--solving-weakness-2" aria-hidden="true">#</a>2.3 Multi-Query Retriever — solving weakness 2</h3>
+<p>Instead of trusting a single embedding of the clause text to find the right vocabulary match, ask an LLM to <strong>generate several different phrasings of the same underlying question</strong>, retrieve for each phrasing independently, and take the union of results (deduplicated).</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">Original clause text → LLM generates 3 reformulations:
+  1. &quot;limitation of liability for indirect and consequential damages&quot;
+  2. &quot;vendor exclusion of responsibility for indirect losses&quot;
+  3. &quot;cap on damages recoverable under a service contract&quot;
+→ retrieve (base + MMR) for each phrasing independently
+→ union + dedupe the results by chunk id</code></pre></div>
+<p>This directly targets weakness 2: even if the clause&#39;s exact wording doesn&#39;t overlap well with the statute&#39;s phrasing, it&#39;s very likely that <em>at least one</em> of the 3-4 LLM-generated reformulations will land closer to how the relevant statute or judgment actually describes the concept. The cost is straightforward: N reformulations means N retrieval calls instead of one (though each individual retrieval call itself is cheap — it&#39;s an embedding + a vector search, not a full LLM call).</p>
+<h3 id="24-contextual-compression-retriever--solving-weakness-3"><a class="heading-anchor" href="#24-contextual-compression-retriever--solving-weakness-3" aria-hidden="true">#</a>2.4 Contextual Compression Retriever — solving weakness 3</h3>
+<p>This wraps a retriever with a <strong>compression step</strong>: after retrieval returns a batch of candidate documents, before they&#39;re handed to the final risk-scoring prompt, run each one through a small extraction step that asks &quot;given this specific query, what part (if any) of this document is actually relevant?&quot; — keeping only that excerpt, or dropping the document entirely if nothing in it is relevant after all (which can happen: a document can rank in the top-k by overall similarity while still not containing anything genuinely on-point for this specific question).</p>
+<p>This is a genuinely different operation from summarization — it&#39;s <em>extraction</em>, not paraphrase. You want the model finding and returning the actual relevant sentences, not writing a shorter version of the whole document. The value: your final risk-scoring prompt sees dense, on-topic legal text instead of full chunks padded with irrelevant surrounding material, which both reduces token cost and measurably improves how well the model can reason about what it&#39;s been given.</p>
+<h3 id="25-composing-the-retriever-stack"><a class="heading-anchor" href="#25-composing-the-retriever-stack" aria-hidden="true">#</a>2.5 Composing the retriever stack</h3>
+<p>Because every retriever in LangChain shares the same interface (<code class="inline-code">invoke(query) → Document[]</code>, from Phase 2.5&#39;s Concept Learning 2.4), each of these upgrades can be a <strong>decorator</strong> — a class that holds a reference to an &quot;inner&quot; retriever, calls it, and post-processes the result — without any of them needing to know or care what&#39;s inside the one they&#39;re wrapping.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">ContextualCompressionRetriever
+   └── wraps → MultiQueryRetriever
+                   └── wraps → MmrRetriever
+                                   └── wraps → base LegalKnowledgeBaseRetriever
+                                                   (plain cosine similarity + doc_group filter,
+                                                    same shape as Phase 2.5&#x27;s ContractRetriever)</code></pre></div>
+<p>Calling <code class="inline-code">.invoke(clauseText)</code> on the outermost object transparently runs the whole stack: generate reformulations → retrieve + MMR-rerank for each → union/dedupe → compress each surviving document down to its relevant excerpt. This is the concrete payoff of building the &quot;basic&quot; retriever by hand in Phase 2.5 rather than reaching for an opaque wrapper immediately — every layer here is legible because you already understand the layer underneath it.</p>
+<h3 id="26-send--dynamic-parallel-fan-out-over-a-runtime-determined-list"><a class="heading-anchor" href="#26-send--dynamic-parallel-fan-out-over-a-runtime-determined-list" aria-hidden="true">#</a>2.6 <code class="inline-code">Send()</code> — dynamic parallel fan-out over a runtime-determined list</h3>
+<p>Phase 3&#39;s <code class="inline-code">extract_clauses</code> node used a plain <code class="inline-code">Promise.all</code> inside one node to process a known, already-loaded list of windows concurrently — that works because the <em>node itself</em> decided to parallelize its own internal work, and the graph never saw more than one &quot;extraction&quot; step happen.</p>
+<p>This phase needs something structurally different: <strong>the graph itself</strong> needs to dynamically create one execution of a node <em>per clause</em>, where the number of clauses isn&#39;t known until the contract&#39;s clause list is loaded from the database at runtime. This is exactly what <code class="inline-code">Send()</code> is for.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dispatchClauseScoring</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisState</span></span>): <span class="hljs-title class_">Send</span>[] {
+  <span class="hljs-keyword">return</span> state.<span class="hljs-property">clauses</span>.<span class="hljs-title function_">map</span>(
+    <span class="hljs-function">(<span class="hljs-params">clause</span>) =&gt;</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Send</span>(<span class="hljs-string">&quot;score_clause&quot;</span>, { <span class="hljs-attr">currentClause</span>: clause })
+  );
+}
+
+graph.<span class="hljs-title function_">addConditionalEdges</span>(<span class="hljs-string">&quot;resolve_doc_groups&quot;</span>, dispatchClauseScoring);</code></pre></div>
+<p>Instead of returning the name of a single next node (like a normal conditional edge would), <code class="inline-code">dispatchClauseScoring</code> returns an <strong>array of <code class="inline-code">Send</code> objects</strong> — each one says &quot;run the node called <code class="inline-code">score_clause</code>, but override its input state with this specific clause.&quot; LangGraph spawns one parallel execution of <code class="inline-code">score_clause</code> per <code class="inline-code">Send</code> object, each with a different <code class="inline-code">currentClause</code> value layered on top of the shared graph state. This is the direct, graph-native analogue of Phase 3&#39;s <code class="inline-code">Promise.all</code> — but expressed as a first-class part of the graph&#39;s structure (traceable, checkpointable, and composable with conditional routing per branch) rather than hidden inside one node&#39;s implementation.</p>
+<p>This exact shape — &quot;map a node over a dynamically-sized list, then converge&quot; — is the <strong>map-reduce pattern</strong>, and it&#39;s the standard way LangGraph handles &quot;I don&#39;t know how many parallel branches I need until runtime.&quot;</p>
+<h3 id="27-conditional-edges-and-the-command-object"><a class="heading-anchor" href="#27-conditional-edges-and-the-command-object" aria-hidden="true">#</a>2.7 Conditional edges and the <code class="inline-code">Command</code> object</h3>
+<p>You&#39;ve already used one conditional construct — Phase 2&#39;s <code class="inline-code">RunnableBranch</code> — for routing inside an LCEL chain. LangGraph&#39;s equivalent, <code class="inline-code">addConditionalEdges</code>, does the same job at the graph level: a routing function inspects the current state and returns the name of whichever node should run next.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">function</span> <span class="hljs-title function_">routeByRisk</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisState</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> state.<span class="hljs-property">currentFinding</span>?.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;HIGH&quot;</span> ? <span class="hljs-string">&quot;judgment_lookup&quot;</span> : <span class="hljs-string">&quot;store_finding&quot;</span>;
+}
+
+graph.<span class="hljs-title function_">addConditionalEdges</span>(<span class="hljs-string">&quot;score_clause&quot;</span>, routeByRisk);</code></pre></div>
+<p>A <strong><code class="inline-code">Command</code></strong> object is a slightly more powerful alternative a node can return instead of a plain partial-state object: it lets a single node&#39;s return value carry <em>both</em> a state update <em>and</em> an explicit instruction for where to go next, in one place, rather than splitting &quot;what changed&quot; (the node&#39;s return) and &quot;where to go&quot; (a separate conditional-edge function) across two different pieces of code. This phase uses the separate-function style (<code class="inline-code">addConditionalEdges</code>) for <code class="inline-code">routeByRisk</code> because the routing logic here is simple enough to read clearly as its own function — <code class="inline-code">Command</code> becomes more valuable once a node&#39;s own internal logic is what determines routing dynamically and cleanly co-locating both makes the code easier to follow, which you&#39;ll see more of once Phase 6.5&#39;s Supervisor needs to decide routing based on more complex internal reasoning.</p>
+<h3 id="28-the-map-reduce-join-how-parallel-branches-converge"><a class="heading-anchor" href="#28-the-map-reduce-join-how-parallel-branches-converge" aria-hidden="true">#</a>2.8 The map-reduce join: how parallel branches converge</h3>
+<p>Once <code class="inline-code">score_clause</code> has run once per clause (some routing on to <code class="inline-code">judgment_lookup</code> first, others going straight to <code class="inline-code">store_finding</code>), you need all of those independent branches to <strong>converge</strong> back into one place before the graph can produce a final, complete result. In LangGraph, this happens naturally: if multiple nodes each have an edge pointing to the <em>same</em> downstream node, the graph waits until every currently-active branch has completed its current step before running that shared downstream node — it does not run the shared node once per incoming branch. Combined with a concatenating reducer (the same pattern from Phase 3&#39;s <code class="inline-code">rawExtractedClauses</code> field), this means the shared <code class="inline-code">aggregate_findings</code> node sees the <strong>complete</strong> list of findings from every parallel branch, exactly once, having correctly waited for all of them.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">score_clause (×N, parallel)
+   ├── HIGH   → judgment_lookup → store_finding ──┐
+   └── other  → store_finding ─────────────────────┼──► aggregate_findings (runs once, after ALL branches arrive)
+                                                     │
+                                                    END</code></pre></div>
+<h3 id="29-checkpointers--why-a-graph-run-needs-to-be-persisted-not-just-executed"><a class="heading-anchor" href="#29-checkpointers--why-a-graph-run-needs-to-be-persisted-not-just-executed" aria-hidden="true">#</a>2.9 Checkpointers — why a graph run needs to be persisted, not just executed</h3>
+<p>Everything so far in this project has been &quot;stateless&quot;: an HTTP request comes in, a chain or graph runs, a result goes back out, and nothing about the <em>run itself</em> survives past the response. That&#39;s fine for a single LLM call, but a full contract risk analysis can involve dozens of parallel branches, take real wall-clock time, and — critically for a legal tool — needs to be <strong>auditable after the fact</strong>: a compliance reviewer should be able to open a completed analysis days later and see exactly what happened at every step, not just the final answer.</p>
+<p>A <strong>checkpointer</strong> solves this by saving the graph&#39;s state to persistent storage after every &quot;superstep&quot; (roughly: after every node or parallel batch of nodes finishes). <code class="inline-code">PostgresSaver</code> (from <code class="inline-code">@langchain/langgraph-checkpoint-postgres</code>) does this directly into your existing Postgres database — no new infrastructure, consistent with your Phase 1 reasoning for choosing pgvector over a separate vector database.</p>
+<p>Every checkpointed run is identified by a <strong><code class="inline-code">thread_id</code></strong> — a string you choose (here, a UUID per analysis run) that groups all of a single run&#39;s checkpoints together, the same way a <code class="inline-code">contract_id</code> groups a contract&#39;s clauses. You pass it via the <code class="inline-code">config</code> object on every call:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: analysisRunId } };
+<span class="hljs-keyword">await</span> compiledGraph.<span class="hljs-title function_">invoke</span>(initialState, config);</code></pre></div>
+<p>With a checkpointer attached, the exact same <code class="inline-code">.invoke()</code> call you&#39;ve been using all along now <em>also</em>, transparently, saves a full snapshot of the graph&#39;s state after each step — which is what makes the audit features in 2.10 possible.</p>
+<h3 id="210-state-management-and-time-travel"><a class="heading-anchor" href="#210-state-management-and-time-travel" aria-hidden="true">#</a>2.10 State management and time travel</h3>
+<p>Once a run is checkpointed, three new operations become available, all scoped by the same <code class="inline-code">thread_id</code>:</p>
+<p><strong><code class="inline-code">getState(config)</code></strong> — returns the graph&#39;s <em>current</em> state (its latest checkpoint) for that thread: useful for &quot;show me where this analysis run stands right now.&quot;</p>
+<p><strong><code class="inline-code">getStateHistory(config)</code></strong> — returns an async iterable walking backward through <em>every</em> checkpoint ever saved for that thread, oldest state visible last. This is your audit trail: each entry includes the state values at that point, which node produced it, and a <code class="inline-code">checkpoint_id</code> you can reference to jump back to that exact moment.</p>
+<p><strong><code class="inline-code">updateState(config, values, asNode)</code></strong> — this is &quot;time travel.&quot; You give it a <code class="inline-code">checkpoint_id</code> (via <code class="inline-code">config.configurable.checkpoint_id</code>) pointing at a specific past checkpoint, plus new values to apply, plus <code class="inline-code">asNode</code> (the name of the node this correction should be attributed to, as if that node itself had produced this output). LangGraph creates a <strong>new checkpoint branching off from that point</strong>, with your corrected values applied. Critically, it does <em>not</em> touch or delete the original run&#39;s history — the original checkpoints remain, and you now additionally have a corrected fork.</p>
+<p><strong>Why this matters for a real product feature, not just a debugging tool:</strong> imagine a compliance reviewer disagrees with a HIGH risk score the model assigned to a clause. Instead of re-running the <em>entire</em> multi-clause analysis (expensive, slow, and would also silently re-score every other clause, potentially producing slightly different results due to LLM non-determinism), they can: look at the audit history, find the checkpoint right after that specific clause&#39;s <code class="inline-code">score_clause</code> step, call <code class="inline-code">updateState</code> with the corrected risk level at that checkpoint, and then resume the graph from there — everything downstream of that one clause (its routing decision, its contribution to <code class="inline-code">aggregate_findings</code>) re-runs using the <em>corrected</em> value, while every other clause&#39;s already-computed result is left completely untouched.</p>
+<h3 id="211-observability--why-this-phase-is-where-tracing-starts-mattering"><a class="heading-anchor" href="#211-observability--why-this-phase-is-where-tracing-starts-mattering" aria-hidden="true">#</a>2.11 Observability — why this phase is where tracing starts mattering</h3>
+<p>A graph this size (dynamic fan-out, conditional routing, multiple retriever layers per branch) is genuinely hard to debug by reading code alone — when a risk score looks wrong, you need to see <em>which</em> documents were retrieved, <em>what</em> the multi-query reformulations were, and <em>what</em> the model actually received in its final prompt. LangSmith tracing (enabled by three environment variables, no code changes required for basic tracing) captures every node execution, every LLM call, and every retriever call in a run as a browsable trace tree. This phase is the natural point to turn it on, because it&#39;s the first point where &quot;just add a console.log and re-run&quot; stops being a practical debugging strategy.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-retriever-upgrade--all-at-once-vs-staged"><a class="heading-anchor" href="#31-retriever-upgrade--all-at-once-vs-staged" aria-hidden="true">#</a>3.1 Retriever upgrade — all at once vs. staged</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Build the full 4-layer stack immediately</strong></td>
+<td>Less code churn (write it once)</td>
+<td>Much harder to isolate which layer is actually helping if something looks wrong; you never build the intuition for what each layer individually contributes</td>
+<td>If you&#39;re confident in the design and just want the end result</td>
+</tr>
+<tr>
+<td><strong>B. Build in stages — plain → MMR → Multi-Query → Contextual Compression, testing after each (roadmap&#39;s choice)</strong></td>
+<td>You can directly compare retrieval quality/token cost before and after each addition; failures are easy to attribute to a specific layer</td>
+<td>More checkpoints to pause and manually verify along the way</td>
+<td><strong>Recommended</strong> — matches your roadmap exactly, and this is a core phase worth understanding deeply rather than rushing</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, exactly as specified. Section 6 below still gives you the complete final code for all four layers — &quot;staged&quot; here means <em>validating</em> each layer as you go, not withholding code.</p>
+<h3 id="32-clause-processing--sequential-loop-vs-send-fan-out"><a class="heading-anchor" href="#32-clause-processing--sequential-loop-vs-send-fan-out" aria-hidden="true">#</a>3.2 Clause processing — sequential loop vs. <code class="inline-code">Send()</code> fan-out</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Sequential loop</strong> — a single node that iterates clauses one at a time with a <code class="inline-code">for</code> loop, using a conditional self-edge to repeat</td>
+<td>Simpler graph structure; easier to reason about ordering</td>
+<td>Total latency scales linearly with clause count; doesn&#39;t exercise <code class="inline-code">Send()</code> at all, leaving that unit unpracticed; large contracts (40+ clauses) become slow</td>
+<td>Small contracts, or if strict ordering of clause processing genuinely matters (it doesn&#39;t here — clauses are independent)</td>
+</tr>
+<tr>
+<td><strong>B. <code class="inline-code">Send()</code>-based parallel fan-out (roadmap&#39;s choice)</strong></td>
+<td>Latency roughly independent of clause count (bounded by API rate limits, not serial calls); directly exercises the map-reduce pattern central to LangGraph&#39;s design</td>
+<td>Slightly more moving parts (dispatch function, per-branch routing, join node); harder to reason about execution order if you&#39;re not used to thinking in terms of &quot;supersteps&quot;</td>
+<td><strong>Recommended</strong> — clauses are fully independent of each other, exactly the situation <code class="inline-code">Send()</code> exists for</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, as specified in your roadmap.</p>
+<h3 id="33-checkpointer-backend"><a class="heading-anchor" href="#33-checkpointer-backend" aria-hidden="true">#</a>3.3 Checkpointer backend</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. <code class="inline-code">MemorySaver</code></strong> (in-process, non-persistent)</td>
+<td>Zero setup, useful for quick local testing</td>
+<td>Checkpoints vanish when the process restarts — completely unusable for the audit-trail feature this phase requires, since a reviewer needs to inspect a run <em>after</em> the server has restarted</td>
+<td>Unit tests, quick local iteration only</td>
+</tr>
+<tr>
+<td><strong>B. <code class="inline-code">PostgresSaver</code></strong> (persistent, in your existing database)</td>
+<td>Survives restarts; consistent with your &quot;one database, not a zoo of specialized stores&quot; architecture principle from Phase 1; audit history is genuinely durable</td>
+<td>Requires running the saver&#39;s setup step once to create its checkpoint tables</td>
+<td><strong>Recommended</strong> — the audit/time-travel feature is a hard requirement of this phase, and only a persistent checkpointer can support it</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B. Use <code class="inline-code">MemorySaver</code> only in your unit tests, where a clean, ephemeral checkpointer is actually the <em>better</em> choice (no test pollution between runs).</p>
+<h3 id="34-auditcorrection-mechanism"><a class="heading-anchor" href="#34-auditcorrection-mechanism" aria-hidden="true">#</a>3.4 Audit/correction mechanism</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Full re-run</strong> — re-invoke the entire graph from scratch whenever a reviewer wants to correct one finding</td>
+<td>Simple to implement (no time-travel code needed)</td>
+<td>Wasteful (re-scores every clause, not just the corrected one); non-deterministic LLM output means <em>other</em> clauses&#39; scores could subtly change too, which is actively undesirable for an audit feature meant to isolate one correction</td>
+<td>Acceptable only for very small contracts where cost/time genuinely don&#39;t matter</td>
+</tr>
+<tr>
+<td><strong>B. <code class="inline-code">updateState</code>-based partial revert (roadmap&#39;s choice)</strong></td>
+<td>Only the corrected clause and anything genuinely downstream of it re-runs; every other clause&#39;s result is provably untouched; the original run&#39;s full history remains intact alongside the correction</td>
+<td>Requires understanding checkpoint IDs and the <code class="inline-code">asNode</code> parameter correctly</td>
+<td><strong>Recommended</strong> — this is the actual point of Concept Learning 2.10, and it&#39;s a meaningfully better product feature, not just a more advanced one</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--database-schema"><a class="heading-anchor" href="#step-1--database-schema" aria-hidden="true">#</a>Step 1 — Database schema</h3>
+<p><strong>What:</strong> A <code class="inline-code">risk_findings</code> table (one row per finalized clause finding) and a <code class="inline-code">clause_doc_group_map</code> reference table (or an inline TypeScript constant — see Step 2) mapping clause types to relevant Phase 1 <code class="inline-code">doc_group</code> values. <code class="inline-code">PostgresSaver</code>&#39;s own checkpoint tables are created separately via its setup call, not hand-written SQL.</p>
+<p><strong>Why:</strong> <code class="inline-code">risk_findings</code> is the row Phase 5&#39;s report generator reads. Doc-group mapping is what keeps retrieval scoped and relevant — retrieving from your entire legal knowledge base for every clause regardless of type would both slow retrieval down and pollute context with irrelevant material (e.g. checking a payment-terms clause against labour law judgments).</p>
+<p><strong>Best practice:</strong> Store <code class="inline-code">analysis_run_id</code> (the graph&#39;s <code class="inline-code">thread_id</code>) on every <code class="inline-code">risk_findings</code> row — this is what lets the audit endpoints correlate a stored finding back to its exact checkpoint history.</p>
+<h3 id="step-2--clause-type--doc-group-resolution"><a class="heading-anchor" href="#step-2--clause-type--doc-group-resolution" aria-hidden="true">#</a>Step 2 — Clause-type → doc-group resolution</h3>
+<p><strong>What:</strong> A lookup table mapping each <code class="inline-code">clause_type</code> (from Phase 3&#39;s <code class="inline-code">CLAUSE_TYPES</code>) to the <code class="inline-code">doc_group</code> values in <code class="inline-code">legal_reference_chunks</code> most relevant to it.</p>
+<p><strong>Why:</strong> This is the concrete mechanism that makes retrieval <em>scoped</em> rather than searching your whole knowledge base for every clause — directly answering the question Phase 2&#39;s classification stage set up (&quot;which <code class="inline-code">doc_group</code>s are even relevant here&quot;).</p>
+<p><strong>Common mistake to avoid:</strong> Mapping too narrowly. A <code class="inline-code">liability_indemnification</code> clause might genuinely need both <code class="inline-code">contract_law</code> and, for an employment contract, <code class="inline-code">labour_law</code> context — err toward including a doc group if there&#39;s a plausible connection, since Contextual Compression (2.4) will filter out anything that turns out not to be relevant anyway.</p>
+<h3 id="step-3--the-retriever-stack-four-layers"><a class="heading-anchor" href="#step-3--the-retriever-stack-four-layers" aria-hidden="true">#</a>Step 3 — The retriever stack (four layers)</h3>
+<p><strong>What:</strong> <code class="inline-code">LegalKnowledgeBaseRetriever</code> (base), <code class="inline-code">MmrRetriever</code> (wraps base), <code class="inline-code">MultiQueryRetriever</code> (wraps MMR), <code class="inline-code">ContextualCompressionRetriever</code> (wraps Multi-Query) — each a small class implementing the same <code class="inline-code">BaseRetriever</code> interface from Phase 2.5.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.1–2.5.</p>
+<p><strong>Best practice:</strong> Log token counts before and after compression during your staged testing (Approach B in 3.1) — this is the concrete evidence for &quot;is this layer actually helping,&quot; not just a theoretical improvement.</p>
+<h3 id="step-4--risk-scoring-schema-and-chain"><a class="heading-anchor" href="#step-4--risk-scoring-schema-and-chain" aria-hidden="true">#</a>Step 4 — Risk-scoring schema and chain</h3>
+<p><strong>What:</strong> <code class="inline-code">RiskFindingSchema</code> (Zod) plus a prompt instructing the model to score risk <strong>only</strong> using the retrieved, compressed context, and a <code class="inline-code">withStructuredOutput()</code> chain.</p>
+<p><strong>Why:</strong> Same groundedness principle as Phase 2.5&#39;s answer chain — an ungrounded risk score is worse than no score at all in a legal-adjacent tool.</p>
+<p><strong>Best practice:</strong> Ask explicitly for the specific chunk(s) that justify the score (<code class="inline-code">legalReferences</code>) — this is both a groundedness forcing function (a model asked to cite its sources is measurably less likely to hallucinate a confident-sounding but ungrounded score) and directly useful output for Phase 5&#39;s report.</p>
+<h3 id="step-5--graph-state-schema"><a class="heading-anchor" href="#step-5--graph-state-schema" aria-hidden="true">#</a>Step 5 — Graph state schema</h3>
+<p><strong>What:</strong> An <code class="inline-code">Annotation.Root</code> state covering <code class="inline-code">contractId</code>, <code class="inline-code">analysisRunId</code>, <code class="inline-code">clauses</code> (loaded from Phase 3&#39;s table, each augmented with resolved <code class="inline-code">docGroups</code>), <code class="inline-code">currentClause</code> (only present inside a <code class="inline-code">Send</code>-dispatched branch), and <code class="inline-code">findings</code> (concatenating reducer, same pattern as Phase 3&#39;s <code class="inline-code">rawExtractedClauses</code>).</p>
+<p><strong>Why:</strong> Same reasoning as Phase 3&#39;s state design — the concatenating reducer on <code class="inline-code">findings</code> is what lets every parallel <code class="inline-code">score_clause</code>/<code class="inline-code">store_finding</code> branch contribute to one shared final list without stepping on each other.</p>
+<h3 id="step-6--resolve_doc_groups-node"><a class="heading-anchor" href="#step-6--resolve_doc_groups-node" aria-hidden="true">#</a>Step 6 — <code class="inline-code">resolve_doc_groups</code> node</h3>
+<p><strong>What:</strong> A single (non-parallel) node that loads the clause-type → doc-group mapping and attaches the resolved <code class="inline-code">docGroups</code> array to every clause in state.</p>
+<p><strong>Why:</strong> Doing this once, before fan-out, means each of the <em>N</em> parallel <code class="inline-code">score_clause</code> branches doesn&#39;t need to redundantly recompute the same mapping logic.</p>
+<h3 id="step-7--fan-out-dispatch-and-the-score_clause-node"><a class="heading-anchor" href="#step-7--fan-out-dispatch-and-the-score_clause-node" aria-hidden="true">#</a>Step 7 — Fan-out dispatch and the <code class="inline-code">score_clause</code> node</h3>
+<p><strong>What:</strong> <code class="inline-code">dispatchClauseScoring</code> (the <code class="inline-code">Send()</code>-returning routing function) and <code class="inline-code">score_clause</code> (retrieves via the full stack, scores via the chain from Step 4, returns one finding).</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.6.</p>
+<p><strong>Common mistake to avoid:</strong> Forgetting that a <code class="inline-code">Send</code>-dispatched node&#39;s state is the <strong>global state with the <code class="inline-code">Send</code> payload merged on top</strong> — <code class="inline-code">score_clause</code> can and should still read shared fields like <code class="inline-code">state.analysisRunId</code>, not just <code class="inline-code">state.currentClause</code>.</p>
+<h3 id="step-8--conditional-routing-and-the-judgment_lookup-stub"><a class="heading-anchor" href="#step-8--conditional-routing-and-the-judgment_lookup-stub" aria-hidden="true">#</a>Step 8 — Conditional routing and the <code class="inline-code">judgment_lookup</code> stub</h3>
+<p><strong>What:</strong> <code class="inline-code">routeByRisk</code> (HIGH → <code class="inline-code">judgment_lookup</code>, else → <code class="inline-code">store_finding</code>) and a <strong>stub</strong> <code class="inline-code">judgment_lookup</code> node that does a simple direct retrieval against your knowledge base&#39;s judgment-type documents — explicitly a placeholder, since Phase 4.5 replaces this exact node with a real agent that decides <em>which</em> tool to use rather than always doing the same fixed lookup.</p>
+<p><strong>Why:</strong> This is the concrete hook Phase 4.5 plugs into — building it as its own named node now, even in stub form, means swapping it for the agent later is a one-node replacement, not a graph restructuring.</p>
+<h3 id="step-9--store_finding-and-aggregate_findings"><a class="heading-anchor" href="#step-9--store_finding-and-aggregate_findings" aria-hidden="true">#</a>Step 9 — <code class="inline-code">store_finding</code> and <code class="inline-code">aggregate_findings</code></h3>
+<p><strong>What:</strong> <code class="inline-code">store_finding</code> inserts (or stages for insert) one finding; <code class="inline-code">aggregate_findings</code> is the join node every branch converges on, computing summary stats (counts per risk level) and marking the run complete.</p>
+<p><strong>Why:</strong> Covered in Concept Learning 2.8 — this is the reduce half of map-reduce.</p>
+<h3 id="step-10--checkpointer-setup-and-graph-compilation"><a class="heading-anchor" href="#step-10--checkpointer-setup-and-graph-compilation" aria-hidden="true">#</a>Step 10 — Checkpointer setup and graph compilation</h3>
+<p><strong>What:</strong> Instantiate <code class="inline-code">PostgresSaver</code>, run its one-time <code class="inline-code">.setup()</code> call, and pass it to <code class="inline-code">.compile({ checkpointer })</code>.</p>
+<p><strong>Best practice:</strong> Run <code class="inline-code">.setup()</code> as part of your migration process (or a dedicated startup check), not on every server boot unconditionally — it&#39;s idempotent but there&#39;s no reason to call it more than once per environment.</p>
+<h3 id="step-11--audit-endpoints"><a class="heading-anchor" href="#step-11--audit-endpoints" aria-hidden="true">#</a>Step 11 — Audit endpoints</h3>
+<p><strong>What:</strong> <code class="inline-code">GET /api/analysis/:threadId/state</code>, <code class="inline-code">GET /api/analysis/:threadId/history</code>, <code class="inline-code">POST /api/analysis/:threadId/revert</code>.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.10.</p>
+<p><strong>Common mistake to avoid:</strong> Exposing raw checkpoint objects directly in the API response without shaping them — checkpoints contain internal LangGraph bookkeeping fields a frontend shouldn&#39;t need to understand; map them to a clean <code class="inline-code">{ checkpointId, node, timestamp, values }</code> shape at the route layer.</p>
+<h3 id="step-12--the-orchestration-endpoint-and-langsmith-setup"><a class="heading-anchor" href="#step-12--the-orchestration-endpoint-and-langsmith-setup" aria-hidden="true">#</a>Step 12 — The orchestration endpoint and LangSmith setup</h3>
+<p><strong>What:</strong> <code class="inline-code">POST /api/contracts/:id/analysis/start</code> — loads clauses, generates a fresh <code class="inline-code">thread_id</code>, invokes the compiled graph, returns the run ID immediately (or the full result, depending on whether you want this synchronous for now — Phase 7 adds real streaming/async progress).</p>
+<p><strong>Best practice:</strong> Return the <code class="inline-code">analysisRunId</code> (<code class="inline-code">thread_id</code>) in the response even if you return full results synchronously — the frontend and the audit endpoints both need it, and it costs nothing to include now.</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<ol>
+<li><strong>Run the migration</strong> below to create <code class="inline-code">risk_findings</code>.</li>
+<li><strong>Install dependencies</strong>: <code class="inline-code">@langchain/langgraph-checkpoint-postgres</code>, and confirm <code class="inline-code">@langchain/langgraph</code> (from Phase 3) is already present.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/docGroups.ts</code></strong> — the clause-type → doc-group mapping.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/retrievers/base.ts</code></strong> — <code class="inline-code">LegalKnowledgeBaseRetriever</code>.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/retrievers/mmr.ts</code></strong> — <code class="inline-code">MmrRetriever</code>, and manually test it against 2-3 sample clauses, comparing its output to the base retriever&#39;s raw top-k.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/retrievers/multiQuery.ts</code></strong> — <code class="inline-code">MultiQueryRetriever</code>, and test with a deliberately vague/ambiguous clause to see the union-of-reformulations effect.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/retrievers/contextualCompression.ts</code></strong> — the final wrapping layer, and log token counts before/after compression on a real example.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/schemas.ts</code></strong> — <code class="inline-code">RiskFindingSchema</code>.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/riskScoringChain.ts</code></strong> — the scoring chain using the full retriever stack.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/state.ts</code></strong> — the <code class="inline-code">Annotation.Root</code> state schema.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/nodes/</code></strong> — <code class="inline-code">resolveDocGroups.ts</code>, <code class="inline-code">scoreClause.ts</code>, <code class="inline-code">judgmentLookupStub.ts</code>, <code class="inline-code">storeFinding.ts</code>, <code class="inline-code">aggregateFindings.ts</code>.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/graph.ts</code></strong> — wire the full graph with <code class="inline-code">Send()</code> dispatch, conditional routing, and the <code class="inline-code">PostgresSaver</code> checkpointer.</li>
+<li><strong>Implement <code class="inline-code">src/analysis/storage.ts</code></strong> — <code class="inline-code">risk_findings</code> persistence.</li>
+<li><strong>Implement <code class="inline-code">src/routes/analysis.ts</code></strong> — the orchestration and audit endpoints.</li>
+<li><strong>Set your LangSmith environment variables</strong> and run a full analysis on a real multi-clause contract; open the trace and confirm you can see the fan-out, the retriever stack calls, and the conditional routing per clause.</li>
+<li><strong>Test the audit trail</strong>: run <code class="inline-code">GET /api/analysis/:threadId/history</code> on a completed run and confirm you can see one checkpoint per node execution, including the parallel <code class="inline-code">score_clause</code> branches.</li>
+<li><strong>Test time travel</strong>: pick one clause&#39;s finding, use <code class="inline-code">updateState</code> to correct its risk level at the right checkpoint, resume the graph, and confirm the <code class="inline-code">risk_findings</code> table reflects the correction while every other clause&#39;s finding is byte-for-byte unchanged.</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<h3 id="61-dependencies"><a class="heading-anchor" href="#61-dependencies" aria-hidden="true">#</a>6.1 Dependencies</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install @langchain/langgraph-checkpoint-postgres</code></pre></div>
+<h3 id="62-environment-variables-append-to-env"><a class="heading-anchor" href="#62-environment-variables-append-to-env" aria-hidden="true">#</a>6.2 Environment variables (append to <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">RISK_SCORING_MODEL=gpt-4o-mini
+RETRIEVER_FETCH_K=20
+RETRIEVER_FINAL_K=5
+RETRIEVER_MMR_LAMBDA=0.6
+MULTI_QUERY_REFORMULATIONS=3
+
+<span class="hljs-comment"># LangSmith tracing (Phase 4 is where this starts earning its keep)</span>
+LANGCHAIN_TRACING_V2=<span class="hljs-literal">true</span>
+LANGCHAIN_API_KEY=ls__...
+LANGCHAIN_PROJECT=legaldocs-phase4</code></pre></div>
+<h3 id="63-database-migration"><a class="heading-anchor" href="#63-database-migration" aria-hidden="true">#</a>6.3 Database migration</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">sql</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-sql"><span class="hljs-comment">-- migrations/005_risk_findings.sql</span>
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> risk_findings (
+    id                UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    contract_id       UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> contracts(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    clause_id         UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> clauses(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    analysis_run_id   TEXT <span class="hljs-keyword">NOT NULL</span>,          <span class="hljs-comment">-- LangGraph thread_id for this run</span>
+    risk_level        TEXT <span class="hljs-keyword">NOT NULL</span>,          <span class="hljs-comment">-- LOW | MEDIUM | HIGH</span>
+    risk_score        <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">NOT NULL</span>,       <span class="hljs-comment">-- 0-100</span>
+    reasoning         TEXT <span class="hljs-keyword">NOT NULL</span>,
+    fix_suggestion    TEXT <span class="hljs-keyword">NOT NULL</span>,
+    legal_references  JSONB <span class="hljs-keyword">NOT NULL</span>,
+    created_at        TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now(),
+    updated_at        TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_risk_findings_contract_id <span class="hljs-keyword">ON</span> risk_findings (contract_id);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_risk_findings_run_id <span class="hljs-keyword">ON</span> risk_findings (analysis_run_id);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_risk_findings_clause_id <span class="hljs-keyword">ON</span> risk_findings (clause_id);</code></pre></div>
+<blockquote class="quote-plain"><p><code class="inline-code">PostgresSaver</code>&#39;s own checkpoint tables are created by calling <code class="inline-code">.setup()</code> once (Step 10&#39;s code below) — do not hand-write them; the schema is internal to the library and may evolve across versions.</p>
+</blockquote>
+<h3 id="64-clause-type--doc-group-mapping"><a class="heading-anchor" href="#64-clause-type--doc-group-mapping" aria-hidden="true">#</a>6.4 Clause-type → doc-group mapping</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/docGroups.ts</span>
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">ExtractedClause</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../clauses/schemas&quot;</span>;
+
+<span class="hljs-comment">/**
+ * Maps each clause type to the Phase 1 knowledge base doc_groups most
+ * likely to contain relevant grounding material. Errs toward including a
+ * group whenever there&#x27;s a plausible connection - Contextual Compression
+ * downstream filters out anything that turns out not to be relevant, so
+ * being slightly generous here costs little and under-scoping risks
+ * missing real grounding entirely.
+ */</span>
+<span class="hljs-keyword">const</span> <span class="hljs-attr">CLAUSE_TYPE_TO_DOC_GROUPS</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">string</span>[]&gt; = {
+  <span class="hljs-attr">payment_terms</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">termination</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>, <span class="hljs-string">&quot;labour_law&quot;</span>],
+  <span class="hljs-attr">confidentiality</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>, <span class="hljs-string">&quot;data_protection&quot;</span>],
+  <span class="hljs-attr">liability_indemnification</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>, <span class="hljs-string">&quot;labour_law&quot;</span>],
+  <span class="hljs-attr">intellectual_property</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>, <span class="hljs-string">&quot;data_protection&quot;</span>],
+  <span class="hljs-attr">non_compete</span>: [<span class="hljs-string">&quot;labour_law&quot;</span>, <span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">dispute_resolution</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">force_majeure</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">warranties_representations</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">assignment</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">governing_law</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">notices</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">definitions</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>],
+  <span class="hljs-attr">other</span>: [<span class="hljs-string">&quot;contract_law&quot;</span>, <span class="hljs-string">&quot;labour_law&quot;</span>, <span class="hljs-string">&quot;data_protection&quot;</span>],
+};
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolveDocGroups</span>(<span class="hljs-params"><span class="hljs-attr">clauseType</span>: <span class="hljs-title class_">ExtractedClause</span>[<span class="hljs-string">&quot;clauseType&quot;</span>]</span>): <span class="hljs-built_in">string</span>[] {
+  <span class="hljs-keyword">return</span> <span class="hljs-variable constant_">CLAUSE_TYPE_TO_DOC_GROUPS</span>[clauseType] ?? [<span class="hljs-string">&quot;contract_law&quot;</span>];
+}</code></pre></div>
+<h3 id="65-base-retriever"><a class="heading-anchor" href="#65-base-retriever" aria-hidden="true">#</a>6.5 Base retriever</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/retrievers/base.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">BaseRetriever</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">BaseRetrieverInput</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/retrievers&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">Document</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/documents&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+<span class="hljs-keyword">const</span> embeddingsClient = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIEmbeddings</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">EMBEDDING_MODEL</span> ?? <span class="hljs-string">&quot;text-embedding-3-small&quot;</span>,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">KnowledgeBaseRetrieverInput</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseRetrieverInput</span> {
+  <span class="hljs-attr">docGroups</span>: <span class="hljs-built_in">string</span>[];
+  <span class="hljs-attr">fetchK</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">EmbeddedDocument</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Document</span> {
+  <span class="hljs-attr">embedding</span>: <span class="hljs-built_in">number</span>[];
+}
+
+<span class="hljs-comment">/**
+ * The base layer of the retriever stack: plain cosine similarity search
+ * against legal_reference_chunks, scoped to the given doc_groups - the
+ * same shape as Phase 2.5&#x27;s ContractRetriever, but querying the Phase 1
+ * knowledge base instead of one contract&#x27;s own chunks, and returning
+ * embeddings alongside content so the MMR layer above can re-rank without
+ * a second round of embedding calls.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LegalKnowledgeBaseRetriever</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">BaseRetriever</span> {
+  lc_namespace = [<span class="hljs-string">&quot;legaldocs&quot;</span>, <span class="hljs-string">&quot;retrievers&quot;</span>, <span class="hljs-string">&quot;knowledge_base&quot;</span>];
+
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">docGroups</span>: <span class="hljs-built_in">string</span>[];
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">fetchK</span>: <span class="hljs-built_in">number</span>;
+
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"><span class="hljs-attr">fields</span>: <span class="hljs-title class_">KnowledgeBaseRetrieverInput</span></span>) {
+    <span class="hljs-variable language_">super</span>(fields);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">docGroups</span> = fields.<span class="hljs-property">docGroups</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">fetchK</span> = fields.<span class="hljs-property">fetchK</span>;
+  }
+
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchCandidatesWithEmbeddings</span>(<span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Promise</span>&lt;{
+    <span class="hljs-attr">queryEmbedding</span>: <span class="hljs-built_in">number</span>[];
+    <span class="hljs-attr">documents</span>: <span class="hljs-title class_">EmbeddedDocument</span>[];
+  }&gt; {
+    <span class="hljs-keyword">const</span> [queryEmbedding] = <span class="hljs-keyword">await</span> embeddingsClient.<span class="hljs-title function_">embedDocuments</span>([query]);
+
+    <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+      <span class="hljs-string">`SELECT content, source_document, section_title, embedding,
+              embedding &lt;=&gt; $1 AS distance
+       FROM legal_reference_chunks
+       WHERE doc_group = ANY($2::text[])
+       ORDER BY embedding &lt;=&gt; $1
+       LIMIT $3`</span>,
+      [<span class="hljs-string">`[<span class="hljs-subst">${queryEmbedding.join(<span class="hljs-string">&quot;,&quot;</span>)}</span>]`</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">docGroups</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">fetchK</span>]
+    );
+
+    <span class="hljs-keyword">const</span> <span class="hljs-attr">documents</span>: <span class="hljs-title class_">EmbeddedDocument</span>[] = rows.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">row</span>) =&gt;</span> ({
+      <span class="hljs-attr">pageContent</span>: row.<span class="hljs-property">content</span>,
+      <span class="hljs-attr">metadata</span>: {
+        <span class="hljs-attr">sourceDocument</span>: row.<span class="hljs-property">source_document</span>,
+        <span class="hljs-attr">sectionTitle</span>: row.<span class="hljs-property">section_title</span>,
+        <span class="hljs-attr">distance</span>: row.<span class="hljs-property">distance</span>,
+      },
+      <span class="hljs-attr">embedding</span>: <span class="hljs-title function_">parsePgVector</span>(row.<span class="hljs-property">embedding</span>),
+    }));
+
+    <span class="hljs-keyword">return</span> { queryEmbedding, documents };
+  }
+
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">_getRelevantDocuments</span>(<span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Document</span>[]&gt; {
+    <span class="hljs-keyword">const</span> { documents } = <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">fetchCandidatesWithEmbeddings</span>(query);
+    <span class="hljs-keyword">return</span> documents;
+  }
+}
+
+<span class="hljs-comment">/** pgvector returns embeddings as a &quot;[0.1,0.2,...]&quot; string literal via the
+ *  driver unless explicitly cast - parse it back into a plain number array. */</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">parsePgVector</span>(<span class="hljs-params"><span class="hljs-attr">raw</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-built_in">number</span>[] {
+  <span class="hljs-keyword">return</span> raw
+    .<span class="hljs-title function_">slice</span>(<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>)
+    .<span class="hljs-title function_">split</span>(<span class="hljs-string">&quot;,&quot;</span>)
+    .<span class="hljs-title function_">map</span>(<span class="hljs-title class_">Number</span>);
+}</code></pre></div>
+<h3 id="66-mmr-retriever"><a class="heading-anchor" href="#66-mmr-retriever" aria-hidden="true">#</a>6.6 MMR retriever</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/retrievers/mmr.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">BaseRetriever</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">BaseRetrieverInput</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/retrievers&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">Document</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/documents&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">LegalKnowledgeBaseRetriever</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">EmbeddedDocument</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./base&quot;</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">cosineSimilarity</span>(<span class="hljs-params"><span class="hljs-attr">a</span>: <span class="hljs-built_in">number</span>[], <span class="hljs-attr">b</span>: <span class="hljs-built_in">number</span>[]</span>): <span class="hljs-built_in">number</span> {
+  <span class="hljs-keyword">let</span> dot = <span class="hljs-number">0</span>, normA = <span class="hljs-number">0</span>, normB = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; a.<span class="hljs-property">length</span>; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  <span class="hljs-keyword">return</span> dot / (<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">sqrt</span>(normA) * <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">sqrt</span>(normB));
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">MmrRetrieverInput</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseRetrieverInput</span> {
+  <span class="hljs-attr">baseRetriever</span>: <span class="hljs-title class_">LegalKnowledgeBaseRetriever</span>;
+  <span class="hljs-attr">finalK</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">lambda</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-comment">/**
+ * Wraps a base retriever with Maximal Marginal Relevance re-ranking: fetches
+ * a larger candidate pool (base retriever&#x27;s fetchK), then greedily selects
+ * finalK documents balancing relevance to the query against dissimilarity
+ * from documents already selected - so the final set isn&#x27;t five near-
+ * identical restatements of the same statute section.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MmrRetriever</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">BaseRetriever</span> {
+  lc_namespace = [<span class="hljs-string">&quot;legaldocs&quot;</span>, <span class="hljs-string">&quot;retrievers&quot;</span>, <span class="hljs-string">&quot;mmr&quot;</span>];
+
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">baseRetriever</span>: <span class="hljs-title class_">LegalKnowledgeBaseRetriever</span>;
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">finalK</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">lambda</span>: <span class="hljs-built_in">number</span>;
+
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"><span class="hljs-attr">fields</span>: <span class="hljs-title class_">MmrRetrieverInput</span></span>) {
+    <span class="hljs-variable language_">super</span>(fields);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">baseRetriever</span> = fields.<span class="hljs-property">baseRetriever</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">finalK</span> = fields.<span class="hljs-property">finalK</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">lambda</span> = fields.<span class="hljs-property">lambda</span>;
+  }
+
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">_getRelevantDocuments</span>(<span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Document</span>[]&gt; {
+    <span class="hljs-keyword">const</span> { queryEmbedding, documents } = <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">baseRetriever</span>.<span class="hljs-title function_">fetchCandidatesWithEmbeddings</span>(
+      query
+    );
+
+    <span class="hljs-keyword">if</span> (documents.<span class="hljs-property">length</span> &lt;= <span class="hljs-variable language_">this</span>.<span class="hljs-property">finalK</span>) <span class="hljs-keyword">return</span> documents;
+
+    <span class="hljs-keyword">const</span> <span class="hljs-attr">selected</span>: <span class="hljs-title class_">EmbeddedDocument</span>[] = [];
+    <span class="hljs-keyword">const</span> remaining = [...documents];
+
+    <span class="hljs-keyword">while</span> (selected.<span class="hljs-property">length</span> &lt; <span class="hljs-variable language_">this</span>.<span class="hljs-property">finalK</span> &amp;&amp; remaining.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">let</span> bestIndex = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">let</span> bestScore = -<span class="hljs-title class_">Infinity</span>;
+
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; remaining.<span class="hljs-property">length</span>; i++) {
+        <span class="hljs-keyword">const</span> relevance = <span class="hljs-title function_">cosineSimilarity</span>(remaining[i].<span class="hljs-property">embedding</span>, queryEmbedding);
+        <span class="hljs-keyword">const</span> maxSimToSelected = selected.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>
+          ? <span class="hljs-number">0</span>
+          : <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">max</span>(...selected.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">s</span>) =&gt;</span> <span class="hljs-title function_">cosineSimilarity</span>(remaining[i].<span class="hljs-property">embedding</span>, s.<span class="hljs-property">embedding</span>)));
+
+        <span class="hljs-keyword">const</span> mmrScore = <span class="hljs-variable language_">this</span>.<span class="hljs-property">lambda</span> * relevance - (<span class="hljs-number">1</span> - <span class="hljs-variable language_">this</span>.<span class="hljs-property">lambda</span>) * maxSimToSelected;
+
+        <span class="hljs-keyword">if</span> (mmrScore &gt; bestScore) {
+          bestScore = mmrScore;
+          bestIndex = i;
+        }
+      }
+
+      selected.<span class="hljs-title function_">push</span>(remaining[bestIndex]);
+      remaining.<span class="hljs-title function_">splice</span>(bestIndex, <span class="hljs-number">1</span>);
+    }
+
+    <span class="hljs-keyword">return</span> selected;
+  }
+}</code></pre></div>
+<h3 id="67-multi-query-retriever"><a class="heading-anchor" href="#67-multi-query-retriever" aria-hidden="true">#</a>6.7 Multi-Query retriever</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/retrievers/multiQuery.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">BaseRetriever</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">BaseRetrieverInput</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/retrievers&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">Document</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/documents&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MmrRetriever</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./mmr&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">RISK_SCORING_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.3</span>, <span class="hljs-comment">// slight variety is desirable here - we WANT differently worded reformulations</span>
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ReformulationSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">reformulations</span>: z
+    .<span class="hljs-title function_">array</span>(z.<span class="hljs-title function_">string</span>())
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Alternative phrasings of the same underlying legal question, using different vocabulary&quot;</span>),
+});
+
+<span class="hljs-keyword">const</span> reformulationPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;Generate {count} alternative phrasings of the following contract clause &quot;</span> +
+      <span class="hljs-string">&quot;concern, each using different legal vocabulary that a statute or judgment &quot;</span> +
+      <span class="hljs-string">&quot;might use to describe the same underlying issue. Do not answer the &quot;</span> +
+      <span class="hljs-string">&quot;question - only rephrase it.&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;{query}&quot;</span>],
+]);
+
+<span class="hljs-keyword">const</span> reformulationChain = reformulationPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">ReformulationSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;reformulate_query&quot;</span> })
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">MultiQueryRetrieverInput</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseRetrieverInput</span> {
+  <span class="hljs-attr">innerRetriever</span>: <span class="hljs-title class_">MmrRetriever</span>;
+  <span class="hljs-attr">reformulationCount</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-comment">/**
+ * Wraps an inner retriever (here, the MMR layer) by generating several
+ * differently-worded reformulations of the query, retrieving independently
+ * for each, and returning the deduplicated union - so a vocabulary mismatch
+ * between the clause&#x27;s exact wording and the knowledge base&#x27;s phrasing
+ * doesn&#x27;t cause an under-retrieval.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MultiQueryRetriever</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">BaseRetriever</span> {
+  lc_namespace = [<span class="hljs-string">&quot;legaldocs&quot;</span>, <span class="hljs-string">&quot;retrievers&quot;</span>, <span class="hljs-string">&quot;multi_query&quot;</span>];
+
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">innerRetriever</span>: <span class="hljs-title class_">MmrRetriever</span>;
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">reformulationCount</span>: <span class="hljs-built_in">number</span>;
+
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"><span class="hljs-attr">fields</span>: <span class="hljs-title class_">MultiQueryRetrieverInput</span></span>) {
+    <span class="hljs-variable language_">super</span>(fields);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">innerRetriever</span> = fields.<span class="hljs-property">innerRetriever</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">reformulationCount</span> = fields.<span class="hljs-property">reformulationCount</span>;
+  }
+
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">_getRelevantDocuments</span>(<span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Document</span>[]&gt; {
+    <span class="hljs-keyword">const</span> { reformulations } = <span class="hljs-keyword">await</span> reformulationChain.<span class="hljs-title function_">invoke</span>({
+      query,
+      <span class="hljs-attr">count</span>: <span class="hljs-variable language_">this</span>.<span class="hljs-property">reformulationCount</span>,
+    });
+
+    <span class="hljs-keyword">const</span> allQueries = [query, ...reformulations];
+
+    <span class="hljs-keyword">const</span> resultsPerQuery = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(
+      allQueries.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">q</span>) =&gt;</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">innerRetriever</span>.<span class="hljs-title function_">invoke</span>(q))
+    );
+
+    <span class="hljs-keyword">const</span> seen = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>&lt;<span class="hljs-built_in">string</span>&gt;();
+    <span class="hljs-keyword">const</span> <span class="hljs-attr">deduped</span>: <span class="hljs-title class_">Document</span>[] = [];
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> docs <span class="hljs-keyword">of</span> resultsPerQuery) {
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> doc <span class="hljs-keyword">of</span> docs) {
+        <span class="hljs-keyword">const</span> key = <span class="hljs-string">`<span class="hljs-subst">${doc.metadata.sourceDocument}</span>::<span class="hljs-subst">${doc.pageContent.slice(<span class="hljs-number">0</span>, <span class="hljs-number">100</span>)}</span>`</span>;
+        <span class="hljs-keyword">if</span> (!seen.<span class="hljs-title function_">has</span>(key)) {
+          seen.<span class="hljs-title function_">add</span>(key);
+          deduped.<span class="hljs-title function_">push</span>(doc);
+        }
+      }
+    }
+
+    <span class="hljs-keyword">return</span> deduped;
+  }
+}</code></pre></div>
+<h3 id="68-contextual-compression-retriever"><a class="heading-anchor" href="#68-contextual-compression-retriever" aria-hidden="true">#</a>6.8 Contextual Compression retriever</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/retrievers/contextualCompression.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">BaseRetriever</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">BaseRetrieverInput</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/retrievers&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">Document</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/documents&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MultiQueryRetriever</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./multiQuery&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">RISK_SCORING_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ExtractionSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">relevantExcerpt</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">nullable</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The verbatim portion of the document relevant to the query, or null if nothing is relevant&quot;</span>),
+});
+
+<span class="hljs-keyword">const</span> extractionPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;Given a query and a document, extract ONLY the verbatim portion of the &quot;</span> +
+      <span class="hljs-string">&quot;document that is relevant to the query. If nothing in the document is &quot;</span> +
+      <span class="hljs-string">&quot;relevant, return null. Do not paraphrase or summarize - extract exact text.&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Query: {query}\n\nDocument:\n{document}&quot;</span>],
+]);
+
+<span class="hljs-keyword">const</span> extractionChain = extractionPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">ExtractionSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;extract_relevant_excerpt&quot;</span> })
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ContextualCompressionRetrieverInput</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseRetrieverInput</span> {
+  <span class="hljs-attr">innerRetriever</span>: <span class="hljs-title class_">MultiQueryRetriever</span>;
+}
+
+<span class="hljs-comment">/**
+ * The outermost layer of the retriever stack: compresses each surviving
+ * document down to only its relevant excerpt (or drops it entirely if
+ * nothing in it is actually on-point), so the final risk-scoring prompt
+ * receives dense, on-topic legal text instead of full chunks padded with
+ * irrelevant surrounding material.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ContextualCompressionRetriever</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">BaseRetriever</span> {
+  lc_namespace = [<span class="hljs-string">&quot;legaldocs&quot;</span>, <span class="hljs-string">&quot;retrievers&quot;</span>, <span class="hljs-string">&quot;contextual_compression&quot;</span>];
+
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">innerRetriever</span>: <span class="hljs-title class_">MultiQueryRetriever</span>;
+
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"><span class="hljs-attr">fields</span>: <span class="hljs-title class_">ContextualCompressionRetrieverInput</span></span>) {
+    <span class="hljs-variable language_">super</span>(fields);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">innerRetriever</span> = fields.<span class="hljs-property">innerRetriever</span>;
+  }
+
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">_getRelevantDocuments</span>(<span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Document</span>[]&gt; {
+    <span class="hljs-keyword">const</span> docs = <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">innerRetriever</span>.<span class="hljs-title function_">invoke</span>(query);
+
+    <span class="hljs-keyword">const</span> compressed = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(
+      docs.<span class="hljs-title function_">map</span>(<span class="hljs-title function_">async</span> (doc) =&gt; {
+        <span class="hljs-keyword">const</span> { relevantExcerpt } = <span class="hljs-keyword">await</span> extractionChain.<span class="hljs-title function_">invoke</span>({
+          query,
+          <span class="hljs-attr">document</span>: doc.<span class="hljs-property">pageContent</span>,
+        });
+        <span class="hljs-keyword">if</span> (!relevantExcerpt) <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+        <span class="hljs-keyword">return</span> { ...doc, <span class="hljs-attr">pageContent</span>: relevantExcerpt };
+      })
+    );
+
+    <span class="hljs-keyword">return</span> compressed.<span class="hljs-title function_">filter</span>((d): d is <span class="hljs-title class_">Document</span> =&gt; d !== <span class="hljs-literal">null</span>);
+  }
+}</code></pre></div>
+<h3 id="69-building-the-full-stack-for-a-clause"><a class="heading-anchor" href="#69-building-the-full-stack-for-a-clause" aria-hidden="true">#</a>6.9 Building the full stack for a clause</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/retrievers/index.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">LegalKnowledgeBaseRetriever</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./base&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MmrRetriever</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./mmr&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MultiQueryRetriever</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./multiQuery&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ContextualCompressionRetriever</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./contextualCompression&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">FETCH_K</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">RETRIEVER_FETCH_K</span> ?? <span class="hljs-number">20</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">FINAL_K</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">RETRIEVER_FINAL_K</span> ?? <span class="hljs-number">5</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">MMR_LAMBDA</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">RETRIEVER_MMR_LAMBDA</span> ?? <span class="hljs-number">0.6</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">REFORMULATION_COUNT</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">MULTI_QUERY_REFORMULATIONS</span> ?? <span class="hljs-number">3</span>);
+
+<span class="hljs-comment">/**
+ * Composes the full 4-layer retriever stack for a given set of doc_groups.
+ * Built fresh per clause since doc_groups differ per clause type - cheap to
+ * construct, all the real cost is in the .invoke() calls themselves.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">buildRetrieverStack</span>(<span class="hljs-params"><span class="hljs-attr">docGroups</span>: <span class="hljs-built_in">string</span>[]</span>) {
+  <span class="hljs-keyword">const</span> base = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LegalKnowledgeBaseRetriever</span>({ docGroups, <span class="hljs-attr">fetchK</span>: <span class="hljs-variable constant_">FETCH_K</span> });
+  <span class="hljs-keyword">const</span> mmr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MmrRetriever</span>({ <span class="hljs-attr">baseRetriever</span>: base, <span class="hljs-attr">finalK</span>: <span class="hljs-variable constant_">FINAL_K</span>, <span class="hljs-attr">lambda</span>: <span class="hljs-variable constant_">MMR_LAMBDA</span> });
+  <span class="hljs-keyword">const</span> multiQuery = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MultiQueryRetriever</span>({
+    <span class="hljs-attr">innerRetriever</span>: mmr,
+    <span class="hljs-attr">reformulationCount</span>: <span class="hljs-variable constant_">REFORMULATION_COUNT</span>,
+  });
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ContextualCompressionRetriever</span>({ <span class="hljs-attr">innerRetriever</span>: multiQuery });
+}</code></pre></div>
+<h3 id="610-risk-finding-schema-and-scoring-chain"><a class="heading-anchor" href="#610-risk-finding-schema-and-scoring-chain" aria-hidden="true">#</a>6.10 Risk finding schema and scoring chain</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/schemas.ts</span>
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">RiskFindingSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">riskLevel</span>: z.<span class="hljs-title function_">enum</span>([<span class="hljs-string">&quot;LOW&quot;</span>, <span class="hljs-string">&quot;MEDIUM&quot;</span>, <span class="hljs-string">&quot;HIGH&quot;</span>]).<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Overall risk level of this clause&quot;</span>),
+  <span class="hljs-attr">riskScore</span>: z.<span class="hljs-title function_">number</span>().<span class="hljs-title function_">min</span>(<span class="hljs-number">0</span>).<span class="hljs-title function_">max</span>(<span class="hljs-number">100</span>).<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Numeric risk score, 0 (no risk) to 100 (severe risk)&quot;</span>),
+  <span class="hljs-attr">reasoning</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Plain-language explanation of the risk, grounded in the provided legal context&quot;</span>),
+  <span class="hljs-attr">fixSuggestion</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A concrete, actionable suggestion to reduce or eliminate this risk&quot;</span>),
+  <span class="hljs-attr">legalReferences</span>: z
+    .<span class="hljs-title function_">array</span>(
+      z.<span class="hljs-title function_">object</span>({
+        <span class="hljs-attr">sourceDocument</span>: z.<span class="hljs-title function_">string</span>(),
+        <span class="hljs-attr">excerpt</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The specific excerpt that justifies this assessment&quot;</span>),
+      })
+    )
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The specific legal references that justify this risk assessment&quot;</span>),
+});
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">RiskFinding</span> = z.<span class="hljs-property">infer</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">RiskFindingSchema</span>&gt;;</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/riskScoringChain.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">Document</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/documents&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">RiskFindingSchema</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./schemas&quot;</span>;
+<span class="hljs-keyword">import</span> { buildRetrieverStack } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./retrievers&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">RISK_SCORING_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> scoringPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;You are a legal risk analyst. Assess the risk of the following contract &quot;</span> +
+      <span class="hljs-string">&quot;clause using ONLY the provided legal context excerpts - do not rely on &quot;</span> +
+      <span class="hljs-string">&quot;general knowledge beyond what&#x27;s given. If the context does not clearly &quot;</span> +
+      <span class="hljs-string">&quot;support a HIGH risk assessment, do not assign one. Every legal reference &quot;</span> +
+      <span class="hljs-string">&quot;you cite must correspond to an excerpt actually provided below.\n\n&quot;</span> +
+      <span class="hljs-string">&quot;Legal context:\n{context}&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Clause type: {clauseType}\nClause text:\n{clauseText}&quot;</span>],
+]);
+
+<span class="hljs-keyword">const</span> scoringChain = scoringPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">RiskFindingSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;score_clause_risk&quot;</span> })
+);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">formatContext</span>(<span class="hljs-params"><span class="hljs-attr">docs</span>: <span class="hljs-title class_">Document</span>[]</span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">if</span> (docs.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;(No relevant legal context was found for this clause.)&quot;</span>;
+  <span class="hljs-keyword">return</span> docs
+    .<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">d, i</span>) =&gt;</span> <span class="hljs-string">`[Reference <span class="hljs-subst">${i + <span class="hljs-number">1</span>}</span> - <span class="hljs-subst">${d.metadata.sourceDocument}</span>]\n<span class="hljs-subst">${d.pageContent}</span>`</span>)
+    .<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n\n&quot;</span>);
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">scoreClauseRisk</span>(<span class="hljs-params">
+  <span class="hljs-attr">clauseType</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">clauseText</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">docGroups</span>: <span class="hljs-built_in">string</span>[]
+</span>) {
+  <span class="hljs-keyword">const</span> retriever = <span class="hljs-title function_">buildRetrieverStack</span>(docGroups);
+  <span class="hljs-keyword">const</span> docs = <span class="hljs-keyword">await</span> retriever.<span class="hljs-title function_">invoke</span>(<span class="hljs-string">`<span class="hljs-subst">${clauseType}</span>: <span class="hljs-subst">${clauseText}</span>`</span>);
+
+  <span class="hljs-keyword">const</span> finding = <span class="hljs-keyword">await</span> scoringChain.<span class="hljs-title function_">invoke</span>({
+    clauseType,
+    clauseText,
+    <span class="hljs-attr">context</span>: <span class="hljs-title function_">formatContext</span>(docs),
+  });
+
+  <span class="hljs-keyword">return</span> { finding, <span class="hljs-attr">retrievedDocs</span>: docs };
+}</code></pre></div>
+<h3 id="611-graph-state"><a class="heading-anchor" href="#611-graph-state" aria-hidden="true">#</a>6.11 Graph state</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/state.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Annotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">RiskFinding</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./schemas&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ClauseWithDocGroups</span> {
+  <span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">clauseType</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">title</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">fullText</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">docGroups</span>: <span class="hljs-built_in">string</span>[];
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">RiskFindingRecord</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">RiskFinding</span> {
+  <span class="hljs-attr">clauseId</span>: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">AnalysisState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">contractId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;(),
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;(),
+  <span class="hljs-attr">clauses</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">ClauseWithDocGroups</span>[]&gt;(),
+
+  <span class="hljs-comment">// Present only inside a Send()-dispatched score_clause branch - overridden</span>
+  <span class="hljs-comment">// per-branch by the Send payload, not set on the shared/global state.</span>
+  <span class="hljs-attr">currentClause</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">ClauseWithDocGroups</span> | <span class="hljs-literal">null</span>&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_existing, incoming</span>) =&gt;</span> incoming,
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span>,
+  }),
+  <span class="hljs-attr">currentFinding</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">RiskFindingRecord</span> | <span class="hljs-literal">null</span>&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_existing, incoming</span>) =&gt;</span> incoming,
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span>,
+  }),
+
+  <span class="hljs-comment">// Concatenating reducer: every parallel branch&#x27;s store_finding call</span>
+  <span class="hljs-comment">// contributes to this same shared list, same pattern as Phase 3&#x27;s</span>
+  <span class="hljs-comment">// rawExtractedClauses field.</span>
+  <span class="hljs-attr">findings</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">RiskFindingRecord</span>[]&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">existing, incoming</span>) =&gt;</span> existing.<span class="hljs-title function_">concat</span>(incoming),
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> [],
+  }),
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">AnalysisStateType</span> = <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">AnalysisState</span>.<span class="hljs-property">State</span>;</code></pre></div>
+<h3 id="612-nodes"><a class="heading-anchor" href="#612-nodes" aria-hidden="true">#</a>6.12 Nodes</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/nodes/resolveDocGroups.ts</span>
+<span class="hljs-keyword">import</span> { resolveDocGroups } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../docGroups&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalysisStateType</span>, <span class="hljs-title class_">ClauseWithDocGroups</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-comment">/**
+ * Runs once, before fan-out: attaches resolved doc_groups to every clause
+ * so each of the N parallel score_clause branches doesn&#x27;t redundantly
+ * recompute the same mapping logic.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolveDocGroupsNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisStateType</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-title class_">AnalysisStateType</span>&gt;&gt; {
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">clauses</span>: <span class="hljs-title class_">ClauseWithDocGroups</span>[] = state.<span class="hljs-property">clauses</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">clause</span>) =&gt;</span> ({
+    ...clause,
+    <span class="hljs-attr">docGroups</span>: <span class="hljs-title function_">resolveDocGroups</span>(clause.<span class="hljs-property">clauseType</span> <span class="hljs-keyword">as</span> <span class="hljs-built_in">any</span>),
+  }));
+  <span class="hljs-keyword">return</span> { clauses };
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/nodes/dispatch.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Send</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalysisStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-comment">/**
+ * The Send() dispatch function: instead of naming one next node, returns
+ * one Send per clause, each targeting &quot;score_clause&quot; with that specific
+ * clause layered into state as currentClause. LangGraph spawns one parallel
+ * execution per Send object - this is the graph-native analogue of Phase
+ * 3&#x27;s Promise.all, now expressed as a first-class, traceable graph edge.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">dispatchClauseScoring</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisStateType</span></span>): <span class="hljs-title class_">Send</span>[] {
+  <span class="hljs-keyword">return</span> state.<span class="hljs-property">clauses</span>.<span class="hljs-title function_">map</span>(
+    <span class="hljs-function">(<span class="hljs-params">clause</span>) =&gt;</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Send</span>(<span class="hljs-string">&quot;score_clause&quot;</span>, { <span class="hljs-attr">currentClause</span>: clause })
+  );
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/nodes/scoreClause.ts</span>
+<span class="hljs-keyword">import</span> { scoreClauseRisk } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../riskScoringChain&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalysisStateType</span>, <span class="hljs-title class_">RiskFindingRecord</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-comment">/**
+ * Runs once per clause, in parallel across all Send()-dispatched branches.
+ * Reads currentClause (this branch&#x27;s override) alongside shared state
+ * fields like analysisRunId - Send-dispatched state is the global state
+ * with the Send payload merged on top, not a fully separate context.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">scoreClauseNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisStateType</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-title class_">AnalysisStateType</span>&gt;&gt; {
+  <span class="hljs-keyword">const</span> clause = state.<span class="hljs-property">currentClause</span>!;
+
+  <span class="hljs-keyword">const</span> { finding } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">scoreClauseRisk</span>(clause.<span class="hljs-property">clauseType</span>, clause.<span class="hljs-property">fullText</span>, clause.<span class="hljs-property">docGroups</span>);
+
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">record</span>: <span class="hljs-title class_">RiskFindingRecord</span> = { ...finding, <span class="hljs-attr">clauseId</span>: clause.<span class="hljs-property">id</span> };
+
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">currentFinding</span>: record };
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/nodes/judgmentLookupStub.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalysisStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+<span class="hljs-keyword">const</span> embeddingsClient = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIEmbeddings</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">EMBEDDING_MODEL</span> ?? <span class="hljs-string">&quot;text-embedding-3-small&quot;</span>,
+});
+
+<span class="hljs-comment">/**
+ * STUB - Phase 4.5 replaces this node&#x27;s body entirely with a real ReAct
+ * agent that decides for itself whether to search case law, search general
+ * precedent, or flag for human review. Kept as its own named node now so
+ * that swap is a one-node replacement, not a graph restructuring.
+ *
+ * For now: a fixed, always-the-same lookup against judgment-type documents
+ * in the knowledge base, for HIGH-risk clauses only.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">judgmentLookupStubNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisStateType</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-title class_">AnalysisStateType</span>&gt;&gt; {
+  <span class="hljs-keyword">const</span> finding = state.<span class="hljs-property">currentFinding</span>!;
+  <span class="hljs-keyword">const</span> [queryEmbedding] = <span class="hljs-keyword">await</span> embeddingsClient.<span class="hljs-title function_">embedDocuments</span>([finding.<span class="hljs-property">reasoning</span>]);
+
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT source_document, content
+     FROM legal_reference_chunks
+     WHERE doc_type = &#x27;judgment&#x27;
+     ORDER BY embedding &lt;=&gt; $1
+     LIMIT 1`</span>,
+    [<span class="hljs-string">`[<span class="hljs-subst">${queryEmbedding.join(<span class="hljs-string">&quot;,&quot;</span>)}</span>]`</span>]
+  );
+
+  <span class="hljs-keyword">if</span> (rows.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> {};
+
+  <span class="hljs-keyword">const</span> updatedFinding = {
+    ...finding,
+    <span class="hljs-attr">legalReferences</span>: [
+      ...finding.<span class="hljs-property">legalReferences</span>,
+      { <span class="hljs-attr">sourceDocument</span>: rows[<span class="hljs-number">0</span>].<span class="hljs-property">source_document</span>, <span class="hljs-attr">excerpt</span>: rows[<span class="hljs-number">0</span>].<span class="hljs-property">content</span>.<span class="hljs-title function_">slice</span>(<span class="hljs-number">0</span>, <span class="hljs-number">500</span>) },
+    ],
+  };
+
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">currentFinding</span>: updatedFinding };
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/nodes/storeFinding.ts</span>
+<span class="hljs-keyword">import</span> { insertRiskFinding } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../storage&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalysisStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">storeFindingNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisStateType</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-title class_">AnalysisStateType</span>&gt;&gt; {
+  <span class="hljs-keyword">const</span> finding = state.<span class="hljs-property">currentFinding</span>!;
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">insertRiskFinding</span>(state.<span class="hljs-property">contractId</span>, state.<span class="hljs-property">analysisRunId</span>, finding);
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">findings</span>: [finding] };
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/nodes/aggregateFindings.ts</span>
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalysisStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+
+<span class="hljs-comment">/**
+ * The join/reduce node: every parallel branch (score_clause -&gt; [judgment_lookup -&gt;]
+ * store_finding) has an edge pointing here. LangGraph waits until ALL active
+ * branches for this superstep have completed before running this node once,
+ * by which point state.findings (concatenating reducer) holds every clause&#x27;s
+ * result exactly once.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">aggregateFindingsNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisStateType</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-title class_">AnalysisStateType</span>&gt;&gt; {
+  <span class="hljs-keyword">const</span> counts = state.<span class="hljs-property">findings</span>.<span class="hljs-title function_">reduce</span>(
+    <span class="hljs-function">(<span class="hljs-params">acc, f</span>) =&gt;</span> {
+      acc[f.<span class="hljs-property">riskLevel</span>] = (acc[f.<span class="hljs-property">riskLevel</span>] ?? <span class="hljs-number">0</span>) + <span class="hljs-number">1</span>;
+      <span class="hljs-keyword">return</span> acc;
+    },
+    {} <span class="hljs-keyword">as</span> <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">number</span>&gt;
+  );
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+    <span class="hljs-string">`[analysis <span class="hljs-subst">${state.analysisRunId}</span>] complete: <span class="hljs-subst">${state.findings.length}</span> findings`</span>,
+    counts
+  );
+
+  <span class="hljs-keyword">return</span> {};
+}</code></pre></div>
+<h3 id="613-routing-function"><a class="heading-anchor" href="#613-routing-function" aria-hidden="true">#</a>6.13 Routing function</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/routing.ts</span>
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">AnalysisStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./state&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">routeByRisk</span>(<span class="hljs-params"><span class="hljs-attr">state</span>: <span class="hljs-title class_">AnalysisStateType</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> state.<span class="hljs-property">currentFinding</span>?.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;HIGH&quot;</span> ? <span class="hljs-string">&quot;judgment_lookup&quot;</span> : <span class="hljs-string">&quot;store_finding&quot;</span>;
+}</code></pre></div>
+<h3 id="614-graph-construction-with-checkpointing"><a class="heading-anchor" href="#614-graph-construction-with-checkpointing" aria-hidden="true">#</a>6.14 Graph construction with checkpointing</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/graph.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">PostgresSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-postgres&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AnalysisState</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./state&quot;</span>;
+<span class="hljs-keyword">import</span> { resolveDocGroupsNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/resolveDocGroups&quot;</span>;
+<span class="hljs-keyword">import</span> { dispatchClauseScoring } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/dispatch&quot;</span>;
+<span class="hljs-keyword">import</span> { scoreClauseNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/scoreClause&quot;</span>;
+<span class="hljs-keyword">import</span> { judgmentLookupStubNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/judgmentLookupStub&quot;</span>;
+<span class="hljs-keyword">import</span> { storeFindingNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/storeFinding&quot;</span>;
+<span class="hljs-keyword">import</span> { aggregateFindingsNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/aggregateFindings&quot;</span>;
+<span class="hljs-keyword">import</span> { routeByRisk } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./routing&quot;</span>;
+
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-title class_">PostgresSaver</span>.<span class="hljs-title function_">fromConnString</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span>!);
+
+<span class="hljs-comment">/**
+ * Call this once at application startup - it creates PostgresSaver&#x27;s own
+ * checkpoint tables if they don&#x27;t already exist. Idempotent, but there&#x27;s no
+ * reason to call it more than once per environment.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">setupCheckpointer</span>(<span class="hljs-params"></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">await</span> checkpointer.<span class="hljs-title function_">setup</span>();
+}
+
+<span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">AnalysisState</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;resolve_doc_groups&quot;</span>, resolveDocGroupsNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;score_clause&quot;</span>, scoreClauseNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;judgment_lookup&quot;</span>, judgmentLookupStubNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;store_finding&quot;</span>, storeFindingNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;aggregate_findings&quot;</span>, aggregateFindingsNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;resolve_doc_groups&quot;</span>)
+  <span class="hljs-comment">// Send()-based dynamic fan-out: one score_clause execution per clause.</span>
+  .<span class="hljs-title function_">addConditionalEdges</span>(<span class="hljs-string">&quot;resolve_doc_groups&quot;</span>, dispatchClauseScoring)
+  <span class="hljs-comment">// Per-branch conditional routing by risk level.</span>
+  .<span class="hljs-title function_">addConditionalEdges</span>(<span class="hljs-string">&quot;score_clause&quot;</span>, routeByRisk, {
+    <span class="hljs-attr">judgment_lookup</span>: <span class="hljs-string">&quot;judgment_lookup&quot;</span>,
+    <span class="hljs-attr">store_finding</span>: <span class="hljs-string">&quot;store_finding&quot;</span>,
+  })
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;judgment_lookup&quot;</span>, <span class="hljs-string">&quot;store_finding&quot;</span>)
+  <span class="hljs-comment">// Every branch converges here - the reduce/join step.</span>
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;store_finding&quot;</span>, <span class="hljs-string">&quot;aggregate_findings&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;aggregate_findings&quot;</span>, <span class="hljs-variable constant_">END</span>);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> analysisGraph = graph.<span class="hljs-title function_">compile</span>({ checkpointer });</code></pre></div>
+<h3 id="615-storage"><a class="heading-anchor" href="#615-storage" aria-hidden="true">#</a>6.15 Storage</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/analysis/storage.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">RiskFindingRecord</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./state&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">insertRiskFinding</span>(<span class="hljs-params">
+  <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">finding</span>: <span class="hljs-title class_">RiskFindingRecord</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`INSERT INTO risk_findings
+       (contract_id, clause_id, analysis_run_id, risk_level, risk_score,
+        reasoning, fix_suggestion, legal_references)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`</span>,
+    [
+      contractId,
+      finding.<span class="hljs-property">clauseId</span>,
+      analysisRunId,
+      finding.<span class="hljs-property">riskLevel</span>,
+      finding.<span class="hljs-property">riskScore</span>,
+      finding.<span class="hljs-property">reasoning</span>,
+      finding.<span class="hljs-property">fixSuggestion</span>,
+      <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(finding.<span class="hljs-property">legalReferences</span>),
+    ]
+  );
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getFindingsForRun</span>(<span class="hljs-params"><span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT * FROM risk_findings WHERE analysis_run_id = $1 ORDER BY created_at ASC`</span>,
+    [analysisRunId]
+  );
+  <span class="hljs-keyword">return</span> rows;
+}</code></pre></div>
+<h3 id="616-orchestration-and-audit-routes"><a class="heading-anchor" href="#616-orchestration-and-audit-routes" aria-hidden="true">#</a>6.16 Orchestration and audit routes</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/routes/analysis.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Router</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;express&quot;</span>;
+<span class="hljs-keyword">import</span> { randomUUID } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;crypto&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { analysisGraph } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../analysis/graph&quot;</span>;
+<span class="hljs-keyword">import</span> { getFindingsForRun } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../analysis/storage&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> analysisRouter = <span class="hljs-title class_">Router</span>();
+
+analysisRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/contracts/:id/analysis/start&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { id } = req.<span class="hljs-property">params</span>;
+
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT id, clause_type, title, full_text FROM clauses WHERE contract_id = $1`</span>,
+    [id]
+  );
+  <span class="hljs-keyword">if</span> (rows.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;No extracted clauses found for this contract.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> analysisRunId = <span class="hljs-title function_">randomUUID</span>();
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: analysisRunId } };
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> analysisGraph.<span class="hljs-title function_">invoke</span>(
+      {
+        <span class="hljs-attr">contractId</span>: id,
+        analysisRunId,
+        <span class="hljs-attr">clauses</span>: rows.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> ({
+          <span class="hljs-attr">id</span>: r.<span class="hljs-property">id</span>,
+          <span class="hljs-attr">clauseType</span>: r.<span class="hljs-property">clause_type</span>,
+          <span class="hljs-attr">title</span>: r.<span class="hljs-property">title</span>,
+          <span class="hljs-attr">fullText</span>: r.<span class="hljs-property">full_text</span>,
+          <span class="hljs-attr">docGroups</span>: [],
+        })),
+      },
+      config
+    );
+
+    <span class="hljs-keyword">const</span> findings = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getFindingsForRun</span>(analysisRunId);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">201</span>).<span class="hljs-title function_">json</span>({ analysisRunId, findings });
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Risk analysis failed:&quot;</span>, err);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Analysis failed.&quot;</span>, analysisRunId });
+  }
+});
+
+analysisRouter.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/analysis/:threadId/state&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: req.<span class="hljs-property">params</span>.<span class="hljs-property">threadId</span> } };
+  <span class="hljs-keyword">const</span> state = <span class="hljs-keyword">await</span> analysisGraph.<span class="hljs-title function_">getState</span>(config);
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">values</span>: state.<span class="hljs-property">values</span>, <span class="hljs-attr">next</span>: state.<span class="hljs-property">next</span> });
+});
+
+analysisRouter.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/analysis/:threadId/history&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: req.<span class="hljs-property">params</span>.<span class="hljs-property">threadId</span> } };
+  <span class="hljs-keyword">const</span> history = [];
+
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> checkpoint <span class="hljs-keyword">of</span> analysisGraph.<span class="hljs-title function_">getStateHistory</span>(config)) {
+    history.<span class="hljs-title function_">push</span>({
+      <span class="hljs-attr">checkpointId</span>: checkpoint.<span class="hljs-property">config</span>.<span class="hljs-property">configurable</span>?.<span class="hljs-property">checkpoint_id</span>,
+      <span class="hljs-attr">node</span>: checkpoint.<span class="hljs-property">metadata</span>?.<span class="hljs-property">source</span>,
+      <span class="hljs-attr">values</span>: checkpoint.<span class="hljs-property">values</span>,
+    });
+  }
+
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ history });
+});
+
+analysisRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/analysis/:threadId/revert&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { threadId } = req.<span class="hljs-property">params</span>;
+  <span class="hljs-keyword">const</span> { checkpointId, correctedFinding } = req.<span class="hljs-property">body</span>;
+
+  <span class="hljs-keyword">const</span> config = {
+    <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: threadId, <span class="hljs-attr">checkpoint_id</span>: checkpointId },
+  };
+
+  <span class="hljs-comment">// Creates a new checkpoint branching off the given point, as if the</span>
+  <span class="hljs-comment">// &quot;store_finding&quot; node itself had produced this corrected value - the</span>
+  <span class="hljs-comment">// original run&#x27;s history remains fully intact alongside this fork.</span>
+  <span class="hljs-keyword">await</span> analysisGraph.<span class="hljs-title function_">updateState</span>(config, { <span class="hljs-attr">currentFinding</span>: correctedFinding }, <span class="hljs-string">&quot;store_finding&quot;</span>);
+
+  <span class="hljs-comment">// Resume execution from the corrected checkpoint onward.</span>
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> analysisGraph.<span class="hljs-title function_">invoke</span>(<span class="hljs-literal">null</span>, config);
+
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">resumed</span>: <span class="hljs-literal">true</span>, result });
+});</code></pre></div>
+<p>Wire it in, and call <code class="inline-code">setupCheckpointer()</code> once at startup:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/app.ts (excerpt)</span>
+<span class="hljs-keyword">import</span> { analysisRouter } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./routes/analysis&quot;</span>;
+<span class="hljs-keyword">import</span> { setupCheckpointer } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./analysis/graph&quot;</span>;
+
+<span class="hljs-keyword">await</span> <span class="hljs-title function_">setupCheckpointer</span>();
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api&quot;</span>, analysisRouter);</code></pre></div>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── src/
+│   ├── analysis/
+│   │   ├── docGroups.ts
+│   │   ├── schemas.ts
+│   │   ├── riskScoringChain.ts
+│   │   ├── state.ts
+│   │   ├── routing.ts
+│   │   ├── storage.ts
+│   │   ├── graph.ts
+│   │   ├── retrievers/
+│   │   │   ├── base.ts
+│   │   │   ├── mmr.ts
+│   │   │   ├── multiQuery.ts
+│   │   │   ├── contextualCompression.ts
+│   │   │   └── index.ts
+│   │   └── nodes/
+│   │       ├── resolveDocGroups.ts
+│   │       ├── dispatch.ts
+│   │       ├── scoreClause.ts
+│   │       ├── judgmentLookupStub.ts
+│   │       ├── storeFinding.ts
+│   │       └── aggregateFindings.ts
+│   ├── routes/
+│   │   └── analysis.ts
+│   └── app.ts
+├── migrations/
+│   └── 005_risk_findings.sql</code></pre></div>
+<h3 id="request--execution-flow"><a class="heading-anchor" href="#request--execution-flow" aria-hidden="true">#</a>Request / execution flow</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">POST /api/contracts/:id/analysis/start
+  │
+  ▼
+Load clauses for contract (404 if none extracted yet — run Phase 3 first)
+  │
+  ▼
+analysisGraph.invoke({ contractId, analysisRunId, clauses }, { thread_id })
+  │
+  ├─ resolve_doc_groups                     — attach doc_groups per clause
+  │
+  ├─ Send() dispatch → score_clause (× N)   — parallel, one per clause
+  │      each: retriever stack (base→MMR→MultiQuery→Compression) → LLM score
+  │
+  ├─ per branch: routeByRisk
+  │      HIGH   → judgment_lookup (stub) → store_finding
+  │      other  → store_finding directly
+  │
+  ├─ ALL branches converge → aggregate_findings   (runs once)
+  │
+  ▼
+HTTP 201 { analysisRunId, findings }
+
+Later, independently:
+GET  /api/analysis/:threadId/state     → current checkpoint
+GET  /api/analysis/:threadId/history   → every checkpoint, in order
+POST /api/analysis/:threadId/revert    → fork + resume from a past checkpoint</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong><code class="inline-code">Send()</code> fan-out over a sequential loop:</strong> clauses are fully independent; there&#39;s no correctness reason to score them one at a time, and doing so would make large-contract analysis latency scale linearly with clause count for no benefit.</li>
+<li><strong>Decorator-composed retrievers, each independently testable:</strong> you can disable/swap any single layer (e.g. test with MMR but without Multi-Query) without touching the others, which is exactly what the staged-build recommendation in section 3.1 depends on.</li>
+<li><strong><code class="inline-code">PostgresSaver</code> over <code class="inline-code">MemorySaver</code> in production:</strong> the audit/time-travel feature is a hard product requirement here, not an optional nicety, and only a persistent checkpointer supports inspecting a run after the process has restarted.</li>
+<li><strong>A named <code class="inline-code">judgment_lookup</code> stub node, not inline logic inside <code class="inline-code">score_clause</code>:</strong> Phase 4.5 needs a clean seam to replace fixed lookup logic with real agent reasoning — giving it its own node now means that swap doesn&#39;t require touching the graph&#39;s edges at all.</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Ground every risk finding strictly in retrieved context, and require the model to cite the specific excerpts it used (<code class="inline-code">legalReferences</code>) — this is both a quality and an auditability requirement for a legal-adjacent tool.</li>
+<li>Treat the checkpointer the same way you treat any other shared client — instantiate once, reuse across requests.</li>
+<li>Keep <code class="inline-code">temperature: 0</code> for the risk-scoring, compression-extraction, and routing-relevant chains; only the Multi-Query reformulation step benefits from a touch of variety (<code class="inline-code">0.3</code>), and only there.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li><code class="inline-code">Send()</code>-based fan-out means analysis latency for a contract scales with the <em>slowest</em> individual clause&#39;s retrieval+scoring time, not the sum of all clauses — a meaningful win once you&#39;re processing 40+ clause contracts.</li>
+<li>Watch your OpenAI rate limits once contract volume grows: many parallel <code class="inline-code">score_clause</code> branches, each running 4 retriever layers plus a scoring call, can burst a large number of concurrent API calls. A concurrency limiter (e.g. <code class="inline-code">p-limit</code> wrapping the retriever stack&#39;s LLM calls) is worth adding before this goes to real production load, even though it&#39;s not strictly necessary for correctness at moderate volume.</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Never log full clause text or full legal excerpts to application logs — log clause IDs, risk levels, and counts only, consistent with every prior phase&#39;s confidentiality discipline.</li>
+<li><code class="inline-code">thread_id</code>s are effectively access tokens to a specific analysis run&#39;s full history — validate that the requesting user actually owns the underlying <code class="inline-code">contract_id</code> before serving <code class="inline-code">/analysis/:threadId/*</code> endpoints once auth exists (same open item noted in Phase 2.5).</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li>Contextual Compression trims token usage right before the most expensive part of the pipeline (the final risk-scoring call) — log before/after token counts during your staged testing to confirm it&#39;s earning its keep on your real corpus, not just in theory.</li>
+<li>Building the retriever stack fresh per clause is cheap (it&#39;s just object construction); the real cost is entirely in the <code class="inline-code">.invoke()</code> calls, so there&#39;s no need to cache or pool retriever <em>instances</em> themselves.</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Keep <code class="inline-code">routeByRisk</code> and <code class="inline-code">dispatchClauseScoring</code> as small, standalone, named functions — they&#39;re the two places graph <em>structure</em> depends on runtime data, and they deserve to be easy to find and unit test in isolation from the nodes themselves.</li>
+<li>Every retriever layer implements the exact same interface — when Phase 6.5 needs a variant retrieval strategy for a different specialist agent, it&#39;s a new decorator, not a rewrite.</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test <code class="inline-code">MmrRetriever</code> with a small fixture of known embeddings where you can hand-calculate the expected selection order — assert it actually diversifies rather than just re-sorting by similarity.</li>
+<li>Unit test <code class="inline-code">routeByRisk</code> and <code class="inline-code">dispatchClauseScoring</code> directly against constructed state objects, with no real graph or LLM involved.</li>
+<li>Integration test the full graph against a small fixture contract with a mix of clause types, using <code class="inline-code">MemorySaver</code> (not <code class="inline-code">PostgresSaver</code>) for test isolation — assert <code class="inline-code">findings.length === clauses.length</code> and that at least one HIGH-risk clause (crafted into the fixture) routed through <code class="inline-code">judgment_lookup</code>.</li>
+<li>Explicitly test <code class="inline-code">updateState</code> + resume against a completed test run — assert the corrected clause&#39;s finding changes while every other finding&#39;s <code class="inline-code">risk_score</code> and <code class="inline-code">reasoning</code> remain byte-for-byte identical to the pre-correction run.</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>How MMR, Multi-Query, and Contextual Compression retrievers each solve a distinct weakness of plain similarity search, and how they compose cleanly as decorators around the same basic retriever interface from Phase 2.5.</li>
+<li><code class="inline-code">Send()</code> as the graph-native way to dynamically fan a node out over a runtime-determined list — the direct successor to Phase 3&#39;s <code class="inline-code">Promise.all</code>, now expressed as a first-class, traceable, conditionally-routable part of the graph itself.</li>
+<li>Conditional edges (<code class="inline-code">addConditionalEdges</code>) as LangGraph&#39;s equivalent of Phase 2&#39;s <code class="inline-code">RunnableBranch</code>, and how multiple parallel branches converging on a shared downstream node is what makes the map-reduce join actually work, backed by a concatenating reducer.</li>
+<li>What a checkpointer is actually for: not just fault tolerance, but making a graph run <strong>durably inspectable</strong> — <code class="inline-code">thread_id</code>-scoped state that survives past the original request/response cycle.</li>
+<li><code class="inline-code">getState</code>, <code class="inline-code">getStateHistory</code>, and <code class="inline-code">updateState</code> as a genuine product feature (auditable, surgical correction of one finding) rather than a debugging convenience — and why forking from a checkpoint, rather than re-running the whole graph, is the only way to correct one clause without risking silent changes to every other clause&#39;s result.</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li>The full 4-layer retriever stack (base, MMR, Multi-Query, Contextual Compression).</li>
+<li><code class="inline-code">RiskFindingSchema</code> and a grounded, citation-requiring risk-scoring chain.</li>
+<li>A compiled, checkpointed LangGraph graph implementing <code class="inline-code">Send()</code>-based parallel clause scoring, conditional HIGH-risk routing to a <code class="inline-code">judgment_lookup</code> stub, and a map-reduce join into <code class="inline-code">aggregate_findings</code>.</li>
+<li><code class="inline-code">risk_findings</code> table and storage layer.</li>
+<li>Orchestration (<code class="inline-code">POST /analysis/start</code>) and full audit endpoints (<code class="inline-code">state</code>, <code class="inline-code">history</code>, <code class="inline-code">revert</code>) built on <code class="inline-code">getState</code>/<code class="inline-code">getStateHistory</code>/<code class="inline-code">updateState</code>.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Running the hands-on tasks against real contracts of varying length and clause diversity, validating both retrieval quality (via the staged-build comparisons) and the time-travel correction flow end to end (tasks 15-17 — yours to execute).</li>
+<li>Everything from Phase 4.5 onward, which builds directly on top of this phase&#39;s graph and output.</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+Phase 4.5 (Legal Research Agent) replaces exactly one thing in this phase&#39;s graph: the body of the <code class="inline-code">judgment_lookup</code> node. Right now, it&#39;s a stub that always does the same fixed similarity search. Phase 4.5 rebuilds it as a real agent — first as a hand-rolled LangChain <code class="inline-code">AgentExecutor</code> with a ReAct loop, then as a LangGraph <code class="inline-code">createReactAgent()</code> + <code class="inline-code">ToolNode</code> — that decides for itself, per HIGH-risk clause, whether to search Indian Kanoon, search general case precedent, or flag the clause for human review. Because this phase built <code class="inline-code">judgment_lookup</code> as its own clearly-scoped node rather than inline logic, that upgrade slots into the exact same graph position, with every other node, edge, and the checkpointer/audit infrastructure completely unchanged.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

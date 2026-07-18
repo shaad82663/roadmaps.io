@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 5: Report Generator</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 5: Report Generator</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-5-report-generator"><a class="heading-anchor" href="#legaldocs--phase-5-report-generator" aria-hidden="true">#</a>LegalDocs — Phase 5: Report Generator</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL (Phase 0/1), <strong>LangGraph.js Functional API (<code class="inline-code">entrypoint</code>, <code class="inline-code">task</code>) — first use in the project</strong>, <code class="inline-code">docx</code> (npm), Zod
+<strong>Depends on:</strong> Phase 3 (<code class="inline-code">clauses</code> — titles/text surfaced per finding), Phase 4 (<code class="inline-code">risk_findings</code>, the <code class="inline-code">thread_id</code>/<code class="inline-code">analysis_run_id</code>, the checkpointer&#39;s completed run), Phase 4.5 (<code class="inline-code">reviewFlagged</code> / <code class="inline-code">reviewReason</code> and agent-sourced <code class="inline-code">legalReferences</code> on each finding)
+<strong>Feeds into:</strong> Phase 6 (whatever consumes a completed, downloadable report as a deliverable — a dashboard, a notification, a client-facing share link); Phase 6.5 (the Supervisor&#39;s natural terminal action, once an analysis run completes, is to trigger this phase&#39;s workflow)</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>Turn a completed analysis run&#39;s <code class="inline-code">risk_findings</code> rows — enriched by both Phase 4&#39;s scoring and Phase 4.5&#39;s legal grounding — into a single, polished, professional <strong>DOCX risk report</strong>: a cover page identifying the contract, an executive summary written in plain language, one detailed section per clause finding grouped by risk level, a visually distinct treatment for any clause Phase 4.5 flagged for human review, and an appendix of the specific legal references cited. The output is a real file, stored durably and available for download, not another JSON payload.</p>
+<p>This phase also introduces a second way to orchestrate a multi-step pipeline: LangGraph&#39;s <strong>Functional API</strong> (<code class="inline-code">entrypoint</code> / <code class="inline-code">task</code>), used here deliberately in contrast to Phase 3 and 4&#39;s <code class="inline-code">StateGraph</code>. Where Phase 4&#39;s problem genuinely needed a graph (dynamic fan-out, conditional branching, checkpointed audit history across many parallel branches), this phase&#39;s problem is a straight line — fetch data, write a summary, render a document, store it — and building a full <code class="inline-code">StateGraph</code> for a straight line would be paying graph-shaped overhead for a shape that never branches. The Functional API is LangGraph&#39;s answer to exactly that mismatch: durable, traceable, individually-retryable steps, expressed as plain <code class="inline-code">async</code>/<code class="inline-code">await</code> code instead of nodes and edges.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>Every phase before this one produced data that lived in your database and your API responses — useful to a frontend, invisible to anyone else. This is the first phase whose output is something a person outside your system can actually hold: a document they can email to a client, attach to a compliance file, or print for a signature meeting. That changes the bar. A JSON array of risk findings can afford to look a little rough around the edges; a document with your product&#39;s name on it, handed to a lawyer or a business owner, cannot.</p>
+<p>It&#39;s also the first phase that has to make an editorial decision your data alone doesn&#39;t make for you: <strong>how much confidence to project.</strong> Phase 4.5 gave you a <code class="inline-code">reviewFlagged</code> signal specifically so a clause with no solid legal grounding could be flagged rather than silently cited as if it were fully justified. If this phase&#39;s report presents a <code class="inline-code">reviewFlagged</code> clause with the same visual and rhetorical confidence as a fully-grounded HIGH-risk finding, all of Phase 4.5&#39;s honesty work is wasted the moment it reaches a reader. Getting that distinction right in the actual rendered document — not just in the underlying data — is the real point of this phase.</p>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">              ┌───────────────────────────┐
+              │  risk_findings (Phase 4)    │
+              │  + reviewFlagged (Ph. 4.5)   │
+              └─────────────┬─────────────┘
+                            │
+              ┌─────────────▼─────────────┐
+              │   PHASE 5 — Report Generator│
+              │   (LangGraph Functional API) │
+              │                              │
+              │  entrypoint(&quot;generate_report&quot;)│
+              │     │                         │
+              │  task: fetchReportData          │
+              │     │                         │
+              │  task: generateExecutiveSummary │  (grounded LLM call)
+              │     │                         │
+              │  task: renderReportDocx         │  (plain rendering, no LLM)
+              │     │                         │
+              │  task: storeReport              │
+              └─────────────┬─────────────┘
+                            │
+              ┌─────────────▼─────────────┐
+              │  generated_reports table    │
+              │  + a .docx file on disk      │
+              └─────────────┬─────────────┘
+                            │
+                     Phase 6 / 6.5
+              (surfaces the download, or
+               triggers this workflow itself)</code></pre></div>
+<p>This phase&#39;s deliverables are: a <code class="inline-code">generated_reports</code> table row per report, an actual <code class="inline-code">.docx</code> file on durable storage, and two endpoints (<code class="inline-code">generate</code>, <code class="inline-code">download</code>).</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-why-this-phase-does-not-need-another-stategraph"><a class="heading-anchor" href="#21-why-this-phase-does-not-need-another-stategraph" aria-hidden="true">#</a>2.1 Why this phase does <em>not</em> need another <code class="inline-code">StateGraph</code></h3>
+<p>Look at what this pipeline actually needs to do: load one analysis run&#39;s data, write one summary of it, render one document from it, save that document once. There is no dynamic list to fan out over (Phase 4&#39;s <code class="inline-code">Send()</code> had one), no point where the next step depends on a runtime decision (Phase 4&#39;s <code class="inline-code">routeByRisk</code> had one), and no need to converge multiple parallel branches back into a shared list (Phase 4&#39;s <code class="inline-code">aggregate_findings</code> had one). It is, structurally, four steps in a straight line.</p>
+<p>You <em>could</em> still build a <code class="inline-code">StateGraph</code> for this — an <code class="inline-code">Annotation.Root</code> state, four nodes, three fixed edges, <code class="inline-code">START</code> and <code class="inline-code">END</code>. It would work. But every one of those pieces (the reducer question for every field, the edge-wiring, the separate node files) is machinery that exists specifically to support branching, fan-out, and multi-path convergence — none of which this pipeline has. Reaching for <code class="inline-code">StateGraph</code> here would be using the tool that solves &quot;a graph of possible paths&quot; on a problem that only ever has one path.</p>
+<p>The Functional API is LangGraph&#39;s deliberate alternative for exactly this shape: <strong>a linear (or simply-structured) pipeline that still wants LangGraph&#39;s operational benefits</strong> — tracing, durable checkpointing, per-step retry — <strong>without the ceremony of declaring state, nodes, and edges for something that was never going to branch.</strong></p>
+<h3 id="22-task--a-plain-async-function-that-becomes-individually-traceable-and-retryable"><a class="heading-anchor" href="#22-task--a-plain-async-function-that-becomes-individually-traceable-and-retryable" aria-hidden="true">#</a>2.2 <code class="inline-code">task</code> — a plain async function that becomes individually traceable and retryable</h3>
+<p><code class="inline-code">task()</code> wraps an ordinary <code class="inline-code">async</code> function. The wrapped version behaves identically from a call-site perspective (<code class="inline-code">await someTask(args)</code> still just runs the function and returns its result) — what changes is what happens <em>around</em> the call: LangSmith records it as a distinct traced step (so a report-generation trace shows &quot;fetch data → summarize → render → store&quot; as clearly as Phase 4&#39;s node-by-node trace does), and — when the surrounding <code class="inline-code">entrypoint</code> has a checkpointer attached — the task&#39;s result is durably recorded against its inputs, so a replayed run can skip re-executing a task whose inputs haven&#39;t changed rather than blindly re-running everything from the top.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> fetchReportData = <span class="hljs-title function_">task</span>(<span class="hljs-string">&quot;fetch_report_data&quot;</span>, <span class="hljs-title function_">async</span> (<span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>) =&gt; {
+  <span class="hljs-comment">// ... plain async work, e.g. a database query</span>
+});</code></pre></div>
+<p>Nothing here is LLM-specific. A <code class="inline-code">task</code> can wrap an LLM call (like the executive summary step) just as naturally as it wraps a database query or a pure rendering function with no I/O at all — <code class="inline-code">task</code> is a generic &quot;make this step a durable, traceable unit,&quot; not a wrapper specifically for model calls.</p>
+<h3 id="23-entrypoint--the-orchestration-is-just-the-function-body"><a class="heading-anchor" href="#23-entrypoint--the-orchestration-is-just-the-function-body" aria-hidden="true">#</a>2.3 <code class="inline-code">entrypoint</code> — the orchestration is just the function body</h3>
+<p><code class="inline-code">entrypoint()</code> wraps the <em>whole workflow</em>. Its body is where the actual difference from <code class="inline-code">StateGraph</code> is most visible: instead of declaring nodes and wiring edges between them, you write plain, ordinary <code class="inline-code">async</code> code — <code class="inline-code">await</code> one task, use its result as the input to the next, <code class="inline-code">if</code> a branch is ever needed, <code class="inline-code">for</code> a loop is ever needed.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> generateReportWorkflow = <span class="hljs-title function_">entrypoint</span>(
+  { checkpointer, <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;generate_report&quot;</span> },
+  <span class="hljs-title function_">async</span> (<span class="hljs-attr">input</span>: { <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span> }) =&gt; {
+    <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchReportData</span>(input.<span class="hljs-property">analysisRunId</span>);
+    <span class="hljs-keyword">const</span> summary = <span class="hljs-keyword">await</span> <span class="hljs-title function_">generateExecutiveSummary</span>(data);
+    <span class="hljs-keyword">const</span> buffer = <span class="hljs-keyword">await</span> <span class="hljs-title function_">renderReportDocx</span>(data, summary);
+    <span class="hljs-keyword">const</span> record = <span class="hljs-keyword">await</span> <span class="hljs-title function_">storeReport</span>(input.<span class="hljs-property">analysisRunId</span>, data.<span class="hljs-property">contractId</span>, buffer, data);
+    <span class="hljs-keyword">return</span> record;
+  }
+);</code></pre></div>
+<p>Read that function top to bottom and you have read the entire pipeline. There is no second file to cross-reference for &quot;what runs after <code class="inline-code">fetchReportData</code>&quot; — the answer is simply &quot;whatever line comes next.&quot; This is the direct trade this API makes: you give up <code class="inline-code">StateGraph</code>&#39;s ability to express branching and parallel fan-out as first-class, inspectable graph structure, and in exchange you get to write the orchestration in the same style as every other function you&#39;ve ever written, while still keeping tracing and durability.</p>
+<h3 id="24-stategraph-vs-functional-api--a-direct-comparison"><a class="heading-anchor" href="#24-stategraph-vs-functional-api--a-direct-comparison" aria-hidden="true">#</a>2.4 <code class="inline-code">StateGraph</code> vs. Functional API — a direct comparison</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><code class="inline-code">StateGraph</code> (Phase 3, 4)</th>
+<th>Functional API (this phase)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>How you express &quot;what runs after what&quot;</td>
+<td>Declared edges between named nodes</td>
+<td>Plain sequential code — the next line</td>
+</tr>
+<tr>
+<td>Branching / conditional routing</td>
+<td>First-class (<code class="inline-code">addConditionalEdges</code>)</td>
+<td>Ordinary <code class="inline-code">if</code>/<code class="inline-code">else</code> in the function body</td>
+</tr>
+<tr>
+<td>Dynamic parallel fan-out over a runtime list</td>
+<td>First-class (<code class="inline-code">Send()</code>)</td>
+<td>Ordinary <code class="inline-code">Promise.all</code> over a plain array, same as Phase 3&#39;s window extraction</td>
+</tr>
+<tr>
+<td>Multiple branches converging</td>
+<td>First-class (shared downstream node + reducer)</td>
+<td>N/A — nothing to converge, because nothing branched</td>
+</tr>
+<tr>
+<td>Per-step tracing</td>
+<td>Yes, per node</td>
+<td>Yes, per <code class="inline-code">task</code></td>
+</tr>
+<tr>
+<td>Durable checkpointing</td>
+<td>Yes, per superstep, inspectable via <code class="inline-code">getState</code>/<code class="inline-code">getStateHistory</code></td>
+<td>Yes, per task result, but there is no separate audit-trail API to browse — durability here is about efficient/correct replay, not a reviewer-facing history feature</td>
+</tr>
+<tr>
+<td>Best fit</td>
+<td>A problem whose shape genuinely branches or fans out — the <em>reason</em> Phase 4 needed it</td>
+<td>A problem that is fundamentally a sequence of steps — the <em>reason</em> this phase doesn&#39;t need more than this</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The honest takeaway:</strong> neither API is &quot;better&quot; in general. Phase 4&#39;s risk analysis is a graph-shaped problem (many parallel clauses, conditional routing per clause, a real audit-trail requirement) and <code class="inline-code">StateGraph</code> is the correct tool for it. This phase&#39;s report generation is a sequence-shaped problem, and the Functional API is the correct tool for <em>this</em> — reaching for <code class="inline-code">StateGraph</code> here would mean spending the graph&#39;s declarative machinery on a shape that never uses the flexibility it buys you.</p>
+<h3 id="25-grounding-the-executive-summary--and-keeping-arithmetic-out-of-the-model39s-hands"><a class="heading-anchor" href="#25-grounding-the-executive-summary--and-keeping-arithmetic-out-of-the-model39s-hands" aria-hidden="true">#</a>2.5 Grounding the executive summary — and keeping arithmetic out of the model&#39;s hands</h3>
+<p>The report&#39;s executive summary is the one genuinely generative step in this pipeline (rendering the DOCX itself is plain code; fetching data is plain code). Same groundedness principle as every prior LLM step in this project: the model should describe what the data says, not invent detail beyond it. But there&#39;s a subtler risk here that Phase 2–4&#39;s chains didn&#39;t have to think about: <strong>this step involves counting and aggregating</strong> (&quot;3 of 12 clauses were scored HIGH risk,&quot; &quot;2 clauses were flagged for human review&quot;), and language models are unreliable arithmetic engines — asking the model to both <em>count</em> the findings and <em>narrate</em> them in the same call invites a mismatch between the prose and the actual numbers.</p>
+<p>The fix: <strong>compute every hard number in code, before the LLM call, and hand the model those numbers as trusted input it must narrate around, not derive itself.</strong></p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> stats = {
+  <span class="hljs-attr">totalClauses</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-property">length</span>,
+  <span class="hljs-attr">highRiskCount</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;HIGH&quot;</span>).<span class="hljs-property">length</span>,
+  <span class="hljs-attr">mediumRiskCount</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;MEDIUM&quot;</span>).<span class="hljs-property">length</span>,
+  <span class="hljs-attr">lowRiskCount</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;LOW&quot;</span>).<span class="hljs-property">length</span>,
+  <span class="hljs-attr">reviewFlaggedCount</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> f.<span class="hljs-property">reviewFlagged</span>).<span class="hljs-property">length</span>,
+};
+<span class="hljs-comment">// stats is passed into the prompt as ground truth; the model is asked to</span>
+<span class="hljs-comment">// write a narrative that is CONSISTENT with these numbers, never to</span>
+<span class="hljs-comment">// recompute or restate them from scratch.</span></code></pre></div>
+<p>This is the same underlying instinct as Phase 4&#39;s &quot;cite the specific excerpt that justifies this score&quot; — don&#39;t trust the model with a task it&#39;s structurally bad at when your own code can do that part perfectly and just hand over the result.</p>
+<h3 id="26-programmatic-docx-generation--documents-as-a-tree-of-parts-not-a-template"><a class="heading-anchor" href="#26-programmatic-docx-generation--documents-as-a-tree-of-parts-not-a-template" aria-hidden="true">#</a>2.6 Programmatic DOCX generation — documents as a tree of parts, not a template</h3>
+<p>The <code class="inline-code">docx</code> npm package models a Word document the way <code class="inline-code">docx</code>-the-format actually is under the hood: a <code class="inline-code">Document</code> containing one or more <code class="inline-code">Section</code>s, each section containing an ordered list of block-level children — <code class="inline-code">Paragraph</code>s (which themselves contain <code class="inline-code">TextRun</code>s for styled inline text), <code class="inline-code">Table</code>s (containing <code class="inline-code">TableRow</code>s containing <code class="inline-code">TableCell</code>s), and heading paragraphs (<code class="inline-code">Paragraph</code> with a <code class="inline-code">heading</code> property). You build this tree entirely in code, then call <code class="inline-code">Packer.toBuffer(document)</code> to serialize it into actual <code class="inline-code">.docx</code> bytes.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Document</span>({
+  <span class="hljs-attr">sections</span>: [{
+    <span class="hljs-attr">children</span>: [
+      <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;Contract Risk Report&quot;</span>, <span class="hljs-attr">heading</span>: <span class="hljs-title class_">HeadingLevel</span>.<span class="hljs-property">TITLE</span> }),
+      <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;Executive Summary&quot;</span>, <span class="hljs-attr">heading</span>: <span class="hljs-title class_">HeadingLevel</span>.<span class="hljs-property">HEADING_1</span> }),
+      <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">children</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>(summary.<span class="hljs-property">narrative</span>)] }),
+    ],
+  }],
+});
+<span class="hljs-keyword">const</span> buffer = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Packer</span>.<span class="hljs-title function_">toBuffer</span>(doc);</code></pre></div>
+<p><strong>Why this over a <code class="inline-code">.docx</code> template with placeholders (the <code class="inline-code">docxtemplater</code>-style approach)?</strong> A template is a great fit when a document&#39;s <em>structure</em> is fixed and only certain values change (a fixed-format certificate, an invoice with a known set of line-item rows). This report&#39;s structure genuinely varies per contract: the number of clause sections is exactly the number of findings, the number of HIGH-risk callouts varies, and whether a &quot;Flagged for Human Review&quot; appendix section appears at all depends on whether <code class="inline-code">reviewFlagged</code> is ever true for this run. Programmatic generation handles a variable number of variably-shaped sections naturally, because it&#39;s just a loop building tree nodes; a template would need its own looping/conditional syntax bolted on to do the same thing, which is more indirection for no real gain here.</p>
+<h3 id="27-giving-the-quotflagged-for-reviewquot-distinction-real-visual-weight"><a class="heading-anchor" href="#27-giving-the-quotflagged-for-reviewquot-distinction-real-visual-weight" aria-hidden="true">#</a>2.7 Giving the &quot;flagged for review&quot; distinction real visual weight</h3>
+<p>Concept Learning 2.5 in Phase 4.5 made the product argument for why <code class="inline-code">reviewFlagged</code> exists; this phase is where that argument has to actually show up on the page. Concretely, that means every <code class="inline-code">reviewFlagged</code> finding&#39;s section in the DOCX uses a visually distinct treatment — this phase uses a shaded paragraph background and a leading &quot;⚠ Flagged for Human Review&quot; label — so a reader scanning the document cannot mistake an unconfirmed finding for a fully-grounded one, even if they only skim. The <code class="inline-code">docx</code> library supports paragraph-level shading (<code class="inline-code">shading: { fill: &quot;FFF3CD&quot; }</code>, a soft amber) and per-run bold/color formatting, which is enough to make this distinction unmissable without needing custom styles or a design tool.</p>
+<h3 id="28-where-the-file-actually-lives"><a class="heading-anchor" href="#28-where-the-file-actually-lives" aria-hidden="true">#</a>2.8 Where the file actually lives</h3>
+<p>A generated report is a binary artifact, not a database row — Postgres stores the <em>record</em> of a report (which run it belongs to, its size, its finding counts, where to find it), not the file&#39;s bytes themselves. This phase deliberately keeps &quot;where files live&quot; behind one small interface (<code class="inline-code">ReportStorage</code>, Concept 3.4) with a local-filesystem implementation for now — the same instinct as Phase 4.5 keeping tool logic separate from the <code class="inline-code">tool()</code> wrapper: swapping local disk for S3-compatible object storage later should mean writing one new class, not touching the workflow or the routes.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-orchestration-lcel-chain-vs-a-new-stategraph-vs-the-functional-api"><a class="heading-anchor" href="#31-orchestration-lcel-chain-vs-a-new-stategraph-vs-the-functional-api" aria-hidden="true">#</a>3.1 Orchestration: LCEL chain vs. a new <code class="inline-code">StateGraph</code> vs. the Functional API</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Plain LCEL <code class="inline-code">.pipe()</code> chain</strong></td>
+<td>Familiar from Phase 2; works fine for the one genuinely &quot;chain-like&quot; step (the executive summary prompt → structured output)</td>
+<td>Forces the non-LLM steps (fetching data, rendering a DOCX, writing a file) into awkward <code class="inline-code">RunnableLambda</code> wrappers just to stay inside the same chain — those steps aren&#39;t runnables in any meaningful sense, they&#39;re just functions</td>
+<td>Fine if the <em>entire</em> pipeline were LLM calls; this one mostly isn&#39;t</td>
+</tr>
+<tr>
+<td><strong>B. A new <code class="inline-code">StateGraph</code></strong></td>
+<td>Consistent with Phase 3/4&#39;s pattern; still traceable and checkpointable</td>
+<td>Pure ceremony for a linear pipeline — an <code class="inline-code">Annotation.Root</code> state, reducers nobody needs (nothing here ever gets contributed to by more than one branch), and edges that only ever say &quot;then do the next thing&quot;</td>
+<td>A problem that might grow branches later, or where team convention values one consistent orchestration primitive above all else</td>
+</tr>
+<tr>
+<td><strong>C. LangGraph Functional API — <code class="inline-code">entrypoint</code>/<code class="inline-code">task</code> (roadmap&#39;s choice)</strong></td>
+<td>Matches the pipeline&#39;s actual shape (a sequence); keeps tracing and durable, replay-safe step caching without declaring state/nodes/edges for a shape that never branches; the orchestration <em>is</em> readable TypeScript, not a wiring diagram</td>
+<td>A second orchestration primitive to know alongside <code class="inline-code">StateGraph</code> — though this is precisely the point: knowing when <em>not</em> to reach for the graph primitive is as valuable as knowing how to use it</td>
+<td><strong>Recommended</strong> — this phase is deliberately your first contrast case for &quot;which LangGraph API fits this problem&#39;s actual shape&quot;</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach C, as specified. Section 6 builds the full pipeline as <code class="inline-code">task</code>-wrapped steps inside one <code class="inline-code">entrypoint</code>.</p>
+<h3 id="32-docx-generation-programmatic-docx-vs-template-based-docxtemplater"><a class="heading-anchor" href="#32-docx-generation-programmatic-docx-vs-template-based-docxtemplater" aria-hidden="true">#</a>3.2 DOCX generation: programmatic (<code class="inline-code">docx</code>) vs. template-based (<code class="inline-code">docxtemplater</code>)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Template-based (<code class="inline-code">docxtemplater</code> + a pre-designed <code class="inline-code">.docx</code> template with <code class="inline-code">{placeholders}</code>)</strong></td>
+<td>A designer can own the template&#39;s visual polish independently of your code; good fit when structure is fixed</td>
+<td>This report&#39;s structure is <em>not</em> fixed — the number of clause sections, the presence/absence of the review-flagged appendix, and per-section styling (risk-level color coding) all vary per run; templating engines can do loops/conditionals but it turns the template itself into a second place your logic lives, split across two files/formats</td>
+<td>Fixed-structure documents: certificates, standard-format invoices, cover letters</td>
+</tr>
+<tr>
+<td><strong>B. Programmatic (<code class="inline-code">docx</code> npm package) (recommended)</strong></td>
+<td>Full, type-checked control over a genuinely variable structure; one place (TypeScript) where all the logic lives; straightforward to add new section types later</td>
+<td>More verbose than filling in a template for a truly fixed layout</td>
+<td><strong>Recommended</strong> — this report&#39;s structure is inherently variable (N clause sections, conditional appendix), which is exactly where programmatic generation earns its keep over templating</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, as specified.</p>
+<h3 id="33-executive-summary-generation-fixed-string-templates-vs-llm-generated-narrative"><a class="heading-anchor" href="#33-executive-summary-generation-fixed-string-templates-vs-llm-generated-narrative" aria-hidden="true">#</a>3.3 Executive summary generation: fixed string templates vs. LLM-generated narrative</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Fixed string templates</strong> (&quot;This contract has {n} HIGH risk clauses...&quot;)</td>
+<td>Zero cost, zero latency, perfectly deterministic</td>
+<td>Reads as a form letter; can&#39;t adapt phrasing to what&#39;s actually notable about <em>this</em> contract (e.g. &quot;the indemnification clause is unusually one-sided&quot; vs. a generic risk count)</td>
+<td>A very budget- or latency-constrained deployment where narrative quality genuinely doesn&#39;t matter</td>
+</tr>
+<tr>
+<td><strong>B. LLM-generated narrative, grounded in code-computed stats (recommended)</strong></td>
+<td>Reads like an actual analyst&#39;s summary; can highlight what&#39;s genuinely notable about this specific contract, not just recite counts</td>
+<td>One more LLM call, and (per Concept 2.5) requires deliberately keeping arithmetic out of the model&#39;s hands to avoid a stats/narrative mismatch</td>
+<td><strong>Recommended</strong> — the counts are computed in code and handed to the model as ground truth specifically so this approach gets the narrative quality without the arithmetic risk</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, with the code-computed-stats safeguard from Concept 2.5 as a hard requirement, not an optional nicety.</p>
+<h3 id="34-report-file-storage-backend"><a class="heading-anchor" href="#34-report-file-storage-backend" aria-hidden="true">#</a>3.4 Report file storage backend</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Local filesystem</strong></td>
+<td>Zero setup, zero new dependencies, fine for local development and small deployments</td>
+<td>Doesn&#39;t survive a container restart in most production deployment models; doesn&#39;t scale across multiple app instances</td>
+<td>Local development, and small/simple production deployments where disk persistence is guaranteed</td>
+</tr>
+<tr>
+<td><strong>B. S3-compatible object storage</strong></td>
+<td>Durable, scalable, standard production choice</td>
+<td>Requires provisioning a bucket and credentials now, before this phase strictly needs to make that decision</td>
+<td>Production, once your deployment target is known</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Neither, exclusively — instead, define one small <code class="inline-code">ReportStorage</code> interface (<code class="inline-code">save(buffer, filename) → path/URL</code>, <code class="inline-code">read(path) → buffer</code>) now, and implement only the local-filesystem version in this phase. This is the same &quot;interface now, real backend later&quot; move Phase 4.5 made for tool logic — swapping in an S3 implementation later is then a new class, not a rewrite of the workflow or routes.</p>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--database-schema-for-generated-reports"><a class="heading-anchor" href="#step-1--database-schema-for-generated-reports" aria-hidden="true">#</a>Step 1 — Database schema for generated reports</h3>
+<p><strong>What:</strong> A <code class="inline-code">generated_reports</code> table — one row per generated file, recording which analysis run it belongs to, where the file lives, its size, and a few denormalized counts (total findings, HIGH count, review-flagged count) for quick listing without re-reading the file.</p>
+<p><strong>Why:</strong> This is the record Phase 6 (or any future dashboard) queries to know a report exists and offer it for download, without needing to touch the file itself just to show a list.</p>
+<p><strong>Best practice:</strong> Store the denormalized counts at generation time rather than recomputing them from <code class="inline-code">risk_findings</code> on every list request — cheap to compute once, here, right when you already have the full findings list in memory.</p>
+<h3 id="step-2--report-data-aggregation"><a class="heading-anchor" href="#step-2--report-data-aggregation" aria-hidden="true">#</a>Step 2 — Report data aggregation</h3>
+<p><strong>What:</strong> <code class="inline-code">fetchReportData(analysisRunId)</code> — one function that loads the contract&#39;s metadata, every clause+finding pair for the run (joined), ordered by risk level (HIGH → MEDIUM → LOW) then by clause order, in a single query.</p>
+<p><strong>Why:</strong> Every downstream step (the summary prompt, the DOCX renderer) needs the exact same shape of data; computing it once, in one place, keeps the summary and the rendered document provably consistent with each other — they&#39;re built from the same object, not two independently-run queries that could drift.</p>
+<p><strong>Common mistake to avoid:</strong> Re-querying inside the renderer for &quot;just one more field&quot; you forgot to include upstream. Get the aggregation query&#39;s shape right once (Step 2&#39;s code below includes everything both the summary and the renderer need) rather than patching it incrementally from inside rendering logic.</p>
+<h3 id="step-3--executive-summary-schema-and-chain"><a class="heading-anchor" href="#step-3--executive-summary-schema-and-chain" aria-hidden="true">#</a>Step 3 — Executive summary schema and chain</h3>
+<p><strong>What:</strong> <code class="inline-code">ExecutiveSummarySchema</code> (Zod) and a <code class="inline-code">withStructuredOutput()</code> chain that receives the code-computed <code class="inline-code">stats</code> object (Concept 2.5) plus a compact list of the highest-risk findings, and returns a short narrative plus a one-line headline risk verdict.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.5.</p>
+<p><strong>Best practice:</strong> Pass only the HIGH-risk (and review-flagged) findings&#39; details into the prompt, not every single finding — the summary&#39;s job is to highlight what matters, and a wall of low-risk clause detail in the prompt both wastes tokens and dilutes what the model should actually be focusing on.</p>
+<h3 id="step-4--the-docx-renderer"><a class="heading-anchor" href="#step-4--the-docx-renderer" aria-hidden="true">#</a>Step 4 — The DOCX renderer</h3>
+<p><strong>What:</strong> <code class="inline-code">renderReportDocx(data, summary)</code> — a pure function (no I/O, no LLM calls) that builds the full <code class="inline-code">Document</code> tree: cover page, executive summary section, one subsection per risk level containing one block per finding (with the review-flagged visual treatment applied where relevant), and a closing legal-references appendix.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.6–2.7.</p>
+<p><strong>Best practice:</strong> Keep this function pure and synchronous-in-spirit (everything it needs is already in its two arguments) — it should be trivially unit-testable by handing it a fixture object and asserting on the resulting document&#39;s structure, with zero mocking of databases or APIs required.</p>
+<p><strong>Common mistake to avoid:</strong> Reaching back into the database or calling the LLM from inside the renderer &quot;just this once&quot; for a missing field. If the renderer needs data, that&#39;s a signal Step 2&#39;s aggregation query is incomplete — fix it there, not by giving the renderer side effects.</p>
+<h3 id="step-5--wrapping-each-step-as-a-task"><a class="heading-anchor" href="#step-5--wrapping-each-step-as-a-task" aria-hidden="true">#</a>Step 5 — Wrapping each step as a <code class="inline-code">task</code></h3>
+<p><strong>What:</strong> <code class="inline-code">fetchReportData</code>, <code class="inline-code">generateExecutiveSummary</code>, <code class="inline-code">renderReportDocx</code>, and <code class="inline-code">storeReport</code> each wrapped with <code class="inline-code">task(name, fn)</code>.</p>
+<p><strong>Why:</strong> Covered in Concept Learning 2.2 — this is what makes each step individually traceable and replay-cacheable, without changing how you call them.</p>
+<h3 id="step-6--the-entrypoint-workflow"><a class="heading-anchor" href="#step-6--the-entrypoint-workflow" aria-hidden="true">#</a>Step 6 — The <code class="inline-code">entrypoint</code> workflow</h3>
+<p><strong>What:</strong> <code class="inline-code">generateReportWorkflow</code>, wiring the four tasks together in the order described in Concept Learning 2.3, with a <code class="inline-code">PostgresSaver</code>-backed checkpointer (the same checkpointer instance Phase 4 already set up — no new infrastructure).</p>
+<p><strong>Why:</strong> Covered in Concept Learning 2.3.</p>
+<p><strong>Best practice:</strong> Give the <code class="inline-code">entrypoint</code> a stable, descriptive <code class="inline-code">name</code> (<code class="inline-code">&quot;generate_report&quot;</code>) — this is what shows up as the top-level trace name in LangSmith, the same reasoning as naming graph nodes clearly in Phase 3/4.</p>
+<h3 id="step-7--storage-abstraction-and-local-filesystem-implementation"><a class="heading-anchor" href="#step-7--storage-abstraction-and-local-filesystem-implementation" aria-hidden="true">#</a>Step 7 — Storage abstraction and local filesystem implementation</h3>
+<p><strong>What:</strong> A <code class="inline-code">ReportStorage</code> interface and a <code class="inline-code">LocalFileReportStorage</code> implementation writing into a configured directory.</p>
+<p><strong>Why/How:</strong> Covered in Concept Learning 2.8 and Approach 3.4.</p>
+<p><strong>Common mistake to avoid:</strong> Deriving a stored filename from user- or model-influenced text (e.g. the contract&#39;s title). Use the report&#39;s own generated UUID as the filename, and keep the human-readable contract name only as a <code class="inline-code">Content-Disposition</code> download filename at the HTTP layer — never as the actual on-disk path.</p>
+<h3 id="step-8--storage-layer-for-the-generated_reports-table"><a class="heading-anchor" href="#step-8--storage-layer-for-the-generated_reports-table" aria-hidden="true">#</a>Step 8 — Storage layer for the <code class="inline-code">generated_reports</code> table</h3>
+<p><strong>What:</strong> <code class="inline-code">insertGeneratedReport(...)</code> and <code class="inline-code">getGeneratedReport(id)</code> / <code class="inline-code">listReportsForContract(contractId)</code> functions.</p>
+<p><strong>Why:</strong> Same reasoning as every prior phase&#39;s storage module — keep SQL in one place, separate from orchestration logic.</p>
+<h3 id="step-9--routes"><a class="heading-anchor" href="#step-9--routes" aria-hidden="true">#</a>Step 9 — Routes</h3>
+<p><strong>What:</strong> <code class="inline-code">POST /api/analysis/:threadId/report</code> (runs the workflow, returns the <code class="inline-code">generated_reports</code> row) and <code class="inline-code">GET /api/reports/:id/download</code> (streams the file back with correct <code class="inline-code">Content-Type</code> and <code class="inline-code">Content-Disposition</code>).</p>
+<p><strong>Best practice:</strong> Validate that the given <code class="inline-code">threadId</code>&#39;s analysis run actually reached <code class="inline-code">aggregate_findings</code> (i.e., Phase 4&#39;s graph completed) before attempting to generate a report — use <code class="inline-code">analysisGraph.getState(config)</code> (already built in Phase 4) to check <code class="inline-code">next</code> is empty, and return a clear 409 if the run is still in progress rather than generating a report from a partial <code class="inline-code">findings</code> list.</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<ol>
+<li><strong>Run the migration</strong> below to create <code class="inline-code">generated_reports</code>.</li>
+<li><strong>Install dependencies</strong>: <code class="inline-code">docx</code>.</li>
+<li><strong>Implement <code class="inline-code">src/reports/storage/reportStorage.ts</code></strong> — the <code class="inline-code">ReportStorage</code> interface and <code class="inline-code">LocalFileReportStorage</code>.</li>
+<li><strong>Implement <code class="inline-code">src/reports/dataAggregation.ts</code></strong> — <code class="inline-code">fetchReportData()</code>.</li>
+<li><strong>Implement <code class="inline-code">src/reports/schemas.ts</code></strong> — <code class="inline-code">ExecutiveSummarySchema</code>.</li>
+<li><strong>Implement <code class="inline-code">src/reports/executiveSummaryChain.ts</code></strong> — the grounded, stats-fed summary chain.</li>
+<li><strong>Implement <code class="inline-code">src/reports/docxRenderer.ts</code></strong> — the full DOCX tree builder, including the review-flagged visual treatment.</li>
+<li><strong>Test the renderer standalone</strong> against a hand-constructed fixture (no database, no LLM) — open the resulting <code class="inline-code">.docx</code> file in Word/LibreOffice and manually confirm the cover page, risk-level sections, and at least one review-flagged callout all render as expected.</li>
+<li><strong>Implement <code class="inline-code">src/reports/tasks.ts</code></strong> and <strong><code class="inline-code">src/reports/workflow.ts</code></strong> — the <code class="inline-code">task</code>-wrapped steps and the <code class="inline-code">entrypoint</code>.</li>
+<li><strong>Implement <code class="inline-code">src/reports/db.ts</code></strong> — <code class="inline-code">generated_reports</code> persistence.</li>
+<li><strong>Implement <code class="inline-code">src/routes/reports.ts</code></strong> and wire it into your Express app.</li>
+<li><strong>Run the full workflow end to end</strong> against a completed Phase 4 analysis run — confirm a <code class="inline-code">generated_reports</code> row is created, the file exists on disk, and <code class="inline-code">GET /api/reports/:id/download</code> returns a valid, openable <code class="inline-code">.docx</code>.</li>
+<li><strong>Test the &quot;not yet complete&quot; guard</strong> — call the generate endpoint with a <code class="inline-code">threadId</code> for a run that hasn&#39;t finished (or a bogus one) and confirm you get a clear error, not a report built from an empty or partial findings list.</li>
+<li><strong>Test replay behavior</strong> — deliberately throw inside <code class="inline-code">renderReportDocx</code> on the first attempt (e.g. a temporary <code class="inline-code">if (Math.random() &lt; 1) throw ...</code>), catch the failure, remove the throw, and re-invoke the same <code class="inline-code">entrypoint</code> call with the same input; confirm (via LangSmith trace or added logging) that <code class="inline-code">fetchReportData</code> and <code class="inline-code">generateExecutiveSummary</code> are not redundantly re-executed on the successful replay.</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<h3 id="61-dependencies"><a class="heading-anchor" href="#61-dependencies" aria-hidden="true">#</a>6.1 Dependencies</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install docx</code></pre></div>
+<h3 id="62-environment-variables-append-to-env"><a class="heading-anchor" href="#62-environment-variables-append-to-env" aria-hidden="true">#</a>6.2 Environment variables (append to <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">REPORT_SUMMARY_MODEL=gpt-4o-mini
+REPORTS_STORAGE_DIR=./storage/reports</code></pre></div>
+<h3 id="63-database-migration"><a class="heading-anchor" href="#63-database-migration" aria-hidden="true">#</a>6.3 Database migration</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">sql</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-sql"><span class="hljs-comment">-- migrations/007_generated_reports.sql</span>
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> generated_reports (
+    id                    UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    contract_id           UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> contracts(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    analysis_run_id       TEXT <span class="hljs-keyword">NOT NULL</span>,
+    file_path             TEXT <span class="hljs-keyword">NOT NULL</span>,
+    file_size_bytes       <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">NOT NULL</span>,
+    findings_count        <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">NOT NULL</span>,
+    high_risk_count       <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">NOT NULL</span>,
+    review_flagged_count  <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">NOT NULL</span>,
+    created_at            TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_generated_reports_run_id <span class="hljs-keyword">ON</span> generated_reports (analysis_run_id);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_generated_reports_contract_id <span class="hljs-keyword">ON</span> generated_reports (contract_id);</code></pre></div>
+<h3 id="64-report-storage-abstraction"><a class="heading-anchor" href="#64-report-storage-abstraction" aria-hidden="true">#</a>6.4 Report storage abstraction</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/reports/storage/reportStorage.ts</span>
+<span class="hljs-keyword">import</span> { promises <span class="hljs-keyword">as</span> fs } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;fs&quot;</span>;
+<span class="hljs-keyword">import</span> path <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;path&quot;</span>;
+<span class="hljs-keyword">import</span> { randomUUID } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;crypto&quot;</span>;
+
+<span class="hljs-comment">/**
+ * Small interface so &quot;where files live&quot; is swappable (local disk now,
+ * S3-compatible object storage later) without touching the workflow or
+ * routes that use it - same &quot;interface now, real backend later&quot; move as
+ * Phase 4.5&#x27;s tool logic/wrapper separation.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ReportStorage</span> {
+  <span class="hljs-title function_">save</span>(<span class="hljs-attr">buffer</span>: <span class="hljs-title class_">Buffer</span>): <span class="hljs-title class_">Promise</span>&lt;{ <span class="hljs-attr">path</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">sizeBytes</span>: <span class="hljs-built_in">number</span> }&gt;;
+  <span class="hljs-title function_">read</span>(<span class="hljs-attr">storedPath</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Buffer</span>&gt;;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LocalFileReportStorage</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">ReportStorage</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-attr">baseDir</span>: <span class="hljs-built_in">string</span></span>) {}
+
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">save</span>(<span class="hljs-attr">buffer</span>: <span class="hljs-title class_">Buffer</span>): <span class="hljs-title class_">Promise</span>&lt;{ <span class="hljs-attr">path</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">sizeBytes</span>: <span class="hljs-built_in">number</span> }&gt; {
+    <span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">mkdir</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">baseDir</span>, { <span class="hljs-attr">recursive</span>: <span class="hljs-literal">true</span> });
+
+    <span class="hljs-comment">// Filename is a fresh UUID, never derived from user- or model-influenced</span>
+    <span class="hljs-comment">// text - human-readable naming is applied only at the HTTP download</span>
+    <span class="hljs-comment">// layer (Content-Disposition), never as the actual on-disk path.</span>
+    <span class="hljs-keyword">const</span> filename = <span class="hljs-string">`<span class="hljs-subst">${randomUUID()}</span>.docx`</span>;
+    <span class="hljs-keyword">const</span> fullPath = path.<span class="hljs-title function_">join</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">baseDir</span>, filename);
+
+    <span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">writeFile</span>(fullPath, buffer);
+
+    <span class="hljs-keyword">return</span> { <span class="hljs-attr">path</span>: fullPath, <span class="hljs-attr">sizeBytes</span>: buffer.<span class="hljs-property">length</span> };
+  }
+
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">read</span>(<span class="hljs-attr">storedPath</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Buffer</span>&gt; {
+    <span class="hljs-keyword">return</span> fs.<span class="hljs-title function_">readFile</span>(storedPath);
+  }
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">reportStorage</span>: <span class="hljs-title class_">ReportStorage</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LocalFileReportStorage</span>(
+  process.<span class="hljs-property">env</span>.<span class="hljs-property">REPORTS_STORAGE_DIR</span> ?? <span class="hljs-string">&quot;./storage/reports&quot;</span>
+);</code></pre></div>
+<h3 id="65-report-data-aggregation"><a class="heading-anchor" href="#65-report-data-aggregation" aria-hidden="true">#</a>6.5 Report data aggregation</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/reports/dataAggregation.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ReportFinding</span> {
+  <span class="hljs-attr">clauseId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">clauseTitle</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">clauseType</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">clauseFullText</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">riskLevel</span>: <span class="hljs-string">&quot;LOW&quot;</span> | <span class="hljs-string">&quot;MEDIUM&quot;</span> | <span class="hljs-string">&quot;HIGH&quot;</span>;
+  <span class="hljs-attr">riskScore</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">reasoning</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">fixSuggestion</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">legalReferences</span>: { <span class="hljs-attr">sourceDocument</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">excerpt</span>: <span class="hljs-built_in">string</span> }[];
+  <span class="hljs-attr">reviewFlagged</span>: <span class="hljs-built_in">boolean</span>;
+  <span class="hljs-attr">reviewReason</span>: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ReportData</span> {
+  <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">contractType</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">contractFilename</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">findings</span>: <span class="hljs-title class_">ReportFinding</span>[];
+}
+
+<span class="hljs-comment">/**
+ * The single source of truth both the executive summary chain and the
+ * DOCX renderer are built from - computing this once, in one place, keeps
+ * the two provably consistent with each other rather than risking two
+ * independently-run queries drifting apart.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">fetchReportData</span>(<span class="hljs-params"><span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">ReportData</span>&gt; {
+  <span class="hljs-keyword">const</span> { <span class="hljs-attr">rows</span>: contractRows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT c.id AS contract_id, c.contract_type, c.original_filename
+     FROM risk_findings rf
+     JOIN contracts c ON c.id = rf.contract_id
+     WHERE rf.analysis_run_id = $1
+     LIMIT 1`</span>,
+    [analysisRunId]
+  );
+
+  <span class="hljs-keyword">if</span> (contractRows.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`No findings exist for analysis run <span class="hljs-subst">${analysisRunId}</span>.`</span>);
+  }
+
+  <span class="hljs-keyword">const</span> { <span class="hljs-attr">rows</span>: findingRows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT
+        cl.id AS clause_id, cl.title AS clause_title, cl.clause_type,
+        cl.full_text AS clause_full_text,
+        rf.risk_level, rf.risk_score, rf.reasoning, rf.fix_suggestion,
+        rf.legal_references, rf.review_flagged, rf.review_reason
+     FROM risk_findings rf
+     JOIN clauses cl ON cl.id = rf.clause_id
+     WHERE rf.analysis_run_id = $1
+     ORDER BY
+        CASE rf.risk_level WHEN &#x27;HIGH&#x27; THEN 0 WHEN &#x27;MEDIUM&#x27; THEN 1 ELSE 2 END,
+        rf.created_at ASC`</span>,
+    [analysisRunId]
+  );
+
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">findings</span>: <span class="hljs-title class_">ReportFinding</span>[] = findingRows.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> ({
+    <span class="hljs-attr">clauseId</span>: r.<span class="hljs-property">clause_id</span>,
+    <span class="hljs-attr">clauseTitle</span>: r.<span class="hljs-property">clause_title</span>,
+    <span class="hljs-attr">clauseType</span>: r.<span class="hljs-property">clause_type</span>,
+    <span class="hljs-attr">clauseFullText</span>: r.<span class="hljs-property">clause_full_text</span>,
+    <span class="hljs-attr">riskLevel</span>: r.<span class="hljs-property">risk_level</span>,
+    <span class="hljs-attr">riskScore</span>: r.<span class="hljs-property">risk_score</span>,
+    <span class="hljs-attr">reasoning</span>: r.<span class="hljs-property">reasoning</span>,
+    <span class="hljs-attr">fixSuggestion</span>: r.<span class="hljs-property">fix_suggestion</span>,
+    <span class="hljs-attr">legalReferences</span>: r.<span class="hljs-property">legal_references</span>,
+    <span class="hljs-attr">reviewFlagged</span>: r.<span class="hljs-property">review_flagged</span>,
+    <span class="hljs-attr">reviewReason</span>: r.<span class="hljs-property">review_reason</span>,
+  }));
+
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">contractId</span>: contractRows[<span class="hljs-number">0</span>].<span class="hljs-property">contract_id</span>,
+    analysisRunId,
+    <span class="hljs-attr">contractType</span>: contractRows[<span class="hljs-number">0</span>].<span class="hljs-property">contract_type</span>,
+    <span class="hljs-attr">contractFilename</span>: contractRows[<span class="hljs-number">0</span>].<span class="hljs-property">original_filename</span> ?? <span class="hljs-string">&quot;Untitled Contract&quot;</span>,
+    findings,
+  };
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ReportStats</span> {
+  <span class="hljs-attr">totalClauses</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">highRiskCount</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">mediumRiskCount</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">lowRiskCount</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">reviewFlaggedCount</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-comment">/**
+ * Every hard number the report needs, computed in plain code - handed to
+ * the LLM as trusted ground truth (Concept Learning 2.5) rather than asked
+ * of the model, since language models are unreliable at exactly this kind
+ * of counting/aggregation task.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">computeReportStats</span>(<span class="hljs-params"><span class="hljs-attr">data</span>: <span class="hljs-title class_">ReportData</span></span>): <span class="hljs-title class_">ReportStats</span> {
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">totalClauses</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-property">length</span>,
+    <span class="hljs-attr">highRiskCount</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;HIGH&quot;</span>).<span class="hljs-property">length</span>,
+    <span class="hljs-attr">mediumRiskCount</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;MEDIUM&quot;</span>).<span class="hljs-property">length</span>,
+    <span class="hljs-attr">lowRiskCount</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;LOW&quot;</span>).<span class="hljs-property">length</span>,
+    <span class="hljs-attr">reviewFlaggedCount</span>: data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-property">reviewFlagged</span>).<span class="hljs-property">length</span>,
+  };
+}</code></pre></div>
+<h3 id="66-executive-summary-schema-and-chain"><a class="heading-anchor" href="#66-executive-summary-schema-and-chain" aria-hidden="true">#</a>6.6 Executive summary schema and chain</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/reports/schemas.ts</span>
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">ExecutiveSummarySchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">headline</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A single-sentence overall risk verdict for this contract, e.g. &#x27;This contract carries significant risk concentrated in two clauses.&#x27;&quot;</span>),
+  <span class="hljs-attr">narrative</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">describe</span>(
+      <span class="hljs-string">&quot;A 2-4 paragraph plain-language executive summary. Must be consistent with the &quot;</span> +
+        <span class="hljs-string">&quot;provided statistics - do not restate or recompute the counts, narrate around them.&quot;</span>
+    ),
+});
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">ExecutiveSummary</span> = z.<span class="hljs-property">infer</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">ExecutiveSummarySchema</span>&gt;;</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/reports/executiveSummaryChain.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ExecutiveSummarySchema</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./schemas&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">ReportData</span>, <span class="hljs-title class_">ReportStats</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./dataAggregation&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">REPORT_SUMMARY_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0.2</span>,
+});
+
+<span class="hljs-keyword">const</span> summaryPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;You are a legal analyst writing the executive summary section of a &quot;</span> +
+      <span class="hljs-string">&quot;contract risk report. You are given exact, pre-computed statistics - &quot;</span> +
+      <span class="hljs-string">&quot;treat these as ground truth. Do NOT recompute, restate as your own &quot;</span> +
+      <span class="hljs-string">&quot;calculation, or contradict them; write a narrative that is consistent &quot;</span> +
+      <span class="hljs-string">&quot;with them. Highlight what is genuinely notable about the highest-risk &quot;</span> +
+      <span class="hljs-string">&quot;findings below; do not attempt to describe every clause.&quot;</span>,
+  ],
+  [
+    <span class="hljs-string">&quot;human&quot;</span>,
+    <span class="hljs-string">&quot;Statistics:\n{stats}\n\n&quot;</span> +
+      <span class="hljs-string">&quot;Contract type: {contractType}\n\n&quot;</span> +
+      <span class="hljs-string">&quot;Highest-risk findings (HIGH risk and/or flagged for human review):\n{highlightedFindings}&quot;</span>,
+  ],
+]);
+
+<span class="hljs-keyword">const</span> summaryChain = summaryPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">ExecutiveSummarySchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;write_executive_summary&quot;</span> })
+);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">formatHighlightedFindings</span>(<span class="hljs-params"><span class="hljs-attr">data</span>: <span class="hljs-title class_">ReportData</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">const</span> highlighted = data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;HIGH&quot;</span> || f.<span class="hljs-property">reviewFlagged</span>);
+
+  <span class="hljs-keyword">if</span> (highlighted.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;(No HIGH-risk or flagged findings - this contract&#x27;s risk profile is low overall.)&quot;</span>;
+  }
+
+  <span class="hljs-keyword">return</span> highlighted
+    .<span class="hljs-title function_">map</span>(
+      <span class="hljs-function">(<span class="hljs-params">f, i</span>) =&gt;</span>
+        <span class="hljs-string">`<span class="hljs-subst">${i + <span class="hljs-number">1</span>}</span>. [<span class="hljs-subst">${f.riskLevel}</span><span class="hljs-subst">${f.reviewFlagged ? <span class="hljs-string">&quot;, FLAGGED FOR REVIEW&quot;</span> : <span class="hljs-string">&quot;&quot;</span>}</span>] `</span> +
+        <span class="hljs-string">`<span class="hljs-subst">${f.clauseTitle}</span>: <span class="hljs-subst">${f.reasoning}</span>`</span>
+    )
+    .<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n&quot;</span>);
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">generateExecutiveSummaryContent</span>(<span class="hljs-params">
+  <span class="hljs-attr">data</span>: <span class="hljs-title class_">ReportData</span>,
+  <span class="hljs-attr">stats</span>: <span class="hljs-title class_">ReportStats</span>
+</span>) {
+  <span class="hljs-keyword">return</span> summaryChain.<span class="hljs-title function_">invoke</span>({
+    <span class="hljs-attr">stats</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(stats, <span class="hljs-literal">null</span>, <span class="hljs-number">2</span>),
+    <span class="hljs-attr">contractType</span>: data.<span class="hljs-property">contractType</span>,
+    <span class="hljs-attr">highlightedFindings</span>: <span class="hljs-title function_">formatHighlightedFindings</span>(data),
+  });
+}</code></pre></div>
+<h3 id="67-docx-renderer"><a class="heading-anchor" href="#67-docx-renderer" aria-hidden="true">#</a>6.7 DOCX renderer</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/reports/docxRenderer.ts</span>
+<span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">Document</span>,
+  <span class="hljs-title class_">Packer</span>,
+  <span class="hljs-title class_">Paragraph</span>,
+  <span class="hljs-title class_">TextRun</span>,
+  <span class="hljs-title class_">HeadingLevel</span>,
+  <span class="hljs-title class_">AlignmentType</span>,
+  <span class="hljs-title class_">BorderStyle</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;docx&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">ReportData</span>, <span class="hljs-title class_">ReportFinding</span>, <span class="hljs-title class_">ReportStats</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./dataAggregation&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">ExecutiveSummary</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./schemas&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-attr">RISK_COLORS</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-title class_">ReportFinding</span>[<span class="hljs-string">&quot;riskLevel&quot;</span>], <span class="hljs-built_in">string</span>&gt; = {
+  <span class="hljs-attr">HIGH</span>: <span class="hljs-string">&quot;C0392B&quot;</span>,
+  <span class="hljs-attr">MEDIUM</span>: <span class="hljs-string">&quot;B7950B&quot;</span>,
+  <span class="hljs-attr">LOW</span>: <span class="hljs-string">&quot;1E8449&quot;</span>,
+};
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">REVIEW_FLAG_SHADING</span> = <span class="hljs-string">&quot;FFF3CD&quot;</span>; <span class="hljs-comment">// soft amber - the review-flagged visual treatment</span>
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">buildCoverPage</span>(<span class="hljs-params"><span class="hljs-attr">data</span>: <span class="hljs-title class_">ReportData</span>, <span class="hljs-attr">stats</span>: <span class="hljs-title class_">ReportStats</span></span>): <span class="hljs-title class_">Paragraph</span>[] {
+  <span class="hljs-keyword">return</span> [
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+      <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;Contract Risk Report&quot;</span>,
+      <span class="hljs-attr">heading</span>: <span class="hljs-title class_">HeadingLevel</span>.<span class="hljs-property">TITLE</span>,
+      <span class="hljs-attr">alignment</span>: <span class="hljs-title class_">AlignmentType</span>.<span class="hljs-property">CENTER</span>,
+    }),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+      <span class="hljs-attr">alignment</span>: <span class="hljs-title class_">AlignmentType</span>.<span class="hljs-property">CENTER</span>,
+      <span class="hljs-attr">children</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({ <span class="hljs-attr">text</span>: data.<span class="hljs-property">contractFilename</span>, <span class="hljs-attr">italics</span>: <span class="hljs-literal">true</span> })],
+    }),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;&quot;</span> }),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+      <span class="hljs-attr">alignment</span>: <span class="hljs-title class_">AlignmentType</span>.<span class="hljs-property">CENTER</span>,
+      <span class="hljs-attr">children</span>: [
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>(
+          <span class="hljs-string">`Contract type: <span class="hljs-subst">${data.contractType}</span>  |  Clauses analyzed: <span class="hljs-subst">${stats.totalClauses}</span>  |  `</span> +
+            <span class="hljs-string">`HIGH risk: <span class="hljs-subst">${stats.highRiskCount}</span>  |  Flagged for review: <span class="hljs-subst">${stats.reviewFlaggedCount}</span>`</span>
+        ),
+      ],
+    }),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;&quot;</span> }),
+  ];
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">buildExecutiveSummarySection</span>(<span class="hljs-params"><span class="hljs-attr">summary</span>: <span class="hljs-title class_">ExecutiveSummary</span></span>): <span class="hljs-title class_">Paragraph</span>[] {
+  <span class="hljs-keyword">return</span> [
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;Executive Summary&quot;</span>, <span class="hljs-attr">heading</span>: <span class="hljs-title class_">HeadingLevel</span>.<span class="hljs-property">HEADING_1</span> }),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+      <span class="hljs-attr">children</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({ <span class="hljs-attr">text</span>: summary.<span class="hljs-property">headline</span>, <span class="hljs-attr">bold</span>: <span class="hljs-literal">true</span> })],
+    }),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;&quot;</span> }),
+    ...summary.<span class="hljs-property">narrative</span>
+      .<span class="hljs-title function_">split</span>(<span class="hljs-regexp">/\n{2,}/</span>)
+      .<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">para</span>) =&gt;</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">children</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>(para.<span class="hljs-title function_">trim</span>())] })),
+  ];
+}
+
+<span class="hljs-comment">/**
+ * Renders one finding as a block of paragraphs. Applies the review-flagged
+ * visual treatment (shaded background + explicit warning label) whenever
+ * reviewFlagged is true - this is where Phase 4.5&#x27;s honesty-over-fabrication
+ * design decision has to actually show up on the page, not just in the data.
+ */</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">buildFindingBlock</span>(<span class="hljs-params"><span class="hljs-attr">finding</span>: <span class="hljs-title class_">ReportFinding</span></span>): <span class="hljs-title class_">Paragraph</span>[] {
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">blocks</span>: <span class="hljs-title class_">Paragraph</span>[] = [];
+
+  blocks.<span class="hljs-title function_">push</span>(
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+      <span class="hljs-attr">heading</span>: <span class="hljs-title class_">HeadingLevel</span>.<span class="hljs-property">HEADING_3</span>,
+      <span class="hljs-attr">children</span>: [
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({
+          <span class="hljs-attr">text</span>: <span class="hljs-string">`<span class="hljs-subst">${finding.clauseTitle}</span> `</span>,
+        }),
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({
+          <span class="hljs-attr">text</span>: <span class="hljs-string">`[<span class="hljs-subst">${finding.riskLevel}</span> · <span class="hljs-subst">${finding.riskScore}</span>/100]`</span>,
+          <span class="hljs-attr">color</span>: <span class="hljs-variable constant_">RISK_COLORS</span>[finding.<span class="hljs-property">riskLevel</span>],
+          <span class="hljs-attr">bold</span>: <span class="hljs-literal">true</span>,
+        }),
+      ],
+    })
+  );
+
+  <span class="hljs-keyword">if</span> (finding.<span class="hljs-property">reviewFlagged</span>) {
+    blocks.<span class="hljs-title function_">push</span>(
+      <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+        <span class="hljs-attr">shading</span>: { <span class="hljs-attr">fill</span>: <span class="hljs-variable constant_">REVIEW_FLAG_SHADING</span> },
+        <span class="hljs-attr">border</span>: {
+          <span class="hljs-attr">left</span>: { <span class="hljs-attr">style</span>: <span class="hljs-title class_">BorderStyle</span>.<span class="hljs-property">SINGLE</span>, <span class="hljs-attr">size</span>: <span class="hljs-number">12</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">&quot;C0392B&quot;</span> },
+        },
+        <span class="hljs-attr">children</span>: [
+          <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;⚠ Flagged for Human Review — &quot;</span>, <span class="hljs-attr">bold</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">color</span>: <span class="hljs-string">&quot;8A6D3B&quot;</span> }),
+          <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({
+            <span class="hljs-attr">text</span>:
+              finding.<span class="hljs-property">reviewReason</span> ??
+              <span class="hljs-string">&quot;Sufficient legal grounding could not be confirmed for this finding. &quot;</span> +
+                <span class="hljs-string">&quot;Manual legal review is recommended before relying on this assessment.&quot;</span>,
+            <span class="hljs-attr">color</span>: <span class="hljs-string">&quot;8A6D3B&quot;</span>,
+          }),
+        ],
+      })
+    );
+  }
+
+  blocks.<span class="hljs-title function_">push</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">children</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({ <span class="hljs-attr">text</span>: finding.<span class="hljs-property">reasoning</span> })] }));
+  blocks.<span class="hljs-title function_">push</span>(
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+      <span class="hljs-attr">children</span>: [
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;Suggested fix: &quot;</span>, <span class="hljs-attr">bold</span>: <span class="hljs-literal">true</span> }),
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({ <span class="hljs-attr">text</span>: finding.<span class="hljs-property">fixSuggestion</span> }),
+      ],
+    })
+  );
+
+  <span class="hljs-keyword">if</span> (finding.<span class="hljs-property">legalReferences</span>.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span> &amp;&amp; !finding.<span class="hljs-property">reviewFlagged</span>) {
+    blocks.<span class="hljs-title function_">push</span>(
+      <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+        <span class="hljs-attr">children</span>: [
+          <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({
+            <span class="hljs-attr">text</span>: <span class="hljs-string">`Grounded in: <span class="hljs-subst">${finding.legalReferences.map((r) =&gt; r.sourceDocument).join(<span class="hljs-string">&quot;; &quot;</span>)}</span>`</span>,
+            <span class="hljs-attr">italics</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">size</span>: <span class="hljs-number">20</span>,
+          }),
+        ],
+      })
+    );
+  }
+
+  blocks.<span class="hljs-title function_">push</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;&quot;</span> }));
+  <span class="hljs-keyword">return</span> blocks;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">buildRiskLevelSection</span>(<span class="hljs-params">
+  <span class="hljs-attr">title</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">findings</span>: <span class="hljs-title class_">ReportFinding</span>[]
+</span>): <span class="hljs-title class_">Paragraph</span>[] {
+  <span class="hljs-keyword">if</span> (findings.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> [];
+  <span class="hljs-keyword">return</span> [
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: title, <span class="hljs-attr">heading</span>: <span class="hljs-title class_">HeadingLevel</span>.<span class="hljs-property">HEADING_1</span> }),
+    ...findings.<span class="hljs-title function_">flatMap</span>(buildFindingBlock),
+  ];
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">buildLegalReferencesAppendix</span>(<span class="hljs-params"><span class="hljs-attr">data</span>: <span class="hljs-title class_">ReportData</span></span>): <span class="hljs-title class_">Paragraph</span>[] {
+  <span class="hljs-keyword">const</span> allRefs = data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">flatMap</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span>
+    f.<span class="hljs-property">legalReferences</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> ({ <span class="hljs-attr">clause</span>: f.<span class="hljs-property">clauseTitle</span>, ...r }))
+  );
+
+  <span class="hljs-keyword">if</span> (allRefs.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> [];
+
+  <span class="hljs-keyword">return</span> [
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;Appendix: Legal References&quot;</span>, <span class="hljs-attr">heading</span>: <span class="hljs-title class_">HeadingLevel</span>.<span class="hljs-property">HEADING_1</span> }),
+    ...allRefs.<span class="hljs-title function_">flatMap</span>(<span class="hljs-function">(<span class="hljs-params">ref</span>) =&gt;</span> [
+      <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({
+        <span class="hljs-attr">children</span>: [
+          <span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">`<span class="hljs-subst">${ref.clause}</span> — <span class="hljs-subst">${ref.sourceDocument}</span>`</span>, <span class="hljs-attr">bold</span>: <span class="hljs-literal">true</span> }),
+        ],
+      }),
+      <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">children</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextRun</span>({ <span class="hljs-attr">text</span>: ref.<span class="hljs-property">excerpt</span>, <span class="hljs-attr">italics</span>: <span class="hljs-literal">true</span> })] }),
+      <span class="hljs-keyword">new</span> <span class="hljs-title class_">Paragraph</span>({ <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;&quot;</span> }),
+    ]),
+  ];
+}
+
+<span class="hljs-comment">/**
+ * Pure function: no I/O, no LLM calls. Everything it needs is already in
+ * its two arguments, which is what makes it trivially unit-testable with a
+ * hand-constructed fixture and zero mocking.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">renderReportDocx</span>(<span class="hljs-params">
+  <span class="hljs-attr">data</span>: <span class="hljs-title class_">ReportData</span>,
+  <span class="hljs-attr">stats</span>: <span class="hljs-title class_">ReportStats</span>,
+  <span class="hljs-attr">summary</span>: <span class="hljs-title class_">ExecutiveSummary</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Buffer</span>&gt; {
+  <span class="hljs-keyword">const</span> high = data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;HIGH&quot;</span>);
+  <span class="hljs-keyword">const</span> medium = data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;MEDIUM&quot;</span>);
+  <span class="hljs-keyword">const</span> low = data.<span class="hljs-property">findings</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">f</span>) =&gt;</span> f.<span class="hljs-property">riskLevel</span> === <span class="hljs-string">&quot;LOW&quot;</span>);
+
+  <span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Document</span>({
+    <span class="hljs-attr">sections</span>: [
+      {
+        <span class="hljs-attr">children</span>: [
+          ...<span class="hljs-title function_">buildCoverPage</span>(data, stats),
+          ...<span class="hljs-title function_">buildExecutiveSummarySection</span>(summary),
+          ...<span class="hljs-title function_">buildRiskLevelSection</span>(<span class="hljs-string">&quot;High Risk Clauses&quot;</span>, high),
+          ...<span class="hljs-title function_">buildRiskLevelSection</span>(<span class="hljs-string">&quot;Medium Risk Clauses&quot;</span>, medium),
+          ...<span class="hljs-title function_">buildRiskLevelSection</span>(<span class="hljs-string">&quot;Low Risk Clauses&quot;</span>, low),
+          ...<span class="hljs-title function_">buildLegalReferencesAppendix</span>(data),
+        ],
+      },
+    ],
+  });
+
+  <span class="hljs-keyword">return</span> <span class="hljs-title class_">Packer</span>.<span class="hljs-title function_">toBuffer</span>(doc);
+}</code></pre></div>
+<h3 id="68-tasks-and-the-entrypoint-workflow"><a class="heading-anchor" href="#68-tasks-and-the-entrypoint-workflow" aria-hidden="true">#</a>6.8 Tasks and the <code class="inline-code">entrypoint</code> workflow</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/reports/tasks.ts</span>
+<span class="hljs-keyword">import</span> { task } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { fetchReportData, computeReportStats } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./dataAggregation&quot;</span>;
+<span class="hljs-keyword">import</span> { generateExecutiveSummaryContent } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./executiveSummaryChain&quot;</span>;
+<span class="hljs-keyword">import</span> { renderReportDocx } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./docxRenderer&quot;</span>;
+<span class="hljs-keyword">import</span> { reportStorage } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./storage/reportStorage&quot;</span>;
+<span class="hljs-keyword">import</span> { insertGeneratedReport } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./db&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> fetchDataTask = <span class="hljs-title function_">task</span>(<span class="hljs-string">&quot;fetch_report_data&quot;</span>, <span class="hljs-title function_">async</span> (<span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>) =&gt; {
+  <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchReportData</span>(analysisRunId);
+  <span class="hljs-keyword">const</span> stats = <span class="hljs-title function_">computeReportStats</span>(data);
+  <span class="hljs-keyword">return</span> { data, stats };
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> summarizeTask = <span class="hljs-title function_">task</span>(
+  <span class="hljs-string">&quot;generate_executive_summary&quot;</span>,
+  <span class="hljs-title function_">async</span> (<span class="hljs-attr">input</span>: <span class="hljs-title class_">Awaited</span>&lt;<span class="hljs-title class_">ReturnType</span>&lt;<span class="hljs-keyword">typeof</span> fetchDataTask&gt;&gt;) =&gt; {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">generateExecutiveSummaryContent</span>(input.<span class="hljs-property">data</span>, input.<span class="hljs-property">stats</span>);
+  }
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> renderTask = <span class="hljs-title function_">task</span>(
+  <span class="hljs-string">&quot;render_report_docx&quot;</span>,
+  <span class="hljs-title function_">async</span> (<span class="hljs-attr">input</span>: {
+    <span class="hljs-attr">data</span>: <span class="hljs-title class_">Awaited</span>&lt;<span class="hljs-title class_">ReturnType</span>&lt;<span class="hljs-keyword">typeof</span> fetchDataTask&gt;&gt;[<span class="hljs-string">&quot;data&quot;</span>];
+    <span class="hljs-attr">stats</span>: <span class="hljs-title class_">Awaited</span>&lt;<span class="hljs-title class_">ReturnType</span>&lt;<span class="hljs-keyword">typeof</span> fetchDataTask&gt;&gt;[<span class="hljs-string">&quot;stats&quot;</span>];
+    <span class="hljs-attr">summary</span>: <span class="hljs-title class_">Awaited</span>&lt;<span class="hljs-title class_">ReturnType</span>&lt;<span class="hljs-keyword">typeof</span> summarizeTask&gt;&gt;;
+  }) =&gt; {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">renderReportDocx</span>(input.<span class="hljs-property">data</span>, input.<span class="hljs-property">stats</span>, input.<span class="hljs-property">summary</span>);
+  }
+);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> storeTask = <span class="hljs-title function_">task</span>(
+  <span class="hljs-string">&quot;store_generated_report&quot;</span>,
+  <span class="hljs-title function_">async</span> (<span class="hljs-attr">input</span>: {
+    <span class="hljs-attr">buffer</span>: <span class="hljs-title class_">Buffer</span>;
+    <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>;
+    <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>;
+    <span class="hljs-attr">stats</span>: <span class="hljs-title class_">Awaited</span>&lt;<span class="hljs-title class_">ReturnType</span>&lt;<span class="hljs-keyword">typeof</span> fetchDataTask&gt;&gt;[<span class="hljs-string">&quot;stats&quot;</span>];
+  }) =&gt; {
+    <span class="hljs-keyword">const</span> { path, sizeBytes } = <span class="hljs-keyword">await</span> reportStorage.<span class="hljs-title function_">save</span>(input.<span class="hljs-property">buffer</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">insertGeneratedReport</span>({
+      <span class="hljs-attr">contractId</span>: input.<span class="hljs-property">contractId</span>,
+      <span class="hljs-attr">analysisRunId</span>: input.<span class="hljs-property">analysisRunId</span>,
+      <span class="hljs-attr">filePath</span>: path,
+      <span class="hljs-attr">fileSizeBytes</span>: sizeBytes,
+      <span class="hljs-attr">findingsCount</span>: input.<span class="hljs-property">stats</span>.<span class="hljs-property">totalClauses</span>,
+      <span class="hljs-attr">highRiskCount</span>: input.<span class="hljs-property">stats</span>.<span class="hljs-property">highRiskCount</span>,
+      <span class="hljs-attr">reviewFlaggedCount</span>: input.<span class="hljs-property">stats</span>.<span class="hljs-property">reviewFlaggedCount</span>,
+    });
+  }
+);</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/reports/workflow.ts</span>
+<span class="hljs-keyword">import</span> { entrypoint } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">PostgresSaver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph-checkpoint-postgres&quot;</span>;
+<span class="hljs-keyword">import</span> { fetchDataTask, summarizeTask, renderTask, storeTask } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./tasks&quot;</span>;
+
+<span class="hljs-comment">// Reuses the same checkpointer backend Phase 4 already set up - no new</span>
+<span class="hljs-comment">// infrastructure, and durability here means efficient/correct replay</span>
+<span class="hljs-comment">// (skip re-running successful prior steps), not a reviewer-facing audit</span>
+<span class="hljs-comment">// trail feature the way Phase 4&#x27;s checkpointer additionally provides.</span>
+<span class="hljs-keyword">const</span> checkpointer = <span class="hljs-title class_">PostgresSaver</span>.<span class="hljs-title function_">fromConnString</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span>!);
+
+<span class="hljs-comment">/**
+ * The entire pipeline, expressed as plain sequential async code rather than
+ * a graph of nodes and edges - appropriate because this pipeline never
+ * branches (Concept Learning 2.1). Reading this function top to bottom IS
+ * reading the whole workflow; there is no second file to cross-reference
+ * for &quot;what runs after what.&quot;
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> generateReportWorkflow = <span class="hljs-title function_">entrypoint</span>(
+  { checkpointer, <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;generate_report&quot;</span> },
+  <span class="hljs-title function_">async</span> (<span class="hljs-attr">input</span>: { <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span> }) =&gt; {
+    <span class="hljs-keyword">const</span> { data, stats } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchDataTask</span>(input.<span class="hljs-property">analysisRunId</span>);
+    <span class="hljs-keyword">const</span> summary = <span class="hljs-keyword">await</span> <span class="hljs-title function_">summarizeTask</span>({ data, stats });
+    <span class="hljs-keyword">const</span> buffer = <span class="hljs-keyword">await</span> <span class="hljs-title function_">renderTask</span>({ data, stats, summary });
+    <span class="hljs-keyword">const</span> record = <span class="hljs-keyword">await</span> <span class="hljs-title function_">storeTask</span>({
+      buffer,
+      <span class="hljs-attr">contractId</span>: data.<span class="hljs-property">contractId</span>,
+      <span class="hljs-attr">analysisRunId</span>: input.<span class="hljs-property">analysisRunId</span>,
+      stats,
+    });
+    <span class="hljs-keyword">return</span> record;
+  }
+);</code></pre></div>
+<h3 id="69-generated_reports-storage"><a class="heading-anchor" href="#69-generated_reports-storage" aria-hidden="true">#</a>6.9 <code class="inline-code">generated_reports</code> storage</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/reports/db.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">InsertGeneratedReportInput</span> {
+  <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">analysisRunId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">filePath</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">fileSizeBytes</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">findingsCount</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">highRiskCount</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">reviewFlaggedCount</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">insertGeneratedReport</span>(<span class="hljs-params"><span class="hljs-attr">input</span>: <span class="hljs-title class_">InsertGeneratedReportInput</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`INSERT INTO generated_reports
+       (contract_id, analysis_run_id, file_path, file_size_bytes,
+        findings_count, high_risk_count, review_flagged_count)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING *`</span>,
+    [
+      input.<span class="hljs-property">contractId</span>,
+      input.<span class="hljs-property">analysisRunId</span>,
+      input.<span class="hljs-property">filePath</span>,
+      input.<span class="hljs-property">fileSizeBytes</span>,
+      input.<span class="hljs-property">findingsCount</span>,
+      input.<span class="hljs-property">highRiskCount</span>,
+      input.<span class="hljs-property">reviewFlaggedCount</span>,
+    ]
+  );
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>];
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getGeneratedReport</span>(<span class="hljs-params"><span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(<span class="hljs-string">`SELECT * FROM generated_reports WHERE id = $1`</span>, [id]);
+  <span class="hljs-keyword">return</span> rows[<span class="hljs-number">0</span>] ?? <span class="hljs-literal">null</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">listReportsForContract</span>(<span class="hljs-params"><span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT * FROM generated_reports WHERE contract_id = $1 ORDER BY created_at DESC`</span>,
+    [contractId]
+  );
+  <span class="hljs-keyword">return</span> rows;
+}</code></pre></div>
+<h3 id="610-routes"><a class="heading-anchor" href="#610-routes" aria-hidden="true">#</a>6.10 Routes</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/routes/reports.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Router</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;express&quot;</span>;
+<span class="hljs-keyword">import</span> { generateReportWorkflow } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../reports/workflow&quot;</span>;
+<span class="hljs-keyword">import</span> { getGeneratedReport } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../reports/db&quot;</span>;
+<span class="hljs-keyword">import</span> { reportStorage } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../reports/storage/reportStorage&quot;</span>;
+<span class="hljs-keyword">import</span> { analysisGraph } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../analysis/graph&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> reportsRouter = <span class="hljs-title class_">Router</span>();
+
+reportsRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/analysis/:threadId/report&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { threadId } = req.<span class="hljs-property">params</span>;
+
+  <span class="hljs-comment">// Guard: don&#x27;t build a report from a run that hasn&#x27;t finished - checked</span>
+  <span class="hljs-comment">// via the same getState() Phase 4 already exposes.</span>
+  <span class="hljs-keyword">const</span> config = { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: threadId } };
+  <span class="hljs-keyword">const</span> state = <span class="hljs-keyword">await</span> analysisGraph.<span class="hljs-title function_">getState</span>(config);
+
+  <span class="hljs-keyword">if</span> (!state.<span class="hljs-property">values</span> || state.<span class="hljs-property">next</span>.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">409</span>).<span class="hljs-title function_">json</span>({
+      <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Analysis run has not completed yet; cannot generate a report from a partial run.&quot;</span>,
+    });
+  }
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> record = <span class="hljs-keyword">await</span> generateReportWorkflow.<span class="hljs-title function_">invoke</span>(
+      { <span class="hljs-attr">analysisRunId</span>: threadId },
+      { <span class="hljs-attr">configurable</span>: { <span class="hljs-attr">thread_id</span>: <span class="hljs-string">`report-<span class="hljs-subst">${threadId}</span>`</span> } }
+    );
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">201</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">report</span>: record });
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Report generation failed:&quot;</span>, err);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Failed to generate report.&quot;</span> });
+  }
+});
+
+reportsRouter.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/reports/:id/download&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> report = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getGeneratedReport</span>(req.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>);
+  <span class="hljs-keyword">if</span> (!report) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Report not found.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> buffer = <span class="hljs-keyword">await</span> reportStorage.<span class="hljs-title function_">read</span>(report.<span class="hljs-property">file_path</span>);
+
+  res.<span class="hljs-title function_">setHeader</span>(
+    <span class="hljs-string">&quot;Content-Type&quot;</span>,
+    <span class="hljs-string">&quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&quot;</span>
+  );
+  res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&quot;Content-Disposition&quot;</span>, <span class="hljs-string">`attachment; filename=&quot;risk-report-<span class="hljs-subst">${report.id}</span>.docx&quot;`</span>);
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">send</span>(buffer);
+});</code></pre></div>
+<p>Wire it in:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/app.ts (excerpt)</span>
+<span class="hljs-keyword">import</span> { reportsRouter } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./routes/reports&quot;</span>;
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api&quot;</span>, reportsRouter);</code></pre></div>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── src/
+│   ├── reports/
+│   │   ├── dataAggregation.ts
+│   │   ├── schemas.ts
+│   │   ├── executiveSummaryChain.ts
+│   │   ├── docxRenderer.ts
+│   │   ├── tasks.ts
+│   │   ├── workflow.ts
+│   │   ├── db.ts
+│   │   └── storage/
+│   │       └── reportStorage.ts
+│   ├── routes/
+│   │   └── reports.ts
+│   └── app.ts
+├── migrations/
+│   └── 007_generated_reports.sql
+├── storage/
+│   └── reports/                (local dev file storage, .gitignore&#x27;d)</code></pre></div>
+<h3 id="execution-flow"><a class="heading-anchor" href="#execution-flow" aria-hidden="true">#</a>Execution flow</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">POST /api/analysis/:threadId/report
+  │
+  ▼
+analysisGraph.getState(config) — confirm the run has actually completed
+  │  (409 if not)
+  ▼
+generateReportWorkflow.invoke({ analysisRunId: threadId })
+  │
+  ├─ fetchDataTask        — one query, joins contract + clauses + findings
+  ├─ summarizeTask         — grounded LLM call, fed pre-computed stats
+  ├─ renderTask            — pure function, builds the .docx byte buffer
+  └─ storeTask             — writes the file, inserts generated_reports row
+  │
+  ▼
+HTTP 201 { report: { id, filePath, findingsCount, highRiskCount, ... } }
+
+Later, independently:
+GET /api/reports/:id/download → streams the .docx back with correct headers</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong>The Functional API over a new <code class="inline-code">StateGraph</code>:</strong> this pipeline never branches, so there is nothing for a graph&#39;s edges or reducers to express that plain sequential <code class="inline-code">await</code> code doesn&#39;t already express just as clearly — see Concept Learning 2.1 and 2.4&#39;s direct comparison.</li>
+<li><strong>Stats computed in code, never asked of the model:</strong> the executive summary&#39;s narrative quality benefits from an LLM; its arithmetic reliability does not. Splitting these means the report can never show a summary that contradicts its own numbers.</li>
+<li><strong>A pure, I/O-free renderer:</strong> keeping <code class="inline-code">renderReportDocx</code> free of database or LLM calls is what makes it trivially unit-testable, and it&#39;s a forcing function that any data the document needs must already live in the aggregation query&#39;s output — no scattered &quot;just one more field&quot; fetches creeping into rendering logic.</li>
+<li><strong>A <code class="inline-code">ReportStorage</code> interface instead of hardcoded filesystem calls throughout:</strong> the same &quot;interface now, real backend later&quot; move as Phase 4.5&#39;s tool logic — moving to S3-compatible storage later touches one file, not the workflow or the routes.</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Compute every hard number (counts, totals) in code and hand it to the LLM as ground truth; never ask the model to both count and narrate in the same call.</li>
+<li>Keep the DOCX renderer pure — no I/O, no LLM calls — so it stays trivially unit-testable and any missing-data problem surfaces as an aggregation-query gap, not a rendering-time patch.</li>
+<li>Give the review-flagged visual treatment real, unmistakable weight (shading, an explicit warning label) — this is the direct, reader-facing payoff of Phase 4.5&#39;s <code class="inline-code">flag_for_human_review</code> design decision, and it&#39;s easy to accidentally under-deliver on at the rendering stage even after getting the data right.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li>Report generation is inherently a single-run, single-document operation with no fan-out — nothing here needs <code class="inline-code">Send()</code> or parallelism; the main scaling lever is running the workflow asynchronously/on a queue for very large contracts, which Phase 7 (streaming/async progress) is the natural place to address.</li>
+<li>The <code class="inline-code">docx</code> library builds the entire document tree in memory before packing — fine at the scale of a single contract&#39;s findings, but worth being aware of if a future direction supports batch/portfolio-wide reports spanning many contracts in one document.</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Serve <code class="inline-code">/reports/:id/download</code> behind the same auth/ownership checks noted as an open item in prior phases — a report is a complete, readable summary of a contract&#39;s legal risk, at least as sensitive as the underlying contract text.</li>
+<li>Never let a user-influenced string become part of an on-disk file path; the UUID-based filename in <code class="inline-code">LocalFileReportStorage</code> (6.4) is a deliberate guard against path traversal or collision, not an arbitrary choice.</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li><code class="inline-code">fetchReportData</code>&#39;s single joined query (rather than N+1 queries per clause) keeps report generation&#39;s database cost flat regardless of how many clauses a contract has.</li>
+<li>The Functional API&#39;s task-level replay caching (Concept Learning 2.2) means a transient failure late in the pipeline (e.g. a disk write error in <code class="inline-code">storeTask</code>) doesn&#39;t force a wasted re-run of the LLM-backed <code class="inline-code">summarizeTask</code> — genuinely useful given the summary call is the most expensive single step in this workflow.</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Adding a new report section (e.g. a &quot;recommended next steps&quot; block) is: write one more <code class="inline-code">buildXSection()</code> function in <code class="inline-code">docxRenderer.ts</code>, call it from <code class="inline-code">renderReportDocx</code>&#39;s section array. No other file needs to change.</li>
+<li>Keep <code class="inline-code">RISK_COLORS</code> and <code class="inline-code">REVIEW_FLAG_SHADING</code> as named constants at the top of the renderer, not inline hex strings scattered through the function bodies — you&#39;ll want to tune these once you&#39;ve seen the report rendered against real contracts.</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test <code class="inline-code">computeReportStats()</code> against a fixture findings array with known counts — this is the easiest possible regression to introduce silently, and it&#39;s the number the entire executive summary is grounded against.</li>
+<li>Unit test <code class="inline-code">renderReportDocx()</code> against a hand-constructed <code class="inline-code">ReportData</code>/<code class="inline-code">ReportStats</code>/<code class="inline-code">ExecutiveSummary</code> fixture with at least one <code class="inline-code">reviewFlagged: true</code> finding — assert the resulting document&#39;s paragraph count and that the review-flagged block&#39;s shading property is actually set (the <code class="inline-code">docx</code> library&#39;s <code class="inline-code">Document</code> object is inspectable enough to assert on before packing).</li>
+<li>Integration test the full <code class="inline-code">entrypoint</code> workflow against a small fixture analysis run — assert a <code class="inline-code">generated_reports</code> row is created with counts matching the fixture, and that the file at <code class="inline-code">file_path</code> is a valid, non-empty <code class="inline-code">.docx</code>.</li>
+<li>Test the &quot;run not complete&quot; guard (route-level) against both a genuinely in-progress <code class="inline-code">thread_id</code> and a nonexistent one, confirming neither reaches <code class="inline-code">generateReportWorkflow.invoke()</code>.</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>Why a linear, non-branching pipeline is a poor fit for <code class="inline-code">StateGraph</code>&#39;s state/node/edge machinery, and how LangGraph&#39;s Functional API (<code class="inline-code">entrypoint</code>/<code class="inline-code">task</code>) gives the same tracing and durable-replay benefits to a pipeline that&#39;s better expressed as plain sequential code — a genuine contrast case, not just &quot;the same thing with different syntax.&quot;</li>
+<li>Why arithmetic and narrative generation should be split across code and model respectively: compute exact counts in TypeScript, hand them to the LLM as trusted ground truth, and ask it only to narrate consistently with them.</li>
+<li>Programmatic DOCX generation as building a document as a tree of parts (sections → paragraphs/tables → runs), and why that fits this report&#39;s inherently variable structure better than a fixed-placeholder template would.</li>
+<li>Why the <code class="inline-code">reviewFlagged</code> signal Phase 4.5 introduced only delivers on its purpose if the rendered document gives it real, unmistakable visual weight — the honesty of the underlying data doesn&#39;t automatically transfer to the reader unless the rendering layer deliberately carries it through.</li>
+<li>Keeping a storage decision (local disk vs. object storage) behind one small interface, so today&#39;s simplest working choice doesn&#39;t become tomorrow&#39;s rewrite.</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li><code class="inline-code">generated_reports</code> table and storage layer.</li>
+<li>Report data aggregation (<code class="inline-code">fetchReportData</code>, <code class="inline-code">computeReportStats</code>) as the single shared source of truth for both the summary and the rendered document.</li>
+<li>A grounded, stats-fed executive summary chain.</li>
+<li>A complete, pure DOCX renderer producing a cover page, executive summary, risk-level-grouped clause sections (with a distinct review-flagged treatment), and a legal-references appendix.</li>
+<li>The full pipeline as a <code class="inline-code">task</code>-wrapped, checkpointed LangGraph <code class="inline-code">entrypoint</code> workflow.</li>
+<li>Generation and download endpoints, including a guard against generating from an incomplete analysis run.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Running the hands-on tasks against a real completed analysis run and visually validating the rendered document, including the replay-caching behavior under a simulated failure (tasks 8, 12-14 — yours to execute).</li>
+<li>Everything from Phase 6 onward, which surfaces this phase&#39;s generated reports to an actual end user.</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+This phase closes the loop that began all the way back in Phase 2: raw contract text in, a professional, trustworthy risk report out. Phase 6 builds on top of a report that now durably exists and can be downloaded on demand — whatever that phase&#39;s user-facing surface turns out to be (a dashboard, a notification, a shareable link), it consumes exactly the <code class="inline-code">generated_reports</code> row and <code class="inline-code">/reports/:id/download</code> endpoint this phase produced, the same way Phase 4.5 consumed Phase 4&#39;s <code class="inline-code">judgment_lookup</code> seam without needing to know how it was implemented underneath. And when Phase 6.5 wraps the full analysis pipeline under a Supervisor, this phase&#39;s <code class="inline-code">entrypoint</code> workflow is a natural terminal action for that Supervisor to trigger directly once it decides an analysis run is complete — no restructuring required, for the same reason Phase 4.5&#39;s agent slotted into Phase 4&#39;s graph without touching its edges: this phase&#39;s only real &quot;interface&quot; to the outside world has always been one function call in, one file out.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

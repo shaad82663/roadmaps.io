@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 2.5: Conversational Contract Q&amp;A</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 2.5: Conversational Contract Q&amp;A</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-25-conversational-contract-qampa"><a class="heading-anchor" href="#legaldocs--phase-25-conversational-contract-qampa" aria-hidden="true">#</a>LegalDocs — Phase 2.5: Conversational Contract Q&amp;A</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL + pgvector (Phase 0/1), LangChain.js (<code class="inline-code">@langchain/core</code>, <code class="inline-code">@langchain/openai</code>, <code class="inline-code">langchain/memory</code>)
+<strong>Depends on:</strong> Phase 1 (chunking/embedding technique reused here), Phase 2 (the <code class="inline-code">contracts</code> table and its <code class="inline-code">raw_text</code> column)
+<strong>Feeds into:</strong> Nothing downstream <em>requires</em> this phase&#39;s output, but it establishes the memory + basic-retriever patterns Phase 4 will build its much larger retriever stack and audit trail on top of</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>Let a user ask quick, grounded questions about a contract they&#39;ve just uploaded — <em>&quot;what&#39;s the termination notice period?&quot;</em>, followed by <em>&quot;what about for cause?&quot;</em> — before they commit to the slower, more expensive full risk analysis in Phase 4. The answers must be grounded in the actual contract text (not the model&#39;s general knowledge), and follow-up questions must correctly use conversation context without the user having to repeat themselves.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>Two reasons, one product-shaped and one curriculum-shaped:</p>
+<ul>
+<li><strong>Product reason:</strong> A full risk analysis (Phase 4) is slow and costs real LLM tokens across many clauses. Most users have a quick specific question first (&quot;does this even have a non-compete clause?&quot;). A cheap, fast, conversational Q&amp;A layer in front of that is genuinely useful and reduces wasted full analyses.</li>
+<li><strong>Curriculum reason:</strong> Your roadmap&#39;s audit found that LangChain&#39;s conversational <strong>Memory</strong> classes (unit 6) had no home anywhere else in the project, because everything else uses LangGraph&#39;s checkpointing for state. This is deliberately the one place you exercise &quot;classic&quot; LangChain memory management, so you understand it before you never need it again (LangGraph checkpointing, which you&#39;ll use everywhere from Phase 3 onward, solves the same underlying problem — &quot;remember what happened so far&quot; — in a different, more powerful way).</li>
+</ul>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">                  ┌───────────────────────────────┐
+                  │  contracts table (from Phase 2) │
+                  │  id, raw_text, contract_type... │
+                  └────────────────┬────────────────┘
+                                   │  (first chat request for this contract)
+                  ┌────────────────▼────────────────┐
+                  │  ensureContractIndexed()          │
+                  │  split raw_text → embed → store   │
+                  └────────────────┬────────────────┘
+                                   │
+                  ┌────────────────▼────────────────┐
+                  │  contract_chunks (pgvector,        │
+                  │  filtered by contract_id)          │
+                  └────────────────┬────────────────┘
+                                   │
+POST /api/contracts/:id/chat ──►  │
+  &quot;what&#x27;s the notice period?&quot;     │
+                                   ▼
+                  ┌───────────────────────────────────┐
+                  │  PHASE 2.5 — Conversational RAG     │
+                  │  load window memory (contract_chats)│
+                  │  → rewrite question w/ history      │
+                  │  → retrieve scoped chunks            │
+                  │  → answer grounded in context        │
+                  │  → persist turn to contract_chats    │
+                  └───────────────────────────────────┘</code></pre></div>
+<p>This phase produces two new tables (<code class="inline-code">contract_chunks</code>, <code class="inline-code">contract_chats</code>) and one new endpoint. It does not modify anything Phase 2 or Phase 4 depend on directly — it&#39;s an additive, self-contained feature.</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-why-quotmemoryquot-is-a-separate-concept-from-rag-retrieval"><a class="heading-anchor" href="#21-why-quotmemoryquot-is-a-separate-concept-from-rag-retrieval" aria-hidden="true">#</a>2.1 Why &quot;Memory&quot; is a separate concept from RAG retrieval</h3>
+<p>It&#39;s easy to conflate these because they both involve &quot;remembering things,&quot; but they solve different problems:</p>
+<ul>
+<li><strong>Retrieval</strong> answers: <em>&quot;What&#39;s in the contract that&#39;s relevant to this question?&quot;</em> — it looks into a document.</li>
+<li><strong>Memory</strong> answers: <em>&quot;What did we already talk about in this conversation?&quot;</em> — it looks into the conversation&#39;s own history.</li>
+</ul>
+<p>A good follow-up answer needs both. Consider:</p>
+<blockquote class="quote-plain"><p>User: &quot;What&#39;s the termination notice period?&quot;
+<em>(retrieval finds the termination clause, answers &quot;30 days&quot;)</em>
+User: &quot;What about for cause?&quot;</p>
+</blockquote>
+<p>That second question, taken alone, is not answerable — &quot;what about for cause&quot; <em>for what</em>? Only with conversation memory do you know the topic is still &quot;termination notice period,&quot; which lets you either (a) answer directly if the retrieved context already covers it, or (b) reformulate the question into a standalone one — <em>&quot;What is the termination notice period for termination for cause?&quot;</em> — before retrieving. That reformulation step is the actual bridge between memory and retrieval, and it&#39;s the crux of this phase.</p>
+<h3 id="22-conversation-memory-classes"><a class="heading-anchor" href="#22-conversation-memory-classes" aria-hidden="true">#</a>2.2 Conversation Memory classes</h3>
+<p>LangChain&#39;s classic memory classes exist to solve one specific bookkeeping problem: <strong>how much of a growing conversation history do you feed back into the model on each turn, and in what form?</strong></p>
+<ul>
+<li><strong><code class="inline-code">BufferMemory</code></strong> — keeps the <em>entire</em> conversation, verbatim, forever. Simple, but token cost grows unbounded as the conversation gets longer, and eventually you&#39;ll exceed the model&#39;s context window.</li>
+<li><strong><code class="inline-code">BufferWindowMemory</code></strong> (your roadmap&#39;s choice) — keeps only the <strong>last <em>k</em> turns</strong> (a sliding window), discarding older ones. Bounded token cost, and for a &quot;quick Q&amp;A before the real analysis&quot; feature, recent context is almost always what matters — nobody is referencing something they asked 40 messages ago in this feature.</li>
+<li><strong><code class="inline-code">ConversationSummaryMemory</code></strong> — instead of discarding old turns, periodically asks an LLM to <em>summarize</em> them into a running summary, keeping unbounded conversation length bounded in token cost at the price of an extra LLM call and some information loss.</li>
+</ul>
+<p><strong>Why <code class="inline-code">BufferWindowMemory</code> is the right choice here:</strong> this is a lightweight &quot;ask a few quick questions&quot; feature, not an extended dialogue. A window of the last 4-6 turns is more than enough context, it&#39;s the cheapest option (no extra summarization LLM call), and it matches the roadmap&#39;s explicit choice.</p>
+<p><strong>A production wrinkle worth understanding clearly:</strong> these memory classes were originally designed assuming a long-lived, in-process object that you keep calling <code class="inline-code">.saveContext()</code> on as a conversation progresses in the same process. Your Express server is <strong>stateless between HTTP requests</strong> — a new request might even be handled by a different server instance if you scale horizontally. So &quot;attaching memory to the chain&quot; here means something slightly different than the textbook example: on every request, you <strong>reconstruct</strong> a <code class="inline-code">BufferWindowMemory</code> instance from persisted history (loaded from your <code class="inline-code">contract_chats</code> table), use it to format the last <em>k</em> turns for the prompt, and then persist the new turn back to the database yourself — the memory object&#39;s job is formatting/windowing logic, not persistence. This is exactly how memory classes are used in any real stateless backend, and understanding this distinction (in-memory object vs. persisted source of truth) is the actual lesson of unit 6, not just &quot;instantiate the class.&quot;</p>
+<h3 id="23-the-quotcondense-questionquot--history-aware-retrieval-pattern"><a class="heading-anchor" href="#23-the-quotcondense-questionquot--history-aware-retrieval-pattern" aria-hidden="true">#</a>2.3 The &quot;condense question&quot; / history-aware retrieval pattern</h3>
+<p>A vector similarity search only works well against a <strong>self-contained</strong> query. &quot;What about for cause?&quot; embedded on its own will retrieve fairly random, unrelated chunks — the query itself doesn&#39;t semantically contain &quot;termination.&quot; So before retrieving, a conversational RAG system typically:</p>
+<ol>
+<li>Takes the raw follow-up question + the recent conversation history.</li>
+<li>Asks the LLM (a cheap, fast call) to rewrite it into a <strong>standalone question</strong> that makes sense with no prior context — <em>&quot;What is the termination notice period for termination for cause?&quot;</em></li>
+<li>Uses <strong>that</strong> rewritten question for the actual vector similarity search.</li>
+<li>Answers using the retrieved context, still with the conversation history available for tone/continuity.</li>
+</ol>
+<p>This two-step &quot;rewrite, then retrieve&quot; shape is standard in conversational RAG and is worth understanding as a pattern, not memorizing as a single function name — you&#39;ll see the identical shape again in Phase 4.5&#39;s agent design, just decided by an agent&#39;s own reasoning instead of a fixed prompt.</p>
+<h3 id="24-retrievers--the-basic-interface"><a class="heading-anchor" href="#24-retrievers--the-basic-interface" aria-hidden="true">#</a>2.4 Retrievers — the basic interface</h3>
+<p>A <strong>retriever</strong> in LangChain is any object implementing one method conceptually: <em>&quot;given a query string, return the most relevant <code class="inline-code">Document</code> objects.&quot;</em> It&#39;s deliberately a thin, swappable interface — the same downstream chain code can work whether the retriever underneath does plain cosine similarity, MMR, or a multi-query fan-out (Phase 4 will swap in progressively fancier retrievers behind the exact same interface). This phase builds the <strong>basic</strong> version: cosine similarity search filtered to one contract&#39;s chunks — the roadmap explicitly scopes this phase to &quot;Retrievers - basic&quot; and saves MMR/Multi-Query/Contextual Compression for Phase 4&#39;s deeper treatment.</p>
+<p><strong>Metadata filtering by <code class="inline-code">contract_id</code></strong> is what makes this retriever <em>scoped</em> rather than searching your entire Phase 1 legal knowledge base. This is a completely separate vector table from Phase 1&#39;s <code class="inline-code">legal_reference_chunks</code> — this phase&#39;s chunks are the user&#39;s own uploaded contract text, not your curated statutes/judgments.</p>
+<h3 id="25-why-chunk-the-contract-at-all-again"><a class="heading-anchor" href="#25-why-chunk-the-contract-at-all-again" aria-hidden="true">#</a>2.5 Why chunk the contract at all, again?</h3>
+<p>The same reasoning from Phase 1 applies: a 40-page contract embedded as one vector would produce a useless &quot;average of everything&quot; representation. Chunking the contract into paragraph-sized pieces (using the exact same <code class="inline-code">RecursiveCharacterTextSplitter</code> approach from Phase 1) lets a question like &quot;what&#39;s the notice period&quot; retrieve the <em>specific</em> termination clause paragraph, not the whole document.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-when-to-chunkembed-the-contract"><a class="heading-anchor" href="#31-when-to-chunkembed-the-contract" aria-hidden="true">#</a>3.1 When to chunk/embed the contract</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Eager — chunk/embed immediately after Phase 2&#39;s upload analysis</strong></td>
+<td>First chat message has zero extra latency; indexing happens once, predictably, during upload</td>
+<td>Every uploaded contract gets embedded even if the user never opens the chat feature — wasted cost for contracts nobody chats with; couples Phase 2&#39;s endpoint to Phase 2.5&#39;s concern</td>
+<td>If chat is a near-universal next step after upload in your product flow</td>
+</tr>
+<tr>
+<td><strong>B. Lazy — chunk/embed on the <em>first</em> chat request for a contract (roadmap-agnostic, recommended)</strong></td>
+<td>Zero wasted embedding cost for contracts nobody chats with; keeps Phase 2 and Phase 2.5 fully decoupled — Phase 2 doesn&#39;t need to know Phase 2.5 exists</td>
+<td>First chat message for a contract has a small extra latency hit while indexing happens</td>
+<td><strong>Recommended</strong> — cheaper by default, cleaner separation of concerns, and the one-time latency cost on the first message is a reasonable, explainable tradeoff</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, implemented as an idempotent <code class="inline-code">ensureContractIndexed(contractId)</code> check at the top of the chat endpoint — the same hash/existence-check idempotency pattern you already used in Phase 1, just checking &quot;does this contract already have chunks&quot; instead of &quot;has this file changed.&quot;</p>
+<h3 id="32-retriever-implementation"><a class="heading-anchor" href="#32-retriever-implementation" aria-hidden="true">#</a>3.2 Retriever implementation</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. LangChain <code class="inline-code">PGVectorStore</code> wrapper configured against a custom table</strong></td>
+<td>Less code; directly returns a LangChain-native retriever via <code class="inline-code">.asRetriever()</code>; consistent with Phase 4&#39;s later retriever stack</td>
+<td>Requires mapping its expected column names onto your custom schema; slightly more setup/configuration overhead for a table this simple</td>
+<td>Reasonable if you want to reuse it identically in Phase 4</td>
+</tr>
+<tr>
+<td><strong>B. A small custom retriever class extending <code class="inline-code">BaseRetriever</code></strong></td>
+<td>Full visibility into exactly what SQL runs and why (genuinely useful at this &quot;basic retriever&quot; learning stage); no schema-mapping friction against your custom <code class="inline-code">contract_chunks</code> table</td>
+<td>You write ~20 lines of retrieval code yourself instead of configuring a wrapper</td>
+<td><strong>Recommended for this phase</strong> — the roadmap calls this &quot;Retrievers - basic,&quot; and building the interface yourself once, by hand, is what makes the wrapped/fancier versions in Phase 4 (MMR, Multi-Query, Contextual Compression) legible as <em>decorators around this same basic idea</em>, rather than opaque magic</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B here. In Phase 4 you&#39;ll likely construct an actual <code class="inline-code">PGVectorStore</code> for the fuller retriever feature set — that&#39;s fine and not a contradiction; this phase is explicitly about understanding the retriever interface at its simplest.</p>
+<h3 id="33-question-rewriting--always-vs-conditionally"><a class="heading-anchor" href="#33-question-rewriting--always-vs-conditionally" aria-hidden="true">#</a>3.3 Question rewriting — always vs. conditionally</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Always rewrite the question through the LLM, even for the first message</strong></td>
+<td>One consistent code path, no branching</td>
+<td>Wastes one LLM call on the very first message of a conversation, where there&#39;s no history to condense against anyway</td>
+<td>Simpler codebases where the extra call is a non-issue</td>
+</tr>
+<tr>
+<td><strong>B. Rewrite only when conversation history exists; use the raw question otherwise</strong></td>
+<td>Saves an LLM call on every conversation&#39;s first message (the most common case)</td>
+<td>One small <code class="inline-code">if</code> branch to maintain</td>
+<td><strong>Recommended</strong> — free latency/cost win with no downside</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--database-schema"><a class="heading-anchor" href="#step-1--database-schema" aria-hidden="true">#</a>Step 1 — Database schema</h3>
+<p><strong>What:</strong> <code class="inline-code">contract_chunks</code> (this contract&#39;s embedded paragraphs) and <code class="inline-code">contract_chats</code> (the running Q&amp;A transcript).</p>
+<p><strong>Why:</strong> Separate tables because they have entirely different lifecycles and access patterns — chunks are written once (lazily) and read often via similarity search; chats are appended to on every turn and read back in full, in order, per conversation.</p>
+<p><strong>Best practice:</strong> <code class="inline-code">ON DELETE CASCADE</code> from both tables back to <code class="inline-code">contracts.id</code> — deleting a contract should cleanly remove its chat history and chunks, not leave orphaned rows.</p>
+<h3 id="step-2--lazy-indexing-ensurecontractindexed"><a class="heading-anchor" href="#step-2--lazy-indexing-ensurecontractindexed" aria-hidden="true">#</a>Step 2 — Lazy indexing (<code class="inline-code">ensureContractIndexed</code>)</h3>
+<p><strong>What:</strong> A function checking whether <code class="inline-code">contract_chunks</code> already has rows for a given <code class="inline-code">contract_id</code>; if not, it splits the contract&#39;s <code class="inline-code">raw_text</code> (reusing Phase 1&#39;s <code class="inline-code">RecursiveCharacterTextSplitter</code> logic) and embeds/stores the chunks.</p>
+<p><strong>Why:</strong> This is what makes the &quot;index on first chat request&quot; approach from section 3.1 idempotent and safe to call at the top of every chat request without re-doing work.</p>
+<p><strong>Common mistake to avoid:</strong> Checking &quot;does the contract exist&quot; instead of &quot;does the contract <em>already have chunks</em>&quot; — those are different questions, and conflating them means a contract that failed indexing once (e.g. an embedding API blip) can get permanently stuck never being retried.</p>
+<h3 id="step-3--the-custom-retriever"><a class="heading-anchor" href="#step-3--the-custom-retriever" aria-hidden="true">#</a>Step 3 — The custom retriever</h3>
+<p><strong>What:</strong> A class extending <code class="inline-code">BaseRetriever</code>, parameterized by <code class="inline-code">contractId</code>, implementing the one method retrievers need: given a query, embed it, run a cosine-similarity SQL query filtered to that <code class="inline-code">contract_id</code>, return the top-k chunks as <code class="inline-code">Document</code> objects.</p>
+<p><strong>Why:</strong> As discussed in 3.2 — full visibility into the retrieval mechanism at this &quot;basic&quot; stage, and a clean interface Phase 4 will later decorate with more advanced strategies.</p>
+<h3 id="step-4--chat-history-persistence-and-window-memory-loading"><a class="heading-anchor" href="#step-4--chat-history-persistence-and-window-memory-loading" aria-hidden="true">#</a>Step 4 — Chat history persistence and window memory loading</h3>
+<p><strong>What:</strong> <code class="inline-code">getRecentTurns(contractId, k)</code> reading the last <code class="inline-code">k</code> human/ai message <em>pairs</em> from <code class="inline-code">contract_chats</code>, and a function turning those rows into a <code class="inline-code">BufferWindowMemory</code> instance (via an <code class="inline-code">InMemoryChatMessageHistory</code> seeded with the loaded messages).</p>
+<p><strong>Why:</strong> This is the &quot;reconstruct memory from persisted state on every stateless request&quot; pattern from Concept Learning 2.2.</p>
+<p><strong>Best practice:</strong> Order by <code class="inline-code">created_at ASC</code> when loading — conversation history must be replayed in the order it actually happened, or the model will misread who said what.</p>
+<h3 id="step-5--question-rewriting-condense-chain"><a class="heading-anchor" href="#step-5--question-rewriting-condense-chain" aria-hidden="true">#</a>Step 5 — Question rewriting (condense) chain</h3>
+<p><strong>What:</strong> A small chain: <code class="inline-code">prompt(history, question) → model → standalone question string</code>, only invoked when history is non-empty (per 3.3).</p>
+<p><strong>Why:</strong> Makes follow-up questions retrievable on their own, per Concept Learning 2.3.</p>
+<p><strong>Common mistake to avoid:</strong> Using a high-temperature model for this step — question rewriting is a precise, mechanical transformation, not a creative task. Keep <code class="inline-code">temperature: 0</code> here too.</p>
+<h3 id="step-6--the-answer-chain"><a class="heading-anchor" href="#step-6--the-answer-chain" aria-hidden="true">#</a>Step 6 — The answer chain</h3>
+<p><strong>What:</strong> A prompt combining the retrieved contract chunks (as grounding context) + the standalone question, instructing the model to answer <strong>only from the provided context</strong> and to say so explicitly if the contract doesn&#39;t address the question — never guess or fall back to general legal knowledge.</p>
+<p><strong>Why:</strong> Groundedness is the entire point of RAG here — an ungrounded answer about someone&#39;s actual contract is actively harmful advice-shaped content, not just a quality issue.</p>
+<p><strong>Best practice:</strong> Include the source chunk indices in the response payload (not necessarily in the natural-language answer) so a frontend can eventually show &quot;this answer is based on paragraph 14&quot; — cheap to add now, valuable later.</p>
+<h3 id="step-7--orchestration-and-the-endpoint"><a class="heading-anchor" href="#step-7--orchestration-and-the-endpoint" aria-hidden="true">#</a>Step 7 — Orchestration and the endpoint</h3>
+<p><strong>What:</strong> <code class="inline-code">POST /api/contracts/:id/chat</code> wiring: ensure indexed → load window memory → rewrite question (conditionally) → retrieve → answer → persist both the user&#39;s question and the model&#39;s answer to <code class="inline-code">contract_chats</code> → respond.</p>
+<p><strong>Best practice:</strong> Persist the <strong>user&#39;s original question</strong> (not the rewritten standalone version) to <code class="inline-code">contract_chats</code> — the rewritten version is an internal implementation detail for retrieval, not something the user said, and mixing the two into the visible transcript would make history replay incoherent on the next turn.</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<ol>
+<li><strong>Run the migration</strong> below to create <code class="inline-code">contract_chunks</code> and <code class="inline-code">contract_chats</code>.</li>
+<li><strong>Install dependencies</strong>: <code class="inline-code">langchain</code> (already installed from Phase 1) — no new packages needed beyond what you have.</li>
+<li><strong>Implement <code class="inline-code">src/chat/indexing.ts</code></strong> — <code class="inline-code">ensureContractIndexed()</code>, reusing Phase 1&#39;s splitter and embedding modules.</li>
+<li><strong>Implement <code class="inline-code">src/chat/retriever.ts</code></strong> — the custom <code class="inline-code">ContractRetriever</code> class.</li>
+<li><strong>Implement <code class="inline-code">src/chat/storage.ts</code></strong> — <code class="inline-code">saveChatTurn()</code>, <code class="inline-code">getRecentTurns()</code>.</li>
+<li><strong>Implement <code class="inline-code">src/chat/memory.ts</code></strong> — <code class="inline-code">buildWindowMemory()</code> from persisted turns.</li>
+<li><strong>Implement <code class="inline-code">src/chat/chains.ts</code></strong> — the condense-question chain and the answer chain.</li>
+<li><strong>Implement <code class="inline-code">src/chat/service.ts</code></strong> — the orchestration function tying steps 2-7 together.</li>
+<li><strong>Implement <code class="inline-code">src/routes/chat.ts</code></strong> and wire it into your Express app.</li>
+<li><strong>Test the happy path</strong>: upload a contract (Phase 2), then ask &quot;What&#39;s the termination notice period in this contract?&quot; — confirm a grounded answer citing the actual clause.</li>
+<li><strong>Test the follow-up</strong>: immediately ask &quot;What about for cause?&quot; — confirm the answer correctly understands you&#39;re still asking about termination notice periods, without you repeating &quot;termination.&quot;</li>
+<li><strong>Test the &quot;not in this contract&quot; case</strong>: ask something the contract doesn&#39;t cover (e.g. &quot;does this contract mention arbitration in Singapore?&quot;) — confirm the model says so rather than fabricating an answer.</li>
+<li><strong>Test the window limit</strong>: have a long back-and-forth (8+ turns) and confirm the system still functions sensibly once older turns fall outside the window — behavior should degrade gracefully (losing very old context), not break.</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<h3 id="61-database-migration"><a class="heading-anchor" href="#61-database-migration" aria-hidden="true">#</a>6.1 Database migration</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">sql</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-sql"><span class="hljs-comment">-- migrations/003_contract_chat.sql</span>
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> contract_chunks (
+    id           UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    contract_id  UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> contracts(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    chunk_index  <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">NOT NULL</span>,
+    content      TEXT <span class="hljs-keyword">NOT NULL</span>,
+    embedding    vector(<span class="hljs-number">1536</span>) <span class="hljs-keyword">NOT NULL</span>,
+    created_at   TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_contract_chunks_contract_id <span class="hljs-keyword">ON</span> contract_chunks (contract_id);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_contract_chunks_embedding_hnsw
+    <span class="hljs-keyword">ON</span> contract_chunks <span class="hljs-keyword">USING</span> hnsw (embedding vector_cosine_ops);
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> contract_chats (
+    id           UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    contract_id  UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> contracts(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    role         TEXT <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">CHECK</span> (role <span class="hljs-keyword">IN</span> (<span class="hljs-string">&#x27;human&#x27;</span>, <span class="hljs-string">&#x27;ai&#x27;</span>)),
+    content      TEXT <span class="hljs-keyword">NOT NULL</span>,
+    created_at   TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_contract_chats_contract_created
+    <span class="hljs-keyword">ON</span> contract_chats (contract_id, created_at);</code></pre></div>
+<h3 id="62-lazy-indexing"><a class="heading-anchor" href="#62-lazy-indexing" aria-hidden="true">#</a>6.2 Lazy indexing</h3>
+<p>This reuses Phase 1&#39;s <code class="inline-code">splitRecursive</code> splitter and <code class="inline-code">embedTexts</code> embedding function directly — no reason to write a second implementation of either.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/indexing.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> format <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg-format&quot;</span>;
+<span class="hljs-keyword">import</span> { splitRecursive } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../ingestion/splitters&quot;</span>; <span class="hljs-comment">// reused from Phase 1</span>
+<span class="hljs-keyword">import</span> { embedTexts } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../ingestion/embeddings&quot;</span>;     <span class="hljs-comment">// reused from Phase 1</span>
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">hasChunks</span>(<span class="hljs-params"><span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">boolean</span>&gt; {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT 1 FROM contract_chunks WHERE contract_id = $1 LIMIT 1`</span>,
+    [contractId]
+  );
+  <span class="hljs-keyword">return</span> rows.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/**
+ * Idempotent lazy indexing: chunks and embeds a contract&#x27;s raw text only if
+ * it hasn&#x27;t been indexed yet. Checking &quot;does contract_chunks have rows&quot; (not
+ * &quot;does the contract exist&quot;) means a contract that failed indexing once
+ * (e.g. a transient embedding API error) will simply be retried on the next
+ * chat request instead of getting permanently stuck unindexed.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">ensureContractIndexed</span>(<span class="hljs-params">
+  <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">rawText</span>: <span class="hljs-built_in">string</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">await</span> <span class="hljs-title function_">hasChunks</span>(contractId)) <span class="hljs-keyword">return</span>;
+
+  <span class="hljs-keyword">const</span> chunks = <span class="hljs-keyword">await</span> <span class="hljs-title function_">splitRecursive</span>(rawText);
+  <span class="hljs-keyword">if</span> (chunks.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`No chunks produced for contract <span class="hljs-subst">${contractId}</span> - raw text may be empty.`</span>);
+  }
+
+  <span class="hljs-keyword">const</span> embeddings = <span class="hljs-keyword">await</span> <span class="hljs-title function_">embedTexts</span>(chunks.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">c</span>) =&gt;</span> c.<span class="hljs-property">content</span>));
+
+  <span class="hljs-keyword">const</span> values = chunks.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">chunk, i</span>) =&gt;</span> [
+    contractId,
+    chunk.<span class="hljs-property">chunkIndex</span>,
+    chunk.<span class="hljs-property">content</span>,
+    <span class="hljs-string">`[<span class="hljs-subst">${embeddings[i].join(<span class="hljs-string">&quot;,&quot;</span>)}</span>]`</span>,
+  ]);
+
+  <span class="hljs-keyword">const</span> insertSql = <span class="hljs-title function_">format</span>(
+    <span class="hljs-string">`INSERT INTO contract_chunks (contract_id, chunk_index, content, embedding) VALUES %L`</span>,
+    values
+  );
+  <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(insertSql);
+}</code></pre></div>
+<h3 id="63-custom-basic-retriever"><a class="heading-anchor" href="#63-custom-basic-retriever" aria-hidden="true">#</a>6.3 Custom basic retriever</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/retriever.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">BaseRetriever</span>, <span class="hljs-keyword">type</span> <span class="hljs-title class_">BaseRetrieverInput</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/retrievers&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">Document</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/documents&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">CallbackManagerForRetrieverRun</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/callbacks/manager&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">OpenAIEmbeddings</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+<span class="hljs-keyword">const</span> embeddingsClient = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OpenAIEmbeddings</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">EMBEDDING_MODEL</span> ?? <span class="hljs-string">&quot;text-embedding-3-small&quot;</span>,
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ContractRetrieverInput</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseRetrieverInput</span> {
+  <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">k</span>?: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-comment">/**
+ * The &quot;basic&quot; retriever for this phase: embed the query, run a cosine
+ * similarity search filtered to one contract&#x27;s chunks, return the top-k as
+ * Documents. This is deliberately simple - Phase 4 will build MMR,
+ * Multi-Query, and Contextual Compression retrievers as decorators around
+ * this exact same underlying idea.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ContractRetriever</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">BaseRetriever</span> {
+  lc_namespace = [<span class="hljs-string">&quot;legaldocs&quot;</span>, <span class="hljs-string">&quot;retrievers&quot;</span>, <span class="hljs-string">&quot;contract&quot;</span>];
+
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-keyword">private</span> <span class="hljs-attr">k</span>: <span class="hljs-built_in">number</span>;
+
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"><span class="hljs-attr">fields</span>: <span class="hljs-title class_">ContractRetrieverInput</span></span>) {
+    <span class="hljs-variable language_">super</span>(fields);
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">contractId</span> = fields.<span class="hljs-property">contractId</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">k</span> = fields.<span class="hljs-property">k</span> ?? <span class="hljs-number">4</span>;
+  }
+
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">_getRelevantDocuments</span>(
+    <span class="hljs-attr">query</span>: <span class="hljs-built_in">string</span>,
+    <span class="hljs-attr">_runManager</span>?: <span class="hljs-title class_">CallbackManagerForRetrieverRun</span>
+  ): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Document</span>[]&gt; {
+    <span class="hljs-keyword">const</span> [queryVector] = <span class="hljs-keyword">await</span> embeddingsClient.<span class="hljs-title function_">embedDocuments</span>([query]);
+
+    <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+      <span class="hljs-string">`SELECT content, chunk_index, embedding &lt;=&gt; $1 AS distance
+       FROM contract_chunks
+       WHERE contract_id = $2
+       ORDER BY embedding &lt;=&gt; $1
+       LIMIT $3`</span>,
+      [<span class="hljs-string">`[<span class="hljs-subst">${queryVector.join(<span class="hljs-string">&quot;,&quot;</span>)}</span>]`</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">contractId</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">k</span>]
+    );
+
+    <span class="hljs-keyword">return</span> rows.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">row</span>) =&gt;</span> ({
+      <span class="hljs-attr">pageContent</span>: row.<span class="hljs-property">content</span>,
+      <span class="hljs-attr">metadata</span>: { <span class="hljs-attr">chunkIndex</span>: row.<span class="hljs-property">chunk_index</span>, <span class="hljs-attr">distance</span>: row.<span class="hljs-property">distance</span> },
+    }));
+  }
+}</code></pre></div>
+<h3 id="64-chat-transcript-storage"><a class="heading-anchor" href="#64-chat-transcript-storage" aria-hidden="true">#</a>6.4 Chat transcript storage</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/storage.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ChatTurn</span> {
+  <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;human&quot;</span> | <span class="hljs-string">&quot;ai&quot;</span>;
+  <span class="hljs-attr">content</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">createdAt</span>: <span class="hljs-title class_">Date</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">saveChatTurn</span>(<span class="hljs-params">
+  <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">role</span>: <span class="hljs-string">&quot;human&quot;</span> | <span class="hljs-string">&quot;ai&quot;</span>,
+  <span class="hljs-attr">content</span>: <span class="hljs-built_in">string</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`INSERT INTO contract_chats (contract_id, role, content) VALUES ($1, $2, $3)`</span>,
+    [contractId, role, content]
+  );
+}
+
+<span class="hljs-comment">/**
+ * Returns the last `k` human/ai turn PAIRS (so up to 2*k rows), in
+ * chronological order. Chronological order matters - replaying history out
+ * of order will make the model misattribute who said what.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getRecentTurns</span>(<span class="hljs-params"><span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">k</span>: <span class="hljs-built_in">number</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">ChatTurn</span>[]&gt; {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT role, content, created_at
+     FROM contract_chats
+     WHERE contract_id = $1
+     ORDER BY created_at DESC
+     LIMIT $2`</span>,
+    [contractId, k * <span class="hljs-number">2</span>]
+  );
+
+  <span class="hljs-keyword">return</span> rows.<span class="hljs-title function_">reverse</span>().<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> ({
+    <span class="hljs-attr">role</span>: r.<span class="hljs-property">role</span>,
+    <span class="hljs-attr">content</span>: r.<span class="hljs-property">content</span>,
+    <span class="hljs-attr">createdAt</span>: r.<span class="hljs-property">created_at</span>,
+  }));
+}</code></pre></div>
+<h3 id="65-window-memory-from-persisted-history"><a class="heading-anchor" href="#65-window-memory-from-persisted-history" aria-hidden="true">#</a>6.5 Window memory from persisted history</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/memory.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">BufferWindowMemory</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;langchain/memory&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">InMemoryChatMessageHistory</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/chat_history&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">HumanMessage</span>, <span class="hljs-title class_">AIMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> { getRecentTurns, <span class="hljs-keyword">type</span> <span class="hljs-title class_">ChatTurn</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./storage&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">WINDOW_SIZE</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">CHAT_MEMORY_WINDOW</span> ?? <span class="hljs-number">5</span>);
+
+<span class="hljs-comment">/**
+ * Reconstructs a BufferWindowMemory instance for this request from
+ * persisted history. This is the stateless-server pattern discussed in
+ * Concept Learning 2.2: the memory OBJECT is short-lived and rebuilt every
+ * request; the database is the actual source of truth for the conversation.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">buildWindowMemory</span>(<span class="hljs-params"><span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;{
+  <span class="hljs-attr">memory</span>: <span class="hljs-title class_">BufferWindowMemory</span>;
+  <span class="hljs-attr">turns</span>: <span class="hljs-title class_">ChatTurn</span>[];
+}&gt; {
+  <span class="hljs-keyword">const</span> turns = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getRecentTurns</span>(contractId, <span class="hljs-variable constant_">WINDOW_SIZE</span>);
+
+  <span class="hljs-keyword">const</span> messages = turns.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span>
+    t.<span class="hljs-property">role</span> === <span class="hljs-string">&quot;human&quot;</span> ? <span class="hljs-keyword">new</span> <span class="hljs-title class_">HumanMessage</span>(t.<span class="hljs-property">content</span>) : <span class="hljs-keyword">new</span> <span class="hljs-title class_">AIMessage</span>(t.<span class="hljs-property">content</span>)
+  );
+
+  <span class="hljs-keyword">const</span> chatHistory = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InMemoryChatMessageHistory</span>(messages);
+
+  <span class="hljs-keyword">const</span> memory = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BufferWindowMemory</span>({
+    <span class="hljs-attr">k</span>: <span class="hljs-variable constant_">WINDOW_SIZE</span>,
+    chatHistory,
+    <span class="hljs-attr">returnMessages</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">memoryKey</span>: <span class="hljs-string">&quot;history&quot;</span>,
+  });
+
+  <span class="hljs-keyword">return</span> { memory, turns };
+}</code></pre></div>
+<h3 id="66-condense-question-and-answer-chains"><a class="heading-anchor" href="#66-condense-question-and-answer-chains" aria-hidden="true">#</a>6.6 Condense-question and answer chains</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/chains.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span>, <span class="hljs-title class_">MessagesPlaceholder</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StringOutputParser</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/output_parsers&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">BaseMessage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/messages&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">Document</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/documents&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CHAT_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-comment">// --- Step: rewrite a follow-up question into a standalone one ---</span>
+
+<span class="hljs-keyword">const</span> condensePrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;Given the conversation history and a follow-up question, rewrite the &quot;</span> +
+      <span class="hljs-string">&quot;follow-up as a standalone question that makes sense without the &quot;</span> +
+      <span class="hljs-string">&quot;history. Do not answer it - only rewrite it. If the follow-up is &quot;</span> +
+      <span class="hljs-string">&quot;already standalone, return it unchanged.&quot;</span>,
+  ],
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessagesPlaceholder</span>(<span class="hljs-string">&quot;history&quot;</span>),
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Follow-up question: {question}\n\nStandalone question:&quot;</span>],
+]);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> condenseQuestionChain = condensePrompt
+  .<span class="hljs-title function_">pipe</span>(model)
+  .<span class="hljs-title function_">pipe</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StringOutputParser</span>());
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">toStandaloneQuestion</span>(<span class="hljs-params">
+  <span class="hljs-attr">question</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">history</span>: <span class="hljs-title class_">BaseMessage</span>[]
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">string</span>&gt; {
+  <span class="hljs-keyword">if</span> (history.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> question;
+  <span class="hljs-keyword">return</span> condenseQuestionChain.<span class="hljs-title function_">invoke</span>({ question, history });
+}
+
+<span class="hljs-comment">// --- Step: answer grounded strictly in retrieved contract context ---</span>
+
+<span class="hljs-keyword">const</span> answerPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;You answer questions about a specific contract using ONLY the context &quot;</span> +
+      <span class="hljs-string">&quot;excerpts provided below. If the context does not contain the answer, &quot;</span> +
+      <span class="hljs-string">&quot;say clearly that the contract does not appear to address this, rather &quot;</span> +
+      <span class="hljs-string">&quot;than guessing or relying on general legal knowledge.\n\nContext:\n{context}&quot;</span>,
+  ],
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessagesPlaceholder</span>(<span class="hljs-string">&quot;history&quot;</span>),
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;{question}&quot;</span>],
+]);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> answerChain = answerPrompt.<span class="hljs-title function_">pipe</span>(model).<span class="hljs-title function_">pipe</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StringOutputParser</span>());
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">formatContext</span>(<span class="hljs-params"><span class="hljs-attr">docs</span>: <span class="hljs-title class_">Document</span>[]</span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> docs
+    .<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">d, i</span>) =&gt;</span> <span class="hljs-string">`[Excerpt <span class="hljs-subst">${i + <span class="hljs-number">1</span>}</span>]\n<span class="hljs-subst">${d.pageContent}</span>`</span>)
+    .<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n\n&quot;</span>);
+}</code></pre></div>
+<h3 id="67-orchestration-service"><a class="heading-anchor" href="#67-orchestration-service" aria-hidden="true">#</a>6.7 Orchestration service</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/chat/service.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ContractRetriever</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./retriever&quot;</span>;
+<span class="hljs-keyword">import</span> { buildWindowMemory } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./memory&quot;</span>;
+<span class="hljs-keyword">import</span> { toStandaloneQuestion, answerChain, formatContext } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./chains&quot;</span>;
+<span class="hljs-keyword">import</span> { saveChatTurn } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./storage&quot;</span>;
+<span class="hljs-keyword">import</span> { ensureContractIndexed } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./indexing&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ChatResult</span> {
+  <span class="hljs-attr">answer</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">standaloneQuestion</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">sourceChunks</span>: { <span class="hljs-attr">chunkIndex</span>: <span class="hljs-built_in">number</span>; <span class="hljs-attr">distance</span>: <span class="hljs-built_in">number</span> }[];
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">askContractQuestion</span>(<span class="hljs-params">
+  <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">rawText</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">question</span>: <span class="hljs-built_in">string</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">ChatResult</span>&gt; {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">ensureContractIndexed</span>(contractId, rawText);
+
+  <span class="hljs-keyword">const</span> { memory } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">buildWindowMemory</span>(contractId);
+  <span class="hljs-keyword">const</span> { history } = (<span class="hljs-keyword">await</span> memory.<span class="hljs-title function_">loadMemoryVariables</span>({})) <span class="hljs-keyword">as</span> {
+    <span class="hljs-attr">history</span>: <span class="hljs-keyword">import</span>(<span class="hljs-string">&quot;@langchain/core/messages&quot;</span>).<span class="hljs-property">BaseMessage</span>[];
+  };
+
+  <span class="hljs-keyword">const</span> standaloneQuestion = <span class="hljs-keyword">await</span> <span class="hljs-title function_">toStandaloneQuestion</span>(question, history);
+
+  <span class="hljs-keyword">const</span> retriever = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ContractRetriever</span>({ contractId, <span class="hljs-attr">k</span>: <span class="hljs-number">4</span> });
+  <span class="hljs-keyword">const</span> docs = <span class="hljs-keyword">await</span> retriever.<span class="hljs-title function_">invoke</span>(standaloneQuestion);
+
+  <span class="hljs-keyword">const</span> answer = <span class="hljs-keyword">await</span> answerChain.<span class="hljs-title function_">invoke</span>({
+    <span class="hljs-attr">context</span>: <span class="hljs-title function_">formatContext</span>(docs),
+    history,
+    <span class="hljs-attr">question</span>: standaloneQuestion,
+  });
+
+  <span class="hljs-comment">// Persist the user&#x27;s ORIGINAL question, not the rewritten standalone</span>
+  <span class="hljs-comment">// version - the rewrite is an internal retrieval detail, not something</span>
+  <span class="hljs-comment">// the user actually said, and storing it would corrupt future replays.</span>
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">saveChatTurn</span>(contractId, <span class="hljs-string">&quot;human&quot;</span>, question);
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">saveChatTurn</span>(contractId, <span class="hljs-string">&quot;ai&quot;</span>, answer);
+
+  <span class="hljs-keyword">return</span> {
+    answer,
+    standaloneQuestion,
+    <span class="hljs-attr">sourceChunks</span>: docs.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">d</span>) =&gt;</span> ({
+      <span class="hljs-attr">chunkIndex</span>: d.<span class="hljs-property">metadata</span>.<span class="hljs-property">chunkIndex</span>,
+      <span class="hljs-attr">distance</span>: d.<span class="hljs-property">metadata</span>.<span class="hljs-property">distance</span>,
+    })),
+  };
+}</code></pre></div>
+<h3 id="68-route"><a class="heading-anchor" href="#68-route" aria-hidden="true">#</a>6.8 Route</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/routes/chat.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Router</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;express&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { askContractQuestion } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../chat/service&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> chatRouter = <span class="hljs-title class_">Router</span>();
+
+chatRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/:id/chat&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { id } = req.<span class="hljs-property">params</span>;
+  <span class="hljs-keyword">const</span> { question } = req.<span class="hljs-property">body</span> <span class="hljs-keyword">as</span> { <span class="hljs-attr">question</span>?: <span class="hljs-built_in">string</span> };
+
+  <span class="hljs-keyword">if</span> (!question || <span class="hljs-keyword">typeof</span> question !== <span class="hljs-string">&quot;string&quot;</span> || question.<span class="hljs-title function_">trim</span>().<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">400</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Request body must include a non-empty &#x27;question&#x27;.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(<span class="hljs-string">`SELECT raw_text FROM contracts WHERE id = $1`</span>, [id]);
+  <span class="hljs-keyword">if</span> (rows.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Contract not found.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">askContractQuestion</span>(id, rows[<span class="hljs-number">0</span>].<span class="hljs-property">raw_text</span>, question);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>(result);
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Contract chat failed:&quot;</span>, err);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Failed to answer question.&quot;</span> });
+  }
+});</code></pre></div>
+<p>Wire it in alongside your Phase 2 router:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/app.ts (excerpt)</span>
+<span class="hljs-keyword">import</span> { chatRouter } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./routes/chat&quot;</span>;
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/contracts&quot;</span>, chatRouter); <span class="hljs-comment">// mounts POST /api/contracts/:id/chat</span></code></pre></div>
+<h3 id="69-environment-variables-append-to-env"><a class="heading-anchor" href="#69-environment-variables-append-to-env" aria-hidden="true">#</a>6.9 Environment variables (append to <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">CHAT_MODEL=gpt-4o-mini
+CHAT_MEMORY_WINDOW=5</code></pre></div>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── src/
+│   ├── chat/
+│   │   ├── indexing.ts
+│   │   ├── retriever.ts
+│   │   ├── storage.ts
+│   │   ├── memory.ts
+│   │   ├── chains.ts
+│   │   └── service.ts
+│   ├── routes/
+│   │   └── chat.ts
+│   └── ingestion/            (reused from Phase 1: splitters.ts, embeddings.ts)
+├── migrations/
+│   └── 003_contract_chat.sql</code></pre></div>
+<h3 id="request-flow"><a class="heading-anchor" href="#request-flow" aria-hidden="true">#</a>Request flow</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">POST /api/contracts/:id/chat  { question: &quot;...&quot; }
+  │
+  ▼
+Load contract.raw_text by id (404 if missing)
+  │
+  ▼
+ensureContractIndexed(id, rawText)     — idempotent, splits+embeds only once
+  │
+  ▼
+buildWindowMemory(id)                   — reconstruct last k turns from DB
+  │
+  ▼
+toStandaloneQuestion(question, history) — skip LLM call if history is empty
+  │
+  ▼
+ContractRetriever.invoke(standaloneQ)   — cosine similarity, filtered by contract_id
+  │
+  ▼
+answerChain.invoke({ context, history, question }) — grounded answer
+  │
+  ▼
+saveChatTurn(human) + saveChatTurn(ai)  — persist ORIGINAL question + answer
+  │
+  ▼
+HTTP 200 { answer, standaloneQuestion, sourceChunks }</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong>Reusing Phase 1&#39;s splitter/embedding modules rather than duplicating them:</strong> the chunking and embedding logic has nothing contract-specific about it — the same function that split a statute into paragraphs works identically on a contract. Writing a second copy would just be a maintenance liability.</li>
+<li><strong>A dedicated <code class="inline-code">contract_chunks</code> table, not reusing <code class="inline-code">legal_reference_chunks</code>:</strong> these are semantically different corpora (curated static reference law vs. one specific user&#39;s uploaded document) with different lifecycles (a contract&#39;s chunks are deleted when the contract is deleted; reference chunks never are). Keeping them in separate tables makes both easier to reason about and query correctly.</li>
+<li><strong>Storing the original question, not the standalone rewrite, in <code class="inline-code">contract_chats</code>:</strong> the transcript should reflect what the user actually said — it&#39;s both more honest and, practically, prevents the rewritten form from compounding oddly across many turns of history replay.</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Keep the answer prompt&#39;s groundedness instruction explicit and strong (&quot;only from context, say so if the contract doesn&#39;t address it&quot;) — this is the single highest-leverage line of prompt engineering in a legal-adjacent RAG feature.</li>
+<li>Use <code class="inline-code">temperature: 0</code> for both the condense and answer chains — consistency matters more than variety for both.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li>Lazy indexing means embedding cost scales with actual chat usage, not upload volume — important once upload volume is much higher than chat engagement.</li>
+<li>The HNSW index on <code class="inline-code">contract_chunks.embedding</code> keeps retrieval fast even as the table accumulates chunks across many contracts over time (the <code class="inline-code">WHERE contract_id = $2</code> filter combined with the index keeps each query scoped and fast regardless of total table size).</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Validate that the requesting user actually has access to the given <code class="inline-code">contract_id</code> before answering (this project doesn&#39;t yet have an auth layer per your roadmap, but note this as a required addition before any multi-tenant deployment — one contract&#39;s chat history should never be readable by another user).</li>
+<li>Never let the answer prompt&#39;s context window include chunks from a <em>different</em> contract — the <code class="inline-code">WHERE contract_id = $2</code> filter in the retriever is the only thing preventing cross-contract data leakage, so treat that filter as a security boundary, not just a relevance optimization.</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li>Skipping the condense-question LLM call when there&#39;s no history (section 3.3) removes an unnecessary round-trip on every conversation&#39;s first message — the most common single request this endpoint will ever handle.</li>
+<li><code class="inline-code">k=4</code> retrieved chunks is a reasonable default for quick Q&A; raising it increases context/cost without necessarily improving answer quality for short, specific questions.</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Keep <code class="inline-code">WINDOW_SIZE</code> an environment variable, not a hardcoded constant — you&#39;ll likely tune this once you see real usage patterns.</li>
+<li>The retriever, memory, and chains modules are independently testable — keep them that way rather than inlining logic directly into <code class="inline-code">service.ts</code>.</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test <code class="inline-code">toStandaloneQuestion()</code> with a mocked model call, asserting it returns the raw question unchanged when <code class="inline-code">history</code> is empty (no LLM call should even be attempted).</li>
+<li>Integration test the full <code class="inline-code">askContractQuestion()</code> flow against a small fixture contract with a known termination clause, asserting the answer correctly reflects that clause&#39;s content.</li>
+<li>Explicitly test the &quot;contract doesn&#39;t address this&quot; case with a question about a topic absent from your fixture contract, asserting the model doesn&#39;t fabricate an answer.</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>The distinction between conversational memory (what was said) and retrieval (what&#39;s in the document), and why conversational RAG needs both working together.</li>
+<li><code class="inline-code">BufferWindowMemory</code> and why a sliding window is the right tradeoff for a lightweight Q&amp;A feature, plus the important practical wrinkle of using memory classes correctly against a stateless HTTP server (rebuild from persisted state each request, don&#39;t rely on the object&#39;s own lifetime).</li>
+<li>The condense-question / history-aware retrieval pattern, and why a follow-up question needs to be rewritten into a standalone form before it can be usefully embedded and searched.</li>
+<li>The basic retriever interface — a swappable &quot;query in, relevant documents out&quot; contract — built here by hand so that Phase 4&#39;s fancier retrievers (MMR, Multi-Query, Contextual Compression) will read as extensions of this same idea rather than unrelated new concepts.</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li><code class="inline-code">contract_chunks</code> and <code class="inline-code">contract_chats</code> tables.</li>
+<li>Idempotent, lazy per-contract indexing reusing Phase 1&#39;s splitting/embedding modules.</li>
+<li>A custom <code class="inline-code">ContractRetriever</code> scoped by <code class="inline-code">contract_id</code>.</li>
+<li>Persisted, reconstructed conversational memory via <code class="inline-code">BufferWindowMemory</code>.</li>
+<li>A full conversational RAG chain: condense → retrieve → answer, wired into <code class="inline-code">POST /api/contracts/:id/chat</code>.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Running the hands-on tasks against real uploaded contracts and validating multi-turn behavior (tasks 10-13 — yours to execute).</li>
+<li>Access control on the chat endpoint once your project adds authentication (noted above as a required follow-up, out of scope for this phase per your roadmap).</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+Phase 3 (Clause Extractor) moves past conversational Q&amp;A into structured, exhaustive extraction — turning the same <code class="inline-code">contracts.raw_text</code> into a complete, typed table of every clause in the document, using <code class="inline-code">withStructuredOutput()</code> + Zod (already familiar from Phase 2) and, for the first time, an actual LangGraph <code class="inline-code">StateGraph</code> (introducing units 0-2 of the LangGraph curriculum). Nothing from this phase is a hard dependency of Phase 3, but the two features will sit side by side in the product: a user can chat with their contract via this phase&#39;s endpoint while the full clause extraction and, later, risk analysis run in the background.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LegalDocs — Phase 3: Clause Extractor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script>
+// Runs before first paint so there is no flash of the wrong theme.
+(function () {
+  try {
+    var stored = localStorage.getItem("md2html-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+<style>
+/* ---------- highlight.js themes (light: atom-one-light, dark: atom-one-dark) ---------- */
+html:not([data-theme="dark"]) pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html:not([data-theme="dark"]) code.hljs{
+  padding: 3px 5px
+}html:not([data-theme="dark"]) .hljs{
+  color: #383a42;
+  background: #fafafa
+}html:not([data-theme="dark"]) .hljs-comment, html:not([data-theme="dark"]) .hljs-quote{
+  color: #a0a1a7;
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-doctag, html:not([data-theme="dark"]) .hljs-keyword, html:not([data-theme="dark"]) .hljs-formula{
+  color: #a626a4
+}html:not([data-theme="dark"]) .hljs-section, html:not([data-theme="dark"]) .hljs-name, html:not([data-theme="dark"]) .hljs-selector-tag, html:not([data-theme="dark"]) .hljs-deletion, html:not([data-theme="dark"]) .hljs-subst{
+  color: #e45649
+}html:not([data-theme="dark"]) .hljs-literal{
+  color: #0184bb
+}html:not([data-theme="dark"]) .hljs-string, html:not([data-theme="dark"]) .hljs-regexp, html:not([data-theme="dark"]) .hljs-addition, html:not([data-theme="dark"]) .hljs-attribute, html:not([data-theme="dark"]) .hljs-meta .hljs-string{
+  color: #50a14f
+}html:not([data-theme="dark"]) .hljs-attr, html:not([data-theme="dark"]) .hljs-variable, html:not([data-theme="dark"]) .hljs-template-variable, html:not([data-theme="dark"]) .hljs-type, html:not([data-theme="dark"]) .hljs-selector-class, html:not([data-theme="dark"]) .hljs-selector-attr, html:not([data-theme="dark"]) .hljs-selector-pseudo, html:not([data-theme="dark"]) .hljs-number{
+  color: #986801
+}html:not([data-theme="dark"]) .hljs-symbol, html:not([data-theme="dark"]) .hljs-bullet, html:not([data-theme="dark"]) .hljs-link, html:not([data-theme="dark"]) .hljs-meta, html:not([data-theme="dark"]) .hljs-selector-id, html:not([data-theme="dark"]) .hljs-title{
+  color: #4078f2
+}html:not([data-theme="dark"]) .hljs-built_in, html:not([data-theme="dark"]) .hljs-title.class_, html:not([data-theme="dark"]) .hljs-class .hljs-title{
+  color: #c18401
+}html:not([data-theme="dark"]) .hljs-emphasis{
+  font-style: italic
+}html:not([data-theme="dark"]) .hljs-strong{
+  font-weight: bold
+}html:not([data-theme="dark"]) .hljs-link{
+  text-decoration: underline
+}
+html[data-theme="dark"] pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}html[data-theme="dark"] code.hljs{
+  padding: 3px 5px
+}html[data-theme="dark"] .hljs{
+  color: #abb2bf;
+  background: #282c34
+}html[data-theme="dark"] .hljs-comment, html[data-theme="dark"] .hljs-quote{
+  color: #5c6370;
+  font-style: italic
+}html[data-theme="dark"] .hljs-doctag, html[data-theme="dark"] .hljs-keyword, html[data-theme="dark"] .hljs-formula{
+  color: #c678dd
+}html[data-theme="dark"] .hljs-section, html[data-theme="dark"] .hljs-name, html[data-theme="dark"] .hljs-selector-tag, html[data-theme="dark"] .hljs-deletion, html[data-theme="dark"] .hljs-subst{
+  color: #e06c75
+}html[data-theme="dark"] .hljs-literal{
+  color: #56b6c2
+}html[data-theme="dark"] .hljs-string, html[data-theme="dark"] .hljs-regexp, html[data-theme="dark"] .hljs-addition, html[data-theme="dark"] .hljs-attribute, html[data-theme="dark"] .hljs-meta .hljs-string{
+  color: #98c379
+}html[data-theme="dark"] .hljs-attr, html[data-theme="dark"] .hljs-variable, html[data-theme="dark"] .hljs-template-variable, html[data-theme="dark"] .hljs-type, html[data-theme="dark"] .hljs-selector-class, html[data-theme="dark"] .hljs-selector-attr, html[data-theme="dark"] .hljs-selector-pseudo, html[data-theme="dark"] .hljs-number{
+  color: #d19a66
+}html[data-theme="dark"] .hljs-symbol, html[data-theme="dark"] .hljs-bullet, html[data-theme="dark"] .hljs-link, html[data-theme="dark"] .hljs-meta, html[data-theme="dark"] .hljs-selector-id, html[data-theme="dark"] .hljs-title{
+  color: #61aeee
+}html[data-theme="dark"] .hljs-built_in, html[data-theme="dark"] .hljs-title.class_, html[data-theme="dark"] .hljs-class .hljs-title{
+  color: #e6c07b
+}html[data-theme="dark"] .hljs-emphasis{
+  font-style: italic
+}html[data-theme="dark"] .hljs-strong{
+  font-weight: bold
+}html[data-theme="dark"] .hljs-link{
+  text-decoration: underline
+}
+
+/* ---------- color tokens: light theme (default) ---------- */
+:root{
+  --page-bg:#fbfbfd;
+  --card-bg:#ffffff;
+  --text:#1c1f26;
+  --heading:#15161c;
+  --muted:#5b6472;
+  --accent:#6d5ef9;
+  --accent-dark:#4a3fd6;
+  --accent-soft:#efeaff;
+  --border:#e6e7ee;
+  --row-hover:#fafaff;
+  --quote-bg:#f7f7fb;
+  --code-bg:#f6f7fb;
+  --code-header-bg:#ebebf3;
+  --code-header-text:#5b6472;
+  --code-border:rgba(0,0,0,0.06);
+  --shadow-card:0 10px 40px rgba(20,20,50,0.08);
+  --shadow-code:0 6px 20px rgba(15,17,23,0.10);
+  --banner-grad:linear-gradient(120deg,#4a3fd6 0%,#6d5ef9 45%,#9b8cff 100%);
+  --toggle-bg:#ffffff;
+  --toggle-border:#e6e7ee;
+  --radius:10px;
+  --max-width:880px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ---------- color tokens: dark theme ---------- */
+[data-theme="dark"]{
+  --page-bg:#0b0d12;
+  --card-bg:#15171f;
+  --text:#dde0e8;
+  --heading:#f2f3f8;
+  --muted:#9aa0b4;
+  --accent:#a89bff;
+  --accent-dark:#c3b8ff;
+  --accent-soft:rgba(109,94,249,0.16);
+  --border:#2a2d3a;
+  --row-hover:#1b1d28;
+  --quote-bg:#1a1c26;
+  --code-bg:#0f1117;
+  --code-header-bg:#1b1d27;
+  --code-header-text:#9aa0b4;
+  --code-border:rgba(255,255,255,0.06);
+  --shadow-card:0 10px 40px rgba(0,0,0,0.45);
+  --shadow-code:0 6px 20px rgba(0,0,0,0.35);
+  --banner-grad:linear-gradient(120deg,#211c4a 0%,#3c2f8a 45%,#5b4bb8 100%);
+  --toggle-bg:#1b1d28;
+  --toggle-border:#33374a;
+}
+
+/* All color changes animate smoothly when the toggle is pressed. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--page-bg);
+  color:var(--text);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .25s ease, color .25s ease;
+}
+body, .article-wrap, .code-block pre, .code-block-header, table, .callout,
+.quote-plain, .top-banner{
+  transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+/* ---------- theme toggle button ---------- */
+.theme-toggle{
+  position:fixed;
+  top:18px;
+  right:18px;
+  z-index:50;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--toggle-border);
+  background:var(--toggle-bg);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.18);
+  transition:transform .15s ease, background-color .25s ease, border-color .25s ease;
+}
+.theme-toggle:hover{transform:translateY(-1px) scale(1.05);}
+.theme-toggle:active{transform:scale(0.95);}
+/* copy-to-clipboard button */
+.copy-btn{background:transparent;border:1px solid var(--code-border);color:var(--code-header-text);border-radius:5px;padding:2px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;font-family:inherit;transition:background 0.18s,color 0.18s,border-color 0.18s;float:right;}
+.copy-btn:hover{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+.copy-btn.copied{background:rgba(39,201,63,0.12);border-color:#27c93f;color:#27c93f;}
+@media (max-width:600px){
+  .theme-toggle{top:12px;right:12px;width:40px;height:40px;font-size:1.05rem;}
+}
+
+/* ---------- top banner ---------- */
+.top-banner{
+  background:var(--banner-grad);
+  color:#fff;
+  padding:56px 24px 64px;
+  text-align:center;
+}
+.top-banner h1{
+  margin:0 auto;
+  max-width:var(--max-width);
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+.top-banner .subtitle{
+  margin-top:10px;
+  opacity:0.92;
+  font-size:1rem;
+}
+
+/* ---------- article shell ---------- */
+.article-wrap{
+  max-width:var(--max-width);
+  margin:-32px auto 80px;
+  background:var(--card-bg);
+  border-radius:16px;
+  box-shadow:var(--shadow-card);
+  padding:48px 56px 64px;
+  position:relative;
+}
+@media (max-width:600px){
+  .article-wrap{padding:28px 20px 40px;}
+  .top-banner{padding:40px 16px 48px;}
+  .top-banner h1{font-size:1.5rem;}
+}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  line-height:1.25;
+  scroll-margin-top:24px;
+  position:relative;
+  color:var(--heading);
+}
+.article-wrap h1{
+  font-size:1.9rem;
+  margin:2.4em 0 0.7em;
+  padding-bottom:0.4em;
+  border-bottom:3px solid var(--accent);
+}
+.article-wrap h1:first-child{margin-top:0;}
+h2{
+  font-size:1.5rem;
+  margin:2.6em 0 0.8em;
+  padding-left:14px;
+  border-left:5px solid var(--accent);
+}
+h3{
+  font-size:1.2rem;
+  margin:2em 0 0.6em;
+  color:var(--accent-dark);
+}
+h4{
+  font-size:1.02rem;
+  margin:1.6em 0 0.5em;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+}
+.heading-anchor{
+  position:absolute;
+  left:-1.1em;
+  opacity:0;
+  text-decoration:none;
+  color:var(--accent);
+  font-weight:400;
+  transition:opacity .15s;
+}
+h1:hover .heading-anchor,h2:hover .heading-anchor,h3:hover .heading-anchor,
+h4:hover .heading-anchor{opacity:1;}
+
+/* ---------- paragraphs / text ---------- */
+p{margin:1em 0;}
+strong{color:var(--heading);}
+a{color:var(--accent-dark);text-decoration:none;border-bottom:1px solid rgba(125,107,255,0.35);}
+a:hover{border-bottom-color:var(--accent-dark);}
+hr{border:none;border-top:1px solid var(--border);margin:2.5em 0;}
+
+/* ---------- lists ---------- */
+ul,ol{padding-left:1.4em;margin:1em 0;}
+li{margin:0.35em 0;}
+li::marker{color:var(--accent);}
+
+/* ---------- inline code ---------- */
+code.inline-code{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  padding:0.15em 0.45em;
+  border-radius:5px;
+  font-size:0.88em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ---------- fenced code blocks ---------- */
+.code-block{
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-code);
+  border:1px solid var(--code-border);
+}
+.code-block-header{
+  background:var(--code-header-bg);
+  color:var(--code-header-text);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-bottom:1px solid var(--code-border);
+}
+.code-block-header::before{
+  content:"";
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:#ff5f56;
+  box-shadow:16px 0 0 #ffbd2e, 32px 0 0 #27c93f;
+  margin-right:48px;
+  vertical-align:middle;
+}
+.code-block pre{
+  margin:0;
+  padding:18px 20px;
+  overflow-x:auto;
+  background:var(--code-bg);
+}
+.code-block code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  font-size:0.88rem;
+  line-height:1.6;
+  background:transparent;
+}
+
+/* ---------- tables ---------- */
+.table-wrap{
+  overflow-x:auto;
+  margin:1.6em 0;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.93rem;
+}
+thead th{
+  background:var(--accent-soft);
+  color:var(--accent-dark);
+  text-align:left;
+  font-weight:700;
+  padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+  color:var(--text);
+}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--row-hover);}
+table code.inline-code{white-space:nowrap;}
+
+/* ---------- blockquotes / callouts ---------- */
+.quote-plain{
+  margin:1.4em 0;
+  padding:0.8em 1.2em;
+  border-left:4px solid var(--border);
+  background:var(--quote-bg);
+  color:var(--muted);
+  border-radius:0 8px 8px 0;
+}
+.callout{
+  margin:1.6em 0;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  background:var(--card-bg);
+}
+.callout-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;
+  padding:10px 16px;
+  font-size:0.92rem;
+}
+.callout-icon{font-size:1.05em;}
+.callout-body{padding:2px 16px 14px;color:var(--text);}
+.callout-body p{margin:0.6em 0;}
+
+.callout-why{border-color:#ffd97a;}
+.callout-why .callout-title{background:#fff8e6;color:#8a6400;}
+.callout-important{border-color:#ff9f9f;}
+.callout-important .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-note{border-color:#9cc4ff;}
+.callout-note .callout-title{background:#eef5ff;color:#1457b8;}
+.callout-warning{border-color:#ff9f9f;}
+.callout-warning .callout-title{background:#fff0f0;color:#b3261e;}
+.callout-tip{border-color:#9be3b8;}
+.callout-tip .callout-title{background:#eafff3;color:#0c7a43;}
+.callout-analogy{border-color:#c8b8ff;}
+.callout-analogy .callout-title{background:#f4f0ff;color:#5b3fd6;}
+.callout-key-insight{border-color:#c8b8ff;}
+.callout-key-insight .callout-title{background:#f4f0ff;color:#5b3fd6;}
+
+/* Dark-mode callouts: darker, desaturated fills with light text so they
+   don't glare against a dark page - same hue family per type for instant
+   recognition, just recalibrated for dark backgrounds. */
+[data-theme="dark"] .callout-why{border-color:#6b5a22;}
+[data-theme="dark"] .callout-why .callout-title{background:rgba(255,217,122,0.12);color:#ffd97a;}
+[data-theme="dark"] .callout-important{border-color:#7a3535;}
+[data-theme="dark"] .callout-important .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-note{border-color:#2f4f7a;}
+[data-theme="dark"] .callout-note .callout-title{background:rgba(120,170,255,0.12);color:#9cc4ff;}
+[data-theme="dark"] .callout-warning{border-color:#7a3535;}
+[data-theme="dark"] .callout-warning .callout-title{background:rgba(255,90,90,0.12);color:#ff9b9b;}
+[data-theme="dark"] .callout-tip{border-color:#2f6b4d;}
+[data-theme="dark"] .callout-tip .callout-title{background:rgba(120,220,160,0.12);color:#9be3b8;}
+[data-theme="dark"] .callout-analogy{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-analogy .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+[data-theme="dark"] .callout-key-insight{border-color:#4f3f8a;}
+[data-theme="dark"] .callout-key-insight .callout-title{background:rgba(160,140,255,0.14);color:#c8b8ff;}
+
+
+/* ---------- footer ---------- */
+.doc-footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.85rem;
+  margin-top:48px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.doc-footer a{color:var(--accent-dark);text-decoration:none;border-bottom:none;}
+.doc-footer a:hover{text-decoration:underline;}
+.doc-footer strong{color:var(--heading);}
+
+/* ---------- scroll progress bar ---------- */
+.scroll-progress-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+[data-theme="dark"] .scroll-progress-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.08s ease-out;
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark mode" onclick="toggleTheme()">
+  <i class="ti ti-moon" id="theme-icon"></i>
+</button>
+<header class="top-banner">
+  <h1>LegalDocs — Phase 3: Clause Extractor</h1>
+</header>
+<main class="article-wrap">
+<h1 id="legaldocs--phase-3-clause-extractor"><a class="heading-anchor" href="#legaldocs--phase-3-clause-extractor" aria-hidden="true">#</a>LegalDocs — Phase 3: Clause Extractor</h1>
+<p><strong>Tech stack:</strong> Node.js / TypeScript, OpenAI, PostgreSQL (from Phase 0), LangChain.js (<code class="inline-code">@langchain/core</code>, <code class="inline-code">@langchain/openai</code>), <strong>LangGraph.js (<code class="inline-code">@langchain/langgraph</code>) — first use in the project</strong>, Zod
+<strong>Depends on:</strong> Phase 2 (the <code class="inline-code">contracts</code> table and its <code class="inline-code">raw_text</code>/<code class="inline-code">contract_type</code> columns)
+<strong>Feeds into:</strong> Phase 4 (the Risk Analyzer&#39;s <code class="inline-code">Send()</code>-based parallel clause loop runs one risk-scoring pass per row this phase writes to the <code class="inline-code">clauses</code> table); Phase 4.5 (the Legal Research Agent is invoked per HIGH-risk clause, which only exists because this phase named and isolated it first)</p>
+<hr>
+<h2 id="1-phase-overview"><a class="heading-anchor" href="#1-phase-overview" aria-hidden="true">#</a>1. Phase Overview</h2>
+<h3 id="objective"><a class="heading-anchor" href="#objective" aria-hidden="true">#</a>Objective</h3>
+<p>Take a contract&#39;s full raw text (already stored by Phase 2) and produce a complete, typed, exhaustive list of every distinct clause inside it — each one tagged with a clause type, given a short summary, and stored as its own row in a new <code class="inline-code">clauses</code> table. Where Phase 2 answered &quot;what kind of contract is this, broadly,&quot; this phase answers &quot;what are the individual, addressable pieces this contract is made of.&quot;</p>
+<p>This phase also does something structurally new: because a real contract can run well past what a single LLM call can reliably reason over in one pass, extraction has to run over a <strong>sliding window</strong> of overlapping text chunks, and the results from those overlapping windows have to be <strong>merged and de-duplicated</strong> afterward. That two-step shape — extract, then reconcile — is a natural fit for a small, explicit <strong>LangGraph</strong> graph rather than a single linear LCEL chain, and this is the first phase where you build one.</p>
+<h3 id="why-this-phase-is-important"><a class="heading-anchor" href="#why-this-phase-is-important" aria-hidden="true">#</a>Why this phase is important</h3>
+<p>Phase 4&#39;s entire Risk Analyzer is built around the idea of scoring <em>individual clauses</em>, not &quot;the contract&quot; as one blob — the roadmap&#39;s <code class="inline-code">Send()</code>-based fan-out explicitly needs a list of discrete clauses to fan out over. If this phase produces messy output (a &quot;clause&quot; that&#39;s actually three clauses concatenated, or the same clause duplicated three times because it happened to land in two overlapping windows), Phase 4&#39;s parallel risk-scoring will silently inherit that mess: duplicate risk findings, or one finding that&#39;s actually a muddled average of three unrelated obligations. Clean, deduplicated, well-typed clauses here are what make everything downstream — risk scoring, the audit trail, the report generator — trustworthy.</p>
+<p>This is also the phase where you first confront a real limitation of a single chain call: <strong>contract length</strong>. A 3-page NDA fits in one LLM call with room to spare. A 40-page vendor master services agreement does not — not because it exceeds the model&#39;s raw context window necessarily, but because asking a model to exhaustively enumerate <em>every</em> clause in a huge block of text in one shot degrades in reliability well before you hit a hard token ceiling. The sliding-window approach you&#39;ll build here is the standard, practical answer to that problem, and it&#39;s a pattern you&#39;ll see again (in a more powerful form) with Phase 4&#39;s <code class="inline-code">Send()</code>-based fan-out.</p>
+<h3 id="where-it-fits-in-the-architecture"><a class="heading-anchor" href="#where-it-fits-in-the-architecture" aria-hidden="true">#</a>Where it fits in the architecture</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">                  ┌─────────────────────────────┐
+                  │  contracts table (Phase 2)    │
+                  │  id, raw_text, contract_type  │
+                  └───────────────┬─────────────┘
+                                  │
+                  ┌───────────────▼─────────────┐
+                  │  PHASE 3 — Clause Extractor   │
+                  │                               │
+                  │   window the raw text          │
+                  │        │                       │
+                  │   ┌────▼────────────┐          │
+                  │   │ extract_clauses │  (node 1) │
+                  │   │  StateGraph      │          │
+                  │   └────┬────────────┘          │
+                  │        │                       │
+                  │   ┌────▼────────────────┐      │
+                  │   │ validate_and_merge   │(node 2)│
+                  │   └────┬────────────────┘      │
+                  └────────┼─────────────────────┘
+                           │
+                  ┌────────▼─────────────────────┐
+                  │  clauses table (Postgres)      │
+                  │  one row per distinct clause,   │
+                  │  typed, summarized, deduplicated│
+                  └────────┬─────────────────────┘
+                           │
+        ┌──────────────────┴───────────────────┐
+        │                                       │
+ Phase 4: Risk Analyzer                  Phase 4.5: Legal
+ (Send() fans out one risk-score          Research Agent
+  execution per clause row)               (invoked per HIGH-risk
+                                            clause from Phase 4)</code></pre></div>
+<p>This phase&#39;s single deliverable is a fully populated <code class="inline-code">clauses</code> table per contract, produced by a compiled 2-node LangGraph graph.</p>
+<hr>
+<h2 id="2-concept-learning"><a class="heading-anchor" href="#2-concept-learning" aria-hidden="true">#</a>2. Concept Learning</h2>
+<h3 id="21-why-langgraph-when-you-already-have-lcel-chains"><a class="heading-anchor" href="#21-why-langgraph-when-you-already-have-lcel-chains" aria-hidden="true">#</a>2.1 Why LangGraph, when you already have LCEL chains</h3>
+<p>Every chain you built in Phase 2 (<code class="inline-code">preprocess.pipe(parallelStage).pipe(withTypeSpecific).pipe(mergeStep)</code>) is, structurally, a <strong>fixed pipeline decided at compose time</strong>. You wire the steps together once in code, and every invocation walks that exact same wiring: same steps, same order, no memory of anything beyond what&#39;s explicitly piped forward. That&#39;s a great fit for &quot;run these known steps once, in this order&quot; — which is exactly what Phase 2 needed.</p>
+<p>This phase&#39;s problem doesn&#39;t quite fit that shape as cleanly, for two reasons that will only get more pronounced from here on:</p>
+<ol>
+<li><strong>There&#39;s a genuine two-stage process with different concerns at each stage</strong> — first extract (possibly messy, possibly duplicated) candidate clauses from each window, <em>then</em> reconcile them into a clean final list. You could still express this as <code class="inline-code">extractStep.pipe(mergeStep)</code> in pure LCEL, and for this phase specifically, that would even work. But —</li>
+<li><strong>This is a taste of a pattern that stops being optional very soon.</strong> Phase 4&#39;s risk analysis needs conditional branching (route HIGH-risk clauses to a research agent, everything else straight to storage), checkpointed state you can inspect and rewind (the audit/undo feature), and parallel fan-out over a dynamic list of clauses whose size you don&#39;t know until runtime. None of that is naturally expressible as a <code class="inline-code">.pipe()</code> chain — LCEL has no concept of &quot;shared state multiple steps read and write,&quot; no built-in checkpointing, and no conditional-edge routing primitive of its own.</li>
+</ol>
+<p><strong>LangGraph&#39;s core idea:</strong> instead of composing runnables into a fixed pipe, you define an explicit <strong>state object</strong> (a schema describing everything the graph will track), a set of <strong>nodes</strong> (each is a function that reads some of that state and returns updates to it), and <strong>edges</strong> connecting nodes together (which can be fixed, or conditional on the current state). You compile the graph once, and the compiled graph itself becomes a runnable you can <code class="inline-code">.invoke()</code> — but internally, it&#39;s walking a graph of nodes reading and writing shared state, not a straight pipe.</p>
+<p><strong>Concretely, the difference for this phase:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>LCEL chain</th>
+<th>LangGraph <code class="inline-code">StateGraph</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What&#39;s passed between steps</td>
+<td>Whatever the previous step returns, and nothing else, unless you explicitly thread it forward (like Phase 2&#39;s <code class="inline-code">RunnablePassthrough</code>)</td>
+<td>A shared, named <strong>state object</strong> every node can read from and write partial updates to</td>
+</tr>
+<tr>
+<td>Adding a third step later</td>
+<td>Re-wire the <code class="inline-code">.pipe()</code> chain</td>
+<td>Add a node, add an edge — the rest of the graph is untouched</td>
+</tr>
+<tr>
+<td>Conditional branching</td>
+<td><code class="inline-code">RunnableBranch</code> (still fairly linear, decided per-invocation)</td>
+<td>Native conditional edges — a node&#39;s output can determine which node runs next, and this scales to much more complex routing than <code class="inline-code">RunnableBranch</code> comfortably expresses</td>
+</tr>
+<tr>
+<td>Memory of past runs / resumability</td>
+<td>None built in</td>
+<td>Checkpointers (Phase 4) let you pause, inspect, and resume a graph run</td>
+</tr>
+</tbody>
+</table></div>
+<p>This phase intentionally builds the <strong>smallest possible real graph</strong> — two nodes, one edge, no branching, no checkpointing yet — specifically so those concepts land as a small, legible first example before Phase 4 asks you to build something considerably larger on the same foundation.</p>
+<h3 id="22-state-amp-schema"><a class="heading-anchor" href="#22-state-amp-schema" aria-hidden="true">#</a>2.2 State &amp; Schema</h3>
+<p>A <code class="inline-code">StateGraph</code> needs to know, up front, <strong>the shape of the data every node will read and write</strong>. In LangGraph.js, you define this with <code class="inline-code">Annotation.Root(...)</code>, which is essentially a typed schema declaration — similar in spirit to your Zod schemas from Phase 2, but describing the graph&#39;s <em>shared memory</em> rather than an LLM&#39;s output shape.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> <span class="hljs-title class_">ClauseExtractionState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">contractId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;(),
+  <span class="hljs-attr">rawText</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;(),
+  <span class="hljs-attr">windows</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">ContractWindow</span>[]&gt;(),
+  <span class="hljs-attr">rawExtractedClauses</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">ExtractedClause</span>[]&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">existing, incoming</span>) =&gt;</span> existing.<span class="hljs-title function_">concat</span>(incoming),
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> [],
+  }),
+  <span class="hljs-attr">mergedClauses</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">ExtractedClause</span>[]&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_existing, incoming</span>) =&gt;</span> incoming,
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> [],
+  }),
+});</code></pre></div>
+<p>Two things are worth understanding carefully here, because they&#39;re easy to misread as boilerplate:</p>
+<p><strong>Every field needs a type</strong>, same reasoning as Zod in Phase 2 — the graph needs to know what shape of data flows through it so it can validate updates and give you type safety in TypeScript.</p>
+<p><strong>The <code class="inline-code">reducer</code> function is the actual new concept.</strong> When a node returns a partial state update like <code class="inline-code">{ rawExtractedClauses: [...] }</code>, the graph doesn&#39;t just overwrite the existing value — it calls that field&#39;s reducer with <code class="inline-code">(currentValue, newValue)</code> and stores whatever the reducer returns. The default reducer (if you don&#39;t specify one) is &quot;replace&quot; — the new value wins outright, which is what you want for <code class="inline-code">mergedClauses</code> (the merge step&#39;s job is to produce one final authoritative list, not append to something). But <code class="inline-code">rawExtractedClauses</code> uses a <strong>concatenating</strong> reducer, because as you&#39;ll see in 2.4, the extraction node processes multiple windows and each window&#39;s results should <em>accumulate</em> into one combined list, not overwrite each other.</p>
+<p>This is the first real payoff of &quot;shared state&quot; over &quot;piped output&quot;: two different nodes (or the same node called multiple times conceptually) can contribute to the <em>same</em> field of state, and the reducer decides how those contributions combine — something a linear <code class="inline-code">.pipe()</code> chain has no clean way to express at all.</p>
+<h3 id="23-nodes-amp-edges"><a class="heading-anchor" href="#23-nodes-amp-edges" aria-hidden="true">#</a>2.3 Nodes &amp; Edges</h3>
+<p>A <strong>node</strong> is just a function: <code class="inline-code">(state) =&gt; Promise&lt;Partial&lt;State&gt;&gt;</code>. It reads whatever fields of state it needs and returns an object containing only the fields it wants to update — it does not need to return the entire state back. This partial-update convention is what makes the reducer system in 2.2 meaningful: the graph merges your partial return into the full state using each field&#39;s reducer.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">extractClausesNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">ClauseExtractionState</span>.<span class="hljs-title class_">State</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">ClauseExtractionState</span>.<span class="hljs-property">State</span>&gt;&gt; {
+  <span class="hljs-comment">// ... does work using state.windows ...</span>
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">rawExtractedClauses</span>: allExtracted };
+}</code></pre></div>
+<p>An <strong>edge</strong> connects one node&#39;s completion to the next node&#39;s start. The simplest edges are fixed: &quot;after node A finishes, always run node B.&quot; LangGraph provides two special pseudo-nodes, <code class="inline-code">START</code> and <code class="inline-code">END</code>, marking where a graph run begins and terminates — every graph needs at least one edge from <code class="inline-code">START</code> and at least one path that reaches <code class="inline-code">END</code>.</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">const</span> graph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">ClauseExtractionState</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;extract_clauses&quot;</span>, extractClausesNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;validate_and_merge&quot;</span>, validateAndMergeNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;extract_clauses&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;extract_clauses&quot;</span>, <span class="hljs-string">&quot;validate_and_merge&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;validate_and_merge&quot;</span>, <span class="hljs-variable constant_">END</span>);
+
+<span class="hljs-keyword">const</span> compiledGraph = graph.<span class="hljs-title function_">compile</span>();</code></pre></div>
+<p><code class="inline-code">compile()</code> validates the graph structure (every node reachable, no dangling edges) and returns a runnable object with the familiar <code class="inline-code">.invoke()</code> / <code class="inline-code">.stream()</code> interface — from the outside, calling a compiled graph looks exactly like calling any other LangChain runnable, which is intentional: it means a graph can itself be embedded as one step inside a larger chain or an even bigger graph later (this is exactly what Phase 5&#39;s subgraphs and Phase 6.5&#39;s multi-agent supervisor will do).</p>
+<p>This phase&#39;s graph is deliberately linear (<code class="inline-code">START → extract_clauses → validate_and_merge → END</code>, no branches, no loops) — the branching and looping constructs (conditional edges, <code class="inline-code">Send()</code>) are introduced in Phase 4 once you have a second, more complex graph to justify them.</p>
+<h3 id="24-the-sliding-window-problem-and-why-it-needs-two-distinct-steps"><a class="heading-anchor" href="#24-the-sliding-window-problem-and-why-it-needs-two-distinct-steps" aria-hidden="true">#</a>2.4 The sliding-window problem, and why it needs two distinct steps</h3>
+<p>Ask an LLM to &quot;list every clause in this contract&quot; for a 3-page NDA, and it does a genuinely solid job in one call — the whole document fits comfortably in its attention at once. Ask the same question of a 40-page master services agreement, and quality degrades well before you hit any hard context-length error: models get less exhaustive and less precise the more they&#39;re asked to hold in view and enumerate at once. The practical fix is the same one Phase 1 used for embeddings, applied to extraction instead: <strong>break the document into overlapping windows</strong>, run extraction independently on each window, and then reconcile the results.</p>
+<p><strong>Why overlapping, not just non-overlapping chunks (as in Phase 1&#39;s plain text splitter)?</strong> A clause can start near the very end of one window and finish at the start of the next. A non-overlapping split would hand the model half a clause in each of two calls, and neither call would report a complete, correct clause. Overlap (e.g. the last ~15% of window <em>N</em> is repeated as the first ~15% of window <em>N+1</em>) means any clause that happened to straddle a boundary is very likely to appear whole in at least one of the two windows.</p>
+<p><strong>The cost of overlap:</strong> any clause sitting in the overlapping region will very likely be extracted <strong>twice</strong> — once by each window that contains it. This is an acceptable, expected cost, not a bug to prevent at the windowing stage. It&#39;s exactly why this phase is naturally two steps rather than one:</p>
+<ol>
+<li><strong>Extract</strong> — run structured extraction independently over every window (some duplication expected, extraction quality is what matters here, not final list length).</li>
+<li><strong>Validate and merge</strong> — reconcile the (probably duplicated, possibly inconsistent) raw results into one clean, deduplicated final list.</li>
+</ol>
+<p>This is precisely the <code class="inline-code">extract_clauses → validate_and_merge</code> two-node graph the roadmap specifies, and it&#39;s a materially better fit for LangGraph&#39;s shared-state model than for a single LCEL chain: node 1 accumulates raw results from <em>N</em> independent window calls into one field (via the concatenating reducer from 2.2), and node 2 reads that accumulated field, reasons over the whole thing at once, and replaces it with a clean final value in a <em>different</em> field.</p>
+<h3 id="25-token-counting-and-window-sizing"><a class="heading-anchor" href="#25-token-counting-and-window-sizing" aria-hidden="true">#</a>2.5 Token counting and window sizing</h3>
+<p>To decide where window boundaries go, you need a reasonably accurate way to estimate how many tokens a piece of text will consume — character count alone is a rough proxy (English text averages roughly 4 characters per token, but this varies with formatting, punctuation density, and non-English text). For a project targeting Indian legal documents specifically (some of which mix English with transliterated terms or dense cross-references), a real tokenizer estimate is worth the small dependency cost over a pure character-count heuristic.</p>
+<p><code class="inline-code">js-tiktoken</code> gives you the actual tokenizer OpenAI&#39;s models use, so you can count tokens precisely rather than guessing:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-keyword">import</span> { encodingForModel } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;js-tiktoken&quot;</span>;
+<span class="hljs-keyword">const</span> enc = <span class="hljs-title function_">encodingForModel</span>(<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>);
+<span class="hljs-keyword">const</span> tokenCount = enc.<span class="hljs-title function_">encode</span>(someText).<span class="hljs-property">length</span>;</code></pre></div>
+<p><strong>Choosing window size and overlap:</strong> this phase uses a 6,000-token window with a 500-token overlap by default. The window size is chosen well under typical model context limits — leaving generous headroom for the system prompt, the schema description injected by <code class="inline-code">withStructuredOutput()</code>, and the model&#39;s own output tokens (a contract with unusually dense clause structure could need a large output). The overlap (roughly 8% of the window) is enough to reliably catch clauses straddling a boundary without doubling your LLM call volume the way a 50% overlap would.</p>
+<p><strong>A contract under the 6,000-token threshold gets exactly one window</strong> — the sliding-window machinery degrades gracefully to &quot;one call, no merging needed&quot; for short contracts, rather than being a special case you have to branch around.</p>
+<h3 id="26-deduplication-and-merging-strategy"><a class="heading-anchor" href="#26-deduplication-and-merging-strategy" aria-hidden="true">#</a>2.6 Deduplication and merging strategy</h3>
+<p>Once you have raw extracted clauses from every window, some are genuinely unique and some are near-duplicates of a clause from an adjacent, overlapping window. Two clauses are considered &quot;the same clause&quot; for merging purposes if they share the same <code class="inline-code">clauseType</code> <strong>and</strong> their <code class="inline-code">fullText</code> values are highly similar — not necessarily identical, since the model might phrase a summary slightly differently between two calls even when quoting the same underlying text.</p>
+<p>This phase uses a pragmatic, LLM-free similarity check for merging (token-set overlap on normalized clause text — fast, deterministic, and free), reserving an LLM call only for genuinely ambiguous cases. This keeps the merge step cheap and fast for the common case (obvious duplicates from window overlap) while still handling subtler cases correctly.</p>
+<hr>
+<h2 id="3-different-approaches"><a class="heading-anchor" href="#3-different-approaches" aria-hidden="true">#</a>3. Different Approaches</h2>
+<h3 id="31-single-pass-vs-sliding-window-extraction"><a class="heading-anchor" href="#31-single-pass-vs-sliding-window-extraction" aria-hidden="true">#</a>3.1 Single-pass vs. sliding-window extraction</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Always single-pass</strong> — one <code class="inline-code">withStructuredOutput()</code> call over the entire <code class="inline-code">raw_text</code></td>
+<td>Simplest possible code; no merge step needed</td>
+<td>Reliability degrades on long contracts well before any hard token limit; risks silently missing clauses on large documents with no signal that anything was dropped</td>
+<td>Short contracts only (NDAs, simple one-page agreements)</td>
+</tr>
+<tr>
+<td><strong>B. Always sliding-window, regardless of length</strong></td>
+<td>One consistent code path for every contract; no special-casing</td>
+<td>Adds an unnecessary merge step and slightly higher LLM cost for contracts that would have fit in one call anyway</td>
+<td>Simpler to reason about if you don&#39;t mind the small overhead on short contracts</td>
+</tr>
+<tr>
+<td><strong>C. Adaptive — single window if the contract is under the token threshold, sliding windows otherwise (roadmap&#39;s approach)</strong></td>
+<td>No wasted merge-step cost for the (very common) short-contract case; scales correctly for the 40-page case explicitly mentioned in your roadmap</td>
+<td>Two code paths to test (though the &quot;windowing&quot; function collapsing to one window is the same code path under the hood, not truly a branch)</td>
+<td><strong>Recommended</strong> — the &quot;one window&quot; case is just <code class="inline-code">createSlidingWindows()</code> naturally returning an array of length 1, so this isn&#39;t really extra complexity, just correct behavior at both ends of the size spectrum</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach C. Implement <code class="inline-code">createSlidingWindows()</code> to always run, and let it return a single window for anything under the threshold — this avoids <code class="inline-code">if (isLongContract) {...} else {...}</code> branching in the orchestration code entirely, since the windowing function already produces the right output shape either way.</p>
+<h3 id="32-orchestration-lcel-chain-vs-langgraph-stategraph"><a class="heading-anchor" href="#32-orchestration-lcel-chain-vs-langgraph-stategraph" aria-hidden="true">#</a>3.2 Orchestration: LCEL chain vs. LangGraph <code class="inline-code">StateGraph</code></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Pure LCEL</strong> — <code class="inline-code">extractStep.pipe(mergeStep)</code>, using <code class="inline-code">RunnableLambda</code> for both</td>
+<td>Fewer new concepts; you already know this pattern from Phase 2</td>
+<td>No shared-state model for accumulating results across an unknown number of window calls (you&#39;d manage that manually inside the <code class="inline-code">RunnableLambda</code>, which works but hides the accumulation logic from the graph/tracing layer); doesn&#39;t establish the LangGraph foundation Phase 4 needs</td>
+<td>Would work fine for this phase alone, in isolation</td>
+</tr>
+<tr>
+<td><strong>B. LangGraph <code class="inline-code">StateGraph</code>, 2 nodes (roadmap&#39;s choice)</strong></td>
+<td>Explicit, typed, traceable shared state; the accumulating-reducer pattern (2.2) is a natural fit for &quot;N window extractions feeding into one list&quot;; establishes the exact primitives (state, nodes, edges, compile) Phase 4 builds on immediately</td>
+<td>One new dependency (<code class="inline-code">@langchain/langgraph</code>) and a handful of new concepts to learn in one sitting</td>
+<td><strong>Recommended</strong> — matches your roadmap exactly, and this phase is deliberately sized to be a gentle first <code class="inline-code">StateGraph</code> before Phase 4&#39;s much larger one</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach B, as specified. This phase is explicitly your roadmap&#39;s &quot;first tiny graph&quot; — small enough to fully understand in one sitting, real enough that Phase 4 isn&#39;t starting from zero.</p>
+<h3 id="33-deduplication-strategy"><a class="heading-anchor" href="#33-deduplication-strategy" aria-hidden="true">#</a>3.3 Deduplication strategy</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. LLM-based merge only</strong> — hand the entire raw list to one more LLM call and ask it to deduplicate and consolidate</td>
+<td>Handles subtle rephrasing differences well; simple to describe</td>
+<td>Expensive and slow for contracts with many clauses (the raw list, including duplicates, could be large); another point of possible LLM inconsistency; nondeterministic</td>
+<td>Fine for small contracts, weaker choice as a general default</td>
+</tr>
+<tr>
+<td><strong>B. Pure algorithmic dedup only</strong> — normalize + token-set similarity threshold, no LLM involvement</td>
+<td>Fast, free, fully deterministic, easy to unit test</td>
+<td>Can miss duplicates where the model phrased the same clause meaningfully differently across two window calls, or wrongly merge two distinct short clauses that happen to share a lot of boilerplate language</td>
+<td>Good for the common case, weak on genuinely ambiguous edge cases</td>
+</tr>
+<tr>
+<td><strong>C. Algorithmic dedup first, LLM tiebreak only for borderline-similarity pairs (roadmap-aligned, recommended)</strong></td>
+<td>Cheap and fast for the large majority of duplicates (near-identical text from window overlap); reserves the more expensive/careful LLM judgment only for cases genuinely worth it</td>
+<td>Slightly more code (two similarity thresholds: an &quot;obviously the same&quot; cutoff and an &quot;obviously different&quot; cutoff, with an LLM call only in between)</td>
+<td><strong>Recommended</strong> — best balance of cost, speed, and correctness for a merge step that needs to run on every contract</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Approach C. Two thresholds on a normalized token-overlap similarity score: above the high threshold, merge automatically; below the low threshold, treat as distinct automatically; only the narrow middle band pays for an LLM call.</p>
+<hr>
+<h2 id="4-detailed-implementation-plan"><a class="heading-anchor" href="#4-detailed-implementation-plan" aria-hidden="true">#</a>4. Detailed Implementation Plan</h2>
+<h3 id="step-1--database-schema-for-clauses"><a class="heading-anchor" href="#step-1--database-schema-for-clauses" aria-hidden="true">#</a>Step 1 — Database schema for clauses</h3>
+<p><strong>What:</strong> A <code class="inline-code">clauses</code> table, one row per final (post-merge) clause, plus a <code class="inline-code">content_hash</code>-based idempotency guard on the parent contract so re-running extraction on an already-processed contract doesn&#39;t create duplicate rows.</p>
+<p><strong>Why:</strong> This is the table Phase 4 fans its <code class="inline-code">Send()</code>-based parallel risk-scoring out over — one risk-scoring execution per row here.</p>
+<p><strong>Best practice:</strong> Store <code class="inline-code">window_indices</code> (which window(s) this clause was found in) as <code class="inline-code">jsonb</code> — genuinely useful for debugging &quot;why did the merge step treat these as the same clause&quot; months from now.</p>
+<p><strong>Common mistake to avoid:</strong> Making <code class="inline-code">clause_type</code> a Postgres <code class="inline-code">ENUM</code>. Exactly like Phase 2&#39;s <code class="inline-code">contract_type</code>, keep it free text — new clause types will come up as you process more real contracts, and a text column means that&#39;s a data change, not a migration.</p>
+<h3 id="step-2--token-aware-sliding-window-module"><a class="heading-anchor" href="#step-2--token-aware-sliding-window-module" aria-hidden="true">#</a>Step 2 — Token-aware sliding window module</h3>
+<p><strong>What:</strong> <code class="inline-code">createSlidingWindows(text, maxTokens, overlapTokens)</code> — splits <code class="inline-code">raw_text</code> into an array of overlapping windows using paragraph boundaries where possible (never splitting a paragraph mid-sentence if it can be avoided), each under <code class="inline-code">maxTokens</code>.</p>
+<p><strong>Why:</strong> This is the direct fix for the reliability problem described in Concept Learning 2.4 and 2.5.</p>
+<p><strong>Best practice:</strong> Split on paragraph boundaries (<code class="inline-code">\n\n</code>) first, falling back to sentence boundaries only if a single paragraph itself exceeds the window size (rare, but a contract can have one unusually long defined-terms paragraph) — this keeps each window&#39;s content coherent rather than cutting arbitrarily by character count.</p>
+<p><strong>Common mistake to avoid:</strong> Computing overlap in <em>characters</em> instead of <em>tokens</em>. Since the whole point of windowing is respecting a token budget, sizing the overlap the same way keeps your window-size math internally consistent.</p>
+<h3 id="step-3--zod-schema-for-a-single-extracted-clause"><a class="heading-anchor" href="#step-3--zod-schema-for-a-single-extracted-clause" aria-hidden="true">#</a>Step 3 — Zod schema for a single extracted clause</h3>
+<p><strong>What:</strong> <code class="inline-code">ExtractedClauseSchema</code> — the structured shape a single extraction call should return for one window (an array of these).</p>
+<p><strong>Why:</strong> Same reasoning as Phase 2 — one schema serves as both the LLM&#39;s output contract (via <code class="inline-code">withStructuredOutput</code>) and your TypeScript type.</p>
+<p><strong>Best practice:</strong> Require <code class="inline-code">fullText</code> to be the <strong>verbatim</strong> clause text (not a paraphrase) — you need the actual original wording for the merge step&#39;s similarity comparison, and later, for a compliance reviewer in Phase 4 to trust that &quot;here&#39;s the risky clause&quot; quotes the real contract, not the model&#39;s rendition of it.</p>
+<h3 id="step-4--the-extract_clauses-node"><a class="heading-anchor" href="#step-4--the-extract_clauses-node" aria-hidden="true">#</a>Step 4 — The <code class="inline-code">extract_clauses</code> node</h3>
+<p><strong>What:</strong> A LangGraph node function that, given <code class="inline-code">state.windows</code>, runs a <code class="inline-code">withStructuredOutput()</code> extraction call <strong>concurrently</strong> across every window (using <code class="inline-code">Promise.all</code>, the same &quot;why serialize independent work&quot; reasoning as Phase 2&#39;s <code class="inline-code">RunnableParallel</code> — just expressed directly here since a graph node is a plain async function, not a composed runnable), and returns the combined raw results.</p>
+<p><strong>Why:</strong> Windows are fully independent of each other — nothing about extracting clauses from window 3 depends on what window 1 returned — so there&#39;s no reason to await them one at a time.</p>
+<p><strong>Best practice:</strong> Tag every extracted clause with its source <code class="inline-code">windowIndex</code> at extraction time, before anything gets merged — exactly the same &quot;attach metadata now, not later&quot; lesson from Phase 1&#39;s chunk indexing.</p>
+<h3 id="step-5--the-validate_and_merge-node"><a class="heading-anchor" href="#step-5--the-validate_and_merge-node" aria-hidden="true">#</a>Step 5 — The <code class="inline-code">validate_and_merge</code> node</h3>
+<p><strong>What:</strong> A node that takes <code class="inline-code">state.rawExtractedClauses</code>, groups candidates by <code class="inline-code">clauseType</code>, computes pairwise text similarity within each group, merges pairs above the high threshold automatically, asks an LLM to adjudicate pairs in the ambiguous middle band, and returns the final deduplicated list.</p>
+<p><strong>Why:</strong> This is the reconciliation step from Concept Learning 2.4 and 2.6.</p>
+<p><strong>Common mistake to avoid:</strong> Comparing every clause against every other clause across the <em>entire</em> contract (O(n²) over all clauses). Grouping by <code class="inline-code">clauseType</code> first narrows comparisons to only clauses that could plausibly be duplicates of each other, which matters once a large contract produces 40+ raw candidate clauses.</p>
+<h3 id="step-6--graph-construction-and-compilation"><a class="heading-anchor" href="#step-6--graph-construction-and-compilation" aria-hidden="true">#</a>Step 6 — Graph construction and compilation</h3>
+<p><strong>What:</strong> Wire <code class="inline-code">extract_clauses</code> and <code class="inline-code">validate_and_merge</code> into a <code class="inline-code">StateGraph</code>, with the state schema from Concept Learning 2.2, and <code class="inline-code">.compile()</code> it once at module load (not per-request) since a compiled graph has no per-request state of its own.</p>
+<p><strong>Why:</strong> Compiling once and reusing the compiled graph across requests is both correct (the graph structure doesn&#39;t change) and efficient (compilation does real validation work you don&#39;t want to repeat every request).</p>
+<h3 id="step-7--storage-layer"><a class="heading-anchor" href="#step-7--storage-layer" aria-hidden="true">#</a>Step 7 — Storage layer</h3>
+<p><strong>What:</strong> Functions to check whether a contract already has extracted clauses (idempotency, same pattern as Phase 1/2), and to bulk-insert the final merged clause list in one transaction.</p>
+<p><strong>Why:</strong> Same reasoning as every prior phase — re-running extraction on an unchanged contract should be a cheap no-op, and a crash mid-insert shouldn&#39;t leave a half-populated <code class="inline-code">clauses</code> table.</p>
+<h3 id="step-8--the-extraction-endpoint"><a class="heading-anchor" href="#step-8--the-extraction-endpoint" aria-hidden="true">#</a>Step 8 — The extraction endpoint</h3>
+<p><strong>What:</strong> <code class="inline-code">POST /api/contracts/:id/clauses/extract</code> — loads the contract&#39;s <code class="inline-code">raw_text</code>, checks idempotency, invokes the compiled graph, stores the result, returns the clause list. A companion <code class="inline-code">GET /api/contracts/:id/clauses</code> for simple retrieval.</p>
+<p><strong>Best practice:</strong> Return the count of clauses found <em>and</em> how many raw candidates were merged away (<code class="inline-code">rawCount - mergedCount</code>) in the response — a useful sanity signal for you while validating extraction quality against real contracts, and free to compute since you already have both numbers in hand.</p>
+<hr>
+<h2 id="5-hands-on-tasks"><a class="heading-anchor" href="#5-hands-on-tasks" aria-hidden="true">#</a>5. Hands-on Tasks</h2>
+<ol>
+<li><strong>Run the migration</strong> below to create the <code class="inline-code">clauses</code> table.</li>
+<li><strong>Install dependencies</strong>: <code class="inline-code">@langchain/langgraph</code>, <code class="inline-code">js-tiktoken</code>.</li>
+<li><strong>Implement <code class="inline-code">src/clauses/tokenizer.ts</code></strong> — the token-counting wrapper around <code class="inline-code">js-tiktoken</code>.</li>
+<li><strong>Implement <code class="inline-code">src/clauses/windowing.ts</code></strong> — <code class="inline-code">createSlidingWindows()</code>.</li>
+<li><strong>Implement <code class="inline-code">src/clauses/schemas.ts</code></strong> — <code class="inline-code">ExtractedClauseSchema</code> and the window-level extraction output schema.</li>
+<li><strong>Implement <code class="inline-code">src/clauses/similarity.ts</code></strong> — normalized token-overlap similarity scoring for the merge step.</li>
+<li><strong>Implement <code class="inline-code">src/clauses/nodes/extractClauses.ts</code></strong> — node 1.</li>
+<li><strong>Implement <code class="inline-code">src/clauses/nodes/validateAndMerge.ts</code></strong> — node 2, including the LLM-tiebreak sub-chain for the ambiguous similarity band.</li>
+<li><strong>Implement <code class="inline-code">src/clauses/graph.ts</code></strong> — build and compile the <code class="inline-code">StateGraph</code>.</li>
+<li><strong>Implement <code class="inline-code">src/clauses/storage.ts</code></strong> — idempotency check + transactional bulk insert.</li>
+<li><strong>Implement <code class="inline-code">src/routes/clauses.ts</code></strong> and wire it into your Express app.</li>
+<li><strong>Test on a short contract</strong> (an NDA that fits in one window) — confirm exactly one window is created and the merge step effectively passes the list through with zero or near-zero duplicates removed.</li>
+<li><strong>Test on a long contract</strong> (40+ pages) — confirm multiple windows are created, some duplicate clauses appear in the raw extraction, and the final merged list has sensibly deduplicated them. Manually spot-check 3-4 clauses against the source document for accuracy.</li>
+<li><strong>Test idempotency</strong> — call the extraction endpoint twice on the same contract and confirm the second call doesn&#39;t create duplicate rows (decide and implement whether it should be a no-op or a force-reprocess, and make that explicit in the endpoint&#39;s behavior/response).</li>
+</ol>
+<hr>
+<h2 id="6-code-guidance"><a class="heading-anchor" href="#6-code-guidance" aria-hidden="true">#</a>6. Code Guidance</h2>
+<h3 id="61-dependencies"><a class="heading-anchor" href="#61-dependencies" aria-hidden="true">#</a>6.1 Dependencies</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">npm install @langchain/langgraph js-tiktoken</code></pre></div>
+<h3 id="62-environment-variables-append-to-env"><a class="heading-anchor" href="#62-environment-variables-append-to-env" aria-hidden="true">#</a>6.2 Environment variables (append to <code class="inline-code">.env</code>)</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-bash">CLAUSE_EXTRACTION_MODEL=gpt-4o-mini
+CLAUSE_WINDOW_MAX_TOKENS=6000
+CLAUSE_WINDOW_OVERLAP_TOKENS=500
+CLAUSE_MERGE_HIGH_SIMILARITY=0.85
+CLAUSE_MERGE_LOW_SIMILARITY=0.4</code></pre></div>
+<h3 id="63-database-migration"><a class="heading-anchor" href="#63-database-migration" aria-hidden="true">#</a>6.3 Database migration</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">sql</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-sql"><span class="hljs-comment">-- migrations/004_clauses.sql</span>
+
+<span class="hljs-keyword">CREATE TABLE</span> IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> clauses (
+    id                UUID <span class="hljs-keyword">PRIMARY KEY</span> <span class="hljs-keyword">DEFAULT</span> gen_random_uuid(),
+    contract_id       UUID <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> contracts(id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    clause_type       TEXT <span class="hljs-keyword">NOT NULL</span>,
+    title             TEXT <span class="hljs-keyword">NOT NULL</span>,
+    full_text         TEXT <span class="hljs-keyword">NOT NULL</span>,
+    summary           TEXT <span class="hljs-keyword">NOT NULL</span>,
+    obligations       JSONB <span class="hljs-keyword">NOT NULL</span>,
+    section_reference TEXT,
+    window_indices    JSONB <span class="hljs-keyword">NOT NULL</span>,
+    created_at        TIMESTAMPTZ <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> now()
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_clauses_contract_id <span class="hljs-keyword">ON</span> clauses (contract_id);
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_clauses_type <span class="hljs-keyword">ON</span> clauses (clause_type);</code></pre></div>
+<h3 id="64-token-aware-windowing"><a class="heading-anchor" href="#64-token-aware-windowing" aria-hidden="true">#</a>6.4 Token-aware windowing</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/tokenizer.ts</span>
+<span class="hljs-keyword">import</span> { encodingForModel, <span class="hljs-keyword">type</span> <span class="hljs-title class_">TiktokenModel</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;js-tiktoken&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-attr">MODEL</span>: <span class="hljs-title class_">TiktokenModel</span> = <span class="hljs-string">&quot;gpt-4o-mini&quot;</span> <span class="hljs-keyword">as</span> <span class="hljs-title class_">TiktokenModel</span>;
+<span class="hljs-keyword">const</span> encoder = <span class="hljs-title function_">encodingForModel</span>(<span class="hljs-variable constant_">MODEL</span>);
+
+<span class="hljs-comment">/** Returns an accurate token count for a piece of text, per the actual
+ *  tokenizer the extraction model uses - a real count, not a char/4 guess. */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">countTokens</span>(<span class="hljs-params"><span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-built_in">number</span> {
+  <span class="hljs-keyword">return</span> encoder.<span class="hljs-title function_">encode</span>(text).<span class="hljs-property">length</span>;
+}</code></pre></div>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/windowing.ts</span>
+<span class="hljs-keyword">import</span> { countTokens } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./tokenizer&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ContractWindow</span> {
+  <span class="hljs-attr">windowIndex</span>: <span class="hljs-built_in">number</span>;
+  <span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">tokenCount</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">MAX_TOKENS</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">CLAUSE_WINDOW_MAX_TOKENS</span> ?? <span class="hljs-number">6000</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">OVERLAP_TOKENS</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">CLAUSE_WINDOW_OVERLAP_TOKENS</span> ?? <span class="hljs-number">500</span>);
+
+<span class="hljs-comment">/**
+ * Splits contract text into overlapping windows sized in tokens (not
+ * characters), so the token-budget math stays internally consistent.
+ * Splits on paragraph boundaries first to keep each window&#x27;s content
+ * coherent; only falls back to sentence-level splitting if a single
+ * paragraph alone exceeds the window size.
+ *
+ * A contract under MAX_TOKENS produces exactly one window - the same
+ * function handles short and long contracts without a special case.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">createSlidingWindows</span>(<span class="hljs-params"><span class="hljs-attr">fullText</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">ContractWindow</span>[] {
+  <span class="hljs-keyword">const</span> paragraphs = fullText.<span class="hljs-title function_">split</span>(<span class="hljs-regexp">/\n\s*\n/</span>).<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">p</span>) =&gt;</span> p.<span class="hljs-title function_">trim</span>().<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>);
+
+  <span class="hljs-comment">// Break any single paragraph that alone exceeds MAX_TOKENS into sentences,</span>
+  <span class="hljs-comment">// so no individual unit we place into a window can overflow it by itself.</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">units</span>: <span class="hljs-built_in">string</span>[] = [];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> para <span class="hljs-keyword">of</span> paragraphs) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-title function_">countTokens</span>(para) &lt;= <span class="hljs-variable constant_">MAX_TOKENS</span>) {
+      units.<span class="hljs-title function_">push</span>(para);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">const</span> sentences = para.<span class="hljs-title function_">split</span>(<span class="hljs-regexp">/(?&lt;=[.!?])\s+/</span>);
+      units.<span class="hljs-title function_">push</span>(...sentences);
+    }
+  }
+
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">windows</span>: <span class="hljs-title class_">ContractWindow</span>[] = [];
+  <span class="hljs-keyword">let</span> <span class="hljs-attr">current</span>: <span class="hljs-built_in">string</span>[] = [];
+  <span class="hljs-keyword">let</span> currentTokens = <span class="hljs-number">0</span>;
+
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">flush</span> = (<span class="hljs-params"></span>) =&gt; {
+    <span class="hljs-keyword">if</span> (current.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>;
+    <span class="hljs-keyword">const</span> text = current.<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;\n\n&quot;</span>);
+    windows.<span class="hljs-title function_">push</span>({ <span class="hljs-attr">windowIndex</span>: windows.<span class="hljs-property">length</span>, text, <span class="hljs-attr">tokenCount</span>: <span class="hljs-title function_">countTokens</span>(text) });
+  };
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> unit <span class="hljs-keyword">of</span> units) {
+    <span class="hljs-keyword">const</span> unitTokens = <span class="hljs-title function_">countTokens</span>(unit);
+
+    <span class="hljs-keyword">if</span> (currentTokens + unitTokens &gt; <span class="hljs-variable constant_">MAX_TOKENS</span> &amp;&amp; current.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>) {
+      <span class="hljs-title function_">flush</span>();
+
+      <span class="hljs-comment">// Build the overlap tail for the next window: walk backward through</span>
+      <span class="hljs-comment">// the just-flushed units until we&#x27;ve collected ~OVERLAP_TOKENS worth.</span>
+      <span class="hljs-keyword">let</span> overlapTokens = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">const</span> <span class="hljs-attr">overlapUnits</span>: <span class="hljs-built_in">string</span>[] = [];
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = current.<span class="hljs-property">length</span> - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span> &amp;&amp; overlapTokens &lt; <span class="hljs-variable constant_">OVERLAP_TOKENS</span>; i--) {
+        overlapUnits.<span class="hljs-title function_">unshift</span>(current[i]);
+        overlapTokens += <span class="hljs-title function_">countTokens</span>(current[i]);
+      }
+
+      current = overlapUnits;
+      currentTokens = overlapTokens;
+    }
+
+    current.<span class="hljs-title function_">push</span>(unit);
+    currentTokens += unitTokens;
+  }
+
+  <span class="hljs-title function_">flush</span>();
+
+  <span class="hljs-keyword">return</span> windows;
+}</code></pre></div>
+<h3 id="65-zod-schema-for-extracted-clauses"><a class="heading-anchor" href="#65-zod-schema-for-extracted-clauses" aria-hidden="true">#</a>6.5 Zod schema for extracted clauses</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/schemas.ts</span>
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CLAUSE_TYPES</span> = [
+  <span class="hljs-string">&quot;payment_terms&quot;</span>,
+  <span class="hljs-string">&quot;termination&quot;</span>,
+  <span class="hljs-string">&quot;confidentiality&quot;</span>,
+  <span class="hljs-string">&quot;liability_indemnification&quot;</span>,
+  <span class="hljs-string">&quot;intellectual_property&quot;</span>,
+  <span class="hljs-string">&quot;non_compete&quot;</span>,
+  <span class="hljs-string">&quot;dispute_resolution&quot;</span>,
+  <span class="hljs-string">&quot;force_majeure&quot;</span>,
+  <span class="hljs-string">&quot;warranties_representations&quot;</span>,
+  <span class="hljs-string">&quot;assignment&quot;</span>,
+  <span class="hljs-string">&quot;governing_law&quot;</span>,
+  <span class="hljs-string">&quot;notices&quot;</span>,
+  <span class="hljs-string">&quot;definitions&quot;</span>,
+  <span class="hljs-string">&quot;other&quot;</span>,
+] <span class="hljs-keyword">as</span> <span class="hljs-keyword">const</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">ExtractedClauseSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">clauseType</span>: z.<span class="hljs-title function_">enum</span>(<span class="hljs-variable constant_">CLAUSE_TYPES</span>).<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The single best-fitting clause category&quot;</span>),
+  <span class="hljs-attr">title</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A short human-readable title for this clause, e.g. &#x27;Termination for Convenience&#x27;&quot;</span>),
+  <span class="hljs-attr">fullText</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The clause&#x27;s VERBATIM text as it appears in the contract - do not paraphrase or summarize here&quot;</span>),
+  <span class="hljs-attr">summary</span>: z.<span class="hljs-title function_">string</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;A one to two sentence plain-language summary of what this clause means&quot;</span>),
+  <span class="hljs-attr">obligations</span>: z
+    .<span class="hljs-title function_">array</span>(z.<span class="hljs-title function_">string</span>())
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Concrete obligations this clause creates, phrased as &#x27;Party X must/may Y&#x27;&quot;</span>),
+  <span class="hljs-attr">sectionReference</span>: z
+    .<span class="hljs-title function_">string</span>()
+    .<span class="hljs-title function_">nullable</span>()
+    .<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;The section/clause number as labeled in the contract, if any, else null&quot;</span>),
+});
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">ExtractedClause</span> = z.<span class="hljs-property">infer</span>&lt;<span class="hljs-keyword">typeof</span> <span class="hljs-title class_">ExtractedClauseSchema</span>&gt;;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">WindowExtractionSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">clauses</span>: z.<span class="hljs-title function_">array</span>(<span class="hljs-title class_">ExtractedClauseSchema</span>).<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;Every distinct clause found in this text window&quot;</span>),
+});
+
+<span class="hljs-comment">/** A clause after window-tagging, carried through the graph state. */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">TaggedClause</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ExtractedClause</span> {
+  <span class="hljs-attr">windowIndices</span>: <span class="hljs-built_in">number</span>[];
+}</code></pre></div>
+<h3 id="66-similarity-scoring-for-merge"><a class="heading-anchor" href="#66-similarity-scoring-for-merge" aria-hidden="true">#</a>6.6 Similarity scoring for merge</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/similarity.ts</span>
+
+<span class="hljs-comment">/** Normalizes text for comparison: lowercase, collapse whitespace, strip
+ *  punctuation - so trivial formatting differences don&#x27;t affect similarity. */</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">normalize</span>(<span class="hljs-params"><span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Set</span>&lt;<span class="hljs-built_in">string</span>&gt; {
+  <span class="hljs-keyword">const</span> cleaned = text
+    .<span class="hljs-title function_">toLowerCase</span>()
+    .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/[^\w\s]/g</span>, <span class="hljs-string">&quot; &quot;</span>)
+    .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\s+/g</span>, <span class="hljs-string">&quot; &quot;</span>)
+    .<span class="hljs-title function_">trim</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>(cleaned.<span class="hljs-title function_">split</span>(<span class="hljs-string">&quot; &quot;</span>));
+}
+
+<span class="hljs-comment">/**
+ * Jaccard similarity over word sets: |intersection| / |union|. Cheap,
+ * deterministic, and free - used to catch the common case of near-identical
+ * clause text extracted twice from overlapping windows, without an LLM call.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">textSimilarity</span>(<span class="hljs-params"><span class="hljs-attr">a</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">b</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-built_in">number</span> {
+  <span class="hljs-keyword">const</span> setA = <span class="hljs-title function_">normalize</span>(a);
+  <span class="hljs-keyword">const</span> setB = <span class="hljs-title function_">normalize</span>(b);
+
+  <span class="hljs-keyword">let</span> intersection = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> word <span class="hljs-keyword">of</span> setA) {
+    <span class="hljs-keyword">if</span> (setB.<span class="hljs-title function_">has</span>(word)) intersection++;
+  }
+  <span class="hljs-keyword">const</span> union = setA.<span class="hljs-property">size</span> + setB.<span class="hljs-property">size</span> - intersection;
+
+  <span class="hljs-keyword">return</span> union === <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : intersection / union;
+}</code></pre></div>
+<h3 id="67-graph-state-schema"><a class="heading-anchor" href="#67-graph-state-schema" aria-hidden="true">#</a>6.7 Graph state schema</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/state.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Annotation</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">ContractWindow</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./windowing&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">TaggedClause</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./schemas&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title class_">ClauseExtractionState</span> = <span class="hljs-title class_">Annotation</span>.<span class="hljs-title class_">Root</span>({
+  <span class="hljs-attr">contractId</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;(),
+  <span class="hljs-attr">contractType</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-built_in">string</span>&gt;(),
+  <span class="hljs-attr">windows</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">ContractWindow</span>[]&gt;(),
+
+  <span class="hljs-comment">// Concatenating reducer: the extraction node processes every window and</span>
+  <span class="hljs-comment">// each window&#x27;s results should ACCUMULATE into this field, not overwrite</span>
+  <span class="hljs-comment">// each other - this is what lets one node&#x27;s async fan-out over N windows</span>
+  <span class="hljs-comment">// land as a single combined list in shared state.</span>
+  <span class="hljs-attr">rawExtractedClauses</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">TaggedClause</span>[]&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">existing, incoming</span>) =&gt;</span> existing.<span class="hljs-title function_">concat</span>(incoming),
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> [],
+  }),
+
+  <span class="hljs-comment">// Replace reducer (the default): the merge step produces one final,</span>
+  <span class="hljs-comment">// authoritative list - it should not be appended to anything prior.</span>
+  <span class="hljs-attr">mergedClauses</span>: <span class="hljs-title class_">Annotation</span>&lt;<span class="hljs-title class_">TaggedClause</span>[]&gt;({
+    <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">_existing, incoming</span>) =&gt;</span> incoming,
+    <span class="hljs-attr">default</span>: <span class="hljs-function">() =&gt;</span> [],
+  }),
+});
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">ClauseExtractionStateType</span> = <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">ClauseExtractionState</span>.<span class="hljs-property">State</span>;</code></pre></div>
+<h3 id="68-node-1--extract_clauses"><a class="heading-anchor" href="#68-node-1--extract_clauses" aria-hidden="true">#</a>6.8 Node 1 — <code class="inline-code">extract_clauses</code></h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/nodes/extractClauses.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">WindowExtractionSchema</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../schemas&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">ClauseExtractionStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">TaggedClause</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../schemas&quot;</span>;
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CLAUSE_EXTRACTION_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> extractionPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;You are a contract analysis expert. Read the contract text window below &quot;</span> +
+      <span class="hljs-string">&quot;and identify every distinct clause it contains. This window may be a &quot;</span> +
+      <span class="hljs-string">&quot;partial excerpt of a larger contract - only report clauses that are &quot;</span> +
+      <span class="hljs-string">&quot;substantially present in THIS window. Quote clause text verbatim; do &quot;</span> +
+      <span class="hljs-string">&quot;not paraphrase in the fullText field. This is contract type: {contractType}.&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Contract text window:\n\n{windowText}&quot;</span>],
+]);
+
+<span class="hljs-keyword">const</span> extractionChain = extractionPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">WindowExtractionSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;extract_window_clauses&quot;</span> })
+);
+
+<span class="hljs-comment">/**
+ * Node 1: runs structured extraction concurrently across every window
+ * (windows are fully independent of each other, so there&#x27;s no reason to
+ * await them sequentially - the same &quot;parallelize independent work&quot;
+ * reasoning as Phase 2&#x27;s RunnableParallel, expressed directly here since a
+ * graph node is a plain async function rather than a composed runnable).
+ *
+ * Duplication across overlapping windows is expected and NOT handled here -
+ * that is entirely the validate_and_merge node&#x27;s job.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">extractClausesNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-title class_">ClauseExtractionStateType</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-title class_">ClauseExtractionStateType</span>&gt;&gt; {
+  <span class="hljs-keyword">const</span> perWindowResults = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(
+    state.<span class="hljs-property">windows</span>.<span class="hljs-title function_">map</span>(<span class="hljs-title function_">async</span> (<span class="hljs-variable language_">window</span>) =&gt; {
+      <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> extractionChain.<span class="hljs-title function_">invoke</span>({
+        <span class="hljs-attr">windowText</span>: <span class="hljs-variable language_">window</span>.<span class="hljs-property">text</span>,
+        <span class="hljs-attr">contractType</span>: state.<span class="hljs-property">contractType</span>,
+      });
+
+      <span class="hljs-keyword">const</span> <span class="hljs-attr">tagged</span>: <span class="hljs-title class_">TaggedClause</span>[] = result.<span class="hljs-property">clauses</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">clause</span>) =&gt;</span> ({
+        ...clause,
+        <span class="hljs-attr">windowIndices</span>: [<span class="hljs-variable language_">window</span>.<span class="hljs-property">windowIndex</span>],
+      }));
+
+      <span class="hljs-keyword">return</span> tagged;
+    })
+  );
+
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">rawExtractedClauses</span>: perWindowResults.<span class="hljs-title function_">flat</span>() };
+}</code></pre></div>
+<h3 id="69-node-2--validate_and_merge"><a class="heading-anchor" href="#69-node-2--validate_and_merge" aria-hidden="true">#</a>6.9 Node 2 — <code class="inline-code">validate_and_merge</code></h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/nodes/validateAndMerge.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatOpenAI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/openai&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ChatPromptTemplate</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/core/prompts&quot;</span>;
+<span class="hljs-keyword">import</span> { z } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;zod&quot;</span>;
+<span class="hljs-keyword">import</span> { textSimilarity } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../similarity&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">ClauseExtractionStateType</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../state&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">TaggedClause</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../schemas&quot;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">HIGH_SIMILARITY</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">CLAUSE_MERGE_HIGH_SIMILARITY</span> ?? <span class="hljs-number">0.85</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">LOW_SIMILARITY</span> = <span class="hljs-title class_">Number</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">CLAUSE_MERGE_LOW_SIMILARITY</span> ?? <span class="hljs-number">0.4</span>);
+
+<span class="hljs-keyword">const</span> model = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ChatOpenAI</span>({
+  <span class="hljs-attr">model</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">CLAUSE_EXTRACTION_MODEL</span> ?? <span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,
+  <span class="hljs-attr">temperature</span>: <span class="hljs-number">0</span>,
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">TiebreakSchema</span> = z.<span class="hljs-title function_">object</span>({
+  <span class="hljs-attr">sameClause</span>: z.<span class="hljs-title function_">boolean</span>().<span class="hljs-title function_">describe</span>(<span class="hljs-string">&quot;True if both excerpts describe the same underlying clause&quot;</span>),
+});
+
+<span class="hljs-keyword">const</span> tiebreakPrompt = <span class="hljs-title class_">ChatPromptTemplate</span>.<span class="hljs-title function_">fromMessages</span>([
+  [
+    <span class="hljs-string">&quot;system&quot;</span>,
+    <span class="hljs-string">&quot;Two clause excerpts were extracted from overlapping windows of the same &quot;</span> +
+      <span class="hljs-string">&quot;contract. Determine whether they describe the SAME underlying clause &quot;</span> +
+      <span class="hljs-string">&quot;(even if worded slightly differently) or two DIFFERENT clauses.&quot;</span>,
+  ],
+  [<span class="hljs-string">&quot;human&quot;</span>, <span class="hljs-string">&quot;Excerpt A:\n{textA}\n\nExcerpt B:\n{textB}&quot;</span>],
+]);
+
+<span class="hljs-keyword">const</span> tiebreakChain = tiebreakPrompt.<span class="hljs-title function_">pipe</span>(
+  model.<span class="hljs-title function_">withStructuredOutput</span>(<span class="hljs-title class_">TiebreakSchema</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;clause_tiebreak&quot;</span> })
+);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">mergeTwo</span>(<span class="hljs-params"><span class="hljs-attr">a</span>: <span class="hljs-title class_">TaggedClause</span>, <span class="hljs-attr">b</span>: <span class="hljs-title class_">TaggedClause</span></span>): <span class="hljs-title class_">TaggedClause</span> {
+  <span class="hljs-comment">// Keep the longer, more complete fullText; union obligations and window indices.</span>
+  <span class="hljs-keyword">const</span> primary = a.<span class="hljs-property">fullText</span>.<span class="hljs-property">length</span> &gt;= b.<span class="hljs-property">fullText</span>.<span class="hljs-property">length</span> ? a : b;
+  <span class="hljs-keyword">return</span> {
+    ...primary,
+    <span class="hljs-attr">obligations</span>: <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>([...a.<span class="hljs-property">obligations</span>, ...b.<span class="hljs-property">obligations</span>])),
+    <span class="hljs-attr">sectionReference</span>: a.<span class="hljs-property">sectionReference</span> ?? b.<span class="hljs-property">sectionReference</span>,
+    <span class="hljs-attr">windowIndices</span>: <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>([...a.<span class="hljs-property">windowIndices</span>, ...b.<span class="hljs-property">windowIndices</span>])),
+  };
+}
+
+<span class="hljs-comment">/**
+ * Node 2: groups raw candidates by clauseType (narrowing comparisons to
+ * only clauses that could plausibly be duplicates), then merges pairs
+ * whose text similarity clears HIGH_SIMILARITY automatically, treats pairs
+ * below LOW_SIMILARITY as definitely distinct automatically, and only pays
+ * for an LLM tiebreak call in the narrow ambiguous band between the two.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">validateAndMergeNode</span>(<span class="hljs-params">
+  <span class="hljs-attr">state</span>: <span class="hljs-title class_">ClauseExtractionStateType</span>
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">Partial</span>&lt;<span class="hljs-title class_">ClauseExtractionStateType</span>&gt;&gt; {
+  <span class="hljs-keyword">const</span> byType = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-title class_">TaggedClause</span>[]&gt;();
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> clause <span class="hljs-keyword">of</span> state.<span class="hljs-property">rawExtractedClauses</span>) {
+    <span class="hljs-keyword">const</span> list = byType.<span class="hljs-title function_">get</span>(clause.<span class="hljs-property">clauseType</span>) ?? [];
+    list.<span class="hljs-title function_">push</span>(clause);
+    byType.<span class="hljs-title function_">set</span>(clause.<span class="hljs-property">clauseType</span>, list);
+  }
+
+  <span class="hljs-keyword">const</span> <span class="hljs-attr">merged</span>: <span class="hljs-title class_">TaggedClause</span>[] = [];
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> candidates <span class="hljs-keyword">of</span> byType.<span class="hljs-title function_">values</span>()) {
+    <span class="hljs-keyword">const</span> consumed = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>&lt;<span class="hljs-built_in">number</span>&gt;();
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; candidates.<span class="hljs-property">length</span>; i++) {
+      <span class="hljs-keyword">if</span> (consumed.<span class="hljs-title function_">has</span>(i)) <span class="hljs-keyword">continue</span>;
+      <span class="hljs-keyword">let</span> current = candidates[i];
+
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> j = i + <span class="hljs-number">1</span>; j &lt; candidates.<span class="hljs-property">length</span>; j++) {
+        <span class="hljs-keyword">if</span> (consumed.<span class="hljs-title function_">has</span>(j)) <span class="hljs-keyword">continue</span>;
+
+        <span class="hljs-keyword">const</span> sim = <span class="hljs-title function_">textSimilarity</span>(current.<span class="hljs-property">fullText</span>, candidates[j].<span class="hljs-property">fullText</span>);
+
+        <span class="hljs-keyword">let</span> <span class="hljs-attr">isSameClause</span>: <span class="hljs-built_in">boolean</span>;
+        <span class="hljs-keyword">if</span> (sim &gt;= <span class="hljs-variable constant_">HIGH_SIMILARITY</span>) {
+          isSameClause = <span class="hljs-literal">true</span>;
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sim &lt;= <span class="hljs-variable constant_">LOW_SIMILARITY</span>) {
+          isSameClause = <span class="hljs-literal">false</span>;
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-comment">// Ambiguous band - the only place an LLM call is spent.</span>
+          <span class="hljs-keyword">const</span> verdict = <span class="hljs-keyword">await</span> tiebreakChain.<span class="hljs-title function_">invoke</span>({
+            <span class="hljs-attr">textA</span>: current.<span class="hljs-property">fullText</span>,
+            <span class="hljs-attr">textB</span>: candidates[j].<span class="hljs-property">fullText</span>,
+          });
+          isSameClause = verdict.<span class="hljs-property">sameClause</span>;
+        }
+
+        <span class="hljs-keyword">if</span> (isSameClause) {
+          current = <span class="hljs-title function_">mergeTwo</span>(current, candidates[j]);
+          consumed.<span class="hljs-title function_">add</span>(j);
+        }
+      }
+
+      merged.<span class="hljs-title function_">push</span>(current);
+    }
+  }
+
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">mergedClauses</span>: merged };
+}</code></pre></div>
+<h3 id="610-graph-construction"><a class="heading-anchor" href="#610-graph-construction" aria-hidden="true">#</a>6.10 Graph construction</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/graph.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">StateGraph</span>, <span class="hljs-variable constant_">START</span>, <span class="hljs-variable constant_">END</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@langchain/langgraph&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ClauseExtractionState</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./state&quot;</span>;
+<span class="hljs-keyword">import</span> { extractClausesNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/extractClauses&quot;</span>;
+<span class="hljs-keyword">import</span> { validateAndMergeNode } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./nodes/validateAndMerge&quot;</span>;
+
+<span class="hljs-comment">/**
+ * The full Phase 3 pipeline as a compiled 2-node graph:
+ *   START -&gt; extract_clauses -&gt; validate_and_merge -&gt; END
+ *
+ * Compiled once at module load (a compiled graph carries no per-request
+ * state of its own, so there is no reason to rebuild it per invocation -
+ * the same reasoning as reusing a single ChatOpenAI client instance).
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> clauseExtractionGraph = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StateGraph</span>(<span class="hljs-title class_">ClauseExtractionState</span>)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;extract_clauses&quot;</span>, extractClausesNode)
+  .<span class="hljs-title function_">addNode</span>(<span class="hljs-string">&quot;validate_and_merge&quot;</span>, validateAndMergeNode)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-variable constant_">START</span>, <span class="hljs-string">&quot;extract_clauses&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;extract_clauses&quot;</span>, <span class="hljs-string">&quot;validate_and_merge&quot;</span>)
+  .<span class="hljs-title function_">addEdge</span>(<span class="hljs-string">&quot;validate_and_merge&quot;</span>, <span class="hljs-variable constant_">END</span>)
+  .<span class="hljs-title function_">compile</span>();</code></pre></div>
+<h3 id="611-storage-layer"><a class="heading-anchor" href="#611-storage-layer" aria-hidden="true">#</a>6.11 Storage layer</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/clauses/storage.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> format <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg-format&quot;</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">type</span> { <span class="hljs-title class_">TaggedClause</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./schemas&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">hasExtractedClauses</span>(<span class="hljs-params"><span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">boolean</span>&gt; {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(<span class="hljs-string">`SELECT 1 FROM clauses WHERE contract_id = $1 LIMIT 1`</span>, [
+    contractId,
+  ]);
+  <span class="hljs-keyword">return</span> rows.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getClausesForContract</span>(<span class="hljs-params"><span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span></span>) {
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT * FROM clauses WHERE contract_id = $1 ORDER BY created_at ASC`</span>,
+    [contractId]
+  );
+  <span class="hljs-keyword">return</span> rows;
+}
+
+<span class="hljs-comment">/**
+ * Replaces all clauses for a contract in a single transaction - a crash
+ * mid-insert rolls back cleanly rather than leaving a half-populated table,
+ * same pattern as Phase 1&#x27;s document-chunk storage.
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">storeClauses</span>(<span class="hljs-params">
+  <span class="hljs-attr">contractId</span>: <span class="hljs-built_in">string</span>,
+  <span class="hljs-attr">clauses</span>: <span class="hljs-title class_">TaggedClause</span>[]
+</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">const</span> client = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">connect</span>();
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(<span class="hljs-string">&quot;BEGIN&quot;</span>);
+
+    <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(<span class="hljs-string">`DELETE FROM clauses WHERE contract_id = $1`</span>, [contractId]);
+
+    <span class="hljs-keyword">if</span> (clauses.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">const</span> values = clauses.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">c</span>) =&gt;</span> [
+        contractId,
+        c.<span class="hljs-property">clauseType</span>,
+        c.<span class="hljs-property">title</span>,
+        c.<span class="hljs-property">fullText</span>,
+        c.<span class="hljs-property">summary</span>,
+        <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(c.<span class="hljs-property">obligations</span>),
+        c.<span class="hljs-property">sectionReference</span>,
+        <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(c.<span class="hljs-property">windowIndices</span>),
+      ]);
+
+      <span class="hljs-keyword">const</span> insertSql = <span class="hljs-title function_">format</span>(
+        <span class="hljs-string">`INSERT INTO clauses
+           (contract_id, clause_type, title, full_text, summary, obligations, section_reference, window_indices)
+         VALUES %L`</span>,
+        values
+      );
+      <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(insertSql);
+    }
+
+    <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(<span class="hljs-string">&quot;COMMIT&quot;</span>);
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-keyword">await</span> client.<span class="hljs-title function_">query</span>(<span class="hljs-string">&quot;ROLLBACK&quot;</span>);
+    <span class="hljs-keyword">throw</span> err;
+  } <span class="hljs-keyword">finally</span> {
+    client.<span class="hljs-title function_">release</span>();
+  }
+}</code></pre></div>
+<h3 id="612-route"><a class="heading-anchor" href="#612-route" aria-hidden="true">#</a>6.12 Route</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/routes/clauses.ts</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Router</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;express&quot;</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Pool</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;pg&quot;</span>;
+<span class="hljs-keyword">import</span> { createSlidingWindows } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../clauses/windowing&quot;</span>;
+<span class="hljs-keyword">import</span> { clauseExtractionGraph } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../clauses/graph&quot;</span>;
+<span class="hljs-keyword">import</span> { hasExtractedClauses, getClausesForContract, storeClauses } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;../clauses/storage&quot;</span>;
+
+<span class="hljs-keyword">const</span> pool = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Pool</span>({ <span class="hljs-attr">connectionString</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">DATABASE_URL</span> });
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> clausesRouter = <span class="hljs-title class_">Router</span>();
+
+clausesRouter.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/:id/clauses/extract&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> { id } = req.<span class="hljs-property">params</span>;
+  <span class="hljs-keyword">const</span> force = req.<span class="hljs-property">query</span>.<span class="hljs-property">force</span> === <span class="hljs-string">&quot;true&quot;</span>;
+
+  <span class="hljs-keyword">const</span> { rows } = <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">query</span>(
+    <span class="hljs-string">`SELECT raw_text, contract_type FROM contracts WHERE id = $1`</span>,
+    [id]
+  );
+  <span class="hljs-keyword">if</span> (rows.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Contract not found.&quot;</span> });
+  }
+
+  <span class="hljs-keyword">if</span> (!force &amp;&amp; (<span class="hljs-keyword">await</span> <span class="hljs-title function_">hasExtractedClauses</span>(id))) {
+    <span class="hljs-keyword">const</span> existing = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getClausesForContract</span>(id);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">reused</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">clauses</span>: existing });
+  }
+
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> { <span class="hljs-attr">raw_text</span>: rawText, <span class="hljs-attr">contract_type</span>: contractType } = rows[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">const</span> windows = <span class="hljs-title function_">createSlidingWindows</span>(rawText);
+
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> clauseExtractionGraph.<span class="hljs-title function_">invoke</span>({
+      <span class="hljs-attr">contractId</span>: id,
+      contractType,
+      windows,
+    });
+
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">storeClauses</span>(id, result.<span class="hljs-property">mergedClauses</span>);
+
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">201</span>).<span class="hljs-title function_">json</span>({
+      <span class="hljs-attr">reused</span>: <span class="hljs-literal">false</span>,
+      <span class="hljs-attr">windowCount</span>: windows.<span class="hljs-property">length</span>,
+      <span class="hljs-attr">rawCandidateCount</span>: result.<span class="hljs-property">rawExtractedClauses</span>.<span class="hljs-property">length</span>,
+      <span class="hljs-attr">mergedCount</span>: result.<span class="hljs-property">mergedClauses</span>.<span class="hljs-property">length</span>,
+      <span class="hljs-attr">clauses</span>: result.<span class="hljs-property">mergedClauses</span>,
+    });
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Clause extraction failed:&quot;</span>, err);
+    <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Failed to extract clauses.&quot;</span> });
+  }
+});
+
+clausesRouter.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/:id/clauses&quot;</span>, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+  <span class="hljs-keyword">const</span> clauses = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getClausesForContract</span>(req.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>);
+  <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">200</span>).<span class="hljs-title function_">json</span>({ clauses });
+});</code></pre></div>
+<p>Wire it in alongside your Phase 2 and Phase 2.5 routers:</p>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-ts"><span class="hljs-comment">// src/app.ts (excerpt)</span>
+<span class="hljs-keyword">import</span> { clausesRouter } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./routes/clauses&quot;</span>;
+app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/contracts&quot;</span>, clausesRouter);</code></pre></div>
+<hr>
+<h2 id="7-architecture-discussion"><a class="heading-anchor" href="#7-architecture-discussion" aria-hidden="true">#</a>7. Architecture Discussion</h2>
+<h3 id="folder-structure-after-this-phase"><a class="heading-anchor" href="#folder-structure-after-this-phase" aria-hidden="true">#</a>Folder structure after this phase</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">legaldocs/
+├── src/
+│   ├── clauses/
+│   │   ├── tokenizer.ts
+│   │   ├── windowing.ts
+│   │   ├── schemas.ts
+│   │   ├── similarity.ts
+│   │   ├── state.ts
+│   │   ├── storage.ts
+│   │   ├── graph.ts
+│   │   └── nodes/
+│   │       ├── extractClauses.ts
+│   │       └── validateAndMerge.ts
+│   ├── routes/
+│   │   └── clauses.ts
+│   └── app.ts
+├── migrations/
+│   └── 004_clauses.sql</code></pre></div>
+<h3 id="request-flow"><a class="heading-anchor" href="#request-flow" aria-hidden="true">#</a>Request flow</h3>
+<div class="code-block"><div class="code-block-header"><span class="code-lang">text</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code class="hljs language-text">POST /api/contracts/:id/clauses/extract
+  │
+  ▼
+Load contract.raw_text + contract_type (404 if missing)
+  │
+  ▼
+hasExtractedClauses(id)?  ──yes──► return existing clauses (unless ?force=true)
+  │ no
+  ▼
+createSlidingWindows(rawText)         — token-aware, overlapping windows
+  │
+  ▼
+clauseExtractionGraph.invoke({...})
+  │
+  ├─ extract_clauses     — Promise.all across all windows, concurrent LLM calls
+  │                         → rawExtractedClauses (accumulated via reducer)
+  │
+  └─ validate_and_merge  — group by clauseType, similarity-based dedup,
+                            LLM tiebreak only for the ambiguous band
+                            → mergedClauses (replaces via reducer)
+  │
+  ▼
+storeClauses(id, mergedClauses)       — transactional replace
+  │
+  ▼
+HTTP 201 { windowCount, rawCandidateCount, mergedCount, clauses }</code></pre></div>
+<h3 id="why-this-design-over-alternatives"><a class="heading-anchor" href="#why-this-design-over-alternatives" aria-hidden="true">#</a>Why this design over alternatives</h3>
+<ul>
+<li><strong>Windowing collapses to one window for short contracts, rather than branching:</strong> <code class="inline-code">createSlidingWindows()</code> always runs, and a contract under the token threshold simply produces an array of length 1 — the orchestration code (and the graph) never needs to know or care whether it&#39;s looking at a 3-page or 40-page contract.</li>
+<li><strong>The extraction node parallelizes independent window calls:</strong> exactly the same &quot;no reason to serialize independent work&quot; reasoning from Phase 2&#39;s <code class="inline-code">RunnableParallel</code>, just expressed as a plain <code class="inline-code">Promise.all</code> inside a graph node rather than a composed LCEL runnable — both are valid places for this pattern; which one you reach for depends on whether you&#39;re inside a linear chain or a graph node.</li>
+<li><strong>Grouping by <code class="inline-code">clauseType</code> before computing similarity:</strong> keeps the merge step&#39;s comparison cost proportional to &quot;how many candidates share a type,&quot; not the square of the total candidate count — matters once a large contract produces 40+ raw candidates across windows.</li>
+<li><strong>The compiled graph is a module-level singleton, not rebuilt per request:</strong> a <code class="inline-code">StateGraph.compile()</code> call validates graph structure; doing that once at startup, rather than on every HTTP request, is both faster and correctly reflects that the graph&#39;s <em>structure</em> never changes between requests — only the <em>state</em> passed into <code class="inline-code">.invoke()</code> does.</li>
+</ul>
+<hr>
+<h2 id="8-best-practices"><a class="heading-anchor" href="#8-best-practices" aria-hidden="true">#</a>8. Best Practices</h2>
+<p><strong>Industry best practices</strong></p>
+<ul>
+<li>Keep <code class="inline-code">fullText</code> verbatim, never paraphrased, in the extraction schema — every downstream feature (merge similarity, Phase 4&#39;s risk quoting, a future compliance reviewer) depends on trusting that field is the actual contract text.</li>
+<li>Treat the compiled graph the same way you treat a <code class="inline-code">ChatOpenAI</code> client instance — construct once, reuse everywhere, never per-request.</li>
+<li>Keep <code class="inline-code">temperature: 0</code> for both the extraction and tiebreak chains — both are precise, low-creativity tasks where consistency matters far more than variety.</li>
+</ul>
+<p><strong>Scalability considerations</strong></p>
+<ul>
+<li>Token-aware windowing means extraction quality and latency scale sensibly with contract length, rather than degrading unpredictably past some undocumented length cliff.</li>
+<li>The <code class="inline-code">Promise.all</code> fan-out in <code class="inline-code">extract_clauses</code> means a 10-window contract costs roughly the same wall-clock time as a 2-window one (bounded by your OpenAI rate limits, not by serial LLM round-trips) — worth revisiting with a concurrency cap (e.g. <code class="inline-code">p-limit</code>) once contract volume is high enough that many extractions could run simultaneously and collectively exceed your rate limit.</li>
+</ul>
+<p><strong>Security considerations</strong></p>
+<ul>
+<li>Same contract-confidentiality logging discipline as Phase 2: never log full clause text to application logs; log clause counts, types, and contract IDs only.</li>
+<li>The extraction endpoint should eventually sit behind the same auth/access-control layer noted as a follow-up in Phase 2.5 — a clause list is at least as sensitive as the raw contract text it was derived from.</li>
+</ul>
+<p><strong>Performance optimizations</strong></p>
+<ul>
+<li>The high/low similarity threshold split (Approach C in 3.3) means the LLM tiebreak call — the most expensive part of the merge step — is only ever spent on genuinely ambiguous pairs, not on every duplicate pair from window overlap.</li>
+<li>Grouping by <code class="inline-code">clauseType</code> before similarity comparison avoids O(n²) comparisons across the entire raw candidate list.</li>
+</ul>
+<p><strong>Maintainability tips</strong></p>
+<ul>
+<li>Adding a new clause type is a one-line addition to <code class="inline-code">CLAUSE_TYPES</code> — no other file needs to change, same pattern as Phase 2&#39;s <code class="inline-code">CONTRACT_TYPES</code>.</li>
+<li>Keep the similarity thresholds (<code class="inline-code">CLAUSE_MERGE_HIGH_SIMILARITY</code> / <code class="inline-code">CLAUSE_MERGE_LOW_SIMILARITY</code>) as environment variables — you&#39;ll want to tune these once you&#39;ve validated merge quality against real contracts with known duplicate clauses.</li>
+</ul>
+<p><strong>Testing considerations</strong></p>
+<ul>
+<li>Unit test <code class="inline-code">createSlidingWindows()</code> against a fixture text sized to require exactly 2 windows — assert both the overlap region&#39;s content and that no paragraph is split mid-sentence.</li>
+<li>Unit test <code class="inline-code">textSimilarity()</code> with known near-duplicate and known-distinct clause text pairs — assert scores land clearly above/below your configured thresholds.</li>
+<li>Integration test the full graph (<code class="inline-code">clauseExtractionGraph.invoke(...)</code>) against a small fixture contract with a deliberately duplicated clause across two synthetic windows — assert the final <code class="inline-code">mergedClauses</code> list contains exactly one merged entry, not two.</li>
+<li>Integration test a short, single-window contract end to end — assert <code class="inline-code">windowCount === 1</code> and that <code class="inline-code">rawCandidateCount === mergedCount</code> (nothing to merge).</li>
+</ul>
+<hr>
+<h2 id="9-summary"><a class="heading-anchor" href="#9-summary" aria-hidden="true">#</a>9. Summary</h2>
+<p><strong>What we learned:</strong></p>
+<ul>
+<li>Why LangGraph&#39;s shared-state model earns its place once a pipeline needs multiple independent calls to accumulate into one place before a distinct reconciliation step runs — a job LCEL&#39;s linear <code class="inline-code">.pipe()</code> composition doesn&#39;t naturally express.</li>
+<li>The <code class="inline-code">Annotation.Root</code> state schema, and specifically how per-field <strong>reducers</strong> decide whether a node&#39;s partial update replaces or accumulates into existing state — the concrete mechanic that makes &quot;shared state&quot; meaningful rather than just a bigger prop-drilling problem.</li>
+<li>Nodes as plain async functions returning partial state updates, and edges (including the <code class="inline-code">START</code>/<code class="inline-code">END</code> markers) as the wiring between them — and that a compiled graph exposes the same <code class="inline-code">.invoke()</code> interface as any other LangChain runnable, which is what makes graphs embeddable inside larger chains or bigger graphs later.</li>
+<li>Why long documents need token-aware sliding-window extraction rather than a single call, and why overlapping windows trade a predictable, acceptable duplication cost for the guarantee that boundary-straddling clauses are still captured whole somewhere.</li>
+<li>A pragmatic, cost-aware deduplication strategy: cheap algorithmic similarity scoring for the obvious cases, an LLM call reserved only for the genuinely ambiguous middle band.</li>
+</ul>
+<p><strong>What has been completed:</strong></p>
+<ul>
+<li><code class="inline-code">clauses</code> table schema.</li>
+<li>Token-aware sliding-window text splitting with paragraph-preserving overlap.</li>
+<li>Zod schemas for structured, verbatim clause extraction.</li>
+<li>A compiled 2-node LangGraph graph (<code class="inline-code">extract_clauses → validate_and_merge</code>) implementing concurrent per-window extraction and similarity/LLM-tiebreak-based deduplication.</li>
+<li>Idempotent, transactional storage into the <code class="inline-code">clauses</code> table.</li>
+<li><code class="inline-code">POST /api/contracts/:id/clauses/extract</code> and <code class="inline-code">GET /api/contracts/:id/clauses</code> endpoints, fully wired.</li>
+</ul>
+<p><strong>What is left:</strong></p>
+<ul>
+<li>Running the hands-on tasks against real short and long contracts and validating extraction/merge quality by manual spot-check (tasks 12-14 — yours to execute).</li>
+<li>Everything from Phase 4 onward, which consumes the <code class="inline-code">clauses</code> table this phase populates.</li>
+</ul>
+<p><strong>How this connects to the next phase:</strong>
+Phase 4 (RAG Risk Analyzer) is the project&#39;s core phase, and it starts exactly where this one ends: one row per clause in the <code class="inline-code">clauses</code> table. Where this phase&#39;s graph was deliberately small and linear (two nodes, one path, no branching), Phase 4 builds a substantially larger graph on the same <code class="inline-code">StateGraph</code>/<code class="inline-code">Annotation</code> foundation — introducing conditional edges (branching by risk level), the <code class="inline-code">Send()</code> API (fanning out one parallel risk-scoring execution per clause row, directly analogous to this phase&#39;s <code class="inline-code">Promise.all</code> over windows but now expressed as a first-class graph construct), checkpointers (persisting graph runs so they can be inspected later), and time-travel state management (letting a compliance reviewer audit and revert a scoring decision). Everything you just learned about state, reducers, nodes, and edges is the prerequisite for all of it.</p>
+
+<footer class="doc-footer">
+  <p>Created by <strong>Mohd Shadab</strong> &nbsp;&middot;&nbsp;
+     <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;&middot;&nbsp;
+     <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+  <p style="margin-top:0.4rem;font-size:0.8rem;opacity:0.7;">&copy; 2026 Interactive Roadmaps.</p>
+</footer>
+</main>
+<div class="scroll-progress-container">
+  <div class="scroll-progress-bar" id="scroll-bar"></div>
+</div>
+<script>
+  // — theme toggle (Tabler icon, same as main index.html) —
+  function toggleTheme() {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    try { localStorage.setItem('md2html-theme', next); } catch (e) {}
+    var icon = document.getElementById('theme-icon');
+    if (icon) icon.className = next === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var icon = document.getElementById('theme-icon');
+    var theme = document.documentElement.getAttribute('data-theme');
+    if (icon) icon.className = theme === 'dark' ? 'ti ti-moon' : 'ti ti-sun';
+  });
+
+  // — copy to clipboard —
+  function copyCode(btn) {
+    var code = btn.closest('.code-block').querySelector('code').innerText;
+    function onCopied() {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(onCopied).catch(function() { legacyCopy(code, onCopied); });
+    } else { legacyCopy(code, onCopied); }
+  }
+  function legacyCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // — scroll progress —
+  (function() {
+    var bar = null;
+    var ticking = false;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (bar) {
+        bar.style.width = scrollPercent + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function() {
+      if (!bar) { bar = document.getElementById('scroll-bar'); }
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

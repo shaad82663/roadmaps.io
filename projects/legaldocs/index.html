@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LegalDocs AI Agent Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    :root {
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      /* Premium Dark Theme */
+      --color-bg-base: #0f1115;
+      --color-bg-gradient: radial-gradient(circle at top center, #1a1d24, #0f1115 80%);
+      --color-background-primary: rgba(30, 33, 40, 0.6);
+      --color-background-secondary: rgba(45, 49, 58, 0.7);
+      --color-border-primary: rgba(255, 255, 255, 0.15);
+      --color-border-secondary: rgba(255, 255, 255, 0.08);
+      --color-border-tertiary: rgba(255, 255, 255, 0.04);
+
+      --color-text-primary: #f8f9fa;
+      --color-text-secondary: #adb5bd;
+      --color-text-tertiary: #6c757d;
+
+      --border-radius-md: 12px;
+      --border-radius-lg: 16px;
+
+      /* Phase Colors */
+      --p-ingest-bg: rgba(99, 102, 241, 0.15);
+      --p-ingest-text: #a5b4fc;
+      --p-ingest-dot: #6366f1;
+      --p-ingest-border: rgba(99, 102, 241, 0.3);
+
+      --p-parse-bg: rgba(20, 184, 166, 0.15);
+      --p-parse-text: #5eead4;
+      --p-parse-dot: #14b8a6;
+      --p-parse-border: rgba(20, 184, 166, 0.3);
+
+      --p-chat-bg: rgba(56, 189, 248, 0.15);
+      --p-chat-text: #7dd3fc;
+      --p-chat-dot: #38bdf8;
+      --p-chat-border: rgba(56, 189, 248, 0.3);
+
+      --p-extract-bg: rgba(245, 158, 11, 0.15);
+      --p-extract-text: #fcd34d;
+      --p-extract-dot: #f59e0b;
+      --p-extract-border: rgba(245, 158, 11, 0.3);
+
+      --p-loops-bg: rgba(168, 85, 247, 0.15);
+      --p-loops-text: #d8b4fe;
+      --p-loops-dot: #a855f7;
+      --p-loops-border: rgba(168, 85, 247, 0.3);
+
+      --p-agent-bg: rgba(236, 72, 153, 0.15);
+      --p-agent-text: #fbcfe8;
+      --p-agent-dot: #ec4899;
+      --p-agent-border: rgba(236, 72, 153, 0.3);
+
+      --p-report-bg: rgba(239, 68, 68, 0.15);
+      --p-report-text: #fca5a5;
+      --p-report-dot: #ef4444;
+      --p-report-border: rgba(239, 68, 68, 0.3);
+
+      --p-mcp-bg: rgba(14, 165, 233, 0.15);
+      --p-mcp-text: #bae6fd;
+      --p-mcp-dot: #0ea5e9;
+      --p-mcp-border: rgba(14, 165, 233, 0.3);
+
+      --p-multi-bg: rgba(139, 92, 246, 0.15);
+      --p-multi-text: #ddd6fe;
+      --p-multi-dot: #8b92f6;
+      --p-multi-border: rgba(139, 92, 246, 0.3);
+
+      --p-dash-bg: rgba(16, 185, 129, 0.15);
+      --p-dash-text: #a7f3d0;
+      --p-dash-dot: #10b981;
+      --p-dash-border: rgba(16, 185, 129, 0.3);
+
+      --p-mem-bg: rgba(244, 63, 94, 0.15);
+      --p-mem-text: #fecdd3;
+      --p-mem-dot: #f43f5e;
+      --p-mem-border: rgba(244, 63, 94, 0.3);
+
+      --p-hard-bg: rgba(107, 114, 128, 0.15);
+      --p-hard-text: #e5e7eb;
+      --p-hard-dot: #6b7280;
+      --p-hard-border: rgba(107, 114, 128, 0.3);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+      background: var(--color-bg-base);
+      background-image: var(--color-bg-gradient);
+      background-attachment: fixed;
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+
+    header {
+      margin-bottom: 3.5rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff, #adb5bd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--color-text-secondary);
+      font-size: 1.15rem;
+      font-weight: 300;
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-card {
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem 2rem;
+      min-width: 130px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--color-border-primary);
+    }
+
+    .stat-val {
+      font-size: 2.75rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.6rem;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--color-border-tertiary);
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--color-text-secondary);
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+    }
+
+    .filter-btn:hover {
+      color: var(--color-text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .filter-btn.active {
+      background: var(--color-text-primary);
+      color: var(--color-bg-base);
+      border-color: var(--color-text-primary);
+      font-weight: 600;
+    }
+
+    .unit-row {
+      display: flex;
+      gap: 1.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 16px;
+    }
+
+    .spine-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-top: 1.75rem;
+      z-index: 2;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .spine-line {
+      flex: 1;
+      width: 2px;
+      background: var(--color-border-secondary);
+      margin: 4px 0;
+    }
+
+    .unit-card {
+      flex: 1;
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .unit-card:hover {
+      transform: translateX(4px);
+      border-color: var(--color-border-primary);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .unit-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .unit-num {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--color-text-tertiary);
+      font-weight: 600;
+    }
+
+    .unit-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .phase-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 100px;
+      border: 1px solid transparent;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .diff-badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.6rem;
+      border-radius: 100px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border-tertiary);
+    }
+
+    .tags-row {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      color: var(--color-text-tertiary);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--color-border-tertiary);
+      transition: all 0.2s;
+    }
+
+    .unit-card:hover .tag {
+      color: var(--color-text-secondary);
+      border-color: var(--color-border-secondary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .expand-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .expand-content.open {
+      max-height: 1000px;
+    }
+
+    .expand-divider {
+      height: 1px;
+      background: var(--color-border-secondary);
+      margin: 1.25rem 0;
+    }
+
+    .expand-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .expand-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .unit-header {
+        gap: 0.5rem;
+      }
+      .unit-title {
+        width: 100%;
+      }
+    }
+
+    .section-label {
+      font-size: 0.85rem;
+      color: var(--color-text-primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-label i {
+      color: var(--color-text-secondary);
+      font-size: 1.2rem;
+    }
+
+    .item-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .item-list li {
+      font-size: 1rem;
+      color: var(--color-text-secondary);
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      line-height: 1.5;
+      border-bottom: 1px solid var(--color-border-tertiary);
+    }
+
+    .item-list li:last-child {
+      border-bottom: none;
+    }
+
+    .item-list li::before {
+      content: '→';
+      color: var(--color-text-tertiary);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+
+    .study-btn {
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.85rem 1.5rem;
+      border-radius: var(--border-radius-md);
+      border: 1px solid var(--color-border-primary);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      margin-top: 2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .study-btn:hover {
+      background: var(--color-text-primary);
+      color: var(--color-bg-base);
+      border-color: var(--color-text-primary);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .chevron {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-block;
+      font-size: 1.25rem;
+      color: var(--color-text-tertiary);
+      margin-left: auto;
+    }
+
+    .unit-card:hover .chevron {
+      color: var(--color-text-primary);
+    }
+
+    .chevron.open {
+      transform: rotate(180deg);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg-base);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border-primary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-text-secondary);
+    }
+
+    /* Theme Toggle Button Styling */
+    .theme-toggle-btn {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-secondary);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      transform: scale(1.1);
+      border-color: var(--color-border-primary);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Light Theme Styling Variable Overrides */
+    :root.light-theme,
+    .light-theme {
+      --color-bg-base: #f5f7fa;
+      --color-bg-gradient: radial-gradient(circle at top center, #ffffff, #edf0f5 80%);
+      --color-background-primary: rgba(255, 255, 255, 0.85);
+      --color-background-secondary: rgba(235, 238, 243, 0.95);
+      --color-border-primary: rgba(0, 0, 0, 0.12);
+      --color-border-secondary: rgba(0, 0, 0, 0.06);
+      --color-border-tertiary: rgba(0, 0, 0, 0.03);
+
+      --color-text-primary: #1a202c;
+      --color-text-secondary: #4a5568;
+      --color-text-tertiary: #718096;
+
+      /* Phase badge overrides for readable contrast in light mode */
+      --p-ingest-bg: rgba(79, 70, 229, 0.08);
+      --p-ingest-text: #4f46e5;
+      --p-ingest-dot: #4f46e5;
+      --p-ingest-border: rgba(79, 70, 229, 0.2);
+
+      --p-parse-bg: rgba(13, 148, 136, 0.08);
+      --p-parse-text: #0d9488;
+      --p-parse-dot: #0d9488;
+      --p-parse-border: rgba(13, 148, 136, 0.2);
+
+      --p-chat-bg: rgba(2, 132, 199, 0.08);
+      --p-chat-text: #0284c7;
+      --p-chat-dot: #0284c7;
+      --p-chat-border: rgba(2, 132, 199, 0.2);
+
+      --p-extract-bg: rgba(217, 119, 6, 0.08);
+      --p-extract-text: #b45309;
+      --p-extract-dot: #d97706;
+      --p-extract-border: rgba(217, 119, 6, 0.2);
+
+      --p-loops-bg: rgba(147, 51, 234, 0.08);
+      --p-loops-text: #9333ea;
+      --p-loops-dot: #9333ea;
+      --p-loops-border: rgba(147, 51, 234, 0.2);
+
+      --p-agent-bg: rgba(219, 39, 119, 0.08);
+      --p-agent-text: #be185d;
+      --p-agent-dot: #db2777;
+      --p-agent-border: rgba(219, 39, 119, 0.2);
+
+      --p-report-bg: rgba(220, 38, 38, 0.08);
+      --p-report-text: #dc2626;
+      --p-report-dot: #dc2626;
+      --p-report-border: rgba(220, 38, 38, 0.2);
+
+      --p-mcp-bg: rgba(2, 132, 199, 0.08);
+      --p-mcp-text: #0284c7;
+      --p-mcp-dot: #0284c7;
+      --p-mcp-border: rgba(2, 132, 199, 0.2);
+
+      --p-multi-bg: rgba(109, 40, 217, 0.08);
+      --p-multi-text: #6d28d9;
+      --p-multi-dot: #6d28d9;
+      --p-multi-border: rgba(109, 40, 217, 0.2);
+
+      --p-dash-bg: rgba(4, 120, 87, 0.08);
+      --p-dash-text: #047857;
+      --p-dash-dot: #047857;
+      --p-dash-border: rgba(4, 120, 87, 0.2);
+
+      --p-mem-bg: rgba(225, 29, 72, 0.08);
+      --p-mem-text: #be123c;
+      --p-mem-dot: #e11d72;
+      --p-mem-border: rgba(225, 29, 72, 0.2);
+
+      --p-hard-bg: rgba(75, 85, 99, 0.08);
+      --p-hard-text: #4b5563;
+      --p-hard-dot: #4b5563;
+      --p-hard-border: rgba(75, 85, 99, 0.2);
+    }
+
+    /* Light Theme adjustments for specific elements */
+    .light-theme h1 {
+      background: linear-gradient(135deg, #1a202c, #4a5568);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .light-theme .theme-toggle-btn {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .light-theme .unit-card:hover {
+      box-shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
+    }
+
+    .light-theme .tag {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--color-text-secondary);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .light-theme .unit-card:hover .tag {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--color-text-primary);
+    }
+
+    .light-theme .study-btn {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.1);
+      color: var(--color-text-primary);
+    }
+
+    .light-theme .study-btn:hover {
+      background: #1a202c;
+      color: #ffffff;
+      border-color: #1a202c;
+      box-shadow: 0 4px 12px rgba(26, 32, 44, 0.25);
+    }
+
+    .light-theme .filters {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .light-theme .filter-btn.active {
+      background: #1a202c;
+      color: #ffffff;
+      border-color: #1a202c;
+    }
+
+    .light-theme ::-webkit-scrollbar-track {
+      background: #f5f7fa;
+    }
+
+    .light-theme ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .light-theme ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--color-border-secondary);
+      color: var(--color-text-secondary);
+    }
+
+    footer a {
+      color: var(--color-text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    footer a:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+  <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+    <i class="ti ti-moon" id="theme-icon"></i>
+  </button>
+
+  <div class="container">
+    <header>
+      <h1>LegalDocs — AI Contract Analysis</h1>
+      <p class="subtitle">13 units across setup, ingestion, parallel extraction, loops, research agents, multi-agent orchestrations, and testing — build a production-grade legal document AI agent pipeline.</p>
+    </header>
+
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-val">13</div>
+        <div class="stat-label">Units</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">12</div>
+        <div class="stat-label">Steps</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">9</div>
+        <div class="stat-label">Deliverables</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">12</div>
+        <div class="stat-label">Phases</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('Phase 0', this)">Phase 0</button>
+      <button class="filter-btn" onclick="setFilter('Phase 1', this)">Phase 1</button>
+      <button class="filter-btn" onclick="setFilter('Phase 2', this)">Phase 2</button>
+      <button class="filter-btn" onclick="setFilter('Phase 3', this)">Phase 3</button>
+      <button class="filter-btn" onclick="setFilter('Phase 4', this)">Phase 4</button>
+      <button class="filter-btn" onclick="setFilter('Phase 5', this)">Phase 5</button>
+      <button class="filter-btn" onclick="setFilter('Phase 6', this)">Phase 6</button>
+      <button class="filter-btn" onclick="setFilter('Phase 7', this)">Phase 7</button>
+      <button class="filter-btn" onclick="setFilter('Phase 8', this)">Phase 8</button>
+      <button class="filter-btn" onclick="setFilter('Phase 9', this)">Phase 9</button>
+    </div>
+
+    <div id="units-list"></div>
+
+    <footer>
+      <p>Created by <strong>Mohd Shadab</strong> &nbsp;·&nbsp; 
+         <a href="https://www.linkedin.com/in/mohd-shadab-7648071ab/" target="_blank"><i class="ti ti-brand-linkedin"></i> LinkedIn</a> &nbsp;·&nbsp;
+         <a href="https://www.instagram.com/_mdshaad/" target="_blank"><i class="ti ti-brand-instagram"></i> @_mdshaad</a></p>
+      <p style="margin-top: 0.5rem; font-size: 0.82rem; opacity: 0.75;">© 2026 Interactive Roadmaps.</p>
+    </footer>
+  </div>
+
+  <script>
+    const phases = {
+      'Phase 0': { bg: 'var(--p-hard-bg)', text: 'var(--p-hard-text)', dot: 'var(--p-hard-dot)', border: 'var(--p-hard-border)' },
+      'Phase 1': { bg: 'var(--p-ingest-bg)', text: 'var(--p-ingest-text)', dot: 'var(--p-ingest-dot)', border: 'var(--p-ingest-border)' },
+      'Phase 2 (Part I)': { bg: 'var(--p-parse-bg)', text: 'var(--p-parse-text)', dot: 'var(--p-parse-dot)', border: 'var(--p-parse-border)' },
+      'Phase 2 (Part II)': { bg: 'var(--p-chat-bg)', text: 'var(--p-chat-text)', dot: 'var(--p-chat-dot)', border: 'var(--p-chat-border)' },
+      'Phase 3': { bg: 'var(--p-extract-bg)', text: 'var(--p-extract-text)', dot: 'var(--p-extract-dot)', border: 'var(--p-extract-border)' },
+      'Phase 4 (Part I)': { bg: 'var(--p-loops-bg)', text: 'var(--p-loops-text)', dot: 'var(--p-loops-dot)', border: 'var(--p-loops-border)' },
+      'Phase 4 (Part II)': { bg: 'var(--p-agent-bg)', text: 'var(--p-agent-text)', dot: 'var(--p-agent-dot)', border: 'var(--p-agent-border)' },
+      'Phase 5': { bg: 'var(--p-report-bg)', text: 'var(--p-report-text)', dot: 'var(--p-report-dot)', border: 'var(--p-report-border)' },
+      'Phase 6 (Part I)': { bg: 'var(--p-mcp-bg)', text: 'var(--p-mcp-text)', dot: 'var(--p-mcp-dot)', border: 'var(--p-mcp-border)' },
+      'Phase 6 (Part II)': { bg: 'var(--p-multi-bg)', text: 'var(--p-multi-text)', dot: 'var(--p-multi-dot)', border: 'var(--p-multi-border)' },
+      'Phase 7': { bg: 'var(--p-dash-bg)', text: 'var(--p-dash-text)', dot: 'var(--p-dash-dot)', border: 'var(--p-dash-border)' },
+      'Phase 8': { bg: 'var(--p-mem-bg)', text: 'var(--p-mem-text)', dot: 'var(--p-mem-dot)', border: 'var(--p-mem-border)' },
+      'Phase 9': { bg: 'var(--p-hard-bg)', text: 'var(--p-hard-text)', dot: 'var(--p-hard-dot)', border: 'var(--p-hard-border)' }
+    };
+
+    const units = [
+      {
+        order: 0, title: 'Project Setup & Infrastructure', phase: 'Phase 0', difficulty: 'Beginner',
+        tags: ['Docker Compose', 'Express', 'TypeScript', 'pgvector', 'Redis'],
+        theory: ['Setting up a reliable local development container group', 'Initializing Express server with modular TS layers', 'Establishing Docker healthchecks and connection pooling configs'],
+        labs: ['Verify database and cache connectivity using local docker containers', 'Setup environment configurations and verify basic healthcheck routes']
+      },
+      {
+        order: 1, title: 'Knowledge Base Ingestion', phase: 'Phase 1', difficulty: 'Beginner',
+        tags: ['lazyLoad', 'splitters', 'chunking', 'pgvector', 'embeddings'],
+        theory: ['Document Loaders: parsing PDF and DOCX files at scale with lazyLoad()', 'RecursiveCharacterTextSplitter and chunking strategies', 'Vector embeddings with OpenAIEmbeddings and storage in pgvector'],
+        labs: ['Ingest a directory of 30+ legal docs using memory-correct lazyLoad()', 'Implement length-based and structure-based (headings) split passes and compare retrieval results']
+      },
+      {
+        order: 2, title: 'Contract Parser & Classifier', phase: 'Phase 2 (Part I)', difficulty: 'Beginner',
+        tags: ['JSON', 'Zod', 'RunnableParallel', 'RunnableBranch', 'RunnableLambda'],
+        theory: ['Output Parsing with JSON & Zod schema validation', 'LCEL concurrency patterns with RunnableParallel', 'Conditional branching using RunnableBranch and custom preprocessing with RunnableLambda'],
+        labs: ['Build a combined classification + party extraction router', 'Configure type-specific prompt branches for NDAs, vendor agreements, and employment contracts']
+      },
+      {
+        order: 3, title: 'Conversational Contract Q&A', phase: 'Phase 2 (Part II)', difficulty: 'Intermediate',
+        tags: ['RAG', 'WindowMemory', 'scoped-retrievers', 'checkpointing'],
+        theory: ['Conversational RAG pipeline construction', 'LangChain Memory modules: WindowMemory and BufferMemory', 'Retrieval isolation using metadata filters for contract_id'],
+        labs: ['Create a conversational chat endpoint with SQLite/Postgres chat history persistence', 'Build a scoped retriever that isolates context per contract']
+      },
+      {
+        order: 4, title: 'Clause Extractor Graph', phase: 'Phase 3', difficulty: 'Intermediate',
+        tags: ['structured-output', 'Zod', 'StateGraph', 'Nodes', 'Edges'],
+        theory: ['Structured output extraction with withStructuredOutput()', 'StateGraph basics in LangGraph: State, Schema, Nodes, and Edges', 'Sliding window technique for large (>8k tokens) documents'],
+        labs: ['Build a 2-node graph (extract_clauses -> validate_and_merge)', 'Extract 25+ named structured clauses from a 40-page contract']
+      },
+      {
+        order: 5, title: 'Parallel Clause Evaluation (RAG Risk Analyser)', phase: 'Phase 4 (Part I)', difficulty: 'Intermediate',
+        tags: ['Send API', 'Command', 'map-reduce', 'parallel-branches'],
+        theory: ['Advanced LangGraph control flow: Send API for dynamic map-reduce parallelization', 'Command API for flexible, interactive routing', 'State updates and reducer functions for merging parallel branch results'],
+        labs: ['Rebuild the sequential clause loop to evaluate compliance rules in parallel using Send()']
+      },
+      {
+        order: 6, title: 'Legal Research Agent', phase: 'Phase 4 (Part II)', difficulty: 'Intermediate',
+        tags: ['ReAct', 'AgentExecutor', 'ToolNode', 'createReactAgent'],
+        theory: ['ReAct agent architecture, tool definitions, and ToolNode', 'AgentExecutor and createReactAgent pattern in LangChain', 'Integrating external search engines and internal vector store tools'],
+        labs: ['Build an autonomous legal research agent that selects between search tools and internal DB tools']
+      },
+      {
+        order: 7, title: 'Report Generator & Functional API', phase: 'Phase 5', difficulty: 'Advanced',
+        tags: ['Functional API', 'entrypoint', 'task', 'caching', 'retries'],
+        theory: ['LangGraph Functional API: entrypoint and task constructs', 'Caching intermediate step results', 'Retry policies and error-recovery in tasks'],
+        labs: ['Build a report generator with caching and retries using the new Functional API']
+      },
+      {
+        order: 8, title: 'MCP & Human-in-the-Loop', phase: 'Phase 6 (Part I)', difficulty: 'Advanced',
+        tags: ['MCP spec', 'interrupt', 'Command resume', 'human-feedback'],
+        theory: ['Model Context Protocol (MCP) spec and integrations', 'Static Human-in-the-loop (interruptBefore/interruptAfter)', 'Dynamic human feedback (Command API to get review input)'],
+        labs: ['Implement a static interrupt before report generation', 'Create a dynamic feedback loop allowing reviewers to edit clauses inline']
+      },
+      {
+        order: 9, title: 'Multi-Agent Architectures', phase: 'Phase 6 (Part II)', difficulty: 'Advanced',
+        tags: ['Supervisor', 'Network', 'Swarm', 'handoffs'],
+        theory: ['Multi-agent design patterns: Supervisor, Network, and Swarm', 'State sharing and routing between independent sub-agents', 'Specialization boundaries for LLM tasks'],
+        labs: ['Refactor the monolith agent graph into a Supervisor agent directing specialized sub-agents']
+      },
+      {
+        order: 10, title: 'Frontend Dashboard & Streaming', phase: 'Phase 7', difficulty: 'Advanced',
+        tags: ['streamEvents', 'abatch', 'token-streaming', 'batching'],
+        theory: ['Real-time token streaming (streamEvents / streamLog)', 'Batch processing execution with abatch', 'JSON streaming responses to client'],
+        labs: ['Build a batch uploader using abatch', 'Create a real-time compliance alert widget using token-level event streaming']
+      },
+      {
+        order: 11, title: 'Long-Term Memory Store', phase: 'Phase 8', difficulty: 'Advanced',
+        tags: ['Store API', 'semantic-memory', 'namespaces', 'cross-thread'],
+        theory: ['Short-term memory (thread-scoped, via Checkpointer) vs. long-term memory (cross-thread, via Store)', 'InMemoryStore and persistent store backends', 'put() / get() / search() — writing, reading, and semantic search over memories'],
+        labs: ['Implement an audit logging system that records reviewer corrections in the Store API']
+      },
+      {
+        order: 12, title: 'Testing & Hardening', phase: 'Phase 9', difficulty: 'Advanced',
+        tags: ['Jest', 'Supertest', 'rate-limiting', 'PM2', 'security'],
+        theory: ['Integration testing strategies with Supertest and Jest', 'Security hardening: rate-limiting and OWASP considerations', 'Process management in production with PM2'],
+        labs: ['Write HTTP integration tests for the review endpoint with mocked database calls']
+      }
+    ];
+
+    let current = 'all';
+
+    function render() {
+      const el = document.getElementById('units-list');
+      const vis = current === 'all' ? units : units.filter(u => u.phase.startsWith(current));
+
+      if (vis.length === 0) {
+        el.innerHTML = '<div style="text-align:center; padding: 3rem; color: var(--color-text-tertiary);">No units found for this phase.</div>';
+        return;
+      }
+
+      el.innerHTML = vis.map((u, i) => {
+        const p = phases[u.phase];
+        const last = i === vis.length - 1;
+        const delay = i * 0.05;
+
+        return `
+<div class="unit-row" id="row-${u.order}" style="animation-delay: ${delay}s">
+  <div class="spine">
+    <div class="spine-dot" style="background:${p.dot}; color:${p.dot}"></div>
+    ${!last ? `<div class="spine-line"></div>` : ''}
+  </div>
+  <div class="unit-card" onclick="toggle(${u.order})">
+    <div class="unit-header">
+      <span class="unit-num">U${String(u.order).padStart(2, '0')}</span>
+      <span class="unit-title">${u.title}</span>
+      <span class="phase-badge" style="background:${p.bg}; color:${p.text}; border-color:${p.border}">${u.phase}</span>
+      <span class="diff-badge">${u.difficulty}</span>
+      <i class="ti ti-chevron-down chevron" id="chev-${u.order}" aria-hidden="true"></i>
+    </div>
+    <div class="tags-row">${u.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    <div class="expand-content" id="exp-${u.order}" onclick="event.stopPropagation()">
+      <div class="expand-divider"></div>
+      <div class="expand-grid">
+        <div>
+          <div class="section-label"><i class="ti ti-book" aria-hidden="true"></i> Theory topics</div>
+          <ul class="item-list">${u.theory.map(t => `<li>${t}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <div class="section-label"><i class="ti ti-terminal-2" aria-hidden="true"></i> Lab exercises</div>
+          <ul class="item-list">${u.labs.map(l => `<li>${l}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <button class="study-btn" onclick="startLearning(${u.order})">
+        <i class="ti ti-player-play-filled" style="font-size: 1rem;"></i> Start Learning this Unit
+      </button>
+    </div>
+  </div>
+</div>`;
+      }).join('');
+    }
+
+    function toggle(id) {
+      const e = document.getElementById('exp-' + id);
+      const c = document.getElementById('chev-' + id);
+      const o = e.classList.contains('open');
+
+      document.querySelectorAll('.expand-content').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.chevron').forEach(el => el.classList.remove('open'));
+
+      if (!o) {
+        e.classList.add('open');
+        c.classList.add('open');
+      }
+    }
+
+    function setFilter(phase, btn) {
+      current = phase;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    }
+
+    function startLearning(order) {
+      const unit = units.find(u => u.order === order);
+      if (!unit) return;
+
+      const phaseMap = {
+        'Phase 1': '1',
+        'Phase 2 (Part I)': '2',
+        'Phase 2 (Part II)': '2.5',
+        'Phase 3': '3',
+        'Phase 4 (Part I)': '4',
+        'Phase 4 (Part II)': '4.5',
+        'Phase 5': '5',
+        'Phase 6 (Part I)': '6',
+        'Phase 6 (Part II)': '6.5'
+      };
+
+      const phaseNum = phaseMap[unit.phase];
+      if (phaseNum) {
+        const htmlPath = `phases/phase_${phaseNum}.html`;
+        const existingPhases = ['1', '2', '2.5', '3', '4', '4.5', '5', '6', '6.5'];
+
+        if (window.location.protocol === 'file:') {
+          if (existingPhases.includes(phaseNum)) {
+            window.location.href = htmlPath;
+          } else {
+            window.location.href = '../../404.html';
+          }
+          return;
+        }
+
+        fetch(htmlPath)
+          .then(res => {
+            if (res.ok) {
+              window.location.href = htmlPath;
+            } else {
+              window.location.href = '../../404.html';
+            }
+          })
+          .catch(() => {
+            if (existingPhases.includes(phaseNum)) {
+              window.location.href = htmlPath;
+            } else {
+              window.location.href = '../../404.html';
+            }
+          });
+      } else {
+        window.location.href = '../../404.html';
+      }
+    }
+
+    function animateCount(element, target, duration = 1200) {
+      if (!element) return;
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const easeProgress = progress * (2 - progress);
+        const currentValue = Math.floor(easeProgress * target);
+        element.textContent = currentValue;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          element.textContent = target;
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      updateIcon();
+    }
+
+    function updateIcon() {
+      const icon = document.getElementById('theme-icon');
+      if (!icon) return;
+      const isLight = document.documentElement.classList.contains('light-theme');
+      if (isLight) {
+        icon.className = 'ti ti-sun';
+      } else {
+        icon.className = 'ti ti-moon';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.stat-val').forEach(el => {
+        const target = parseInt(el.textContent, 10);
+        if (!isNaN(target)) {
+          el.textContent = '0';
+          animateCount(el, target);
+        }
+      });
+
+      updateIcon();
+      render();
+    });
+  </script>
+</body>
+
+</html>
