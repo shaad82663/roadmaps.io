@@ -442,7 +442,7 @@
       justify-content: center;
     }
 
-    .study-btn:hover {
+    .study-btn:hover:not(:disabled) {
       background: var(--color-text-primary);
       color: var(--color-bg-base);
       border-color: var(--color-text-primary);
@@ -621,7 +621,7 @@
       color: var(--color-text-primary);
     }
 
-    .light-theme .study-btn:hover {
+    .light-theme .study-btn:hover:not(:disabled) {
       background: #1a202c;
       color: #ffffff;
       border-color: #1a202c;
@@ -741,6 +741,18 @@
       'Phase 7': { bg: 'var(--p-dash-bg)', text: 'var(--p-dash-text)', dot: 'var(--p-dash-dot)', border: 'var(--p-dash-border)' },
       'Phase 8': { bg: 'var(--p-mem-bg)', text: 'var(--p-mem-text)', dot: 'var(--p-mem-dot)', border: 'var(--p-mem-border)' },
       'Phase 9': { bg: 'var(--p-hard-bg)', text: 'var(--p-hard-text)', dot: 'var(--p-hard-dot)', border: 'var(--p-hard-border)' }
+    };
+
+    const phaseMap = {
+      'Phase 1': '1',
+      'Phase 2 (Part I)': '2',
+      'Phase 2 (Part II)': '2.5',
+      'Phase 3': '3',
+      'Phase 4 (Part I)': '4',
+      'Phase 4 (Part II)': '4.5',
+      'Phase 5': '5',
+      'Phase 6 (Part I)': '6',
+      'Phase 6 (Part II)': '6.5'
     };
 
     const units = [
@@ -867,9 +879,15 @@
           <ul class="item-list">${u.labs.map(l => `<li>${l}</li>`).join('')}</ul>
         </div>
       </div>
+      ${phaseMap[u.phase] ? `
       <button class="study-btn" onclick="startLearning(${u.order})">
         <i class="ti ti-player-play-filled" style="font-size: 1rem;"></i> Start Learning this Unit
       </button>
+      ` : `
+      <button class="study-btn" style="opacity: 0.5; cursor: not-allowed;" disabled>
+        <i class="ti ti-lock" style="font-size: 1rem;"></i> Content Coming Soon
+      </button>
+      `}
     </div>
   </div>
 </div>`;
@@ -901,18 +919,6 @@
       const unit = units.find(u => u.order === order);
       if (!unit) return;
 
-      const phaseMap = {
-        'Phase 1': '1',
-        'Phase 2 (Part I)': '2',
-        'Phase 2 (Part II)': '2.5',
-        'Phase 3': '3',
-        'Phase 4 (Part I)': '4',
-        'Phase 4 (Part II)': '4.5',
-        'Phase 5': '5',
-        'Phase 6 (Part I)': '6',
-        'Phase 6 (Part II)': '6.5'
-      };
-
       const phaseNum = phaseMap[unit.phase];
       if (phaseNum) {
         const htmlPath = `phases/phase_${phaseNum}.html`;
@@ -922,7 +928,7 @@
           if (existingPhases.includes(phaseNum)) {
             window.location.href = htmlPath;
           } else {
-            window.location.href = '../../404.html';
+            alert('This phase content is not available yet.');
           }
           return;
         }
@@ -932,18 +938,18 @@
             if (res.ok) {
               window.location.href = htmlPath;
             } else {
-              window.location.href = '../../404.html';
+              alert('This phase content is not available yet.');
             }
           })
           .catch(() => {
             if (existingPhases.includes(phaseNum)) {
               window.location.href = htmlPath;
             } else {
-              window.location.href = '../../404.html';
+              alert('This phase content is not available yet.');
             }
           });
       } else {
-        window.location.href = '../../404.html';
+        alert('This phase content is not available yet.');
       }
     }
 
